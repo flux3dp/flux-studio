@@ -40,7 +40,7 @@ define([
             return {
                 config: {},
                 showBacklash: false,
-                postbackUrl: 'http://your-domain/flux-status-changed?st_id=%(st_id)',
+                postbackUrl: 'http://your-domain/flux-status-changed?st_id=%(st_id)i',
             };
         },
 
