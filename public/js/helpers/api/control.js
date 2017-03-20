@@ -71,7 +71,9 @@ define([
                 },
                 onFatal: (response) => {
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
-                        createWs();
+                        setTimeout(() => {
+                            createWs();
+                        }, 3 * 1000);
                     }
                     else if(response.error === 'UNKNOWN_DEVICE') {
                         ProgressActions.close();
