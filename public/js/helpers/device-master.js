@@ -98,8 +98,7 @@ define([
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source);
 
         Object.assign(_selectedDevice, latestDevice[0]);
-        let d = deferred || $.Deferred(),
-            uuid = device.uuid;
+        let d = deferred || $.Deferred();
 
         const goAuth = (uuid) => {
             ProgressActions.close();
@@ -108,7 +107,7 @@ define([
             const handleSubmit = (password) => {
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
 
-                auth(uuid, password).done((data) => {
+                auth(device.uuid, password).done((data) => {
                     device.plaintext_password = password;
                     selectDevice(device, d);
                 })
@@ -119,7 +118,7 @@ define([
                         lang.select_printer.auth_failure
                     );
 
-                    goAuth(uuid);
+                    goAuth(device.uuid);
 
                     AlertActions.showPopupError('device-auth-fail', message);
                 });
@@ -137,7 +136,7 @@ define([
         };
 
         const createDeviceActions = (availableUsbChannel = -1) => {
-            return DeviceController(uuid, {
+            return DeviceController(device.uuid, {
                 availableUsbChannel,
                 onConnect: function(response, options) {
                     d.notify(response);
@@ -222,14 +221,14 @@ define([
 
         ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
 
-        if(_existConnection(uuid, device.source)) {
+        if(_existConnection(device.uuid, device.source)) {
             ProgressActions.close();
-            _device = _switchDevice(uuid);
+            _device = _switchDevice(device.uuid);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
             _device = {};
-            _device.uuid = uuid;
+            _device.uuid = device.uuid;
             _device.source = device.source;
             _device.name = device.name;
             delete _actionMap[device.uuid];
@@ -243,6 +242,11 @@ define([
             }
 
             SocketMaster = new Sm();
+
+            // if usb not detected but device us using usb
+            if(this.availableUsbChannel === -1 && device.source === 'h2h') {
+                device = getDeviceBySerialFromAvailableList(device.serial, false);
+            }
 
             // if availableUsbChannel has been defined
             if(
@@ -1272,6 +1276,16 @@ define([
         else {
             callback.onTimeout();
         }
+    }
+
+    function getDeviceBySerialFromAvailableList(serial, isUsb = false) {
+        let matchedDevice = _availableDevices.filter(device => {
+            let a = device.serial === serial;
+            if (isUsb) { a = a && device.source === 'h2h'; };
+            return a;
+        });
+
+        return matchedDevice[0];
     }
 
     function usbDefaultDeviceCheck(device) {
