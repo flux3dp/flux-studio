@@ -77,7 +77,6 @@ define([
                 },
 
                 render: function() {
-                    console.log('Load Holder', Holder);
                     // return <div />;
                     
                     return <Holder

@@ -850,12 +850,17 @@ define([
         }
     }
 
-    function calibrate() {
-        let d = $.Deferred();
-        let debug_data = {};
+    function calibrate(opts) {
+        let d = $.Deferred(),
+            debug_data = {};
+        
+        opts = opts || {};
+        opts.forceExtruder = opts.forceExtruder === null ? true : opts.forceExtruder;
+        opts.doubleZProbe = opts.doubleZProbe === null ? false : opts.doubleZProbe;
+
 
         const processError = (resp = {}) => {
-            if (typeof resp == 'string') resp = { error: [resp] };
+            if (typeof resp === 'string') { resp = { error: [resp] }; }
             if (resp.error && resp.error === 'EDGE_CASE') { return; }
             DeviceErrorHandler.processDeviceMasterResponse(resp);
             AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
@@ -871,16 +876,15 @@ define([
                 else {
                     _d.reject(response);
                 }
-            }).then((headInfo) => {
-                if(headInfo.module === null) {
-                    return $.Deferred().reject({module:null, error: ["HEAD_ERROR", "HEAD_OFFLINE"]});
+            }).then((headResp) => {
+                if (opts.forceExtruder) {
+                    if(headResp.module === null) {
+                        return $.Deferred().reject({module:null, error: ['HEAD_ERROR', 'HEAD_OFFLINE']});
+                    } else if(headResp.module !== 'EXTRUDER') {
+                        return $.Deferred().reject({module:'LASER', error: ['HEAD_ERROR', 'TYPE_ERROR']});
+                    }
                 }
-                else if(headInfo.module !== 'EXTRUDER') {
-                    return $.Deferred().reject({module:'LASER', error: ["HEAD_ERROR", "TYPE_ERROR"]});
-                }
-                else {
-                    return SocketMaster.addTask('maintainHome');
-                }
+                return SocketMaster.addTask('maintainHome');
             }).then((response) => {
                 response.status === 'ok' ? _d.resolve() : _d.reject();
             }).fail((error) => {
@@ -891,7 +895,7 @@ define([
 
         const step2 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask('calibrate@maintain').then((response) => {
+            SocketMaster.addTask(opts.doubleZProbe ? 'calibrateDoubleZProbe@maintain' : 'calibrate@maintain').then((response) => {
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {

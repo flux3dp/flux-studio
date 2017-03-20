@@ -471,7 +471,6 @@ define([
                                         AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
                                     }, 100);
                                 }).fail((resp) => {
-                                    console.log('THe error', resp);
                                     if (resp.error[0] === 'EDGE_CASE') { return; }
                                     if (resp.module === 'LASER') {
                                         AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);

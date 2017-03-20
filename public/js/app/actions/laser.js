@@ -19,9 +19,10 @@ define([
     'app/constants/device-constants',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
+    'helpers/device-error-handler',
     'freetrans',
     'helpers/jquery.box',
-    'plugins/file-saver/file-saver.min'
+    'plugins/file-saver/file-saver.min',
 ], function(
     $,
     bitmapLaserParser,
@@ -42,7 +43,8 @@ define([
     DeviceMaster,
     DeviceConstants,
     ProgressActions,
-    ProgressConstants
+    ProgressConstants,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -138,7 +140,7 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if ('svg' === self.state.fileFormat && true === $img.hasClass('svg')) {
+                    if ('svg' === self.state.fileFormat && $img.hasClass('svg')) {
                         svgWebSocket.History.deleteAt($img.data('name'));
                     }
 
@@ -401,7 +403,7 @@ define([
             },
             $target_image = null, // changing when image clicked
             resetPosTimer = null,
-            handleLaser = function(settings, callback, progressType, fileMode) {
+            getToolpath = function(settings, callback, progressType, fileMode) {
                 fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
 
@@ -699,16 +701,44 @@ define([
         });
 
         return {
-            handleLaser: function(settings) {
-                handleLaser(
-                    settings,
-                    sendToMachine,
-                    ProgressConstants.STEPPING
-                );
+            runCommand: function(settings, command) {
+                if (command === 'start') {
+                    getToolpath(
+                        settings,
+                        sendToMachine,
+                        ProgressConstants.STEPPING
+                    );
+                } else if (command === 'calibrate') {
+                    DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
+                        ProgressActions.open(
+                            ProgressConstants.WAITING,
+                            lang.device.calibrating
+                        );
+                        DeviceMaster.calibrate({forceExtruder: false, doubleZProbe: true}).done((debug_message) => {
+                            setTimeout(() => {
+                                AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
+                            }, 100);
+                        }).fail((resp) => {
+                            if (resp.error[0] === 'EDGE_CASE') { return; }
+                            if (resp.module === 'LASER') {
+                                AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
+                            }
+                            else {
+                                DeviceErrorHandler.processDeviceMasterResponse(resp);
+                                AlertActions.showPopupError('calibrate-fail', DeviceErrorHandler.translate(resp.error));
+                            }
+                        }).always(() => {
+                            ProgressActions.close();
+                        });
+                    }).fail(() => {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                    });
+                }
             },
             sendToMachine: sendToMachine,
             exportTaskCode: function(settings, fileMode) {
-                handleLaser(
+                getToolpath(
                     settings,
                     function(blob, fileMode) {
                         var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
@@ -766,13 +796,13 @@ define([
             },
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name),
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase(),
                     currentFileFormat = self.state.fileFormat;
 
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
                 if ('string' !== typeof currentFileFormat) {
-                    currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
+                    currentFileFormat = ('svg' === extension.toLowerCase() ? 'svg' : 'bitmap');
                     // in draw mode. only svg files are acceptable.
                     currentFileFormat = ((self.props.page === 'draw' || self.props.page === 'cut') ? 'svg' : currentFileFormat);
                     self.setState({
@@ -792,7 +822,7 @@ define([
             onFileReadEnd: function(e, files) {
                 var parserSocket;
                 var firstFile = e.target ? e.target.files.item(0) : files[0],
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name);
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase();
 
                 // go svg process
                 if (extension === 'svg') {

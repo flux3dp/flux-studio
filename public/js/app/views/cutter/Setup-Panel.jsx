@@ -111,8 +111,6 @@ define([
         },
 
         _renderOvercut: function() {
-            var max = 50;
-
             return {
                 label: (
                     <div title={lang.cut.overcutTip}>
@@ -129,7 +127,7 @@ define([
                             defaultValue={this.state.defaults.overcut}
                             getValue={this._updateDefaults}
                             min={0}
-                            max={max}
+                            max={10}
                         />
                     </div>
                 )
@@ -162,7 +160,6 @@ define([
         },
 
          _renderBladeRadius: function() {
-            var min = Math.max(5, this.state.defaults.bladeRadius);
 
             return {
                 label: (
@@ -179,8 +176,8 @@ define([
                             defaultUnit="mm"
                             defaultValue={this.state.defaults.bladeRadius}
                             getValue={this._updateDefaults}
-                            min={min}
-                            max={150}
+                            min={0}
+                            max={3}
                         />
                     </div>
                 )

@@ -65,7 +65,8 @@ define([
                         sizeLock: false,
                         angle: 0,
                         threshold: 255,
-                        images: []
+                        images: [],
+                        machineCommand: 'start'
                     };
                 },
 
@@ -130,7 +131,15 @@ define([
                 _handleStartClick: function() {
                     this.setState({
                         openPrinterSelectorWindow: true,
+                        machineCommand: 'start',
                         settings: this._fetchFormalSettings()
+                    });
+                },
+
+                _handleCalibrateClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        machineCommand: 'calibrate'
                     });
                 },
 
@@ -232,7 +241,7 @@ define([
                                 openPrinterSelectorWindow: false
                             });
 
-                            self.state.laserEvents.handleLaser(self.state.settings);
+                            self.state.laserEvents.runCommand(self.state.settings, self.state.machineCommand);
                         },
                         onClose = function(e) {
                             self.setState({
@@ -328,7 +337,7 @@ define([
                                 'btn-go': true
                             }),
                             dataAttrs: {
-                                'ga-event': 'laser-outline'
+                                'ga-event': 'holder-outline'
                             },
                             onClick: this._handleStartClick
                         }].concat(buttons);
@@ -344,9 +353,9 @@ define([
                                 'btn-go': true
                             }),
                             dataAttrs: {
-                                'ga-event': 'laser-calibrate'
+                                'ga-event': 'holder-calibrate'
                             },
-                            onClick: this._handleStartClick
+                            onClick: this._handleCalibrateClick
                         }].concat(buttons);
                     }
 

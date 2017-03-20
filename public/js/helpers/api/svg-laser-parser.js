@@ -143,7 +143,7 @@ define([
                             });
                             $deferred.resolve({files: files, hasBadFiles: hasBadFiles });
                         }
-                        else if ('svg' === file.extension) {
+                        else if (file.extension && 'svg' === file.extension.toLowerCase()) {
                             sendFile(file);
                             currIndex += 1;
                         }

@@ -439,10 +439,11 @@ define([
                 return d.promise();
             },
 
-            calibrate: (clean) => {
+            calibrate: (clean, doubleZProbe) => {
                 let d = $.Deferred(),
                     errorCount = 0,
-                    temp = { debug: [] };
+                    temp = { debug: [] },
+                    doubleZProbeDone = false;
 
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
@@ -450,6 +451,12 @@ define([
                             ws.send('maintain zprobe');
                         }
                         else {
+                            if (doubleZProbe && !doubleZProbeDone) {
+                                doubleZProbeDone = true;
+                                ws.send('maintain zprobe');
+                                return;
+                            }
+
                             response.debug = temp.debug;
                             d.resolve(response);
                         }
@@ -693,7 +700,11 @@ define([
 
         ctrl.maintainClean = function(){
             return ctrl.calibrate(true);
-        }
+        };
+
+        ctrl.calibrateDoubleZProbe = function(){
+            return ctrl.calibrate(true, true);
+        };
 
         return ctrl;
     };
