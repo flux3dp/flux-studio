@@ -901,7 +901,7 @@ define([
     function calibrate(opts) {
         let d = $.Deferred(),
             debug_data = {};
-        
+
         opts = opts || {};
         opts.forceExtruder = opts.forceExtruder === null ? true : opts.forceExtruder;
         opts.doubleZProbe = opts.doubleZProbe === null ? false : opts.doubleZProbe;
@@ -1322,6 +1322,14 @@ define([
         }
     }
 
+    function existDevice(serial) {
+        let found = _availableDevices.filter(device => {
+            return device.serial === serial;
+        });
+
+        return found.length > 0;
+    }
+
     // Core
 
     function DeviceSingleton() {
@@ -1393,6 +1401,7 @@ define([
             this.getAvailableDevices            = getAvailableDevices;
             this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
             this.stopChangingFilament           = stopChangingFilament;
+            this.existDevice                    = existDevice;
 
             Discover(
                 'device-master',

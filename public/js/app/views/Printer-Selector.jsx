@@ -166,6 +166,7 @@ define([
 
             //check for default printer availablity
             let device = initializeMachine.defaultPrinter.get();
+                existDevice = DeviceMaster.existDevice(device.serial);
 
             const noDefaultPrinter = () => {
                 self.setState({
@@ -174,7 +175,7 @@ define([
                 }, next);
             };
 
-            if(Object.keys(device).length === 0) {
+            if(!existDevice) {
                 noDefaultPrinter();
             }
             else {
