@@ -2721,6 +2721,12 @@ hr {
         bottom: 0;
         right: 0; }
 
+.invert:before {
+    background: #E0E0E0 !important; }
+
+.invert:after {
+    background: #FFFFFF !important; }
+
 .spinner-roller-reverse {
     background: linear-gradient(to right, #E0E0E0 10%, rgba(255, 255, 255, 0) 42%); }
     .spinner-roller-reverse::before {
@@ -3263,8 +3269,7 @@ hr {
             margin: 0 0 20px 0;
             text-align: left;
             line-height: 1.4em;
-            word-wrap: break-word;
-            word-break: break-all;
+            word-break: break-word;
             white-space: pre-wrap; }
             .modal-window .modal-alert .message a {
                 font-size: 1em; }

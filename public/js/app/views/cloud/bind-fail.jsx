@@ -1,18 +1,23 @@
 define([
     'jquery',
     'react',
-    'helpers/device-master'
+    'helpers/device-master',
+    'helpers/device-error-handler'
 ], function(
     $,
     React,
-    DeviceMaster
+    DeviceMaster,
+    DeviceErrorHandler
 ) {
     'use strict';
 
     return React.createClass({
 
         _handleBackToList: function() {
-            location.hash = '#studio/cloud/bind-machine';
+            this.props.clear();
+            setTimeout(() => {
+                location.hash = '#studio/cloud/bind-machine';
+            }, 10);
         },
 
         _handleCancel: function() {
@@ -20,13 +25,20 @@ define([
         },
 
         render: function() {
-            let lang = this.props.lang.settings.flux_cloud;
+            let lang = this.props.lang.settings.flux_cloud,
+                { error } = this.props,
+                message;
+
+            message = Boolean(error) ?
+                DeviceErrorHandler.translate(error) :
+                lang.binding_error_description;
+
             return(
                 <div className="cloud bind-success">
                     <div className="container">
                         <div className="title">
                             <h3>{lang.binding_fail}</h3>
-                            <label>{lang.binding_fail_description}</label>
+                            <label>{message}</label>
                         </div>
                         <div className="icon">
                             <img src="img/error-icon.svg" />

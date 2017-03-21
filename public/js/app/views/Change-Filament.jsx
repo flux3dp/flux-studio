@@ -124,8 +124,8 @@ define([
                 else {
                     DeviceMaster.stopChangingFilament().then(() => {
                         DeviceMaster.killSelf();
-                        this.setState(this.getInitialState());
                     });
+                    this.setState(this.getInitialState());
                 }
             },
 

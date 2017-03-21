@@ -14,6 +14,7 @@ define([], function(){
         PRINT                           : 'PRINT',
         LASER                           : 'LASER',
         DRAW                            : 'DRAW',
+        CUT                             : 'CUT',
         DEVICE_LIST                     : 'DEVICE_LIST',
 
         // Monitor mode

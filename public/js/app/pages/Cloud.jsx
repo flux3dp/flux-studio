@@ -48,26 +48,39 @@ define([
                 };
             },
 
-            _renderContent: function() {
+            componentWillUpdate: function(nextProps, nextState) {
+                console.log('test next props', nextProps, nextState, this.props, this.state);
+            },
+
+            logError: function(errorArray) {
+                this.setState({
+                    error: errorArray,
+                    view: 'bind-fail'
+                });
+            },
+
+            clear: function() {
+                this.setState({ view: '' });
+            },
+
+            renderContent: function() {
                 var content = {},
-                    view = args.child,
-                    self = this;
+                    view = this.state.view || args.child;
 
-                content['sign-in'] = () => <SignIn lang={this.state.lang} />
-                content['sign-up'] = () => <SignUp lang={this.state.lang} />
-                content['sign-up-success'] = () => <SignUpSuccess lang={this.state.lang} />
-                content['sign-up-fail'] = () => <SignUpFail lang={this.state.lang} />
-                content['forgot-password'] = () => <ForgotPassword lang={this.state.lang} />
-                content['email-sent'] = () => <EmailSent lang={this.state.lang} />
-                content['bind-machine'] = () => <BindMachine lang={this.state.lang} />
-                content['bind-success'] = () => <BindSuccess lang={this.state.lang} />
-                content['bind-fail'] = () => <BindFail lang={this.state.lang} />
-                content['bind-error'] = () => <BindError lang={this.state.lang} />
-                content['change-password'] = () => <ChangePassword lang={this.state.lang} />
-                content['sign-out'] = () => <SignOut />
-                content['terms'] = () => <Terms lang={this.state.lang} />
-                content['privacy'] = () => <Privacy lang={this.state.lang} />
-
+                content['sign-in']          = () => <SignIn lang={this.state.lang} />;
+                content['sign-up']          = () => <SignUp lang={this.state.lang} />;
+                content['sign-up-success']  = () => <SignUpSuccess lang={this.state.lang} />;
+                content['sign-up-fail']     = () => <SignUpFail lang={this.state.lang} />;
+                content['forgot-password']  = () => <ForgotPassword lang={this.state.lang} />;
+                content['email-sent']       = () => <EmailSent lang={this.state.lang} />;
+                content['bind-machine']     = () => <BindMachine lang={this.state.lang} onError={this.logError} />;
+                content['bind-success']     = () => <BindSuccess lang={this.state.lang} />;
+                content['bind-fail']        = () => <BindFail lang={this.state.lang} error={this.state.error} clear={this.clear} />;
+                content['bind-error']       = () => <BindError lang={this.state.lang} />;
+                content['change-password']  = () => <ChangePassword lang={this.state.lang} />;
+                content['sign-out']         = () => <SignOut />;
+                content['terms']            = () => <Terms lang={this.state.lang} />;
+                content['privacy']          = () => <Privacy lang={this.state.lang} />;
 
                 if(typeof content[view] === 'undefined') { view = 'sign-in'; }
                 return content[view]();
@@ -77,7 +90,7 @@ define([
                 return (
                     <div className="studio-container settings-cloud">
                         <div className="cloud">
-                            {this._renderContent()}
+                            {this.renderContent()}
                         </div>
                     </div>
                 );

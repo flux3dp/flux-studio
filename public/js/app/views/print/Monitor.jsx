@@ -189,6 +189,12 @@ define([
                 if(!result.done) {
                     result.value.then(() => {
                         go(s.next());
+                    })
+                    .fail(error => {
+                        console.log('monitor', error);
+                        if(error.status === 'fatal') {
+                            DeviceMaster.reconnect();
+                        }
                     });
                 }
             };
@@ -512,6 +518,9 @@ define([
                     }).progress((progress) => {
                         let p = parseInt(progress.step / progress.total * 100);
                         store.dispatch(MonitorActionCreator.setUploadProgress(p));
+                    })
+                    .fail((error) => {
+
                     });
                 }
                 else {
@@ -653,6 +662,19 @@ define([
                         showingPopup = false;
                         AlertActions.closePopup();
                     }
+                }
+
+                if(error[0] === 'TIMEOUT') {
+                    if(this.reconnected) {
+                        AlertActions.showPopupError('', lang.message.connectionTimeout);
+                        this.props.onClose();
+                    }
+                    else {
+                        this.reconnected = true;
+                        DeviceMaster.reconnect();
+                    }
+
+                    return;
                 }
 
                 // only display error during these state
