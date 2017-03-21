@@ -273,7 +273,8 @@ define(function() {
             usb: 'USB',
             device: 'Machine',
             setting: 'SETTING',
-            draw: 'DRAW'
+            draw: 'DRAW',
+            cut: 'CUT',
         },
         settings: {
             on: 'On',
@@ -636,6 +637,22 @@ define(function() {
                 mm: 'mm'
             }
         },
+        cut: {
+            calibrate: 'Auto\nLevel',
+            zOffset: 'Cutting Height',
+            overcut: 'Overcut',
+            speed: 'Speed',
+            bladeRadius: 'Blade Radius',
+            backlash: 'Backlash Compensation',
+            zOffsetTip: 'Adjust cutting height for thicker vinyl and to prevent cutting too hard or too light',
+            overcutTip: 'Overcut loops for peeling off easier',
+            speedTip: 'The cutting speed',
+            backlashTip: 'Adjust the value if straight lines is not straight enough',
+            units: {
+                mms: 'mm/s',
+                mm: 'mm'
+            }
+        },
         laser: {
             import: 'IMPORT',
             save: 'Save',
@@ -646,6 +663,7 @@ define(function() {
             get_fcode: 'Save<br/>Task',
             name: 'Name',
             go: 'GO',
+            showOutline: 'View\nFrame',
             do_calibrate: 'It seems you\'re using engraving for the first time, you can use the kraft card in the package to find the best focal length. Do you want to load the calibration image? You can also load it later in "Advanced".',
             process_caption: 'Generating',
             laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',

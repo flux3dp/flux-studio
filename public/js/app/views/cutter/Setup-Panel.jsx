@@ -26,14 +26,15 @@ define([
     ButtonGroup,
     Alert,
     DialogMenu,
-    config,
+    ConfigHelper,
     i18n,
     round,
     ClassNames
 ) {
     'use strict';
 
-    let lang = i18n.lang;
+    let Config = ConfigHelper(),
+        lang = i18n.lang;
 
     return React.createClass({
 
@@ -59,15 +60,16 @@ define([
             var self = this,
                 refs = self.refs,
                 opts = {
-                    liftHeight: refs.liftHeight.value(),
-                    drawHeight: refs.drawHeight.value(),
-                    speed: refs.speed.value()
+                    zOffset: refs.zOffset.value(),
+                    overcut: refs.overcut.value(),
+                    speed: refs.speed.value(),
+                    bladeRadius: refs.bladeRadius.value()
                 },
                 state = {
                     defaults: opts
                 };
 
-            config().write('draw-defaults', opts);
+            Config.write('cut-defaults', opts);
 
             self.setState(state);
         },
@@ -82,23 +84,23 @@ define([
         },
 
         // Lifecycle
-        _renderLiftHeight: function() {
-            var min = Math.max(5, this.state.defaults.drawHeight);
+        _renderZOffset: function() {
+            var min = -1;
 
             return {
                 label: (
-                    <div title={lang.draw.pen_up_title}>
-                        <span className="caption">{lang.draw.pen_up}</span>
-                        <span>{this.state.defaults.liftHeight}</span>
+                    <div title={lang.cut.zOffsetTip}>
+                        <span className="caption">{lang.cut.zOffset}</span>
+                        <span>{this.state.defaults.zOffset}</span>
                         <span>{lang.draw.units.mm}</span>
                     </div>
                 ),
                 content: (
                     <div className="object-height-input">
                         <UnitInput
-                            ref="liftHeight"
+                            ref="zOffset"
                             defaultUnit="mm"
-                            defaultValue={this.state.defaults.liftHeight}
+                            defaultValue={this.state.defaults.zOffset}
                             getValue={this._updateDefaults}
                             min={min}
                             max={150}
@@ -108,26 +110,24 @@ define([
             };
         },
 
-        _renderDrawHeight: function() {
-            var max = Math.min(150, this.state.defaults.liftHeight);
-
+        _renderOvercut: function() {
             return {
                 label: (
-                    <div title={lang.draw.pen_down_title}>
-                        <span className="caption">{lang.draw.pen_down}</span>
-                        <span>{this.state.defaults.drawHeight}</span>
+                    <div title={lang.cut.overcutTip}>
+                        <span className="caption">{lang.cut.overcut}</span>
+                        <span>{this.state.defaults.overcut}</span>
                         <span>{lang.draw.units.mm}</span>
                     </div>
                 ),
                 content: (
                     <div className="object-height-input">
                         <UnitInput
-                            ref="drawHeight"
+                            ref="overcut"
                             defaultUnit="mm"
-                            defaultValue={this.state.defaults.drawHeight}
+                            defaultValue={this.state.defaults.overcut}
                             getValue={this._updateDefaults}
-                            min={5}
-                            max={max}
+                            min={0}
+                            max={10}
                         />
                     </div>
                 )
@@ -137,8 +137,8 @@ define([
         _renderSpeed: function() {
             return {
                 label: (
-                    <div title={lang.draw.speed_title}>
-                        <span className="caption">{lang.draw.speed}</span>
+                    <div title={lang.cut.speedTip}>
+                        <span className="caption">{lang.cut.speed}</span>
                         <span>{this.state.defaults.speed}</span>
                         <span>{lang.draw.units.mms}</span>
                     </div>
@@ -159,14 +159,37 @@ define([
             };
         },
 
+         _renderBladeRadius: function() {
+
+            return {
+                label: (
+                    <div title={lang.cut.bladeRadiusTip}>
+                        <span className="caption">{lang.cut.bladeRadius}</span>
+                        <span>{this.state.defaults.bladeRadius}</span>
+                        <span>{lang.draw.units.mm}</span>
+                    </div>
+                ),
+                content: (
+                    <div className="object-height-input">
+                        <UnitInput
+                            ref="bladeRadius"
+                            defaultUnit="mm"
+                            defaultValue={this.state.defaults.bladeRadius}
+                            getValue={this._updateDefaults}
+                            min={0}
+                            max={3}
+                        />
+                    </div>
+                )
+            };
+        },
+
         render: function() {
-            var liftHeight = this._renderLiftHeight(),
-                drawHeight = this._renderDrawHeight(),
-                speed = this._renderSpeed(),
-                items = [
-                    liftHeight,
-                    drawHeight,
-                    speed
+            let items = [
+                    this._renderZOffset(),
+                    this._renderOvercut(),
+                    this._renderSpeed(),
+                    this._renderBladeRadius()
                 ];
 
             return (

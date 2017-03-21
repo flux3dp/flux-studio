@@ -1,6 +1,14 @@
 {
-    "version": "0.2.0",
+    "version": "0.1.0",
     "configurations": [
+        {
+            "name": "Attach Chrome",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9222,
+            "url": "http://localhost:8111/#studio/print",
+            "webRoot": "${workspaceRoot}/public"
+        },
         {
             "name": "Attach",
             "type": "nwjs",

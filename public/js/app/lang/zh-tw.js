@@ -268,12 +268,13 @@ define(function() {
         },
         menu: {
             print: '列印',
-            laser: '雷雕',
+            laser: '鐳刻',
             scan: '掃描',
             usb: 'USB',
             device: '機器',
             setting: '設定',
-            draw: '繪製'
+            draw: '繪製',
+            cut: '紙藝',
         },
         settings: {
             on: '開',
@@ -650,6 +651,22 @@ define(function() {
                 mm: 'mm'
             }
         },
+        cut: {
+            calibrate: '校正',
+            zOffset: '切割高度',
+            overcut: '閉環過切',
+            speed: '速度',
+            bladeRadius: '刀尖半徑',
+            backlash: 'Backlash 補償',
+            zOffsetTip: '刀頭模組底部距離切割平面的距離',
+            overcutTip: '當切割路徑起始點與結束點座標相同時，切到結束點後再走一些從起始點開始的路徑',
+            speedTip: '切割速度',
+            backlashTip: '如果直線不夠直，調整參數',
+            units: {
+                mms: 'mm/s',
+                mm: 'mm'
+            }
+        },
         laser: {
             import: '匯入',
             save: '儲存⋯',
@@ -660,6 +677,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
+            showOutline: '顯示\n輪廓',
             do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，可以透過包裝裡附的牛皮卡找到最佳的焦距，是否要載入焦距校正圖片？（稍後亦可以於進階面板中載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',

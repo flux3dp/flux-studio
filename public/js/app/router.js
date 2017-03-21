@@ -35,7 +35,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings|draw|cloud)\/?(.*)?/,
+                        /^studio\/?(print|laser|scan|usb|settings|draw|cut|cloud)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -121,8 +121,9 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                 map = {
                     'print': this.print,
                     'settings': this.settings,
-                    'laser': this.laser.bind(null, page),
-                    'draw': this.laser.bind(null, page),
+                    'laser': this.holder.bind(null, page),
+                    'draw': this.holder.bind(null, page),
+                    'cut': this.holder.bind(null, page),
                     'scan': this.scan,
                     'usb': this.usb,
                     'device': this.device,
@@ -179,8 +180,9 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
             });
         },
 
-        laser: function(page, step) {
-            requirejs(['jsx!pages/Laser'], function(view) {
+        holder: function(page, step) {
+            let pageCamel = page.charAt(0).toUpperCase() + page.substring(1).toLowerCase();
+            requirejs(['jsx!pages/' + pageCamel ], function(view) {
                 var args = {
                     step: step,
                     props: {
