@@ -57,7 +57,7 @@ define([
             const { store } = this.context;
 
             this.unsubscribe = store.subscribe(() => {
-                // this.forceUpdate();
+                this.forceUpdate();
             });
         },
 
