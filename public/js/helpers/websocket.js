@@ -5,7 +5,7 @@ define([
     'app/stores/alert-store',
     'helpers/output-error',
     'helpers/logger',
-    'helpers/blob-segments'
+    'helpers/blob-segments',
 ], function(
     isJson,
     i18n,
@@ -23,7 +23,7 @@ define([
             console.log(i, conn.url);
         });
     };
-
+    
     var hadConnected = false,
         showProgramErrorPopup = true,
         WsLogger = new Logger('websocket'),
@@ -42,11 +42,13 @@ define([
     return function(options) {
         var lang = i18n.get(),
             { dev } = window.FLUX,
+            customHost = localStorage.getItem('host'),
+            customPort = localStorage.getItem('port'),
             defaultCallback = function(result) {},
             defaultOptions = {
-                hostname: dev ? '127.0.0.1' : 'localhost',
+                hostname: customHost ? customHost : (dev ? '127.0.0.1' : 'localhost'),
                 method: '',
-                port: dev ? '8000' : window.FLUX.ghostPort,
+                port: customPort ? customPort : dev ? '8000' : window.FLUX.ghostPort,
                 autoReconnect: true,
                 ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
