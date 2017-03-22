@@ -101,7 +101,7 @@ define([
                     });
 
                     console.log('mounted');
-                    if(!Config.read('laser-calibrated') && Config.read('configured-model') === 'fd1p' && this.props.page === 'laser') {
+                    if(!Config.read('laser-calibrated') && this.props.page === 'laser') {
                         // NOTE: only yes no support this kind of callback
                         AlertActions.showPopupYesNo('do-calibrate', lang.laser.do_calibrate, '', null, {
                             yes: function() {
@@ -343,7 +343,7 @@ define([
                         }].concat(buttons);
                     }
 
-                    if (this.props.page === 'cut') {
+                    if (this.props.page === 'cut' || this.props.page === 'mill') {
                         buttons = [{
                             label: lang.cut.calibrate,
                             className: cx({

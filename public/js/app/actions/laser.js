@@ -110,7 +110,6 @@ define([
                         return false === file.isBroken;
                     }),
                     currentFileFormat = self.state.fileFormat,
-                    operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
                     hasImage = (0 < self.state.images.length + goodFiles.length);
 
                 self.state.images = self.state.images.concat(goodFiles);
@@ -122,7 +121,7 @@ define([
                 self.setState({
                     images: self.state.images,
                     hasImage: hasImage,
-                    mode: operationMode,
+                    mode: self.props.page,
                     fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
                 });
 
@@ -804,7 +803,7 @@ define([
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension.toLowerCase() ? 'svg' : 'bitmap');
                     // in draw mode. only svg files are acceptable.
-                    currentFileFormat = ((self.props.page === 'draw' || self.props.page === 'cut') ? 'svg' : currentFileFormat);
+                    currentFileFormat = self.props.page === 'engrave' ? currentFileFormat : 'svg';
                     self.setState({
                         fileFormat: currentFileFormat
                     });
