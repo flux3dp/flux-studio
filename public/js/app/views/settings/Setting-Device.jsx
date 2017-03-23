@@ -26,6 +26,8 @@ define([
     FirmwareVersionChecker
 ) {
     'use strict';
+    
+    let lang = i18n.lang;
 
     return React.createClass({
         getDefaultProps: function() {
@@ -40,7 +42,7 @@ define([
             return {
                 config: {},
                 showBacklash: false,
-                postbackUrl: 'http://your-domain/flux-status-changed?st_id=%(st_id)',
+                postbackUrl: 'http://your-domain/flux-status-changed?st_id=%(st_id)i',
             };
         },
 
@@ -116,18 +118,30 @@ define([
             config[id] = value;
             this.setState({ config });
         },
-
-        _updateBacklash: function(e) {
-            let v = parseFloat(e.target.value);
-
-            // max backlash is 0.2
-            if(v > 0.2) { v = 0.2; }
-
-            this.setState({ backlash: v });
-
-            if(e.type === 'blur') {
+        
+         _updateBacklash: function(e) {
+            if (e.type === 'blur') {
+                let v = parseFloat(e.target.value);
+                if(v > 0.2) { v = 0.2; }
+                this.setState({ backlash: v });
                 v = v * 80; // 80 is the offset value for backend
                 DeviceMaster.setDeviceSetting('backlash', `"A:${v} B:${v} C:${v}"`);
+            } else {
+                this.setState({ backlash: e.target.value });
+            }
+        },
+
+        _updateMachineRadius: function(e) {
+            if(e.type === 'blur') {
+                let v = parseFloat(e.target.value);
+
+                if(v > 99.7) { v = 99.7; }
+                if(v < 93.7) { v = 93.7; }
+
+                this.setState({ machine_radius: v });
+                DeviceMaster.setDeviceSetting('leveling', `R:${v}`);
+            } else {
+                this.setState({ machine_radius: e.target.value });
             }
         },
 
@@ -140,8 +154,7 @@ define([
         },
 
         _getDeviceList: function() {
-            let nameList,
-                { lang } = this.props;
+            let nameList;
 
             nameList = this.devices.map(d => {
                 return d.source === 'h2h' ? `${d.name} (USB)` : d.name;
@@ -207,7 +220,12 @@ define([
                 return FirmwareVersionChecker.check(device, 'BACKLASH');
             }).then((allowBacklash) => {
                 this.setState({ showBacklash: allowBacklash });
-                return DeviceMaster.getDeviceSettings(allowBacklash, this.allowUpgradeKit);
+                this.allowBacklash = allowBacklash;
+                return FirmwareVersionChecker.check(device, 'M666R_MMTEST');
+            }).then((allowM666R_MMTest) => {
+                this.setState({ allowM666R_MMTest });
+                this.allowM666R_MMTest = allowM666R_MMTest;
+                return DeviceMaster.getDeviceSettings(this.allowBacklash, this.allowUpgradeKit, this.allowM666R_MMTest);
             }).then((config) => {
                 config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
                 this.setState({ config });
@@ -217,12 +235,21 @@ define([
                     _value = _value.split(' ')[0].split(':')[1];
                     this.setState({ backlash: parseFloat(_value) / 80 });
                 }
+
+                if(config['leveling']) {
+                    let _value = this.state.config['leveling'].split(' '),
+                        leveling = {};
+                    _value.map((v) => { return v.split(':'); }).map((v) => {
+                        leveling[v[0]] = v[1];
+                    });
+                    this.setState({ machine_radius: parseFloat(leveling['R']) });
+                    console.log('leveling', leveling);
+                }
             });
         },
 
         _renderCorrectionSetting: function() {
-            let { lang } = this.props,
-                options,
+            let options,
                 content;
 
             options = [
@@ -248,8 +275,7 @@ define([
         },
 
         _renderDetectFilamentSetting: function() {
-            let { lang } = this.props,
-                options,
+            let options,
                 content;
 
             options = [
@@ -274,8 +300,7 @@ define([
         },
 
         _renderFilterHeadErrorSetting: function() {
-            let { lang } = this.props,
-                options,
+            let options,
                 content;
 
             options = [
@@ -304,8 +329,7 @@ define([
         },
 
         _renderAutoResumeSetting: function() {
-            let { lang } = this.props,
-                options,
+            let options,
                 content;
 
             options = [
@@ -329,8 +353,7 @@ define([
         },
 
         _renderBroadcast: function() {
-            let { lang } = this.props,
-                options,
+            let options,
                 content;
 
             options = [
@@ -355,8 +378,7 @@ define([
         },
 
         _renderEnableCloud: function() {
-            let { lang } = this.props,
-                options,
+            let options,
                 content;
 
             options = [
@@ -380,8 +402,7 @@ define([
         },
 
         _renderBackLash: function() {
-            let { lang } = this.props,
-                content;
+            let content;
 
             content = (
                 <div className="controls">
@@ -401,8 +422,7 @@ define([
 
         _renderCamera: function() {
             if(this.state.allowUpgradeKit) {
-                let { lang } = this.props,
-                    options,
+                let options,
                     content;
 
                 options = [
@@ -431,8 +451,7 @@ define([
 
         _renderPlusExtrusion: function() {
             if(this.state.allowUpgradeKit) {
-                let { lang } = this.props,
-                    options,
+                let options,
                     content;
 
                 options = [
@@ -461,10 +480,7 @@ define([
 
         _renderPlayerPostBack: function() {
             if(this.state.allowUpgradeKit) {
-                let { lang } = this.props,
-                    content;
-
-                content = (
+                let content = (
                     <div className="controls">
                         <div className="label">{lang.device.postback_url}</div>
                         <input
@@ -484,6 +500,53 @@ define([
             }
         },
 
+        _renderMovementTest: function() {
+            if(this.state.allowM666R_MMTest) {
+                let options,
+                    content;
+
+                options = [
+                    { id: 'N', name: lang.device.disable},
+                    { id: 'Y', name: lang.device.enable}
+                ];
+
+                content = (
+                    <div className="controls">
+                        <div className="label">{lang.device.movement_test}</div>
+                        <RadioControl
+                            id="movement_test"
+                            options={options}
+                            default={this.state.config['movement_test'] || 'Y'}
+                            onChange={this._handleComponentValueChange}
+                        />
+                    </div>
+                );
+
+                return Object.keys(this.state.config).length > 0 ? content : '';
+            }
+            else {
+                return (<div></div>);
+            }
+        },
+
+
+        _renderMachineRadius: function() {
+           let content = (
+                <div className="controls">
+                    <div className="label">{lang.device.machine_radius}</div>
+                    <input
+                        id="machine_radius"
+                        value={this.state.machine_radius}
+                        onChange={this._updateMachineRadius}
+                        onBlur={this._updateMachineRadius}
+                    />
+                    <label>mm</label>
+                </div>
+            );
+
+            return (this.state.allowM666R_MMTest && Object.keys(this.state.config).length > 0) ? content : '';
+        },
+
         render : function() {
             let deviceList      = this._getDeviceList(),
                 correction      = this._renderCorrectionSetting(),
@@ -495,7 +558,9 @@ define([
                 backlash        = this._renderBackLash(),
                 camera          = this._renderCamera(),
                 plusExtrusion   = this._renderPlusExtrusion(),
-                playerPostBack  = this._renderPlayerPostBack();
+                playerPostBack  = this._renderPlayerPostBack(),
+                movementTest    = this._renderMovementTest(),
+                machineRadius   = this._renderMachineRadius();
 
             return (
                 <div className="form general">
@@ -510,6 +575,8 @@ define([
                     {camera}
                     {plusExtrusion}
                     {playerPostBack}
+                    {movementTest}
+                    {machineRadius}
                 </div>
             );
         }
