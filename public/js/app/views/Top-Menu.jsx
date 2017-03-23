@@ -79,6 +79,13 @@ define([
                     className: genericClassName,
                     label: lang.menu.cut,
                     imgSrc: '/img/menu/icon-draw.svg'
+                },
+                {
+                    name: 'mill',
+                    displayName: 'Mill',
+                    className: genericClassName,
+                    label: lang.menu.mill,
+                    imgSrc: '/img/menu/icon-draw.svg'
                 }
             ];
 

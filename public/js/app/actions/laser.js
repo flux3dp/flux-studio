@@ -110,8 +110,7 @@ define([
                 var goodFiles = response.files.filter((file) => {
                         return false === file.isBroken;
                     }),
-                    currentFileFormat = fileFormat,
-                    operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
+                    currentFileFormat = self.state.fileFormat,
                     hasImage = (0 < self.state.images.length + goodFiles.length);
 
                 self.state.images = self.state.images.concat(goodFiles);
@@ -123,7 +122,7 @@ define([
                 self.setState({
                     images: self.state.images,
                     hasImage: hasImage,
-                    mode: operationMode,
+                    mode: self.props.page,
                     fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
                 });
 
@@ -803,6 +802,14 @@ define([
                 fileFormat = extension;
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
+                if ('string' !== typeof currentFileFormat) {
+                    currentFileFormat = ('svg' === extension.toLowerCase() ? 'svg' : 'bitmap');
+                    // in draw mode. only svg files are acceptable.
+                    currentFileFormat = self.props.page === 'laser' ? currentFileFormat : 'svg';
+                    self.setState({
+                        fileFormat: currentFileFormat
+                    });
+                }
                 if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
                         type: self.props.page
