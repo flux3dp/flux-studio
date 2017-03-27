@@ -40,6 +40,7 @@ define([
 
     return function(args) {
         args = args || {};
+        console.log('args', args);
 
         let view = React.createClass({
                 getDefaultProps: function() {
@@ -133,6 +134,12 @@ define([
                         openPrinterSelectorWindow: true,
                         machineCommand: 'start',
                         settings: this._fetchFormalSettings()
+                    });
+                },
+                _handleShowOutlineClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        machineCommand: 'showOutline'
                     });
                 },
 
@@ -326,7 +333,7 @@ define([
                             },
                             onClick: this._handleStartClick
                         }];
-                    
+
                     if (this.props.page === 'laser') {
                         buttons = [{
                             label: lang.laser.showOutline,
@@ -339,7 +346,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'holder-outline'
                             },
-                            onClick: this._handleStartClick
+                            onClick: this._handleShowOutlineClick
                         }].concat(buttons);
                     }
 

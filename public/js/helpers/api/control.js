@@ -551,6 +551,17 @@ define([
                 return d.promise();
             },
 
+            showOutline: (position, size, angle) => {
+            //  console.log('showOutline', position, size, angle);
+              let start_x = position.x - size.width/2,
+                  start_y = position.y - size.height/2;
+              console.log('width:', size.width, 'height:', size.height);
+              console.log('start_x:', start_x, ',start_y:', start_y);
+              console.log('angle');
+              return useDefaultResponse(
+                `laser show_outline ${size.width} ${size.height} ${start_x} ${start_y}`);
+            },
+
             endMaintainMode: () => {
                 ctrl.mode = '';
                 return useDefaultResponse('task quit');
@@ -568,7 +579,7 @@ define([
                 return useDefaultResponse('play press_button');
             },
 
-            setHeadTemperatureDuringPause: (temperature) => {
+            show: (temperature) => {
                 return useDefaultResponse(`play toolhead heater 0 ${temperature}`);
             },
 

@@ -378,7 +378,7 @@ define([
             statusChanged = false;
 
         ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
-        
+
         let t = setInterval(() => {
             SocketMaster.addTask('report').then(r => {
                 d.notify(r, t);
@@ -850,10 +850,15 @@ define([
         }
     }
 
+    async function showOutline(position, size, angle) {
+        const resp = await SocketMaster.addTask(
+                                  'showOutline', position, size, angle);
+    }
+
     function calibrate(opts) {
         let d = $.Deferred(),
             debug_data = {};
-        
+
         opts = opts || {};
         opts.forceExtruder = opts.forceExtruder === null ? true : opts.forceExtruder;
         opts.doubleZProbe = opts.doubleZProbe === null ? false : opts.doubleZProbe;
@@ -1307,6 +1312,7 @@ define([
             this.streamCamera                   = streamCamera;
             this.stopStreamCamera               = stopStreamCamera;
             this.calibrate                      = calibrate;
+            this.showOutline                    = showOutline;
             this.home                           = home;
             this.cleanCalibration               = cleanCalibration;
             this.detectHead                     = detectHead;

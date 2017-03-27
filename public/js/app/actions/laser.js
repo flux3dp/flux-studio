@@ -168,7 +168,7 @@ define([
                         height: $img.height() * freetrans.scaley,
                         width: $img.width() * freetrans.scalex,
                     };
-
+                console.log("referesh iamge", threshold, self.refs.setupPanel.isShading(), self.state.fileFormat);
                 imageData(
                     $img.data('file').blob,
                     {
@@ -402,6 +402,21 @@ define([
             },
             $target_image = null, // changing when image clicked
             resetPosTimer = null,
+            //============== for test async functioni ==========================
+            showOutline = async () => {
+              const printer = await DeviceMaster.select(self.state.selectedPrinter);
+                  ProgressActions.open(
+                      ProgressConstants.WAITING,
+                      lang.device.showOutline
+                  );
+              const test = await DeviceMaster.showOutline(this.state.position,
+                                                          this.state.size,
+                                                          this.state.angle
+                                                          );
+              ProgressActions.close();
+              },
+            //======================END ========================================
+
             getToolpath = function(settings, callback, progressType, fileMode) {
                 fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
@@ -419,6 +434,7 @@ define([
                             pointX = offset.left - containerOffset.left + (width / 2),
                             pointY = offset.top - containerOffset.top + (height / 2);
 
+                        console.log('offset', offset, 'width', width, 'height', height, 'poingX', pointX, 'pointY', pointY);
                         return {
                             x: pointX,
                             y: pointY
@@ -707,6 +723,11 @@ define([
                         sendToMachine,
                         ProgressConstants.STEPPING
                     );
+                } else if (command === 'showOutline') {
+                  //console.log('$el', $el);
+                  console.log('laser_platform', $laser_platform);
+                  //showOutline();
+
                 } else if (command === 'calibrate') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
                         ProgressActions.open(
@@ -803,7 +824,7 @@ define([
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension.toLowerCase() ? 'svg' : 'bitmap');
                     // in draw mode. only svg files are acceptable.
-                    currentFileFormat = self.props.page === 'engrave' ? currentFileFormat : 'svg';
+                    currentFileFormat = self.props.page === 'laser' ? currentFileFormat : 'svg';
                     self.setState({
                         fileFormat: currentFileFormat
                     });
