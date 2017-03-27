@@ -86,7 +86,9 @@ define([
 
                 _ws.onmessage = function(result) {
                     var data = (true === isJson(result.data) ? JSON.parse(result.data) : result.data),
-                        message = trimMessage(['<', result.data].join(' '));
+                        message = trimMessage(['<', result.data].join(' ')),
+                        errorStr = '',
+                        skipError = false;
 
                     while(wsLog.log.length >= logLimit) {
                         wsLog.log.shift();
@@ -108,24 +110,44 @@ define([
 
                     switch (data.status) {
                     case 'error':
-                        if(window.FLUX.allowTracking) {
-                            window.Raven.captureException(data);
+                        errorStr = data instanceof Object ? data.error : '';
+                        skipError = false;
+
+                        if (data instanceof Object && data.error instanceof Array) {
+                            errorStr = data.error.join('_');
                         }
-                        console.log('ws error', data);
+
+                        if (errorStr === 'NOT_EXIST_BAD_NODE') { skipError = true; }
+
+                        if (window.FLUX.allowTracking && !skipError) {
+                            window.Raven.captureException(data);
+                            console.log('ws error', errorStr); 
+                        }
                         socketOptions.onError(data);
                         break;
                     case 'fatal':
+                        errorStr = data instanceof Object ? data.error : '';
+                        skipError = false;
+
+                        if (data instanceof Object && data.error instanceof Array) {
+                            errorStr = data.error.join('_');
+                        }
+
+                        if (errorStr === 'AUTH_ERROR') { skipError = true; }
+                        
                         // if identify error, reconnect again
-                        if (data.error === 'REMOTE_IDENTIFY_ERROR') {
+                        if (errorStr === 'REMOTE_IDENTIFY_ERROR') {
                             setTimeout(() => {
                                 ws = createWebSocket(options);
                             }, 1000);
                             return;
                         }
-                        else if (window.FLUX.allowTracking) {
+
+                        if (window.FLUX.allowTracking && !skipError) {
                             window.Raven.captureException(data);
+                            console.log('ws fatal', errorStr); 
                         }
-                        console.log('ws fatal', data);
+                        
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
