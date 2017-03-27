@@ -434,7 +434,6 @@ define([
                             pointX = offset.left - containerOffset.left + (width / 2),
                             pointY = offset.top - containerOffset.top + (height / 2);
 
-                        console.log('offset', offset, 'width', width, 'height', height, 'poingX', pointX, 'pointY', pointY);
                         return {
                             x: pointX,
                             y: pointY
@@ -466,6 +465,8 @@ define([
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
+                                console.log('sub_data', sub_data);
+                                console.log('$el', $el);
 
                             if ('svg' === self.state.fileFormat) {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
@@ -724,8 +725,9 @@ define([
                         ProgressConstants.STEPPING
                     );
                 } else if (command === 'showOutline') {
-                  //console.log('$el', $el);
                   console.log('laser_platform', $laser_platform);
+                  //top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
+                  //bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right')),
                   //showOutline();
 
                 } else if (command === 'calibrate') {
