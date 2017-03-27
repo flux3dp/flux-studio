@@ -797,7 +797,8 @@ define([
             },
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase();
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase(),
+                    currentFileFormat = self.state.fileFormat;
 
                 fileFormat = extension;
                 ProgressActions.open(ProgressConstants.NONSTOP);
