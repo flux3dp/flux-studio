@@ -1247,7 +1247,8 @@ define(function() {
             target_temperature: 'Target temperature',
             current_temperature: 'Current temperature',
             set: 'set',
-            incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead'
+            incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead',
+            attach_toolhead: 'Please connect the printing toolhead'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',

@@ -1242,7 +1242,8 @@ define(function() {
             target_temperature: '目標溫度',
             current_temperature: '目前溫度',
             set: '設定',
-            incorrect_toolhead: '錯誤工具頭，請使用列印工具頭'
+            incorrect_toolhead: '錯誤工具頭，請使用列印工具頭',
+            attach_toolhead: '請插上列印工具頭'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
