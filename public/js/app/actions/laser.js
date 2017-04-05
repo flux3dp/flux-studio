@@ -566,7 +566,6 @@ define([
                 $ftControls = $img.parent().find('.ft-controls');
                 $ftControls.width(size.width).height(size.height);
 
-                console.log('$ftControls', $ftControls);
                 if (file.index === file.totalFiles - 1) {
                     ProgressActions.close();
                 }
