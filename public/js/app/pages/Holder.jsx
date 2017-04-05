@@ -338,7 +338,7 @@ define([
                         buttons = [{
                             label: lang.laser.showOutline,
                             className: cx({
-                                'btn-disabled': false,
+                                'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-go': true

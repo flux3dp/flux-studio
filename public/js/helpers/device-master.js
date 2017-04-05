@@ -850,9 +850,9 @@ define([
         }
     }
 
-    async function showOutline(position, size, angle) {
+    async function showOutline(position) {
         const resp = await SocketMaster.addTask(
-                                  'showOutline', position, size, angle);
+                                  'showOutline', position);
     }
 
     function calibrate(opts) {

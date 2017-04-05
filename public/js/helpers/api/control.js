@@ -551,15 +551,14 @@ define([
                 return d.promise();
             },
 
-            showOutline: (position, size, angle) => {
-            //  console.log('showOutline', position, size, angle);
-              let start_x = position.x - size.width/2,
-                  start_y = position.y - size.height/2;
-              console.log('width:', size.width, 'height:', size.height);
-              console.log('start_x:', start_x, ',start_y:', start_y);
-              console.log('angle');
+            showOutline: (position) => {
+              let first = position.first.toString(),
+                  second = position.second.toString(),
+                  third = position.third.toString(),
+                  fourth = position.fourth.toString();
+
               return useDefaultResponse(
-                `laser show_outline ${size.width} ${size.height} ${start_x} ${start_y}`);
+                `laser show_outline ${first} ${second} ${third} ${fourth}`);
             },
 
             endMaintainMode: () => {
