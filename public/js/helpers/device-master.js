@@ -245,7 +245,11 @@ define([
             SocketMaster = new Sm();
 
             // if usb not detected but device us using usb
-            if(self.availableUsbChannel === -1 && device.source === 'h2h') {
+            if(
+                typeof self !== 'undefined' &&
+                self.availableUsbChannel === -1 &&
+                device.source === 'h2h'
+            ) {
                 device = getDeviceBySerialFromAvailableList(device.serial, false);
             }
 
