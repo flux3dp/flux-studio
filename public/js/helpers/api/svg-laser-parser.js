@@ -29,7 +29,8 @@ define([
         var apiMethod = {
                 laser: 'svg-laser-parser',
                 draw: 'pen-svg-parser',
-                cut: 'svg-vinyl-parser'
+                cut: 'svg-vinyl-parser',
+                mill: 'svg-vinyl-parser'
             }[opts.type],
             ws = new Websocket({
                 method: apiMethod,

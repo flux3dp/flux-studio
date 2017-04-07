@@ -37,9 +37,15 @@ define([
                         this._startReport();
                     }
                     else {
+                        let message = lang.head_temperature.incorrect_toolhead;
+
+                        if(info.head_module === null) {
+                            message = lang.head_temperature.attach_toolhead;
+                        }
+
                         AlertActions.showPopupError(
                             'HEAD-ERROR',
-                            lang.head_temperature.incorrect_toolhead
+                            message
                         );
                         this.props.onClose();
                     }

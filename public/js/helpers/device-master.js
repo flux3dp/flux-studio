@@ -95,7 +95,8 @@ define([
         }
 
         // match the device from the newest received device list
-        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source);
+        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
+            self = this;
 
         Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred();
@@ -244,14 +245,18 @@ define([
             SocketMaster = new Sm();
 
             // if usb not detected but device us using usb
-            if(this.availableUsbChannel === -1 && device.source === 'h2h') {
+            if(
+                typeof self !== 'undefined' &&
+                self.availableUsbChannel === -1 &&
+                device.source === 'h2h'
+            ) {
                 device = getDeviceBySerialFromAvailableList(device.serial, false);
             }
 
             // if availableUsbChannel has been defined
             if(
-                typeof this !== 'undefined' &&
-                typeof this.availableUsbChannel !== 'undefined' &&
+                typeof self !== 'undefined' &&
+                typeof self.availableUsbChannel !== 'undefined' &&
                 device.source === 'h2h'
             ) {
                 _device.actions = createDeviceActions(this.availableUsbChannel);
@@ -1244,10 +1249,11 @@ define([
 
         // returns the available channel, -1 otherwise
         this.availableUsbChannel = this.availableUsbChannel || -1;
+        let self = this;
         UsbChecker((channel) => {
             channel = parseInt(channel);
-            console.log(`availableUsbChannel: ${this.availableUsbChannel} ${channel}`);
-            this.availableUsbChannel = channel;
+            console.log(`availableUsbChannel: ${self.availableUsbChannel} ${channel}`);
+            self.availableUsbChannel = channel;
 
             // to be replaced when redux is implemented
             Object.keys(usbEventListeners).forEach(id => {

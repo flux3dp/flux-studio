@@ -21,6 +21,8 @@ define([
         dispatchers = [],
         idList = [],
         _devices = {},
+        existDefaultPrinter = initializeMachine.defaultPrinter.exist(),
+        defaultPrinter = initializeMachine.defaultPrinter.get(),
         sendFoundPrinter = function() {
             discoverLogger.clear().append(_devices);
 
@@ -48,9 +50,7 @@ define([
                 }
             }
 
-            if (true === initializeMachine.defaultPrinter.exist() &&
-                device.uuid === initializeMachine.defaultPrinter.get().uuid
-            ) {
+            if (existDefaultPrinter && device.uuid === defaultPrinter.uuid ) {
                 initializeMachine.defaultPrinter.set(device);
             }
 

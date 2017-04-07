@@ -275,6 +275,7 @@ define(function() {
             setting: 'SETTING',
             draw: 'DRAW',
             cut: 'CUT',
+            mill: 'MILL'
         },
         settings: {
             on: 'On',
@@ -643,6 +644,23 @@ define(function() {
             overcut: 'Overcut',
             speed: 'Speed',
             bladeRadius: 'Blade Radius',
+            backlash: 'Backlash Compensation',
+            zOffsetTip: 'Adjust cutting height for thicker vinyl and to prevent cutting too hard or too light',
+            overcutTip: 'Overcut loops for peeling off easier',
+            speedTip: 'The cutting speed',
+            backlashTip: 'Adjust the value if straight lines is not straight enough',
+            units: {
+                mms: 'mm/s',
+                mm: 'mm'
+            }
+        },
+        mill: {
+            calibrate: 'Auto\nLevel',
+            zOffset: 'Cutting Height',
+            overcut: 'Overcut',
+            speed: 'Speed',
+            repeat: 'Repeat',
+            stepHeight: 'Step Height',
             backlash: 'Backlash Compensation',
             zOffsetTip: 'Adjust cutting height for thicker vinyl and to prevent cutting too hard or too light',
             overcutTip: 'Overcut loops for peeling off easier',
@@ -1229,7 +1247,8 @@ define(function() {
             target_temperature: 'Target temperature',
             current_temperature: 'Current temperature',
             set: 'set',
-            incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead'
+            incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead',
+            attach_toolhead: 'Please connect the printing toolhead'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',
