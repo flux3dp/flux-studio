@@ -164,6 +164,7 @@ define([
                         lang={lang}
                         forceAuth={true}
                         bypassDefaultPrinter={true}
+                        bypassCheck={true}
                         onGettingPrinter={this._onGettingPrinter}
                     />
                 );

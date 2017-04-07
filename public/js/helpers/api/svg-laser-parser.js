@@ -24,13 +24,14 @@ define([
 
     return function(opts) {
         opts = opts || {};
-        opts.isLaser = ('boolean' === typeof opts.isLaser ? opts.isLaser : true);
+        opts.type = opts.type || 'laser';
 
-        var apiMethod = (
-                true === opts.isLaser ?
-                'svg-laser-parser' :
-                'pen-svg-parser'
-            ),
+        var apiMethod = {
+                laser: 'svg-laser-parser',
+                draw: 'pen-svg-parser',
+                cut: 'svg-vinyl-parser',
+                mill: 'svg-vinyl-parser'
+            }[opts.type],
             ws = new Websocket({
                 method: apiMethod,
                 onMessage: function(data) {
@@ -143,7 +144,7 @@ define([
                             });
                             $deferred.resolve({files: files, hasBadFiles: hasBadFiles });
                         }
-                        else if ('svg' === file.extension) {
+                        else if (file.extension && 'svg' === file.extension.toLowerCase()) {
                             sendFile(file);
                             currIndex += 1;
                         }
@@ -314,7 +315,7 @@ define([
                     }
                     else if ('complete' === data.status) {
                         total_length = data.length;
-                        duration = data.time;
+                        duration = data.time + 1;
                     }
                     else if (true === data instanceof Blob) {
                         blobs.push(data);

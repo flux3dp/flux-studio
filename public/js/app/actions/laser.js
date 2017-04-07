@@ -19,9 +19,10 @@ define([
     'app/constants/device-constants',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
+    'helpers/device-error-handler',
     'freetrans',
     'helpers/jquery.box',
-    'plugins/file-saver/file-saver.min'
+    'plugins/file-saver/file-saver.min',
 ], function(
     $,
     bitmapLaserParser,
@@ -42,7 +43,8 @@ define([
     DeviceMaster,
     DeviceConstants,
     ProgressActions,
-    ProgressConstants
+    ProgressConstants,
+    DeviceErrorHandler
 ) {
     'use strict';
 
@@ -58,13 +60,12 @@ define([
             LASER_IMG_CLASS = 'img-container',
             $laser_platform,
             lang = i18n.get(),
-            $uploadDeferred = $.Deferred(),
+            fileFormat = '',
             PLATFORM_DIAMETER_PIXEL,
             _onUploadResponse = function(response) {
                 var url = window.URL,
                     platformDiameter = $laser_platform.width(),
                     ratio = 1,
-                    badFiles = [],
                     messages = [];
 
                 // handle bad files
@@ -110,7 +111,6 @@ define([
                         return false === file.isBroken;
                     }),
                     currentFileFormat = self.state.fileFormat,
-                    operationMode = ('svg' === currentFileFormat ? 'cut' : 'engrave'),
                     hasImage = (0 < self.state.images.length + goodFiles.length);
 
                 self.state.images = self.state.images.concat(goodFiles);
@@ -122,7 +122,7 @@ define([
                 self.setState({
                     images: self.state.images,
                     hasImage: hasImage,
-                    mode: operationMode,
+                    mode: self.props.page,
                     fileFormat: (0 < self.state.images.length ? currentFileFormat : undefined)
                 });
 
@@ -133,7 +133,6 @@ define([
             deleteImage = function() {
                 var $img_container = $('.' + LASER_IMG_CLASS).not($target_image),
                     $img = $target_image,
-                    reset_file_type = false,
                     state = {
                         selectedImage: false,
                         debug: false
@@ -141,7 +140,7 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if ('svg' === self.state.fileFormat && true === $img.hasClass('svg')) {
+                    if (fileFormat === 'svg' && $img.hasClass('svg')) {
                         svgWebSocket.History.deleteAt($img.data('name'));
                     }
 
@@ -155,7 +154,7 @@ define([
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
                         menuFactory.methods.refresh();
-                        self.state.fileFormat = undefined;
+                        fileFormat = '';
                     }
                     else {
                         $target_image = $img_container[0];
@@ -180,7 +179,7 @@ define([
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
                             threshold: parseInt(threshold, 10),
-                            is_svg: ('svg' === self.state.fileFormat)
+                            is_svg: (fileFormat === 'svg')
                         },
                         onComplete: function(result) {
                             $img.attr('src', result.canvas.toDataURL('image/png'));
@@ -190,7 +189,7 @@ define([
             },
             sendToMachine = function(blob) {
                 var blobUrl = window.URL,
-                    source = self.props.page === 'draw' ? GlobalConstants.DRAW : GlobalConstants.LASER,
+                    source = (self.props.page || '').toUpperCase(),
                     fcodeReaderMethods = fcodeReader(),
                     goToMonitor = function(thumbnailBlob) {
                         ProgressActions.close();
@@ -319,7 +318,6 @@ define([
 
                 return range > limit;
             },
-            sleep,
             resetPosition = function($target) {
                 var $img_container = $target || $('.' + LASER_IMG_CLASS),
                     platform_pos = $laser_platform.box(true),
@@ -404,10 +402,8 @@ define([
                 }
             },
             $target_image = null, // changing when image clicked
-            printer = null,
             resetPosTimer = null,
-            printer_selecting = false,
-            handleLaser = function(settings, callback, progressType, fileMode) {
+            getToolpath = function(settings, callback, progressType, fileMode) {
                 fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
 
@@ -434,12 +430,10 @@ define([
 
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
-                                image = new Image(),
                                 top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
                                 bottom_right = getPoint($el.find('.ft-scaler-bottom.ft-scaler-right')),
                                 $img = $el.parents('.ft-container').find('img'),
                                 box = $img.box(),
-                                isShading = self.refs.setupPanel.isShading(),
                                 width = 0,
                                 height = 0,
                                 sub_data = {
@@ -452,13 +446,13 @@ define([
                                     threshold: $img.data('threshold') || 255
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.state.fileFormat),
+                                    is_svg: (fileFormat === 'svg'),
                                     threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
 
-                            if ('svg' === self.state.fileFormat) {
+                            if (fileFormat === 'svg') {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
                                     width: box.width,
                                     height: box.height
@@ -480,7 +474,7 @@ define([
                                         sub_data.height = result.size.height;
                                         sub_data.width = result.size.width;
 
-                                        if ('svg' === self.state.fileFormat) {
+                                        if (fileFormat === 'svg') {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -491,7 +485,7 @@ define([
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
-                                            if ('svg' === self.state.fileFormat) {
+                                            if (fileFormat === 'svg') {
                                                 sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {
@@ -617,8 +611,7 @@ define([
         function handleUploadImage(file) {
             // if this is svg file that does provide a bigger enough image
             var width = file.imgSize.width,
-                height = file.imgSize.height,
-                ratio;
+                height = file.imgSize.height;
 
             imageData(file.blob, {
                 width: width,
@@ -628,7 +621,7 @@ define([
                     is_rgba: true,
                     is_shading: self.refs.setupPanel.isShading(),
                     threshold: 255,
-                    is_svg: ('svg' === self.state.fileFormat)
+                    is_svg: (fileFormat === 'svg')
                 },
                 onComplete: function(result) {
                     var originalUrl = file.url;
@@ -652,15 +645,16 @@ define([
                 menuFactory.methods.refresh();
             }
 
-            if (!$exclude || ($exclude && $('img.image-active').length == 0)) {
+            if (!$exclude || ($exclude && $('img.image-active').length === 0)) {
                 $target_image = null;
 
                 if (!dontRefresh) {
                     self.setState({
                         selectedImage: false
                     });
-                } else {
-                    return { selectedImage: false }
+                }
+                else {
+                    return { selectedImage: false };
                 }
             }
         }
@@ -708,16 +702,44 @@ define([
         });
 
         return {
-            handleLaser: function(settings) {
-                handleLaser(
-                    settings,
-                    sendToMachine,
-                    ProgressConstants.STEPPING
-                );
+            runCommand: function(settings, command) {
+                if (command === 'start') {
+                    getToolpath(
+                        settings,
+                        sendToMachine,
+                        ProgressConstants.STEPPING
+                    );
+                } else if (command === 'calibrate') {
+                    DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
+                        ProgressActions.open(
+                            ProgressConstants.WAITING,
+                            lang.device.calibrating
+                        );
+                        DeviceMaster.calibrate({forceExtruder: false, doubleZProbe: true}).done((debug_message) => {
+                            setTimeout(() => {
+                                AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
+                            }, 100);
+                        }).fail((resp) => {
+                            if (resp.error[0] === 'EDGE_CASE') { return; }
+                            if (resp.module === 'LASER') {
+                                AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
+                            }
+                            else {
+                                DeviceErrorHandler.processDeviceMasterResponse(resp);
+                                AlertActions.showPopupError('calibrate-fail', DeviceErrorHandler.translate(resp.error));
+                            }
+                        }).always(() => {
+                            ProgressActions.close();
+                        });
+                    }).fail(() => {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                    });
+                }
             },
             sendToMachine: sendToMachine,
             exportTaskCode: function(settings, fileMode) {
-                handleLaser(
+                getToolpath(
                     settings,
                     function(blob, fileMode) {
                         var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
@@ -775,23 +797,23 @@ define([
             },
             onReadFileStarted: function(e) {
                 var firstFile = e.target.files.item(0),
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name),
+                    extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase(),
                     currentFileFormat = self.state.fileFormat;
 
+                fileFormat = extension;
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
                 if ('string' !== typeof currentFileFormat) {
-                    currentFileFormat = ('svg' === extension ? 'svg' : 'bitmap');
+                    currentFileFormat = ('svg' === extension.toLowerCase() ? 'svg' : 'bitmap');
                     // in draw mode. only svg files are acceptable.
-                    currentFileFormat = (self.props.page === 'draw' ? 'svg' : currentFileFormat);
+                    currentFileFormat = self.props.page === 'laser' ? currentFileFormat : 'svg';
                     self.setState({
                         fileFormat: currentFileFormat
                     });
                 }
-
                 if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
-                        isLaser: 'laser' === self.props.page
+                        type: self.props.page
                     });
                 }
                 else {
@@ -800,11 +822,9 @@ define([
             },
             onFileReadEnd: function(e, files) {
                 var parserSocket;
-                var firstFile = e.target ? e.target.files.item(0) : files[0],
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name);
 
                 // go svg process
-                if (extension === 'svg') {
+                if (fileFormat === 'svg') {
                     parserSocket = svgWebSocket;
                 }
                 // go bitmap process
@@ -829,7 +849,6 @@ define([
             imageTransform: function(e, params) {
                 var $el = $(e.currentTarget),
                     type = $el.data('type'),
-                    box = $el.box(),
                     val = $el.val(),
                     freetrans = $target_image.data('freetrans'),
                     args = {

@@ -59,3 +59,5 @@ _test/tests_output/CHROME_57.0.2987.98_MAC_dashboard.xml
 _test/nwjs
 
 _test/tests_output/CHROME_57.0.2987.98_MAC_printing.xml
+stl.cache
+temp.transform

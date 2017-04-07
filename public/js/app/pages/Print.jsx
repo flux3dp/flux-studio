@@ -431,7 +431,7 @@ define([
                                     onTimeout: () => {
                                         this.hideSpinner();
                                         setTimeout(function() {
-                                            AlertActions.showWarning(sprintf('Unable to find printer %s', selectedPrinterName));
+                                            AlertActions.showWarning(lang.message.unable_to_find_machine + device.name);
                                         }, 100);
                                     }
                                 });
