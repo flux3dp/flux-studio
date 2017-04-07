@@ -215,7 +215,7 @@ define([
                         _selectedDevice = {};
                         _wasKilled = false;
                     }
-                    console.log('process fatal');
+                    console.log('process fatal', response);
                 }
             });
         };
@@ -225,6 +225,7 @@ define([
         if(_existConnection(device.uuid, device.source)) {
             ProgressActions.close();
             _device = _switchDevice(device.uuid);
+            SocketMaster.setWebSocket(_actionMap[device.uuid]);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
