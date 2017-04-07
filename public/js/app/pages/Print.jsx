@@ -468,7 +468,8 @@ define([
                         this.setState({displayModelControl: false});
                         this.showSpinner();
 
-                        let device = {},
+                        let self = this,
+                            device = {},
                             callback;
 
                         if (Config().read('configured-printer') !== '') {
@@ -493,7 +494,7 @@ define([
                                 }.bind(this), 100);
                             }.bind(this),
                             onTimeout: function() {
-                                this.hideSpinner();
+                                self.hideSpinner();
                                 setTimeout(function() {
                                     AlertActions.showWarning(sprintf(lang.set_default.error, device.name));
                                 }, 100);
