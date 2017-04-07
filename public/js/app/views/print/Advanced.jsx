@@ -83,15 +83,15 @@ define([
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
             slic3rInfill = [
-                { label: lang.rectilinear, value: 'rectilinear' }, 
-                { label: lang.line, value: 'line' }, 
+                { label: lang.rectilinear, value: 'rectilinear' },
+                { label: lang.line, value: 'line' },
                 { label: lang.honeycomb, value: 'honeycomb' }
             ];
             slic3rSupport = [
                 { label: lang.rectilinearGrid, value: 'rectilinear-grid' },
                 { label: lang.line, value: 'line' },
-                { label: lang.rectilinear, value: 'rectilinear' }, 
-                { label: lang.honeycomb, value: 'honeycomb' } 
+                { label: lang.rectilinear, value: 'rectilinear' },
+                { label: lang.honeycomb, value: 'honeycomb' }
             ];
             curaInfill = [
                 { label: lang.curaInfill.automatic, value: 'AUTOMATIC' },
@@ -548,7 +548,7 @@ define([
             if(advancedSetting.engine === 'cura') {
                 infillPattern = curaInfill;
             } else if(advancedSetting.engine === 'cura2') {
-                infillPattern = cura2Infill; 
+                infillPattern = cura2Infill;
             }
             else {
                 infillPattern = slic3rInfill;
@@ -812,7 +812,8 @@ define([
                                         cols="50"
                                         value={this.state[advancedSetting.getExpertKey()]}
                                         onChange={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
-                                        onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')} />
+                                        // onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
+                                    />
                                 </div>
                             </div>
                         </div>
