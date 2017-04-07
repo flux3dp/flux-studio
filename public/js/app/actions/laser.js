@@ -117,6 +117,7 @@ define([
 
                 menuFactory.items.execute.enabled = hasImage;
                 menuFactory.items.saveTask.enabled = hasImage;
+                menuFactory.items.clear.enabled = true;
                 menuFactory.methods.refresh();
 
                 self.setState({
@@ -162,6 +163,14 @@ define([
 
                     self.setState(state);
                 }
+            },
+            clearScene = function() {
+                $('.ft-container').remove();
+                self.setState({
+                    images: [],
+                    hasImage: false
+                });
+                menuFactory.items.clear.enabled = false;
             },
             refreshImage = function($img, threshold) {
                 var freetrans = $img.data('freetrans'),
@@ -898,7 +907,8 @@ define([
             },
             destroy: function() {
                 clearInterval(resetPosTimer);
-            }
+            },
+            clearScene: clearScene
         };
     };
 });

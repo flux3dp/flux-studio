@@ -14,7 +14,8 @@ define([
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/i18n',
-    'helpers/dnd-handler'
+    'helpers/dnd-handler',
+    'helpers/nwjs/menu-factory'
 ], function(
     $,
     React,
@@ -31,7 +32,8 @@ define([
     ButtonGroup,
     ConfigHelper,
     i18n,
-    DnDHandler
+    DnDHandler,
+    MenuFactory
 ) {
     'use strict';
 
@@ -100,7 +102,6 @@ define([
                         setupPanelDefaults: this.props.panelOptions
                     });
 
-                    console.log('mounted');
                     if(!Config.read('laser-calibrated') && this.props.page === 'laser') {
                         // NOTE: only yes no support this kind of callback
                         AlertActions.showPopupYesNo('do-calibrate', lang.laser.do_calibrate, '', null, {
@@ -113,6 +114,10 @@ define([
                             }
                         });
                     }
+
+                    MenuFactory.items.clear.onClick = () => {
+                        self.state.laserEvents.clearScene();
+                    };
                 },
 
                 componentWillUnmount: function () {
@@ -326,7 +331,7 @@ define([
                             },
                             onClick: this._handleStartClick
                         }];
-                    
+
                     if (this.props.page === 'laser') {
                         buttons = [{
                             label: lang.laser.showOutline,
