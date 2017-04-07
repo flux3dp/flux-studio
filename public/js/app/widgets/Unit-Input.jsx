@@ -133,9 +133,14 @@ define([
 
         // UI Events
         _onBlur: function(e) {
+            let textboxValue = this.refs.unitInput.getDOMNode().value;
             var value = this._confirmValue();
-
-            this.props.getValue(e, value);
+            if(textboxValue === '') {
+                this.refs.unitInput.getDOMNode().value = this.props.defaultValue + this.props.defaultUnit;
+            }
+            else {
+                this.props.getValue(e, value);
+            }
         },
 
         _onKeyUp: function(e) {
@@ -154,6 +159,9 @@ define([
                 break;
             case keyCodeConstants.KEY_DOWN:
                 addValue = -Math.abs(this.props.step);
+                break;
+            case keyCodeConstants.KEY_ESC:
+                this._onBlur(e);
                 break;
             case keyCodeConstants.KEY_PLUS:
             case keyCodeConstants.KEY_MINUS:

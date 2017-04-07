@@ -468,7 +468,7 @@ define([
                                     maxLength="32"
                                     title={lang.initialize.set_machine_generic.ap_mode_name_format}
                                     placeholder={lang.initialize.set_machine_generic.ap_mode_name_placeholder}
-                                    onKeyUp={self._checkApModeSetting}
+                                    onChange={self._checkApModeSetting}
                                 />
                             </label>
                             <label className="h-control">
@@ -485,7 +485,7 @@ define([
                                     pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]{8,}$"
                                     title={lang.initialize.set_machine_generic.ap_mode_pass_format}
                                     placeholder={lang.initialize.set_machine_generic.ap_mode_pass_placeholder}
-                                    onKeyUp={self._checkApModeSetting}
+                                    onChange={self._checkApModeSetting}
                                 />
                             </label>
                             <div className="button-group btn-v-group">

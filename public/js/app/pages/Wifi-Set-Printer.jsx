@@ -258,9 +258,13 @@ define([
                             <div className="controls">
                                 <label className="control" htmlFor="printer-name">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.printer_name}</h4>
-                                    <input ref="name" id="printer-name" type="text" className={printerNameClass}
-                                        autoFocus={true}
+                                    <input
+                                        ref="name"
+                                        id="printer-name"
+                                        type="text"
+                                        className={printerNameClass}
                                         autoComplete="off"
+                                        autoFocus={true}
                                         defaultValue={this.state.settingPrinter.name}
                                         placeholder={lang.initialize.set_machine_generic.printer_name_placeholder}
                                     />
@@ -269,8 +273,13 @@ define([
                                 {oldPassword}
                                 <label className="control" htmlFor="printer-password">
                                     <h4 className="input-head">{lang.initialize.set_machine_generic.password}</h4>
-                                    <input ref="password" htmlFor="printer-password" type="password" className={printerPasswordClass}
-                                    placeholder={lang.initialize.set_machine_generic.password_placeholder}/>
+                                    <input
+                                        id="printer-password"
+                                        ref="password"
+                                        type="password"
+                                        className={printerPasswordClass}
+                                        placeholder={lang.initialize.set_machine_generic.password_placeholder}
+                                    />
                                 </label>
                             </div>
                             <div className="btn-v-group">

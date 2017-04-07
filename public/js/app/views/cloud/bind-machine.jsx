@@ -7,7 +7,8 @@ define([
 	'helpers/pad-string',
 	'plugins/classnames/index',
 	'helpers/api/cloud',
-	'app/actions/alert-actions'
+	'app/actions/alert-actions',
+	'helpers/firmware-version-checker'
 ], function(
 	$,
 	React,
@@ -17,7 +18,8 @@ define([
 	PadString,
 	ClassNames,
 	CloudApi,
-	AlertActions
+	AlertActions,
+	FirmwareVersionChecker
 ) {
 	'use strict';
 
@@ -68,49 +70,22 @@ define([
 		},
 
 		_handleSelectDevice: function(device) {
-			const cloudRequiredVersion = '1.5';
-			const meetVersionRequirement = (installed) => {
-				let a = installed.split('.');
-				let b = cloudRequiredVersion.split('.');
-
-				for (let i = 0; i < a.length; ++i) {
-					a[i] = Number(a[i]);
+			FirmwareVersionChecker.check(device, 'CLOUD').then((allowCloud) => {
+				if(allowCloud) {
+					this.setState({
+						meetVersionRequirement: allowCloud,
+						selectedDevice: device
+					});
 				}
-				for (let i = 0; i < b.length; ++i) {
-					b[i] = Number(b[i]);
-				}
-				if (a.length === 2) {
-					a[2] = 0;
-				}
+				else {
+					let lang = this.props.lang.settings.flux_cloud;
 
-				if (a[0] > b[0]) { return true; }
-				if (a[0] < b[0]) { return false; }
-
-				if (a[1] > b[1]) { return true; }
-				if (a[1] < b[1]) { return false; }
-
-				if (a[2] > b[2]) { return true; }
-				if (a[2] < b[2]) { return false; }
-
-				return true;
-			};
-
-			let version = device.version,
-				vRegex = /([\d.]+)(a|b)?(\d*)?/g,
-				match = vRegex.exec(version),
-				lang = this.props.lang.settings.flux_cloud;
-
-			if(match.length > 2) {
-				let meetRequirement = meetVersionRequirement(match[1]);
-				this.setState({ meetVersionRequirement: meetRequirement });
-				if(!meetRequirement) {
 					AlertActions.showPopupError(
 						'error-vcredist',
 						lang.not_supported_firmware
 					);
 				}
-			}
-			this.setState({ selectedDevice: device});
+			});
 		},
 
 		_handleCancel: function() {
@@ -128,7 +103,29 @@ define([
 					location.hash = '#/studio/cloud/bind-fail';
 				}
 				else {
+					const waitForDevice = (deferred) => {
+						deferred = deferred || $.Deferred();
+
+						DeviceMaster.getDeviceInfo().then(response => {
+							let result = response.cloud[1].join('_');
+
+							if(response.cloud[0] === false && result === 'DISABLE') {
+								setTimeout(() => {
+									waitForDevice(deferred);
+								}, 2 * 1000);
+							}
+							else {
+								let error = response.cloud[1];
+								error.unshift('CLOUD');
+								this.props.onError(error);
+							}
+						});
+
+						return deferred.promise();
+					};
+
 					DeviceMaster.getDeviceInfo().then(response => {
+						let tried = 0;
 
 						const bindDevice = (uuid, token, accessId, signature) => {
 							CloudApi.bindDevice(uuid, token, accessId, signature).then(r => {
@@ -137,7 +134,16 @@ define([
 									location.hash = '#/studio/cloud/bind-success';
 								}
 								else {
-									location.hash = '#/studio/cloud/bind-fail';
+									if(tried > 2) {
+										location.hash = '#/studio/cloud/bind-fail';
+									}
+									else {
+										tried++;
+										// try another time
+										setTimeout(() => {
+											bindDevice(uuid, token, accessId, signature);
+										}, 2 * 1000);
+									}
 								}
 							});
 						};
@@ -146,41 +152,41 @@ define([
 							if(typeof cloudResult === 'undefined') {
 								return new Promise(r => r.resolve());
 							}
+
 							if(cloudResult.status === 'ok') {
-								DeviceMaster.getCloudValidationCode().then(r => {
-									let { token, signature } = r.code,
-										{ uuid } = this.state.selectedDevice,
-										accessId = r.code.access_id;
-
-									signature = encodeURIComponent(signature);
-									bindDevice(uuid, token, accessId, signature);
+								waitForDevice().then(() => {
+									getCloudValidationCodeAndBind();
+								}).fail((error) => {
+									this.props.onError(error);
 								});
-							} else {
-								location.hash = '#/studio/cloud/bind-fail';
-							}
-						};
-
-						const processBindError = () => {
-							location.hash = `#/studio/cloud/bind-error/${this.state.selectedDevice.uuid}`;
-						};
-
-						if(!Boolean(response.cloud)) {
-							processBindError();
-						}
-						else if(response.cloud[0] === true) {
-							DeviceMaster.enableCloud().then(processEnableCloudResult);
-						}
-						else if(!response.cloud[0]) {
-							let { cloud } = response,
-								reason = Array.isArray(cloud) ? cloud[1] : cloud[1].split(',');
-							if(reason[0] === 'DISABLE') {
-								DeviceMaster.enableCloud().then(processEnableCloudResult);
-							}
-							else if(response.cloud[1] === 'UNKNOWN_ERROR') {
-								processBindError();
 							}
 							else {
 								location.hash = '#/studio/cloud/bind-fail';
+							}
+						};
+
+						const getCloudValidationCodeAndBind = () => {
+							DeviceMaster.getCloudValidationCode().then(r => {
+								let { token, signature } = r.code,
+									{ uuid } = this.state.selectedDevice,
+									accessId = r.code.access_id;
+
+								signature = encodeURIComponent(signature);
+								bindDevice(uuid, token, accessId, signature);
+							});
+						};
+
+						if(response.cloud[0] === true) {
+							getCloudValidationCodeAndBind();
+						}
+						else {
+							if(response.cloud[1].join('') === 'DISABLE') {
+								DeviceMaster.enableCloud().then(processEnableCloudResult);
+							}
+							else {
+								let error = response.cloud[1];
+								error.unshift('CLOUD');
+								this.props.onError(error);
 							}
 						}
 					});

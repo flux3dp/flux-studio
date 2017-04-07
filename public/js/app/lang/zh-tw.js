@@ -97,6 +97,7 @@ define(function() {
                 new: '新增機器',
                 device_monitor: '儀表板',
                 device_info: '機器資訊',
+                head_info: '工具頭資訊',
                 change_filament: '更換線料',
                 default_device: '設為預設',
                 check_firmware_update: '韌體更新',
@@ -386,7 +387,9 @@ define(function() {
                 submit: '儲存',
                 sign_out: '登出',
                 not_supported_firmware: '支援 FLUX cloud 需要機器韌體 v1.5＋',
-                unbind_device: '確認要不再綁定此機器?'
+                unbind_device: '確認要不再綁定此機器?',
+                CLOUD_SESSION_CONNECTION_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (Session)',
+                CLOUD_UNKNOWN_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (General)',
             }
         },
         print: {
@@ -1173,7 +1176,8 @@ define(function() {
             usb_unplugged: 'USB 連線逾時，請確認與機器的連接',
             launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
             uploading_fcode: '正在上傳 fcode',
-            cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式'
+            cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式',
+            unable_to_find_machine: '無法連接到機器 '
         },
         machine_status: {
             '-10': '原生模式',
@@ -1239,7 +1243,8 @@ define(function() {
             target_temperature: '目標溫度',
             current_temperature: '目前溫度',
             set: '設定',
-            incorrect_toolhead: '錯誤工具頭，請使用列印工具頭'
+            incorrect_toolhead: '錯誤工具頭，請使用列印工具頭',
+            attach_toolhead: '請插上列印工具頭'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
@@ -1287,6 +1292,17 @@ define(function() {
             headMissing: '無法取得工具頭資訊，請確認工具頭是否連接於機器',
             calibrated: '平台校正完成',
             extruderOnly: '請使用列印工具頭來做校正'
+        },
+        head_info: {
+            ID                  : 'ID',
+            VERSION             : '工具頭韌體版本',
+            HEAD_MODULE         : '工具頭種類',
+            EXTRUDER            : '列印模組',
+            LASER               : '鐳刻模組',
+            USED                : '使用時間',
+            HARDWARE_VERSION    : '硬體版本',
+            FOCAL_LENGTH        : '焦距調整',
+            hour                : '小時'
         }
     };
 });

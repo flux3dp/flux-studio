@@ -60,6 +60,7 @@ define([
             LASER_IMG_CLASS = 'img-container',
             $laser_platform,
             lang = i18n.get(),
+            fileFormat = '',
             PLATFORM_DIAMETER_PIXEL,
             _onUploadResponse = function(response) {
                 var url = window.URL,
@@ -139,7 +140,7 @@ define([
 
                 if (null !== $target_image) {
                     // delete svg blob from history
-                    if ('svg' === self.state.fileFormat && $img.hasClass('svg')) {
+                    if (fileFormat === 'svg' && $img.hasClass('svg')) {
                         svgWebSocket.History.deleteAt($img.data('name'));
                     }
 
@@ -153,7 +154,7 @@ define([
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
                         menuFactory.methods.refresh();
-                        self.state.fileFormat = undefined;
+                        fileFormat = '';
                     }
                     else {
                         $target_image = $img_container[0];
@@ -178,7 +179,7 @@ define([
                             is_rgba: true,
                             is_shading: self.refs.setupPanel.isShading(),
                             threshold: parseInt(threshold, 10),
-                            is_svg: ('svg' === self.state.fileFormat)
+                            is_svg: (fileFormat === 'svg')
                         },
                         onComplete: function(result) {
                             $img.attr('src', result.canvas.toDataURL('image/png'));
@@ -466,13 +467,13 @@ define([
                                     threshold: $img.data('threshold') || 255
                                 },
                                 grayscaleOpts = {
-                                    is_svg: ('svg' === self.state.fileFormat),
+                                    is_svg: (fileFormat === 'svg'),
                                     threshold: 255
                                 },
                                 src = $img.data('base'),
                                 previewImageSize;
 
-                            if ('svg' === self.state.fileFormat) {
+                            if (fileFormat === 'svg') {
                                 previewImageSize = svgWebSocket.computePreviewImageSize({
                                     width: box.width,
                                     height: box.height
@@ -494,7 +495,7 @@ define([
                                         sub_data.height = result.size.height;
                                         sub_data.width = result.size.width;
 
-                                        if ('svg' === self.state.fileFormat) {
+                                        if (fileFormat === 'svg') {
                                             sub_data.svg_data = svgWebSocket.History.findByName($img.data('name'))[0].data;
                                         }
 
@@ -505,7 +506,7 @@ define([
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
-                                            if ('svg' === self.state.fileFormat) {
+                                            if (fileFormat === 'svg') {
                                                 sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {
@@ -641,7 +642,7 @@ define([
                     is_rgba: true,
                     is_shading: self.refs.setupPanel.isShading(),
                     threshold: 255,
-                    is_svg: ('svg' === self.state.fileFormat)
+                    is_svg: (fileFormat === 'svg')
                 },
                 onComplete: function(result) {
                     var originalUrl = file.url;
@@ -665,15 +666,16 @@ define([
                 menuFactory.methods.refresh();
             }
 
-            if (!$exclude || ($exclude && $('img.image-active').length == 0)) {
+            if (!$exclude || ($exclude && $('img.image-active').length === 0)) {
                 $target_image = null;
 
                 if (!dontRefresh) {
                     self.setState({
                         selectedImage: false
                     });
-                } else {
-                    return { selectedImage: false }
+                }
+                else {
+                    return { selectedImage: false };
                 }
             }
         }
@@ -838,6 +840,7 @@ define([
                     extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase(),
                     currentFileFormat = self.state.fileFormat;
 
+                fileFormat = extension;
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
                 if ('string' !== typeof currentFileFormat) {
@@ -848,7 +851,6 @@ define([
                         fileFormat: currentFileFormat
                     });
                 }
-
                 if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
                         type: self.props.page
@@ -860,11 +862,9 @@ define([
             },
             onFileReadEnd: function(e, files) {
                 var parserSocket;
-                var firstFile = e.target ? e.target.files.item(0) : files[0],
-                    extension = self.refs.fileUploader.getFileExtension(firstFile.name).toLowerCase();
 
                 // go svg process
-                if (extension === 'svg') {
+                if (fileFormat === 'svg') {
                     parserSocket = svgWebSocket;
                 }
                 // go bitmap process

@@ -57,7 +57,7 @@ define([
             const { store } = this.context;
 
             this.unsubscribe = store.subscribe(() => {
-                // this.forceUpdate();
+                this.forceUpdate();
             });
         },
 
@@ -140,7 +140,7 @@ define([
                 if(!item[0]) {
                     item = [result.files[i]];
                 }
-                let imgSrc = item[1] ? URL.createObjectURL(item[1]) : '/img/ph_s.png';
+                let imgSrc = item[2] instanceof Blob ? URL.createObjectURL(item[2]) : '/img/ph_s.png';
                 let fileNameClass = ClassNames('name', {'selected': Monitor.selectedItem.name === item[0]});
 
                 return (
@@ -188,7 +188,7 @@ define([
         },
 
         _processImage: function(imageBlob) {
-            let targetDevice = DeviceMaster.getSelectedDevice();
+            let targetDevice = this.props.selectedDevice;
             if (targetDevice) {
                 if (!hdChecked[targetDevice.serial]) {
                     getImageSize(URL.createObjectURL(imageBlob), (size) => {
@@ -232,7 +232,7 @@ define([
         },
 
         _getJobProgress: function() {
-            let { Monitor, Device } = this.context.store.getState()
+            let { Monitor, Device } = this.context.store.getState();
             if(Monitor.mode === GlobalConstants.FILE_PREVIEW  || this._isAbortedOrCompleted()) {
                 return '';
             }
