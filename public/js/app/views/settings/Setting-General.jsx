@@ -10,13 +10,17 @@ define([
     'use strict';
 
     let Controls = React.createClass({
+        innerHtml: function() {
+            return {__html: this.props.label};
+        },
         render: function() {
             return (
                 <div className="row-fluid">
 
                     <div className="span3 no-left-margin">
-                        <label className="font2">
-                            {this.props.label}
+                        <label className="font2"
+                            dangerouslySetInnerHTML={this.innerHtml()}
+                        >
                         </label>
                     </div>
 
