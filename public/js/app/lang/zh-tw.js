@@ -960,6 +960,7 @@ define(function() {
             aborted: '已終止',
             completed: '已完成',
             calibrating: '校正中',
+            showOutline: '繪製輪廓中',
             starting: '啟動中',
             resuming: '恢復中',
             scanning: '掃描',

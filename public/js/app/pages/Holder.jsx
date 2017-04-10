@@ -42,6 +42,7 @@ define([
 
     return function(args) {
         args = args || {};
+        console.log('args', args);
 
         let view = React.createClass({
                 getDefaultProps: function() {
@@ -145,6 +146,12 @@ define([
                         openPrinterSelectorWindow: true,
                         machineCommand: 'start',
                         settings: this._fetchFormalSettings()
+                    });
+                },
+                _handleShowOutlineClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        machineCommand: 'showOutline'
                     });
                 },
 
@@ -343,7 +350,7 @@ define([
                         buttons = [{
                             label: lang.laser.showOutline,
                             className: cx({
-                                'btn-disabled': false,
+                                'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-go': true
@@ -351,7 +358,7 @@ define([
                             dataAttrs: {
                                 'ga-event': 'holder-outline'
                             },
-                            onClick: this._handleStartClick
+                            onClick: this._handleShowOutlineClick
                         }].concat(buttons);
                     }
 

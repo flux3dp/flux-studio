@@ -904,6 +904,11 @@ define([
         }
     }
 
+    async function showOutline(position) {
+        const resp = await SocketMaster.addTask(
+                                  'showOutline', position);
+    }
+
     function calibrate(opts) {
         let d = $.Deferred(),
             debug_data = {};
@@ -1379,6 +1384,7 @@ define([
             this.streamCamera                   = streamCamera;
             this.stopStreamCamera               = stopStreamCamera;
             this.calibrate                      = calibrate;
+            this.showOutline                    = showOutline;
             this.home                           = home;
             this.cleanCalibration               = cleanCalibration;
             this.detectHead                     = detectHead;

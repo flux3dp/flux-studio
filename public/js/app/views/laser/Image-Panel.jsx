@@ -91,7 +91,7 @@ define([
 
             var self = this,
                 state = self.state;
-
+                
             state[which] = !self.state[which];
             self.setState(state);
 
@@ -103,7 +103,7 @@ define([
                 thresholdDisplay = round(thresholdValue / lang.laser.advanced.form.power.max * 100, 0);
 
             return (
-                'engrave' === props.mode ?
+                'laser' === props.mode ?
                 <label className="controls accordion">
                     <p className="caption">
                         {lang.laser.object_params.threshold.text}

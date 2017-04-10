@@ -552,6 +552,16 @@ define([
                 return d.promise();
             },
 
+            showOutline: (position) => {
+              let first = position.first.toString(),
+                  second = position.second.toString(),
+                  third = position.third.toString(),
+                  fourth = position.fourth.toString();
+
+              return useDefaultResponse(
+                `laser show_outline ${first} ${second} ${third} ${fourth}`);
+            },
+
             endMaintainMode: () => {
                 ctrl.mode = '';
                 return useDefaultResponse('task quit');
@@ -569,7 +579,7 @@ define([
                 return useDefaultResponse('play press_button');
             },
 
-            setHeadTemperatureDuringPause: (temperature) => {
+            show: (temperature) => {
                 return useDefaultResponse(`play toolhead heater 0 ${temperature}`);
             },
 
