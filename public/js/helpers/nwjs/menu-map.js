@@ -125,6 +125,12 @@ define([
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
+            alignCenter: {
+                label: lang.edit.alignCenter,
+                enabled: true,
+                onClick: emptyFunction,
+                parent: parentIndex.EDIT
+            },
             undo: {
                 label: lang.edit.undo,
                 enabled: false,
@@ -231,6 +237,7 @@ define([
                     items.scale,
                     items.rotate,
                     items.reset,
+                    items.alignCenter,
                     separator,
                     items.clear
                 ]

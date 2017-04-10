@@ -193,6 +193,8 @@ define([
                 menuItem,
                 menuOption;
 
+            console.log('subMenu', subMenu);
+
             if (undefined === items) {
                 return undefined;
             }
@@ -210,6 +212,7 @@ define([
             }
 
             items.forEach(function(el) {
+                console.log('el :', el);
                 menuOption = {
                     label: el.label || '',
                     type: el.type || 'normal',
@@ -789,6 +792,7 @@ define([
 
         doDiscover();
     }
+    console.log('menuMap :',menuMap);
 
     return {
         items: menuMap.items,

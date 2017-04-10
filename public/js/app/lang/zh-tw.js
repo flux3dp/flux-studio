@@ -90,6 +90,7 @@ define(function() {
                 scale: '縮放',
                 clear: '清除場景',
                 undo: '復原',
+                alignCenter: '置中',
                 reset: '重設'
             },
             device: {

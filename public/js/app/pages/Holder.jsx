@@ -77,11 +77,16 @@ define([
 
                     DnDHandler.plug(document, self._handleDragAndDrop);
 
+
                     self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
 
                     self.state.laserEvents.menuFactory.items.import.onClick = function() {
                         self.refs.fileUploader.getDOMNode().click();
                     };
+
+                    self.state.laserEvents.menuFactory.items.alignCenter.onClick = function() {
+                      console.log('click!');
+                    }
 
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
@@ -118,6 +123,8 @@ define([
                     MenuFactory.items.clear.onClick = () => {
                         self.state.laserEvents.clearScene();
                     };
+
+                    console.log('menuFactory :', self.state);
                 },
 
                 componentWillUnmount: function () {
