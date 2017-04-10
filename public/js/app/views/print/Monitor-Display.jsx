@@ -273,7 +273,7 @@ define([
             }
 
             let { slicingResult } = this.context;
-            console.log("Context ", this.context);
+            // console.log("Context ", this.context);
             let jobTime = FormatDuration(this._getJobTime()) || '',
                 jobProgress = this._getJobProgress(),
                 jobType = this._getJobType(),
