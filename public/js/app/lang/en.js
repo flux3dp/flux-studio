@@ -296,7 +296,7 @@ define(function() {
             confirm_reset: 'Confirm reset FS?',
             language: 'Language',
             notifications: 'Notifications',
-            default_model: 'Default Model\n(For Print Settings)',
+            default_model: 'Default Model<br />(For Print Settings)',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: 'None',
