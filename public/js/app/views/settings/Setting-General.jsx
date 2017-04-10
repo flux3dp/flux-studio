@@ -6,7 +6,8 @@ define([
     'jsx!widgets/Select',
     'app/actions/alert-actions',
     'helpers/local-storage',
-], function($, React, i18n, config, SelectView, AlertActions, LocalStorage) {
+    'app/actions/initialize-machine',
+], function($, React, i18n, config, SelectView, AlertActions, LocalStorage, initializeMachine) {
     'use strict';
 
     let Controls = React.createClass({
@@ -14,6 +15,7 @@ define([
             return {__html: this.props.label};
         },
         render: function() {
+            let style = { width: 'calc(100% / 10 * 3 - 10px)' };
             return (
                 <div className="row-fluid">
 
@@ -83,6 +85,13 @@ define([
             config().write(id, e.target.value);
         },
 
+        _removeDefaultMachine: function() {
+            if(confirm(this.state.lang.settings.confirm_remove_default)) {
+              initializeMachine.defaultPrinter.clear();
+              this.forceUpdate();
+            }
+        },
+
         _resetFS: function() {
             if(confirm(this.state.lang.settings.confirm_reset)) {
                 LocalStorage.clearAllExceptIP();
@@ -90,8 +99,12 @@ define([
             }
         },
 
+
         render: function() {
             let { supported_langs } = this.props,
+                printer = initializeMachine.defaultPrinter.get(),
+                default_machine_button,
+                tableStyle = {width: '70%'},
                 pokeIP = config().read('poke-ip-addr'),
                 lang = this.state.lang,
                 notificationOptions = [],
@@ -166,6 +179,13 @@ define([
                 }
             ];
 
+            if (printer.name != undefined) {
+              default_machine_button = <a className="font3"
+                          onClick={this._removeDefaultMachine}
+                        >{lang.settings.remove_default_machine_button}</a>
+            } else {
+              default_machine_button = <span>{lang.settings.default_machine_button}</span>
+            }
 
             return (
                 <div className="form general">
@@ -223,7 +243,18 @@ define([
                         />
                     </Controls>
 
-                    <Controls label={lang.settings.reset}>
+                    <Controls label={lang.settings.default_machine}>
+                      <table style={tableStyle}>
+                        <tr>
+                          <td>{printer.name}</td>
+                          <td>
+                            {default_machine_button}
+                          </td>
+                        </tr>
+                      </table>
+                    </Controls>
+
+                    <Controls label="">
                         <a className="font3"
                             onClick={this._resetFS}
                         >{lang.settings.reset_now}</a>

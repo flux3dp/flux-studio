@@ -50,9 +50,9 @@ define([
                 }
             }
 
-            if (existDefaultPrinter && device.uuid === defaultPrinter.uuid ) {
-                initializeMachine.defaultPrinter.set(device);
-            }
+        //    if (existDefaultPrinter && device.uuid === defaultPrinter.uuid ) {
+        //        initializeMachine.defaultPrinter.set(device);
+        //    }
 
             clearTimeout(timer);
             timer = setTimeout(() => {
