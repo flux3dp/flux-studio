@@ -19,7 +19,7 @@ define([
             return (
                 <div className="row-fluid">
 
-                    <div className="span3 no-left-margin">
+                    <div className="span3 no-left-margin" style={style}>
                         <label className="font2"
                             dangerouslySetInnerHTML={this.innerHtml()}
                         >
@@ -257,7 +257,7 @@ define([
                     <Controls label="">
                         <a className="font3"
                             onClick={this._resetFS}
-                        >{lang.settings.reset_now}</a>
+                        ><b>{lang.settings.reset_now}</b></a>
                     </Controls>
 
                 </div>
