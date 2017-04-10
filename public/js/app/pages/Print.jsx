@@ -108,7 +108,7 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
-                    var _settings            = Config().read('advanced-settings'),
+                    var _settings           = Config().read('advanced-settings'),
                         tutorialFinished    = Config().read('tutorial-finished'),
                         configuredPrinter   = Config().read('configured-printer');
 
@@ -546,7 +546,6 @@ define([
                     }.bind(this));
 
                     advancedSettings.set('raft', isOn ? 1 : 0, true);
-
                     this._saveSetting();
                 },
 
@@ -560,6 +559,7 @@ define([
                             supportOn: isOn
                         });
                     }.bind(this));
+
                     advancedSettings.set('support_material', isOn ? 1 : 0);
                     this._saveSetting();
                 },
@@ -947,6 +947,21 @@ define([
                 },
 
                 _saveSetting: function() {
+                    let { custom } = advancedSettings,
+                        raftIndex = custom.indexOf('raft ='),
+                        supportIndex = custom.indexOf('support_material =');
+
+                    // extra process for raft (because it's a direct control on left panel)
+                    if(raftIndex > 0) {
+                        custom = custom.slice(0, raftIndex) + `raft = ${advancedSettings.raft}\n` + custom.slice(raftIndex + 9);
+                    }
+
+                    if(supportIndex > 0) {
+                        custom= custom.slice(0, supportIndex) + `support_material = ${advancedSettings.support_material}\n` + custom.slice(supportIndex + 21);
+                    }
+
+                    advancedSettings.custom = custom;
+
                     Config().write('advanced-settings', advancedSettings.toString());
                 },
 

@@ -127,9 +127,9 @@ define([
 
         // Custom
         this.custom                              = '';
-        this.custom = this.toExpert('');
+        this.custom                              = this.toExpert('');
         this.customCura2                         = '';
-        this.customCura2 = this.toExpert('', 'cura2');
+        this.customCura2                         = this.toExpert('', 'cura2');
     }
 
     SlicerSettings.prototype.toExpert = function(customString = '', slicer = 'slic3r') {
@@ -144,7 +144,6 @@ define([
 
         function cura2() {
             var customCura2 = ( customString || self.customCura2 ).split('\n');
-
             Object.keys(self).filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function')).map((key) => {
                 let value = self[key];
                 if (cura2mapping[key] && cura2mapping[key].key) {
@@ -208,7 +207,7 @@ define([
                     if (this.engine === 'cura2') {
                         let rev = cura2revMapping[_key];
                         if (_key == 'support_angle') {
-                            console.log(rev);   
+                            console.log(rev);
                         }
                         if (rev && this.hasOwnProperty(rev.key)) {
                             this[rev.key] = rev.fn ? rev.fn(_value, self) : _value;
