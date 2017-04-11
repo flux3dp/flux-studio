@@ -90,6 +90,7 @@ define(function() {
                 scale: 'Scale',
                 clear: 'Clear Scene',
                 undo: 'Undo',
+                alignCenter: 'Align Center',
                 reset: 'Reset'
             },
             device: {

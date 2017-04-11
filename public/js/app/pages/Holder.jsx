@@ -85,10 +85,6 @@ define([
                         self.refs.fileUploader.getDOMNode().click();
                     };
 
-                    self.state.laserEvents.menuFactory.items.alignCenter.onClick = function() {
-                      console.log('click!');
-                    }
-
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
                         self._handleStartClick();
@@ -388,7 +384,6 @@ define([
                         printerSelector = this._renderPrinterSelectorWindow(),
                         uploader = this._renderFileUploader(),
                         actionButtons = this._renderActionButtons();
-
                     return (
                         <div className="studio-container laser-studio">
                             {printerSelector}

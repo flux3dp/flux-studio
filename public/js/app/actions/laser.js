@@ -115,6 +115,7 @@ define([
 
                 self.state.images = self.state.images.concat(goodFiles);
 
+                menuFactory.items.alignCenter.enabled = hasImage;
                 menuFactory.items.execute.enabled = hasImage;
                 menuFactory.items.saveTask.enabled = hasImage;
                 menuFactory.items.clear.enabled = true;
@@ -152,6 +153,8 @@ define([
                         state.hasImage = false;
                         state.images = [];
 
+                        menuFactory.items.alignCenter.enabled = false;
+                        menuFactory.items.duplicate.enabled = false;
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
                         menuFactory.methods.refresh();
@@ -601,6 +604,22 @@ define([
                                 self.setState({
                                     hasImage: true
                                 });
+                            },
+
+                            alignCenter = function() {
+                              let args = {
+                                      maintainAspectRatio: true,
+                                      x: convertToHtmlCoordinate(0, 'x'),
+                                      y: convertToHtmlCoordinate(0, 'y')
+                                  },
+                                  params = {
+                                    position :{ x: 0, y: 0 },
+                                  };
+
+                              refreshObjectParams(e, $target_image);
+                              refreshImagePanelPos();
+                              self.setState(params);
+                              $target_image.freetrans(args);
                             };
 
                         if (false === $img.hasClass('image-active')) {
@@ -626,6 +645,8 @@ define([
                             // Async heavy call
                             menuFactory.items.duplicate.enabled = true;
                             menuFactory.items.duplicate.onClick = clone;
+                            menuFactory.items.alignCenter.enabled = true;
+                            menuFactory.items.alignCenter.onClick = alignCenter;
                             menuFactory.methods.refresh();
                         }, 50);
                     });
@@ -672,6 +693,7 @@ define([
 
             if (!dontRefresh) {
                 menuFactory.items.duplicate.enabled = false;
+                menuFactory.items.alignCenter.enabled = false;
                 menuFactory.methods.refresh();
             }
 
@@ -933,7 +955,6 @@ define([
 
                 refreshImagePanelPos();
                 self.setState(params);
-
                 $target_image.freetrans(args);
             },
             menuFactory: menuFactory,

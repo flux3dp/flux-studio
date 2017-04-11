@@ -91,7 +91,7 @@ define([
 
             var self = this,
                 state = self.state;
-                
+
             state[which] = !self.state[which];
             self.setState(state);
 

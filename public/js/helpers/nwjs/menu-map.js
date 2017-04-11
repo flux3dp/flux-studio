@@ -127,7 +127,7 @@ define([
             },
             alignCenter: {
                 label: lang.edit.alignCenter,
-                enabled: true,
+                enabled: false,
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
