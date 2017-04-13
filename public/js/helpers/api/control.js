@@ -552,14 +552,17 @@ define([
                 return d.promise();
             },
 
-            showOutline: (position) => {
-              let first = position.first.toString(),
-                  second = position.second.toString(),
-                  third = position.third.toString(),
-                  fourth = position.fourth.toString();
+            showOutline: (positions) => {
+              let frames = '';
+              positions.forEach(function(position) {
+                let frame = [position.first,
+                             position.second,
+                             position.third,
+                             position.fourth];
+                frames += JSON.stringify(frame) + " ";
+              });
 
-              return useDefaultResponse(
-                `laser show_outline ${first} ${second} ${third} ${fourth}`);
+              return useDefaultResponse(`laser show_outline ${frames}`);
             },
 
             endMaintainMode: () => {

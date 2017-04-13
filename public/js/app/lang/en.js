@@ -964,6 +964,7 @@ define(function() {
             aborted: 'Aborted',
             completed: 'Completed',
             calibrating: 'Calibrating',
+            showOutline: 'frame showing',
             starting: 'Starting',
             resuming: 'Resuming',
             scanning: 'Scanning',

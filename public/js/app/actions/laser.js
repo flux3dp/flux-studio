@@ -421,14 +421,14 @@ define([
             resetPosTimer = null,
             //============== for test async function ===========================
             showOutline = async (outLine_data) => {
-              const printer = await DeviceMaster.select(self.state.selectedPrinter);
-                  ProgressActions.open(
-                      ProgressConstants.WAITING,
-                      lang.device.showOutline
-                  );
-              const test = await DeviceMaster.showOutline(outLine_data);
+              await DeviceMaster.select(self.state.selectedPrinter);
+                ProgressActions.open(
+                    ProgressConstants.WAITING,
+                    lang.device.showOutline
+                );
+              await DeviceMaster.showOutline(outLine_data);
               ProgressActions.close();
-              },
+            },
             //======================END ========================================
 
             getPoint = function($el) {
@@ -460,7 +460,6 @@ define([
                     //================ END ==================================*/
                     args = [],
                     doLaser = function(settings) {
-
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
                                 top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
@@ -616,10 +615,10 @@ define([
                                     position :{ x: 0, y: 0 },
                                   };
 
-                              refreshObjectParams(e, $target_image);
-                              refreshImagePanelPos();
                               self.setState(params);
                               $target_image.freetrans(args);
+                              refreshImagePanelPos();
+                              refreshObjectParams(e, $target_image);
                             };
 
                         if (false === $img.hasClass('image-active')) {
@@ -719,7 +718,7 @@ define([
                     windowPos = $('body').box(true),
                     initialPosition = {
                         left: pos.right + 10,
-                        top: pos.center.y - 66
+                        top: pos.center.y  - 66
                     };
 
                 // check position top
@@ -762,13 +761,15 @@ define([
                         ProgressConstants.STEPPING
                     );
                 } else if (command === 'showOutline') {
-                    let $ft_controls = $laser_platform.find('.ft-controls'),
-                        tl = getPoint($ft_controls.find('.ft-scaler-top.ft-scaler-left')),
-                        tr = getPoint($ft_controls.find('.ft-scaler-top.ft-scaler-right')),
-                        br = getPoint($ft_controls.find('.ft-scaler-bottom.ft-scaler-right')),
-                        bl = getPoint($ft_controls.find('.ft-scaler-bottom.ft-scaler-left')),
-
-                        position = {
+                    let positions = [],
+                        $ft_controls = $laser_platform.find('.ft-controls');
+                    $ft_controls.each(function(index, image) {
+                        let $image = $(image),
+                            tl = getPoint($image.find('.ft-scaler-top.ft-scaler-left')),
+                            tr = getPoint($image.find('.ft-scaler-top.ft-scaler-right')),
+                            br = getPoint($image.find('.ft-scaler-bottom.ft-scaler-right')),
+                            bl = getPoint($image.find('.ft-scaler-bottom.ft-scaler-left')),
+                            position = {
                                 first: [convertToRealCoordinate(tl.x, 'x'),
                                         convertToRealCoordinate(tl.y, 'y')],
                                 second: [convertToRealCoordinate(tr.x, 'x'),
@@ -778,7 +779,9 @@ define([
                                 fourth: [convertToRealCoordinate(bl.x, 'x'),
                                          convertToRealCoordinate(bl.y, 'y')],
                             };
-                    showOutline(position);
+                        positions.push(position);
+                    });
+                    showOutline(positions);
 
                 } else if (command === 'calibrate') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {

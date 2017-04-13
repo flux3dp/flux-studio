@@ -904,9 +904,8 @@ define([
         }
     }
 
-    async function showOutline(position) {
-        const resp = await SocketMaster.addTask(
-                                  'showOutline', position);
+    async function showOutline(positions) {
+      await SocketMaster.addTask('showOutline', positions);
     }
 
     function calibrate(opts) {
