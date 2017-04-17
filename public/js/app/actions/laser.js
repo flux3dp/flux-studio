@@ -513,6 +513,7 @@ define([
                                         sub_data.real_width = box.width / $laser_platform.width() * DIAMETER;
                                         sub_data.real_height = box.height / $laser_platform.height() * DIAMETER;
 
+                                        args.push(sub_data);
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
