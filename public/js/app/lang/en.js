@@ -639,7 +639,14 @@ define(function() {
             }
         },
         cut: {
-            calibrate: 'Auto\nLevel',
+            horizontal_calibrate: 'Horizontal\nAdjustment',
+            height_calibrate: 'Height\nAdjustment',
+            running_horizontal_adjustment: 'Running Horizontal Adjustment..',
+            running_height_adjustment: 'Running Height Adjustment...',
+            run_height_adjustment: 'Please adjust the blade, and run the height adjustment',
+            horizontal_adjustment_completed: 'Horizontal Adjustment Completed',
+            height_adjustment_completed: 'Height Adjustment Completed',
+            you_can_now_cut: 'Congrats! You can now start cutting sheets.',
             zOffset: 'Cutting Height',
             overcut: 'Overcut',
             speed: 'Speed',

@@ -439,7 +439,7 @@ define([
                 return d.promise();
             },
 
-            calibrate: (clean, doubleZProbe) => {
+            calibrate: (clean, doubleZProbe, withoutZProbe) => {
                 let d = $.Deferred(),
                     errorCount = 0,
                     temp = { debug: [] },
@@ -447,11 +447,13 @@ define([
 
                 events.onMessage = (response) => {
                     if(response.status === 'ok') {
-                        if(response.data.length > 1) {
+                        if (withoutZProbe) {
+                            response.debug = temp.debug;
+                            d.resolve(response);
+                        } else if(response.data.length > 1) {
                             ws.send('maintain zprobe');
-                        }
-                        else {
-                            if (doubleZProbe && !doubleZProbeDone) {
+                        } else {
+                            if (doubleZProbe&& !doubleZProbeDone) {
                                 doubleZProbeDone = true;
                                 ws.send('maintain zprobe');
                                 return;
@@ -505,6 +507,56 @@ define([
 
                 let cmd = 'maintain calibrating' + (clean ? ' clean' : '');
                 ws.send(cmd);
+                return d.promise();
+            },
+
+            zprobe: () => {
+                let d = $.Deferred(),
+                    errorCount = 0,
+                    temp = { debug: [] };
+
+                events.onMessage = (response) => {
+                    if (response.status === 'ok') {
+                        response.debug = temp.debug;
+                        d.resolve(response);
+                    } else if (response.status === 'operating') {
+                        temp.operation_info = response;
+                        d.notify(response);
+                    }
+                };
+
+                events.onDebug = (response) => {
+                    if(response.log){
+                        if(temp.operation_info){
+                            if(typeof temp.operation_info.pos !== 'undefined') {
+                                response.log += ' POS ' + temp.operation_info.pos;
+                            }
+                            else{
+                                response.log += ' Z';
+                            }
+                        }
+                        temp.debug.push(response.log);
+                    }
+                };
+
+                events.onError = (response) => {
+                    if(response.status === 'error') {
+                        if(errorCount === 0 && response.error[0] === 'HEAD_ERROR') {
+                            setTimeout(() => {
+                                errorCount++;
+                                ws.send('maintain zprobe');
+                            }, 500);
+                        }
+                        else {
+                            d.reject(response);
+                        }
+                    }
+                    else {
+                        d.reject(response);
+                    }
+                };
+                events.onFatal = (response) => { d.reject(response); };
+                ws.send('maintain zprobe');
                 return d.promise();
             },
 
@@ -705,6 +757,10 @@ define([
 
         ctrl.calibrateDoubleZProbe = function(){
             return ctrl.calibrate(true, true);
+        };
+
+        ctrl.calibrateWithoutZProbe = function(){
+            return ctrl.calibrate(true, false, true);
         };
 
         return ctrl;

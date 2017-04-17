@@ -652,7 +652,14 @@ define(function() {
             }
         },
         cut: {
-            calibrate: '校正',
+            horizontal_calibrate: '水平\n校正',
+            height_calibrate: '高度\n校正',
+            running_horizontal_adjustment: '水平校正中',
+            running_height_adjustment: '高度校正中',
+            run_height_adjustment: '請調整刀具，並執行高度校正。',
+            horizontal_adjustment_completed: '水平校正完成',
+            height_adjustment_completed: '高度校正完成',
+            you_can_now_cut: '恭喜您！您可以開始進行切割工作',
             zOffset: '切割高度',
             overcut: '閉環過切',
             speed: '速度',

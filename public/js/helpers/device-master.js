@@ -910,6 +910,7 @@ define([
         opts = opts || {};
         opts.forceExtruder = opts.forceExtruder === null ? true : opts.forceExtruder;
         opts.doubleZProbe = opts.doubleZProbe === null ? false : opts.doubleZProbe;
+        opts.withoutZProbe = opts.withoutZProbe === null ? false : opts.withoutZProbe;
 
 
         const processError = (resp = {}) => {
@@ -948,7 +949,7 @@ define([
 
         const step2 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask(opts.doubleZProbe ? 'calibrateDoubleZProbe@maintain' : 'calibrate@maintain').then((response) => {
+            SocketMaster.addTask(opts.doubleZProbe ? 'calibrateDoubleZProbe@maintain' : ( opts.withoutZProbe ? 'calibrateWithoutZProbe@maintain' : 'calibrate@maintain' ) ).then((response) => {
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
@@ -971,6 +972,76 @@ define([
 
         return d.promise();
     }
+
+
+    function zprobe(opts) {
+        let d = $.Deferred(),
+            debug_data = {};
+
+        opts = opts || {};
+        opts.forceExtruder = opts.forceExtruder === null ? true : opts.forceExtruder;
+
+
+        const processError = (resp = {}) => {
+            if (typeof resp === 'string') { resp = { error: [resp] }; }
+            if (resp.error && resp.error === 'EDGE_CASE') { return; }
+            DeviceErrorHandler.processDeviceMasterResponse(resp);
+            AlertActions.showPopupError('device-busy', DeviceErrorHandler.translate(resp.error));
+            SocketMaster.addTask('endMaintainMode');
+        };
+
+        const step1 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('enterMaintainMode').then((response) => {
+                if(response.status === 'ok') {
+                    return SocketMaster.addTask('getHeadInfo@maintain');
+                }
+                else {
+                    _d.reject(response);
+                }
+            }).then((headResp) => {
+                if (opts.forceExtruder) {
+                    if(headResp.module === null) {
+                        return $.Deferred().reject({module:null, error: ['HEAD_ERROR', 'HEAD_OFFLINE']});
+                    } else if(headResp.module !== 'EXTRUDER') {
+                        return $.Deferred().reject({module:'LASER', error: ['HEAD_ERROR', 'TYPE_ERROR']});
+                    }
+                }
+                return SocketMaster.addTask('maintainHome');
+            }).then((response) => {
+                response.status === 'ok' ? _d.resolve() : _d.reject();
+            }).fail((error) => {
+                _d.reject(error);
+            });
+            return _d.promise();
+        };
+
+        const step2 = () => {
+            let _d = $.Deferred();
+            SocketMaster.addTask('zprobe@maintain').then((response) => {
+                debug_data = response.debug;
+                return SocketMaster.addTask('endMaintainMode');
+            }).then(() => {
+                _d.resolve();
+            }).fail((error) => {
+                _d.reject(error);
+            });
+            return _d.promise();
+        };
+
+        step1().then(() => {
+            return step2();
+        }).then(() => {
+            d.resolve(debug_data);
+        }).fail((error) => {
+            console.log(error);
+            processError(error);
+            d.reject(error);
+        });
+
+        return d.promise();
+    }
+
 
     function home() {
         let d = $.Deferred();
@@ -1378,6 +1449,7 @@ define([
             this.streamCamera                   = streamCamera;
             this.stopStreamCamera               = stopStreamCamera;
             this.calibrate                      = calibrate;
+            this.zprobe                         = zprobe;
             this.home                           = home;
             this.cleanCalibration               = cleanCalibration;
             this.detectHead                     = detectHead;
