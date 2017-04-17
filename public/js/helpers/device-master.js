@@ -1143,12 +1143,12 @@ define([
         return _availableDevices;
     }
 
-    function getDeviceSettings(withBacklash, withUpgradeKit) {
+    function getDeviceSettings(withBacklash, withUpgradeKit, withM666R_MMTest) {
         let d = $.Deferred(),
             settings = {},
             _settings = ['correction', 'filament_detect', 'head_error_level', 'autoresume', 'broadcast', 'enable_cloud'];
 
-        if(withBacklash === true) {
+        if (withBacklash === true) {
             _settings.push('backlash');
         }
 
@@ -1159,6 +1159,11 @@ define([
                 'plus_extrusion',
                 'player_postback_url'
             ];
+        }
+
+        if (withM666R_MMTest) {
+            _settings.push('leveling');
+            _settings.push('movement_test');
         }
 
         const worker = function*() {

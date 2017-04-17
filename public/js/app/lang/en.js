@@ -1026,6 +1026,8 @@ define(function() {
             plus_camera: 'Upgrade Kits Camera',
             plus_extrusion: 'Upgrade Kits Extruder',
             postback_url: 'Status callback URL',
+            movement_test: 'Movement Test Before Print',
+            machine_radius: 'Machine Radius',
             disable: 'Disable',
             enable: 'Enable'
         },
