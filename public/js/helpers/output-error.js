@@ -40,7 +40,6 @@ define([
                 report_info = {
                     ws: allLog.websocket || '',
                     discoverDeviceList: allLog.discover || '',
-                    screenshot: jpegUrl,
                     localStorage: {},
                     general: allLog.generic || '',
                 },

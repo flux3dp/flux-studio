@@ -76,7 +76,8 @@ define([
                 printOptions        : [],
                 loadFinished        : false,
                 hasDefaultPrinter   : hasDefaultPrinter,
-                discoverMethods     : {}
+                discoverMethods     : {},
+                componentReady      : false
             };
         },
 
@@ -118,48 +119,73 @@ define([
 
             AlertStore.onCancel(self._onCancel);
 
-            self.setState({
-                discoverMethods: discover(
-                    self.state.discoverId,
-                    function(printers) {
-                        printers = DeviceList(printers);
-                        refreshOption(printers);
-                    }
-                )
-            }, function() {
-                var timer,
-                    tryTimes = 20,
-                    selectDefaultDevice = function() {
-                        if (true === self.state.hasDefaultPrinter) {
-                            if (null !== currentPrinter) {
-                                self._selectPrinter(selectedPrinter);
+            const next = () => {
+                self.setState({
+                    discoverMethods: discover(
+                        self.state.discoverId,
+                        function(printers) {
+                            printers = DeviceList(printers);
+                            refreshOption(printers);
+                        }
+                    )
+                }, function() {
+                    var timer,
+                        tryTimes = 20,
+                        selectDefaultDevice = function() {
+                            if (true === self.state.hasDefaultPrinter) {
+                                if (null !== currentPrinter) {
+                                    self._selectPrinter(selectedPrinter);
+                                    clearInterval(timer);
+                                }
+                                else {
+                                    tryTimes--;
+                                }
+                            }
+
+                            if (0 > tryTimes) {
                                 clearInterval(timer);
+                                if(self.state.printOptions.length === 0) {
+                                    AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
+                                }
+                                else {
+                                    self.setState({
+                                        loadFinished: false,
+                                        hasDefaultPrinter: false
+                                    });
+                                }
                             }
-                            else {
-                                tryTimes--;
-                            }
-                        }
+                        };
 
-                        if (0 > tryTimes) {
-                            clearInterval(timer);
-                            if(self.state.printOptions.length === 0) {
-                                AlertActions.showPopupError('device-not-found', lang.message.device_not_found.message, lang.message.device_not_found.caption);
-                            }
-                            else {
-                                self.setState({
-                                    loadFinished: false,
-                                    hasDefaultPrinter: false
-                                });
-                            }
-                        }
-                    };
+                    currentPrinter = self.state.discoverMethods.getLatestPrinter(selectedPrinter);
 
-                currentPrinter = self.state.discoverMethods.getLatestPrinter(selectedPrinter);
+                    timer = setInterval(selectDefaultDevice, 100);
+                });
 
-                timer = setInterval(selectDefaultDevice, 100);
-            });
+                self._waitForPrinters();
+            };
 
-            self._waitForPrinters();
+            //check for default printer availablity
+            let device = initializeMachine.defaultPrinter.get();
+
+            const noDefaultPrinter = () => {
+                self.setState({
+                    loadFinished: false,
+                    hasDefaultPrinter: false
+                }, next);
+            };
+
+            if(Object.keys(device).length === 0) {
+                noDefaultPrinter();
+            }
+            else {
+                DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
+                .then(next)
+                .fail(() => {
+                    console.log('[print selector] select device failed');
+                    noDefaultPrinter();
+                });
+            }
+
         },
 
         componentWillUnmount: function() {
@@ -174,6 +200,7 @@ define([
         },
 
         _onCancel: function(id) {
+            this.setState({ processing: false });
             switch (id) {
             case 'no-printer':
             case 'printer-connection-timeout':
@@ -185,6 +212,7 @@ define([
         },
 
         _selectPrinter: function(printer, e) {
+            this.setState({ processing: true });
             var self = this,
                 lang = self.props.lang,
                 onError;
@@ -231,11 +259,12 @@ define([
                 self._returnSelectedPrinter();
             }
             else {
-                DeviceMaster.selectDevice(self.selected_printer).done(function(status) {
+                DeviceMaster.selectDevice(self.selected_printer).done((status) => {
                     if (status === DeviceConstants.CONNECTED) {
                         printer = self.selected_printer;
                         ProgressActions.open(ProgressConstants.NONSTOP);
-                        checkDeviceStatus(printer).done(function() {
+
+                        const next = () => {
                             ProgressActions.close();
                             if (true === self.props.forceAuth && true === printer.password) {
                                 onError();
@@ -243,7 +272,15 @@ define([
                             }
 
                             self._returnSelectedPrinter();
-                        });
+                        }
+                        if(this.props.bypassCheck === true) {
+                            next();
+                        }
+                        else {
+                            checkDeviceStatus(printer).done(() => {
+                                next();
+                            });
+                        }
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         // TODO: Check default printer
@@ -260,7 +297,7 @@ define([
                     }
                 }).always(() => {
                     ProgressActions.close();
-                }).fail(function(status) {
+                }).fail((status) => {
                     AlertActions.showPopupError('fatal-occurred', status);
                 });
             }
@@ -308,6 +345,12 @@ define([
                     </div>
                 );
 
+            if(this.state.processing) {
+                content = (
+                    <div className="spinner-roller invert"/>
+                );
+            }
+
             return content;
         },
 
@@ -315,6 +358,22 @@ define([
             var self = this;
 
             self.props.onGettingPrinter(self.selected_printer);
+        },
+
+        _waitForPrinters: function() {
+            setTimeout(this._openAlertWithnoPrinters, 5000);
+        },
+
+        _openAlertWithnoPrinters: function() {
+            var self = this,
+                lang = self.props.lang;
+
+            AlertStore.removeRetryListener(self._waitForPrinters);
+
+            if (0 === self.state.printOptions.length && false === self.state.hasDefaultPrinter) {
+                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                AlertStore.onRetry(self._waitForPrinters);
+            }
         },
 
         _renderPrinterItem: function(printer) {
@@ -374,23 +433,8 @@ define([
                     <div className="arrow arrow-right"/>
                 </div>
             );
-        },
-
-        _waitForPrinters: function() {
-            setTimeout(this._openAlertWithnoPrinters, 5000);
-        },
-
-        _openAlertWithnoPrinters: function() {
-            var self = this,
-                lang = self.props.lang;
-
-            AlertStore.removeRetryListener(self._waitForPrinters);
-
-            if (0 === self.state.printOptions.length && false === self.state.hasDefaultPrinter) {
-                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
-                AlertStore.onRetry(self._waitForPrinters);
-            }
         }
+
     });
 
     return View;

@@ -55,11 +55,14 @@ define([
         _stopChangingFilamentCallback,
         _selectedDevice = {},
         _deviceNameMap = {},
+        _actionMap = {},
         _device,
         _cameraTimeoutTracker,
+        _wasKilled = false,
         nwConsole,
         usbDeviceReport = {},
         _devices = [],
+        _availableDevices = [],
         _errors = {},
         availableUsbChannel = -1,
         usbEventListeners = {};
@@ -92,11 +95,10 @@ define([
         }
 
         // match the device from the newest received device list
-        let latestDevice = _devices.filter(d => d.serial === device.serial && d.source === device.source);
+        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source);
 
         Object.assign(_selectedDevice, latestDevice[0]);
-        let d = deferred || $.Deferred(),
-            uuid = device.uuid;
+        let d = deferred || $.Deferred();
 
         const goAuth = (uuid) => {
             ProgressActions.close();
@@ -105,7 +107,7 @@ define([
             const handleSubmit = (password) => {
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
 
-                auth(uuid, password).done((data) => {
+                auth(device.uuid, password).done((data) => {
                     device.plaintext_password = password;
                     selectDevice(device, d);
                 })
@@ -116,7 +118,7 @@ define([
                         lang.select_printer.auth_failure
                     );
 
-                    goAuth(uuid);
+                    goAuth(device.uuid);
 
                     AlertActions.showPopupError('device-auth-fail', message);
                 });
@@ -134,7 +136,7 @@ define([
         };
 
         const createDeviceActions = (availableUsbChannel = -1) => {
-            return DeviceController(uuid, {
+            return DeviceController(device.uuid, {
                 availableUsbChannel,
                 onConnect: function(response, options) {
                     d.notify(response);
@@ -142,6 +144,10 @@ define([
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                         if (options == null || (options && !options.dedicated)) {
                             ProgressActions.close();
+                        }
+                        let exist = _devices.some(dev => { dev.uuid === device.uuid; });
+                        if(!exist) {
+                            _devices.push(device);
                         }
                         d.resolve(DeviceConstants.CONNECTED);
                         // _devices.push(_device);
@@ -188,6 +194,10 @@ define([
                     default:
                         let message = lang.message.unknown_error;
 
+                        if(response.error === 'NOT_FOUND') {
+                            message = lang.message.unable_to_find_machine;
+                        }
+
                         if(response.error === 'UNKNOWN_DEVICE') {
                             message = lang.message.unknown_device;
                         }
@@ -198,37 +208,59 @@ define([
                         );
                     }
                 },
-                onFatal: function(e) {
-                    _selectedDevice = {};
-
+                onFatal: function(response) {
+                    // process fatal
+                    if(!_wasKilled) {
+                        _selectedDevice = {};
+                        _wasKilled = false;
+                    }
+                    console.log('process fatal');
                 }
             });
         };
 
         ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
 
-        if(_existConnection(uuid)) {
+        if(_existConnection(device.uuid, device.source)) {
             ProgressActions.close();
-            _device = _switchDevice(uuid);
+            _device = _switchDevice(device.uuid);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
             _device = {};
-            _device.uuid = uuid;
+            _device.uuid = device.uuid;
             _device.source = device.source;
             _device.name = device.name;
+            delete _actionMap[device.uuid];
         }
 
         const initSocketMaster = () => {
+
+            if(typeof _actionMap[device.uuid] !== 'undefined') {
+                _device.actions = _actionMap[device.uuid];
+                return;
+            }
+
             SocketMaster = new Sm();
 
+            // if usb not detected but device us using usb
+            if(this.availableUsbChannel === -1 && device.source === 'h2h') {
+                device = getDeviceBySerialFromAvailableList(device.serial, false);
+            }
+
             // if availableUsbChannel has been defined
-            if(typeof this !== 'undefined' && typeof this.availableUsbChannel !== 'undefined' && device.source === 'h2h') {
+            if(
+                typeof this !== 'undefined' &&
+                typeof this.availableUsbChannel !== 'undefined' &&
+                device.source === 'h2h'
+            ) {
                 _device.actions = createDeviceActions(this.availableUsbChannel);
             }
             else {
                 _device.actions = createDeviceActions(device.uuid);
             }
+
+            _actionMap[device.uuid] = _device.actions;
             SocketMaster.setWebSocket(_device.actions);
         };
 
@@ -380,22 +412,23 @@ define([
         ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
 
         let t = setInterval(() => {
-            SocketMaster.addTask('report').then(r => {
+            SocketMaster.addTask('report')
+            .then(r => {
                 d.notify(r, t);
                 let { st_id, error } = r.device_status;
-                if (st_id == 64) {
+                if (st_id === 64) {
                     clearInterval(t);
                     setTimeout(() => {
                         quit();
                         d.resolve();
                     }, 300);
-                } else if (( st_id == 128 || st_id == 48 || st_id == 36 ) && error && error.length > 0) { // Error occured
+                } else if (( st_id === 128 || st_id === 48 || st_id === 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
-                } else if(st_id == 128) {
+                } else if(st_id === 128) {
                     clearInterval(t);
                     d.reject(error);
-                } else if (st_id == 0) {
+                } else if (st_id === 0) {
                     // Resolve if the status was running and some how skipped the completed part
                     if (statusChanged) {
                         clearInterval(t);
@@ -462,6 +495,7 @@ define([
     }
 
     function killSelf() {
+        _wasKilled = true;
         let d = $.Deferred();
         _device.actions.killSelf().then(response => {
             d.resolve(response);
@@ -683,7 +717,9 @@ define([
             }
         });
 
-        return selectDevice(_selectedDevice);
+        killSelf().always(() => {
+            selectDevice(_selectedDevice);
+        });
     }
 
     // get functions
@@ -693,7 +729,10 @@ define([
     }
 
     function getSelectedDevice() {
-        return _device;
+        // retrieve the whole device information from discover.js
+        let foundDevices = _availableDevices.filter(d => d.uuid === _device.uuid);
+
+        return foundDevices.length > 0 ? foundDevices[0] : _device;
     }
 
     function getPreviewInfo() {
@@ -749,7 +788,14 @@ define([
             'QUIT_TASK' : () => SocketMaster.addTask('quitTask'),
 
             'REPORT'    : () => {
-                let d = $.Deferred();
+                let d = $.Deferred(),
+                    timeout;
+
+                timeout = setTimeout(() => {
+                    console.log('play report timeout');
+                    d.reject({ status: 'fata', error: ['TIMEOUT'] });
+                }, 10 * 1000);
+
                 SocketMaster.addTask('report').then((result) => {
                     // force update st_label for a backend inconsistancy
                     let s = result.device_status;
@@ -759,6 +805,8 @@ define([
                     d.resolve(s);
                 }).fail((error) => {
                     d.reject(error);
+                }).always(() => {
+                    clearTimeout(timeout);
                 });
                 return d.promise();
             }
@@ -1083,7 +1131,7 @@ define([
 
     // device are stored in array _devices
     function getAvailableDevices() {
-        return _devices;
+        return _availableDevices;
     }
 
     function getDeviceSettings(withBacklash, withUpgradeKit, withM666R_MMTest) {
@@ -1224,7 +1272,7 @@ define([
     }
 
     function getDeviceBySerial(serial, isUsb, callback) {
-        let matchedDevice = _devices.filter(d => {
+        let matchedDevice = _availableDevices.filter(d => {
             let a = d.serial === serial;
             if (isUsb) { a = a && d.source === 'h2h'; };
             return a;
@@ -1247,15 +1295,24 @@ define([
         }
     }
 
+    function getDeviceBySerialFromAvailableList(serial, isUsb = false) {
+        let matchedDevice = _availableDevices.filter(device => {
+            let a = device.serial === serial;
+            if (isUsb) { a = a && device.source === 'h2h'; };
+            return a;
+        });
+
+        return matchedDevice[0];
+    }
+
     function usbDefaultDeviceCheck(device) {
-        // console.log('---', device.source, this.availableUsbChannel != device.addr);
         if(device.source !== 'h2h') {
             return device;
         }
 
         if(this.availableUsbChannel !== device.addr) {
             // get wifi version instead of h2h
-            let dev = _devices.filter(_dev => _dev.serial === device.serial);
+            let dev = _availableDevices.filter(_dev => _dev.serial === device.serial);
             if(dev[0]) {
                 console.log(dev[0]);
                 return dev[0];
@@ -1345,7 +1402,7 @@ define([
                     devices.forEach(d => {
                         _deviceNameMap[d.name] = d;
                     });
-                    _devices = devices;
+                    _availableDevices = devices;
                     _scanDeviceError(devices);
                 }
             );

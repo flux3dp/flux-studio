@@ -14,11 +14,11 @@ define(function() {
             osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
         generic_error: {
-            UNKNOWN_ERROR: "[UE] Please restart FLUX Studio",
-            OPERATION_ERROR: "[OE] A status conflict occured, please retry the action.",
-            SUBSYSTEM_ERROR: "[SE] Please restart the machine",
-            UNKNOWN_COMMAND: "[UC] Please update the Delta+/Delta Firmware",
-            RESOURCE_BUSY: "[RB] Please restart  the machine, or try again"
+            UNKNOWN_ERROR: '[UE] Please restart FLUX Studio',
+            OPERATION_ERROR: '[OE] A status conflict occured, please retry the action.',
+            SUBSYSTEM_ERROR: '[SE] Please restart the machine',
+            UNKNOWN_COMMAND: '[UC] Please update the Delta+/Delta Firmware',
+            RESOURCE_BUSY: '[RB] Please restart  the machine, or try again'
         },
         device_selection: {
             no_printers: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
@@ -97,6 +97,7 @@ define(function() {
                 new: 'Add a New Machine',
                 device_monitor: 'Dashboard',
                 device_info: 'Machine Info',
+                head_info: 'Toolhead Info',
                 change_filament: 'Change Printing Material',
                 default_device: 'Set as Default',
                 check_firmware_update: 'Update Firmware',
@@ -372,7 +373,9 @@ define(function() {
                 submit: 'SAVE',
                 sign_out: 'Sign out',
                 not_supported_firmware: 'Please upgrade your machine firmware\nto v1.5+ for cloud feature',
-                unbind_device: 'Would you like to unbind this machine?'
+                unbind_device: 'Would you like to unbind this machine?',
+                CLOUD_SESSION_CONNECTION_ERROR: 'The machine is unable to access to the cloud server. Please reboot the machine.',
+                CLOUD_UNKNOWN_ERROR: 'The machine is unable to connected to the cloud server. Please reboot the machine.',
             }
         },
         print: {
@@ -1142,7 +1145,8 @@ define(function() {
             usb_unplugged: 'USB connection is lost. Please check your USB connection',
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
             uploading_fcode: 'Uploading fcode',
-            cant_connect_to_device: 'Cannot connect to the machine, please check your connection'
+            cant_connect_to_device: 'Cannot connect to the machine, please check your connection',
+            unable_to_find_machine: 'Unable to find machine '
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -1257,6 +1261,17 @@ define(function() {
             headMissing: 'Cannot retrieve head module information, please make sure it\'s attached',
             calibrated: 'Auto Leveling Completed',
             extruderOnly: 'Please use the printing toolhead for calibration'
+        },
+        head_info: {
+            ID                  : 'ID',
+            VERSION             : 'Firmware Version',
+            HEAD_MODULE         : 'Toolhead Type',
+            EXTRUDER            : 'Printing Toolhead',
+            LASER               : 'Engraving Toolhead',
+            USED                : 'Used',
+            HARDWARE_VERSION    : 'Hardware Version',
+            FOCAL_LENGTH        : 'Focal Length',
+            hours               : 'Hours'
         }
     };
 });

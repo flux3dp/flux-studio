@@ -19,7 +19,7 @@ define([
         opts.onError = opts.onError || function() {};
         opts.onConnect = opts.onConnect || function() {};
 
-        let timeout = 10000,
+        let timeout = 12 * 1000,
             timmer,
             isConnected = false,
             lang = i18n.get(),
@@ -71,7 +71,9 @@ define([
                 },
                 onFatal: (response) => {
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
-                        createWs();
+                        setTimeout(() => {
+                            createWs();
+                        }, 3 * 1000);
                     }
                     else if(response.error === 'UNKNOWN_DEVICE') {
                         ProgressActions.close();
@@ -95,6 +97,7 @@ define([
                 },
                 onClose: (response) => {
                     isConnected = false;
+                    opts.onFatal(response);
                 },
                 onOpen: () => {
                     _ws.send(rsaKey());
@@ -199,10 +202,7 @@ define([
                 _ws = createDedicatedWs(fileInfoWsId);
 
                 events.onMessage = (response) => {
-                    if(response instanceof Blob || data.length === 2) {
-                        data.push(response);
-                    }
-
+                    data.push(response);
                     if(response.status === 'ok') {
                         d.resolve(data);
                     }
