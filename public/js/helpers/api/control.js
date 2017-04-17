@@ -552,7 +552,7 @@ define([
                 return d.promise();
             },
 
-            showOutline: (positions) => {
+            showOutline: (object_height, positions) => {
               let frames = '';
               positions.forEach(function(position) {
                 let frame = [position.first,
@@ -562,7 +562,7 @@ define([
                 frames += JSON.stringify(frame) + " ";
               });
 
-              return useDefaultResponse(`laser show_outline ${frames}`);
+              return useDefaultResponse(`laser show_outline ${object_height} ${frames}`);
             },
 
             endMaintainMode: () => {

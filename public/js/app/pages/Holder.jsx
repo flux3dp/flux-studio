@@ -42,7 +42,6 @@ define([
 
     return function(args) {
         args = args || {};
-        console.log('args', args);
 
         let view = React.createClass({
                 getDefaultProps: function() {
@@ -120,8 +119,6 @@ define([
                     MenuFactory.items.clear.onClick = () => {
                         self.state.laserEvents.clearScene();
                     };
-
-                    console.log('menuFactory :', self.state);
                 },
 
                 componentWillUnmount: function () {
@@ -147,7 +144,8 @@ define([
                 _handleShowOutlineClick: function() {
                     this.setState({
                         openPrinterSelectorWindow: true,
-                        machineCommand: 'showOutline'
+                        machineCommand: 'showOutline',
+                        settings: this._fetchFormalSettings()
                     });
                 },
 

@@ -789,7 +789,6 @@ define([
 
         doDiscover();
     }
-    console.log('menuMap :',menuMap);
 
     return {
         items: menuMap.items,

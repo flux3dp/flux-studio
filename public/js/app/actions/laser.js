@@ -420,13 +420,13 @@ define([
             $target_image = null, // changing when image clicked
             resetPosTimer = null,
             //============== for test async function ===========================
-            showOutline = async (outLine_data) => {
+            showOutline = async (object_height, outLine_data) => {
               await DeviceMaster.select(self.state.selectedPrinter);
                 ProgressActions.open(
                     ProgressConstants.WAITING,
                     lang.device.showOutline
                 );
-              await DeviceMaster.showOutline(outLine_data);
+              await DeviceMaster.showOutline(object_height, outLine_data);
               ProgressActions.close();
             },
             //======================END ========================================
@@ -513,7 +513,6 @@ define([
                                         sub_data.real_width = box.width / $laser_platform.width() * DIAMETER;
                                         sub_data.real_height = box.height / $laser_platform.height() * DIAMETER;
 
-                                        args.push(sub_data);
 
                                         if (args.length === $ft_controls.length) {
                                             // sending data
@@ -762,7 +761,9 @@ define([
                     );
                 } else if (command === 'showOutline') {
                     let positions = [],
+                        objectHeight = settings.object_height,
                         $ft_controls = $laser_platform.find('.ft-controls');
+                    console.log('height', objectHeight);
                     $ft_controls.each(function(index, image) {
                         let $image = $(image),
                             tl = getPoint($image.find('.ft-scaler-top.ft-scaler-left')),
@@ -781,7 +782,7 @@ define([
                             };
                         positions.push(position);
                     });
-                    showOutline(positions);
+                    showOutline(objectHeight, positions);
 
                 } else if (command === 'calibrate') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
