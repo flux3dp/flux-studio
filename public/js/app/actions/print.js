@@ -2563,6 +2563,26 @@ define([
         }
     }
 
+    function alignCenterPosition() {
+      if (SELECTED) {
+        alignCenter();
+        setObjectDialoguePosition(SELECTED);
+        blobExpired = true;
+        hasPreviewImage = false;
+        slicingStatus.error = null;
+        startSlicing(slicingType.F);
+        checkOutOfBounds(SELECTED).then(() => {
+            // disable preview when object are all out of bound
+            reactSrc.setState({ hasObject: !allOutOfBound()});
+            if(blobExpired && objects.length > 0 && !allOutOfBound()) {
+                slicingStatus.showProgress = false;
+                doSlicing();
+            }
+        });
+        render();
+      }
+    }
+
     function undo() {
         if(history.length > 0) {
             let entry = history.pop();
@@ -2789,11 +2809,13 @@ define([
         MenuFactory.items.scale.enabled = enabled;
         MenuFactory.items.rotate.enabled = enabled;
         MenuFactory.items.reset.enabled = enabled;
+        MenuFactory.items.alignCenter.enabled = enabled;
 
         MenuFactory.items.duplicate.onClick = duplicateSelected;
         MenuFactory.items.scale.onClick = setScaleMode;
         MenuFactory.items.rotate.onClick = setRotateMode;
         MenuFactory.items.reset.onClick = resetObject;
+        MenuFactory.items.alignCenter.onClick = alignCenterPosition;
         MenuFactory.methods.refresh();
     }
 
@@ -2938,6 +2960,7 @@ define([
     }
 
     return {
+        alignCenterPosition : alignCenterPosition,
         init                : init,
         appendModel         : appendModel,
         appendModels        : appendModels,

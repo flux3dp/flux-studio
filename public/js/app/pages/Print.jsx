@@ -271,6 +271,12 @@ define([
                         director.undo();
                     });
 
+                    //========for testing only==================
+                    //shortcuts.on(['cmd', 'b'], () => {
+                    //  director.alignCenterPosition();
+                    //});
+                    //==========================================
+
                     shortcuts.on(['cmd', 'shift', 'x'], () => {
                         this._handleClearScene();
                     });
