@@ -26,7 +26,8 @@ define([
             textPosition: 'center'
         },
         fov = 70,
-        far = 3000;
+        far = 3000,
+        originalCameraRotation;
 
     function destroy() {
         camera = scene = renderer = orbitControl = cylinder = undefined;
@@ -43,6 +44,8 @@ define([
             camera.up = new THREE.Vector3(0, 0, 1);
             camera.position.set(-100, 100, 120);
             camera.lookAt( new THREE.Vector3( -5, -5, 0 ) );
+
+            originalCameraRotation = camera.rotation.clone();
 
             scene.add(camera);
 
@@ -432,6 +435,92 @@ define([
         });
     }
 
+    function _getCameraLook(_camera) {
+        let vector = new THREE.Vector3(0, 0, -1);
+        vector.applyEuler(_camera.rotation, _camera.rotation.order);
+        return vector;
+    }
+
+    function getBlobFromScene() {
+        let ccp = camera.position.clone(),
+            ccr = camera.rotation.clone(),
+            d = $.Deferred(),
+            ol = _getCameraLook(camera);
+
+        camera.position.set(0, -180, 60);
+        camera.rotation.set(originalCameraRotation.x, originalCameraRotation.y, originalCameraRotation.z, originalCameraRotation.order);
+        camera.lookAt(new THREE.Vector3(0,380,0));
+        render();
+
+        // let s = SELECTED;
+        renderer.domElement.toBlob(function(blob) {
+            // let previewUrl = URL.createObjectURL(blob);
+            // console.log(previewUrl);
+            camera.position.set(ccp.x, ccp.y, ccp.z);
+            camera.rotation.set(ccr.x, ccr.y, ccr.z, ccr.order);
+            camera.lookAt(ol);
+            // toggleTransformControl(false);
+            render();
+            cropImageUsingCanvas(blob).then((blob2) => {
+                // let file = new File([blob2], 'mypreview.png', {type:'image/png', lastModified:Date.now()});
+                saveAs(blob2, 'mypreview.png');
+                d.resolve(blob2);
+            });
+        });
+
+        return d.promise();
+    }
+
+    function cropImageUsingCanvas(data) {
+        if(data instanceof Blob) {
+            console.log("Loading blob", data);
+            // Blob to HTMLImage
+            let newImg = document.createElement('img'),
+                url = URL.createObjectURL(data),
+                d = $.Deferred();
+
+            newImg.onload = function() {
+                console.log("Loaded image", url, newImg.width, newImg.height);
+                URL.revokeObjectURL(url);
+
+                cropImageUsingCanvas(newImg, true).then(function(blob) {
+                    console.log("Resolved cropping", url);
+                    d.resolve(blob);
+                });
+            };
+
+            newImg.src = url;
+
+            return d.promise();
+        }
+        //HTMLImage to Canvas, Canvas to Blob
+        let width = 640, height = 640,
+            canvas = document.createElement('canvas'),
+            sh = data.height,
+            sw = data.width,
+            sx = 0,
+            sy = 0,
+            d = $.Deferred();
+
+        if(data.width > data.height) {
+            sx = (data.width - data.height)/2;
+            sw = data.height;
+        }else if(data.width < data.height) {
+            sy = (data.height - data.width)/2;
+            sh = data.width;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        let context = canvas.getContext('2d');
+        console.log("drawing image element", sx, sy, sw, sh);
+        context.drawImage(data, sx, sy, sw, sh, 0, 0, width, height);
+        canvas.toBlob(function(blob) {
+            d.resolve(blob);
+        });
+        return d.promise();
+    }
+
     function render() {
         renderer.render(scene, camera);
 
@@ -464,6 +553,7 @@ define([
         loadStl: loadStl,
         render: render,
         matrix: matrix,
+        getBlobFromScene: getBlobFromScene,
         toScreenPosition: function(mesh) {
             return toScreenPosition(mesh, camera, container);
         },

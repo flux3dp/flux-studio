@@ -400,7 +400,6 @@ define([
             this._clearSelectedItem();
 
             let actions = {
-
                 'PREVIEW' : () => {},
                 'FILE': () => { this._dispatchFolderContent(lastAction.path); },
                 'CAMERA': () => {},

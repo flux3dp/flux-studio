@@ -21,6 +21,7 @@ define([
     return React.createClass({
         contextTypes: {
             store: React.PropTypes.object,
+            slicingResult: React.PropTypes.object,
             lang: React.PropTypes.object
         },
 
@@ -90,7 +91,9 @@ define([
         },
 
         _getProgress: function() {
+            this.context.slicingResult = this.context.slicingResult || {};
             let { Monitor, Device } = this.context.store.getState(),
+                { time } = this.context.slicingResult,
                 lang = this.lang.monitor;
 
             if(Object.keys(Device.status).length === 0) {
@@ -106,11 +109,14 @@ define([
             }
 
             let o = findObjectContainsProperty(Device.jobInfo, 'TIME_COST');
+            if(o.length !== 0) {
+                time = o[0].TIME_COST;
+            }
 
             if(
                 !Device.status ||
                 !Device.jobInfo ||
-                o.length === 0 ||
+                typeof time === 'undefined' ||
                 Monitor.mode === GlobalConstants.FILE_PREVIEW ||
                 this._isAbortedOrCompleted() ||
                 Device.status.st_label === 'WAITING_HEAD' ||
@@ -120,7 +126,8 @@ define([
             }
 
             let percentageDone = parseInt(Device.status.prog * 100),
-            timeLeft = FormatDuration(o[0].TIME_COST * (1 - Device.status.prog));
+            // timeLeft = FormatDuration(o[0].TIME_COST * (1 - Device.status.prog));
+            timeLeft = FormatDuration(time * (1 - Device.status.prog));
 
             return `${percentageDone}%, ${timeLeft} ${this.lang.monitor.left}`;
         },

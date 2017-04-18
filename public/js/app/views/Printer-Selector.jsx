@@ -400,8 +400,8 @@ define([
             let img = `/img/icon_${printer.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
 
             return (
-                <div className="device printer-item" data-status={statusId} data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
-                    <div className="col device-name">{printer.name}</div>
+                <div className="device printer-item" id={printer.name} data-status={statusId} data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>
+                    <div className="col device-name" id={printer.name}>{printer.name}</div>
                     <div className="col module">{headText}</div>
                     <div className="col status">{statusText}</div>
                     <div className="col connection-type">
