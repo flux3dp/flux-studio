@@ -18,7 +18,7 @@ define([
         lang = i18n.lang;
 
     'use strict';
-    
+
     return function(args) {
         args = args || {};
 
@@ -60,6 +60,7 @@ define([
                 _fetchFormalSettings: function(holder) {
                     let options = Config.read('laser-defaults') || {},
                         max = lang.laser.advanced.form.power.max;
+
                     return {
                         object_height: options.objectHeight,
                         height_offset: options.heightOffset || 0,
@@ -83,9 +84,8 @@ define([
                 },
 
                 render: function() {
-                    console.log('Load Holder', Holder);
                     // return <div />;
-                    
+
                     return <Holder
                         page={this.props.page}
                         acceptFormat={'image/*'}

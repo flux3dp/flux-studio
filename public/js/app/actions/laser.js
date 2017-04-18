@@ -115,8 +115,10 @@ define([
 
                 self.state.images = self.state.images.concat(goodFiles);
 
+                menuFactory.items.alignCenter.enabled = hasImage;
                 menuFactory.items.execute.enabled = hasImage;
                 menuFactory.items.saveTask.enabled = hasImage;
+                menuFactory.items.clear.enabled = true;
                 menuFactory.methods.refresh();
 
                 self.setState({
@@ -151,6 +153,8 @@ define([
                         state.hasImage = false;
                         state.images = [];
 
+                        menuFactory.items.alignCenter.enabled = false;
+                        menuFactory.items.duplicate.enabled = false;
                         menuFactory.items.execute.enabled = false;
                         menuFactory.items.saveTask.enabled = false;
                         menuFactory.methods.refresh();
@@ -163,13 +167,21 @@ define([
                     self.setState(state);
                 }
             },
+            clearScene = function() {
+                $('.ft-container').remove();
+                self.setState({
+                    images: [],
+                    hasImage: false
+                });
+                menuFactory.items.clear.enabled = false;
+            },
             refreshImage = function($img, threshold) {
                 var freetrans = $img.data('freetrans'),
                     box = {
                         height: $img.height() * freetrans.scaley,
                         width: $img.width() * freetrans.scalex,
                     };
-
+                console.log("referesh iamge", threshold, self.refs.setupPanel.isShading(), self.state.fileFormat);
                 imageData(
                     $img.data('file').blob,
                     {
@@ -365,10 +377,14 @@ define([
                     el_offset_position = $el.box(true);
                     data = $el.data('freetrans');
 
+                    // make center display (0, 0) is possible.
+                    let x = convertToRealCoordinate(el_position.center.x, 'x'),
+                        y = convertToRealCoordinate(el_position.center.y, 'y');
                     position = {
-                        x: convertToRealCoordinate(el_position.center.x, 'x'),
-                        y: convertToRealCoordinate(el_position.center.y, 'y')
+                        x: x > -0.33 && x < 0.33 ? 0 : x,
+                        y: y > -0.33 && y < 0.33 ? 0 : y
                     };
+
                     size = {
                         width: round(el_position.width * DIAMETER / PLATFORM_DIAMETER_PIXEL, -2),
                         height: round(el_position.height * DIAMETER / PLATFORM_DIAMETER_PIXEL, -2)
@@ -403,6 +419,32 @@ define([
             },
             $target_image = null, // changing when image clicked
             resetPosTimer = null,
+            //============== for test async function ===========================
+            showOutline = async (object_height, outLine_data) => {
+              await DeviceMaster.select(self.state.selectedPrinter);
+                ProgressActions.open(
+                    ProgressConstants.WAITING,
+                    lang.device.showOutline
+                );
+              await DeviceMaster.showOutline(object_height, outLine_data);
+              ProgressActions.close();
+            },
+            //======================END ========================================
+
+            getPoint = function($el) {
+                var containerOffset = $laser_platform.offset(),
+                    offset = $el.offset(),
+                    width = $el.width(),
+                    height = $el.height(),
+                    pointX = offset.left - containerOffset.left + (width / 2),
+                    pointY = offset.top - containerOffset.top + (height / 2);
+
+                return {
+                    x: pointX,
+                    y: pointY
+                };
+            },
+
             getToolpath = function(settings, callback, progressType, fileMode) {
                 fileMode = fileMode || '-f';
                 progressType = progressType || ProgressConstants.NONSTOP;
@@ -412,22 +454,12 @@ define([
                         GlobalActions.sliceComplete({ time: arguments[2] });
                         callback.apply(null, arguments);
                     },
-                    getPoint = function($el) {
-                        var containerOffset = $laser_platform.offset(),
-                            offset = $el.offset(),
-                            width = $el.width(),
-                            height = $el.height(),
-                            pointX = offset.left - containerOffset.left + (width / 2),
-                            pointY = offset.top - containerOffset.top + (height / 2);
 
-                        return {
-                            x: pointX,
-                            y: pointY
-                        };
-                    },
+                    /*== move to up-level for other function useing===========
+                    getPoint = function($el) {
+                    //================ END ==================================*/
                     args = [],
                     doLaser = function(settings) {
-
                         $ft_controls.each(function(k, el) {
                             var $el = $(el),
                                 top_left = getPoint($el.find('.ft-scaler-top.ft-scaler-left')),
@@ -571,6 +603,22 @@ define([
                                 self.setState({
                                     hasImage: true
                                 });
+                            },
+
+                            alignCenter = function() {
+                              let args = {
+                                      maintainAspectRatio: true,
+                                      x: convertToHtmlCoordinate(0, 'x'),
+                                      y: convertToHtmlCoordinate(0, 'y')
+                                  },
+                                  params = {
+                                    position :{ x: 0, y: 0 },
+                                  };
+
+                              self.setState(params);
+                              $target_image.freetrans(args);
+                              refreshImagePanelPos();
+                              refreshObjectParams(e, $target_image);
                             };
 
                         if (false === $img.hasClass('image-active')) {
@@ -596,6 +644,8 @@ define([
                             // Async heavy call
                             menuFactory.items.duplicate.enabled = true;
                             menuFactory.items.duplicate.onClick = clone;
+                            menuFactory.items.alignCenter.enabled = true;
+                            menuFactory.items.alignCenter.onClick = alignCenter;
                             menuFactory.methods.refresh();
                         }, 50);
                     });
@@ -642,6 +692,7 @@ define([
 
             if (!dontRefresh) {
                 menuFactory.items.duplicate.enabled = false;
+                menuFactory.items.alignCenter.enabled = false;
                 menuFactory.methods.refresh();
             }
 
@@ -667,7 +718,7 @@ define([
                     windowPos = $('body').box(true),
                     initialPosition = {
                         left: pos.right + 10,
-                        top: pos.center.y - 66
+                        top: pos.center.y  - 66
                     };
 
                 // check position top
@@ -709,6 +760,31 @@ define([
                         sendToMachine,
                         ProgressConstants.STEPPING
                     );
+                } else if (command === 'showOutline') {
+                    let positions = [],
+                        objectHeight = settings.object_height,
+                        $ft_controls = $laser_platform.find('.ft-controls');
+                    console.log('height', objectHeight);
+                    $ft_controls.each(function(index, image) {
+                        let $image = $(image),
+                            tl = getPoint($image.find('.ft-scaler-top.ft-scaler-left')),
+                            tr = getPoint($image.find('.ft-scaler-top.ft-scaler-right')),
+                            br = getPoint($image.find('.ft-scaler-bottom.ft-scaler-right')),
+                            bl = getPoint($image.find('.ft-scaler-bottom.ft-scaler-left')),
+                            position = {
+                                first: [convertToRealCoordinate(tl.x, 'x'),
+                                        convertToRealCoordinate(tl.y, 'y')],
+                                second: [convertToRealCoordinate(tr.x, 'x'),
+                                         convertToRealCoordinate(tr.y, 'y')],
+                                third: [convertToRealCoordinate(br.x, 'x'),
+                                        convertToRealCoordinate(br.y, 'y')],
+                                fourth: [convertToRealCoordinate(bl.x, 'x'),
+                                         convertToRealCoordinate(bl.y, 'y')],
+                            };
+                        positions.push(position);
+                    });
+                    showOutline(objectHeight, positions);
+
                 } else if (command === 'calibrate') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
                         ProgressActions.open(
@@ -884,7 +960,6 @@ define([
 
                 refreshImagePanelPos();
                 self.setState(params);
-
                 $target_image.freetrans(args);
             },
             menuFactory: menuFactory,
@@ -898,7 +973,8 @@ define([
             },
             destroy: function() {
                 clearInterval(resetPosTimer);
-            }
+            },
+            clearScene: clearScene
         };
     };
 });

@@ -90,6 +90,7 @@ define(function() {
                 scale: '縮放',
                 clear: '清除場景',
                 undo: '復原',
+                alignCenter: '置中',
                 reset: '重設'
             },
             device: {
@@ -291,6 +292,10 @@ define(function() {
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
             reset: '重置所有設定',
+            default_machine: '預設機器',
+            default_machine_button: '無',
+            remove_default_machine_button: '刪除',
+            confirm_remove_default: '將會刪除預設機器',
             reset_now: '重置所有設定',
             confirm_reset: '確認要重置 FLUX Studio?',
             language: '語言',
@@ -955,6 +960,7 @@ define(function() {
             aborted: '已終止',
             completed: '已完成',
             calibrating: '校正中',
+            showOutline: '繪製輪廓中',
             starting: '啟動中',
             resuming: '恢復中',
             scanning: '掃描',

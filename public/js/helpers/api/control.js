@@ -552,6 +552,19 @@ define([
                 return d.promise();
             },
 
+            showOutline: (object_height, positions) => {
+              let frames = '';
+              positions.forEach(function(position) {
+                let frame = [position.first,
+                             position.second,
+                             position.third,
+                             position.fourth];
+                frames += JSON.stringify(frame) + " ";
+              });
+
+              return useDefaultResponse(`laser show_outline ${object_height} ${frames}`);
+            },
+
             endMaintainMode: () => {
                 ctrl.mode = '';
                 return useDefaultResponse('task quit');
@@ -569,7 +582,7 @@ define([
                 return useDefaultResponse('play press_button');
             },
 
-            setHeadTemperatureDuringPause: (temperature) => {
+            show: (temperature) => {
                 return useDefaultResponse(`play toolhead heater 0 ${temperature}`);
             },
 

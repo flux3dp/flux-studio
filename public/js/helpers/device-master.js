@@ -215,7 +215,7 @@ define([
                         _selectedDevice = {};
                         _wasKilled = false;
                     }
-                    console.log('process fatal');
+                    console.log('process fatal', response);
                 }
             });
         };
@@ -225,6 +225,7 @@ define([
         if(_existConnection(device.uuid, device.source)) {
             ProgressActions.close();
             _device = _switchDevice(device.uuid);
+            SocketMaster.setWebSocket(_actionMap[device.uuid]);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
@@ -903,6 +904,10 @@ define([
         }
     }
 
+    async function showOutline(object_height, positions) {
+      await SocketMaster.addTask('showOutline', object_height, positions);
+    }
+
     function calibrate(opts) {
         let d = $.Deferred(),
             debug_data = {};
@@ -1378,6 +1383,7 @@ define([
             this.streamCamera                   = streamCamera;
             this.stopStreamCamera               = stopStreamCamera;
             this.calibrate                      = calibrate;
+            this.showOutline                    = showOutline;
             this.home                           = home;
             this.cleanCalibration               = cleanCalibration;
             this.detectHead                     = detectHead;
