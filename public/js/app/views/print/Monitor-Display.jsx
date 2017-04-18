@@ -209,17 +209,20 @@ define([
 
         _getJobType: function() {
             let { Monitor, Device } = this.context.store.getState();
-            let { lang } = this.context, jobInfo, o;
+            let { lang } = this.context, jobInfo, headProp, taskProp;
 
             jobInfo = Monitor.mode === GlobalConstants.FILE_PREVIEW ? Monitor.selectedFileInfo : Device.jobInfo;
-            o = findObjectContainsProperty(jobInfo, 'HEAD_TYPE');
+            
+            headProp = findObjectContainsProperty(jobInfo, 'HEAD_TYPE');
+            taskProp = findObjectContainsProperty(jobInfo, 'TASK_TYPE');
 
-            if(o.length === 0) {
+            if(headProp.length === 0) {
                 let operatingFunction = location.hash.split('/')[1];
                 return lang.monitor.task[operatingFunction.toUpperCase()];
+            } else if (taskProp.length > 0) {
+                return lang.monitor.task[taskProp[0].TASK_TYPE.toUpperCase()];
             }
-
-            return lang.monitor.task[o[0].HEAD_TYPE.toUpperCase()];
+            return lang.monitor.task[headProp[0].HEAD_TYPE.toUpperCase()];
         },
 
         _getJobTime: function() {
@@ -273,7 +276,6 @@ define([
             }
 
             let { slicingResult } = this.context;
-            console.log("Context ", this.context);
             let jobTime = FormatDuration(this._getJobTime()) || '',
                 jobProgress = this._getJobProgress(),
                 jobType = this._getJobType(),

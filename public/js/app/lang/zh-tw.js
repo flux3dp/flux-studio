@@ -1098,6 +1098,8 @@ define(function() {
                 PRINT                           : '列印工作',
                 LASER                           : '雕刻工作',
                 DRAW                            : '繪製工作',
+                CUT                             : '切割工作',
+                VINYL                           : '切割工作',
                 'N/A'                           : '繪製工作'
             },
             device: {

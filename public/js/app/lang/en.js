@@ -1102,6 +1102,8 @@ define(function() {
                 PRINT                           : 'Printing Task',
                 LASER                           : 'Engraving Task',
                 DRAW                            : 'Drawing Task',
+                CUT                             : 'Cutting Task',
+                VINYL                           : 'Cutting Task',
                 'N/A'                           : 'Drawing Task'
             },
             device: {
