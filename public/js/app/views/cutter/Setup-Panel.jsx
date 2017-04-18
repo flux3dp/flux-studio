@@ -61,7 +61,7 @@ define([
                 refs = self.refs,
                 opts = {
                     zOffset: refs.zOffset.value(),
-                    overcut: refs.overcut.value(),
+                    //overcut: refs.overcut.value(),
                     speed: refs.speed.value(),
                     bladeRadius: refs.bladeRadius.value()
                 },
