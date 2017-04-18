@@ -75,7 +75,7 @@ define([
         }
     }
 
-    function SlicerSettings(id) {
+    function SlicerSettings(id, opts) {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
             .toString(16)
@@ -130,6 +130,12 @@ define([
         this.custom                              = this.toExpert('');
         this.customCura2                         = '';
         this.customCura2                         = this.toExpert('', 'cura2');
+
+        if (opts) {
+            for (var i in opts) {
+                this[i] = opts[i];
+            }
+        }
     }
 
     SlicerSettings.prototype.toExpert = function(customString = '', slicer = 'slic3r') {
@@ -165,7 +171,7 @@ define([
             return customCura2.join('\n');
         }
 
-        let result = (slicer === 'slic3r') ? slic3r() : cura2();
+        let result = (slicer === 'slic3r' || slicer == 'cura') ? slic3r() : cura2();
         return result;
     };
 
@@ -192,6 +198,9 @@ define([
                 delete settings.id;
                 Object.assign(this, settings);
                 Object.assign(settings, holdAttrs);
+                console.log("Load settings object", this.engine, this.id);
+                this.fixSettingsCompatibility();
+                this.custom = this.toExpert('', this.engine);
             }
         }
         else {
@@ -221,7 +230,8 @@ define([
                     }
                 }
             }.bind(this));
-
+            console.log("Load settings", this.engine, this.id);
+            this.fixSettingsCompatibility();
             this[this.getExpertKey()] = settings.join('\n');
             if(this.custom == null) { throw new Error('null custom error'); }
         }
@@ -265,6 +275,20 @@ define([
 
     SlicerSettings.prototype.getExpertKey = function() {
         return this.engine === 'cura2' ? 'customCura2' : 'custom';
+    };
+
+    SlicerSettings.prototype.fixSettingsCompatibility = function() {
+        if (this.engine === 'slic3r') {
+            if (this.support_material_pattern === 'LINES') {
+                this.support_material_pattern = 'rectilinear';
+            }
+        }
+
+        if (this.engine === 'cura') {
+            if (this.support_material_pattern === 'rectilinear') {
+                this.support_material_pattern = 'LINES';
+            }
+        }
     };
 
     SlicerSettings.prototype.toString = function() {

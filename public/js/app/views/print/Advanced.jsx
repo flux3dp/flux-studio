@@ -89,7 +89,6 @@ define([
             ];
             slic3rSupport = [
                 { label: lang.rectilinearGrid, value: 'rectilinear-grid' },
-                { label: lang.line, value: 'line' },
                 { label: lang.rectilinear, value: 'rectilinear' },
                 { label: lang.honeycomb, value: 'honeycomb' }
             ];
@@ -305,7 +304,7 @@ define([
 
             if(id === 'engine') {
                 advancedSetting.fill_pattern = {'slic3r': 'honeycomb', 'cura': 'GRID', 'cura2':'TRIANGLES'}[value];
-                advancedSetting.support_material_pattern = {'slic3r': 'line', 'cura': 'LINES', 'cura2':'ZIGZAG'}[value];
+                advancedSetting.support_material_pattern = {'slic3r': 'rectilinear', 'cura': 'LINES', 'cura2':'ZIGZAG'}[value];
                 this.setState({ showBridgeSpeed: value !== 'cura2' });
             }
             else if(id === 'fill_pattern' && value !== 'rectilinear') {

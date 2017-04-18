@@ -103,7 +103,7 @@ define([
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'cura2',
+            defaultSlicingEngine = 'cura',
             tourGuide = TutorialSteps,
             view = React.createClass({
 
