@@ -787,15 +787,19 @@ define([
 
                 } else if (command === 'calibrate') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
-                        ProgressActions.open(
-                            ProgressConstants.WAITING,
-                            lang.device.calibrating
-                        );
-                        DeviceMaster.calibrate({forceExtruder: false, doubleZProbe: true}).done((debug_message) => {
+                        console.log('open progress action');
+                        setTimeout(() => { 
+                            ProgressActions.open(
+                                ProgressConstants.NONSTOP,
+                                lang.cut.running_horizontal_adjustment
+                            );
+                        }, 1);
+                        DeviceMaster.calibrate({forceExtruder: false, doubleZProbe: false, withoutZProbe: true}).done((debug_message) => {
                             setTimeout(() => {
-                                AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
+                                AlertActions.showPopupInfo('zprobed', lang.cut.run_height_adjustment, lang.cut.horizontal_adjustment_completed);
                             }, 100);
                         }).fail((resp) => {
+                            console.log('fail');
                             if (resp.error[0] === 'EDGE_CASE') { return; }
                             if (resp.module === 'LASER') {
                                 AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
@@ -803,6 +807,36 @@ define([
                             else {
                                 DeviceErrorHandler.processDeviceMasterResponse(resp);
                                 AlertActions.showPopupError('calibrate-fail', DeviceErrorHandler.translate(resp.error));
+                            }
+                        }).always(() => {
+                            console.log("response too early?");
+                            ProgressActions.close();
+                        });
+                    }).fail(() => {
+                        console.log('out fail..');
+                        ProgressActions.close();
+                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                    });
+                } else if (command === 'zprobe') {
+                    DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
+                        setTimeout(() => { 
+                            ProgressActions.open(
+                                ProgressConstants.NONSTOP,
+                                lang.cut.running_height_adjustment
+                            );
+                        }, 1);
+                        DeviceMaster.zprobe({forceExtruder: false}).done((debug_message) => {
+                            setTimeout(() => {
+                                AlertActions.showPopupInfo('zprobed', lang.cut.you_can_now_cut, lang.cut.height_adjustment_completed);
+                            }, 100);
+                        }).fail((resp) => {
+                            if (resp.error[0] === 'EDGE_CASE') { return; }
+                            if (resp.module === 'LASER') {
+                                AlertActions.showPopupError('zprobe-fail', lang.calibration.extruderOnly);
+                            }
+                            else {
+                                DeviceErrorHandler.processDeviceMasterResponse(resp);
+                                AlertActions.showPopupError('zprobe-fail', DeviceErrorHandler.translate(resp.error));
                             }
                         }).always(() => {
                             ProgressActions.close();

@@ -156,6 +156,13 @@ define([
                     });
                 },
 
+                _handleZProbeClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        machineCommand: 'zprobe'
+                    });
+                },
+
                 _handleExportClick: function(filemode) {
                     this.state.laserEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
                 },
@@ -358,17 +365,32 @@ define([
 
                     if (this.props.page === 'cut' || this.props.page === 'mill') {
                         buttons = [{
-                            label: lang.cut.calibrate,
+                            label: lang.cut.horizontal_calibrate,
                             className: cx({
                                 'btn-disabled': false,
                                 'btn-default': true,
                                 'btn-hexagon': true,
-                                'btn-go': true
+                                'btn-go': true,
+                                'mini-text': true
                             }),
                             dataAttrs: {
                                 'ga-event': 'holder-calibrate'
                             },
                             onClick: this._handleCalibrateClick
+                        },
+                        {
+                            label: lang.cut.height_calibrate,
+                            className: cx({
+                                'btn-disabled': false,
+                                'btn-default': true,
+                                'btn-hexagon': true,
+                                'btn-go': true,
+                                'mini-text': true
+                            }),
+                            dataAttrs: {
+                                'ga-event': 'holder-calibrate'
+                            },
+                            onClick: this._handleZProbeClick
                         }].concat(buttons);
                     }
 

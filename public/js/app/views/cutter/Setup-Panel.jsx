@@ -187,7 +187,7 @@ define([
         render: function() {
             let items = [
                     this._renderZOffset(),
-                    this._renderOvercut(),
+                    // this._renderOvercut(),
                     this._renderSpeed(),
                     this._renderBladeRadius()
                 ];

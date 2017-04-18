@@ -219,6 +219,7 @@ define([
         _getPreviewInfo: function() {
             let d = $.Deferred();
             DeviceMaster.getPreviewInfo().then((info) => {
+                console.log('Device Master upload preview info', info);
                 store.dispatch(DeviceActionCreator.updateJobInfo(info));
                 d.resolve();
             });

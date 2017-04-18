@@ -2883,6 +2883,8 @@ hr {
         background-image: none;
         box-shadow: none;
         color: inherit; }
+    .btn-hexagon.btn-go.mini-text {
+        font-size: 14px; }
 
 /* button helper */
 .btn-multiline-text {
