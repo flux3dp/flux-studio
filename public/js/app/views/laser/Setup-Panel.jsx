@@ -415,9 +415,7 @@ define([
         _renderShading: function() {
             var cx = React.addons.classSet,
                 checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
-                classes = cx({
-                    'display-text': true
-                });
+                classes = cx('display-text', 'shading');
             return {
                 label: (
                     <TextToggle

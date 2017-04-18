@@ -11,7 +11,7 @@ module.exports = {
       .click('a[data-ga-event=skip]') // Skip setting
       .waitForElementVisible('button[data-ga-event=start]', 500)
       .click('button[data-ga-event=start]') // Start creating
-      .waitForElementVisible('div.modal-alert', 8000) 
+      .waitForElementVisible('div.modal-alert', 8000)
       .waitForElementNotPresent('div.modal-alert .spinner-roller', 30000) // Wait slicing service loaded
       .waitForElementVisible('button[data-ga-event=yes]', 8000)
       .click('button[data-ga-event=yes]') /// Say will send usage info

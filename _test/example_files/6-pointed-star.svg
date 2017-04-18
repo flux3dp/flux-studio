@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="240.73"
+   height="275.03"
+   id="svg7229"
+   sodipodi:version="0.32"
+   inkscape:version="0.44.1"
+   sodipodi:docbase="E:\Joseph's Computer\businesses\Shared rosary\Current Website parts\to web\Pub Dom to web"
+   sodipodi:docname="Pub Dom 6-pointed_star.svg"
+   version="1.0">
+  <defs
+     id="defs7231" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.2448186"
+     inkscape:cx="312.71177"
+     inkscape:cy="211.37801"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:window-width="1440"
+     inkscape:window-height="844"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     width="240.73px"
+     height="275.03px" />
+  <metadata
+     id="metadata7234">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-225.5325,-115.5531)">
+    <path
+       sodipodi:type="star"
+       style="opacity:1;fill:white;fill-opacity:1;stroke:black;stroke-width:4;stroke-linecap:square;stroke-miterlimit:39.40000153;stroke-dasharray:none;stroke-opacity:1"
+       id="path11691"
+       sodipodi:sides="6"
+       sodipodi:cx="250.07632"
+       sodipodi:cy="157.24774"
+       sodipodi:r1="128.01526"
+       sodipodi:r2="42.629082"
+       sodipodi:arg1="-1.5707963"
+       sodipodi:arg2="-1.0471976"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 250.07633,29.232483 L 271.39086,120.32987 L 360.94079,93.240115 L 292.70541,157.24774 L 360.94079,221.25537 L 271.39087,194.16561 L 250.07632,285.263 L 228.76179,194.16561 L 139.21186,221.25537 L 207.44724,157.24774 L 139.21186,93.240109 L 228.76178,120.32988 L 250.07633,29.232483 z "
+       transform="translate(96.3206,96.3206)"
+       inkscape:export-filename="C:\Documents and Settings\All Users\Documents\businesses\Shared rosary\Current Website parts\to web\Pub Dom to web\6-pointed star fixed to one-third spoke"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+  </g>
+</svg>

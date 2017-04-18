@@ -62,7 +62,7 @@ define([
                 options.push({
                     data: opt,
                     label: (
-                        <div className="resolution-item">
+                        <div className={`resolution-item resolution-${opt.text.toLowerCase()}`}>
                             <span className="caption">{opt.text}</span>
                             <span className="time">{opt.time}</span>
                         </div>
@@ -73,7 +73,7 @@ define([
             return {
                 label: (
                     <div>
-                        <span className="caption">{this.state.defaults.resolution.text}</span>
+                        <span className="caption resolution">{this.state.defaults.resolution.text}</span>
                         <span>{lang.scan.quality}</span>
                     </div>
                 ),

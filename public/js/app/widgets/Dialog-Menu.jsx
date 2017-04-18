@@ -80,7 +80,6 @@ function(
                 };
 
                 itemLabelClassName = Object.assign(itemLabelClassName, opt.labelClass);
-
                 if (opt.label) {
                     listItems.push({
                         label: (
