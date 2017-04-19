@@ -289,15 +289,22 @@ define([
                         LocalStorage.clearAllExceptIP();
                     });
 
+                    // windows
+                    if(navigator.appVersion.indexOf('Win') !== -1) {
+                        shortcuts.on(['ctrl', 'd'], (e) => {
+                            e.preventDefault();
+                            director.duplicateSelected();
+                        });
+
+                        shortcuts.on(['ctrl', 'z'], () => {
+                            director.undo();
+                        });
+                    }
+
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
                         // copy event
                         shortcuts.on(['cmd', 'd'], (e) => {
-                            e.preventDefault();
-                            director.duplicateSelected();
-                        });
-                        
-                        shortcuts.on(['ctrl', 'd'], (e) => {
                             e.preventDefault();
                             director.duplicateSelected();
                         });
