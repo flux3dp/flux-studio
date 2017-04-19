@@ -133,13 +133,7 @@ define([
                     }
 
                     // processing support
-                    let supportOn;
-                    if(advancedSettings.engine === 'cura2') {
-                        supportOn = advancedSettings.customCura2.indexOf('support_enable = true') > 0;
-                    }
-                    else {
-                        supportOn = advancedSettings.customCura2.indexOf('support_material = 1') > 0;
-                    }
+                    let supportOn = !!advancedSettings.support_material;
 
                     return ({
                         showAdvancedSettings        : false,
@@ -579,6 +573,7 @@ define([
                 _handleSupportClick: function() {
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
+
                     let filteredItem = advancedSettings.filter({ key: 'support_material', value: isOn ? 1 : 0 });
                     director.setParameter(filteredItem.key, filteredItem.value).then(function() {
                         this.setState({
@@ -587,7 +582,7 @@ define([
                         });
                     }.bind(this));
 
-                    advancedSettings.set('support_material', isOn ? 1 : 0);
+                    advancedSettings.set('support_material', isOn ? 1 : 0, true);
                     this._saveSetting();
                 },
 
@@ -674,26 +669,10 @@ define([
                         quality: quality
                     });
 
-                    // note: cura2 uses support_enable where others uses support_material
-                    if(advancedSettings.engine === 'cura2') {
-                        advancedSettings.support_enable = advancedSettings.customCura2.indexOf('support_enable = true') > 0;
-                    }
-                    else {
-                        advancedSettings.support_material = advancedSettings.custom.indexOf('support_material = 1') > 0 ? 1 : 0;
-                    }
 
                     if (!setting) {
                         let self = this;
                         let uploadSettings = () => {
-                            if(advancedSettings.engine === 'cura2') {
-                                let supportOn = advancedSettings.customCura2.indexOf('support_enable = true') > 0;
-                                advancedSettings.support_enable = supportOn;
-                            }
-                            else {
-                                // other slicing engine
-                                let supportOn = advancedSettings.custom.indexOf('support_material = 1') > 0 ? 1 : 0;
-                                console.log('other engine support on? ', supportOn);
-                            }
                             director.setAdvanceParameter(advancedSettings.deepClone()).then(() => {
                                 Object.assign(fineAdvancedSettings, advancedSettings);
                                 advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
@@ -992,32 +971,7 @@ define([
                 },
 
                 _saveSetting: function() {
-                    let { custom } = advancedSettings,
-                        raftIndex = custom.indexOf('raft ='),
-                        supportIndex = custom.indexOf('support_material =');
-
-                    if(advancedSettings.engine === 'cura2') {
-                        custom = advancedSettings.customCura2;
-                        supportIndex = custom.indexOf('support_enable =');
-                    }
-
                     // extra process for raft (because it's a direct control on left panel)
-                    if(raftIndex > 0) {
-                        custom = custom.slice(0, raftIndex) + `raft = ${advancedSettings.raft}\n` + custom.slice(raftIndex + 9);
-                    }
-
-                    if(supportIndex > 0) {
-                        if(advancedSettings.engine === 'cura2') {
-                            let supportOn = advancedSettings.support_material === 1;
-                            custom = custom.replace(`support_enable = ${!supportOn}`, `support_enable = ${supportOn}`);
-                            advancedSettings.customCura2 = custom;
-                        }
-                        else {
-                            custom = custom.slice(0, supportIndex) + `support_material = ${advancedSettings.support_material}\n` + custom.slice(supportIndex + 21);
-                            advancedSettings.custom = custom;
-                        }
-                    }
-
                     Config().write('advanced-settings', advancedSettings.toString());
                 },
 

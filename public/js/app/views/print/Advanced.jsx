@@ -119,6 +119,7 @@ define([
                 { label: lang.curaSupport.lines, value: 'LINES' },
                 { label: lang.curaSupport.zigzag, value: 'ZIGZAG' }
             ];
+            advancedSetting.engine = this.props.setting.engine;
             advancedSetting.load(this.props.setting, true);
 
             this._updateCustomField();
@@ -303,6 +304,7 @@ define([
             let { engine, fill_density, fill_pattern } = advancedSetting;
 
             if(id === 'engine') {
+                advancedSetting.engine = value;
                 advancedSetting.fill_pattern = {'slic3r': 'honeycomb', 'cura': 'GRID', 'cura2':'TRIANGLES'}[value];
                 advancedSetting.support_material_pattern = {'slic3r': 'rectilinear', 'cura': 'LINES', 'cura2':'ZIGZAG'}[value];
                 this.setState({ showBridgeSpeed: value !== 'cura2' });

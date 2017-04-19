@@ -171,7 +171,7 @@ define([
             return customCura2.join('\n');
         }
 
-        let result = (slicer === 'slic3r' || slicer == 'cura') ? slic3r() : cura2();
+        let result = (slicer === 'slic3r' || slicer === 'cura') ? slic3r() : cura2();
         return result;
     };
 
@@ -182,7 +182,7 @@ define([
                 this.customCura2 = settings.customCura2;
                 this.load(this.custom);
                 this.customCura2 = this.toExpert('', 'cura2');
-                if(this.custom === null) throw new Error('null custom error');
+                if(this.custom === null) { throw new Error('null custom error'); }
             }
             else {
                 let holdAttrs = { id: settings.id };
@@ -198,9 +198,9 @@ define([
                 delete settings.id;
                 Object.assign(this, settings);
                 Object.assign(settings, holdAttrs);
-                console.log("Load settings object", this.engine, this.id);
+                console.log('Load settings object', this.engine, this.id);
                 this.fixSettingsCompatibility();
-                this.custom = this.toExpert('', this.engine);
+                this.custom = this.toExpert('', 'slic3r');
             }
         }
         else {
@@ -215,7 +215,7 @@ define([
 
                     if (this.engine === 'cura2') {
                         let rev = cura2revMapping[_key];
-                        if (_key == 'support_angle') {
+                        if (_key === 'support_angle') {
                             console.log(rev);
                         }
                         if (rev && this.hasOwnProperty(rev.key)) {
@@ -230,7 +230,7 @@ define([
                     }
                 }
             }.bind(this));
-            console.log("Load settings", this.engine, this.id);
+            console.log('Load settings', this.engine, this.id);
             this.fixSettingsCompatibility();
             this[this.getExpertKey()] = settings.join('\n');
             if(this.custom == null) { throw new Error('null custom error'); }
@@ -241,7 +241,11 @@ define([
     SlicerSettings.prototype.set = function (id, value, updateCustom = false) {
         // TODO map keys
         this[id] = value;
-        if(this.custom == null) { throw new Error('null custom error'); }
+        if (this.custom == null) { throw new Error('null custom error'); }
+        if (updateCustom) {
+            this.custom = this.toExpert('', 'slic3r');
+            this.customCura2 = this.toExpert('', 'cura2');
+        }
     };
 
     SlicerSettings.prototype.filter = function(p0) {
