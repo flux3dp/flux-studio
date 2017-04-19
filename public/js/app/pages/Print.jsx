@@ -296,6 +296,11 @@ define([
                             e.preventDefault();
                             director.duplicateSelected();
                         });
+                        
+                        shortcuts.on(['ctrl', 'd'], (e) => {
+                            e.preventDefault();
+                            director.duplicateSelected();
+                        });
                     }
                 },
 
