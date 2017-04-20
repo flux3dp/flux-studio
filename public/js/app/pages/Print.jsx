@@ -278,22 +278,21 @@ define([
                     //shortcuts.on(['cmd', 'b'], () => {
                     //  director.alignCenterPosition();
                     //});
+                    // shortcuts.on(['ctrl', 'shift', 't'], () => {
+                    //     window.customEvent.onTutorialClick();
+                    // });
+                    //
+                    // shortcuts.on(['cmd', 'shift', 'a'], () => {
+                    //     LocalStorage.clearAllExceptIP();
+                    // });
                     //==========================================
 
                     shortcuts.on(['cmd', 'shift', 'x'], () => {
                         this._handleClearScene();
                     });
 
-                    shortcuts.on(['ctrl', 'shift', 't'], () => {
-                        window.customEvent.onTutorialClick();
-                    });
-
-                    shortcuts.on(['cmd', 'shift', 'a'], () => {
-                        LocalStorage.clearAllExceptIP();
-                    });
-
-                    // windows
-                    if(navigator.appVersion.indexOf('Win') !== -1) {
+                    // windows & Linux
+                    if(navigator.appVersion.indexOf('Mac') === -1) {
                         shortcuts.on(['ctrl', 'd'], (e) => {
                             e.preventDefault();
                             director.duplicateSelected();
@@ -301,6 +300,10 @@ define([
 
                         shortcuts.on(['ctrl', 'z'], () => {
                             director.undo();
+                        });
+
+                        shortcuts.on(['ctrl', 'shift', 'x'], () => {
+                            this._handleClearScene();
                         });
                     }
 

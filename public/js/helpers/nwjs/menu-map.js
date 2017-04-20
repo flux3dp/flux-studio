@@ -108,7 +108,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: 'cmd+alt',
+                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd+alt' : 'ctrl+alt',
                 parent: parentIndex.EDIT
             },
             rotate: {
@@ -116,7 +116,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'r',
-                modifiers: 'cmd+alt',
+                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd+alt' : 'ctrl+alt',
                 parent: parentIndex.EDIT
             },
             reset: {
