@@ -1691,6 +1691,7 @@ define([
                         scene.add(mesh);
                         outlineScene.add(mesh.outlineMesh);
                         objects.push(mesh);
+                        addHistory('ADD', mesh);
 
                         doSlicing();
                         syncObjectOutline(mesh);
