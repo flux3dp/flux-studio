@@ -17,12 +17,15 @@ define(['jquery'],function($) {
     }
 
     function pack() {
+        console.log('packing');
         var fileInfo = [],
             totalSize;
 
         totalSize = files.reduce(function(p, c) {
-            return p.size + c.size;
+            return {size: p.size + c.size};
         }, {size: 0});
+
+        totalSize = totalSize.size;
 
         files.forEach(function(i) {
             fileInfo.push({size: i.size, name: i.name});

@@ -2400,7 +2400,7 @@ define([
             });
         }
 
-        saveAs(packer.pack());
+        saveAs(packer.pack(), 'scene.fsc');
     }
 
     function loadScene() {
