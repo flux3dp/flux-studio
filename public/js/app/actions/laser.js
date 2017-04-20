@@ -20,6 +20,7 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'helpers/device-error-handler',
+    'helpers/check-device-status',
     'freetrans',
     'helpers/jquery.box',
     'plugins/file-saver/file-saver.min',
@@ -44,7 +45,8 @@ define([
     DeviceConstants,
     ProgressActions,
     ProgressConstants,
-    DeviceErrorHandler
+    DeviceErrorHandler,
+    CheckDeviceStatus
 ) {
     'use strict';
 
@@ -787,13 +789,13 @@ define([
 
                 } else if (command === 'calibrate') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
-                        setTimeout(() => { 
+                        setTimeout(() => {
                             ProgressActions.open(
                                 ProgressConstants.NONSTOP,
                                 lang.cut.running_horizontal_adjustment
                             );
                         }, 1);
-                        checkDeviceStatus(currentPrinter).then(() => {
+                        CheckDeviceStatus(self.state.selectedPrinter).then(() => {
                             DeviceMaster.calibrate({forceExtruder: false, doubleZProbe: false, withoutZProbe: true}).done((debug_message) => {
                                 setTimeout(() => {
                                     AlertActions.showPopupInfo('zprobed', lang.cut.run_height_adjustment, lang.cut.horizontal_adjustment_completed);
@@ -820,13 +822,13 @@ define([
                     });
                 } else if (command === 'zprobe') {
                     DeviceMaster.select(self.state.selectedPrinter).then((printer) => {
-                        setTimeout(() => { 
+                        setTimeout(() => {
                             ProgressActions.open(
                                 ProgressConstants.NONSTOP,
                                 lang.cut.running_height_adjustment
                             );
                         }, 1);
-                        checkDeviceStatus(currentPrinter).then(() => {
+                        CheckDeviceStatus(self.state.selectedPrinter).then(() => {
                             DeviceMaster.zprobe({forceExtruder: false}).done((debug_message) => {
                                 setTimeout(() => {
                                     AlertActions.showPopupInfo('zprobed', lang.cut.you_can_now_cut, lang.cut.height_adjustment_completed);
