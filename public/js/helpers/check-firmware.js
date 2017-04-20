@@ -23,9 +23,10 @@ define(['jquery'], function($) {
             versionKey = versionKeyMap[type] || '';
 
         type = typeMap[type] || 'pi';
+        printer = printer || {};
         data = {
             os: type,
-            v: printer[versionKey]
+            v: printer[versionKey] || ''
         };
 
         if (true === navigator.onLine) {
