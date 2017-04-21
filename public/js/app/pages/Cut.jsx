@@ -34,7 +34,7 @@ define([
                 getInitialState: function() {
                     return {
                         options: {
-                            zOffset: 0.05,
+                            zOffset: 0,
                             overcut: 2,
                             speed: 30,
                             bladeRadius: 0.28
@@ -45,7 +45,7 @@ define([
                 componentDidMount: function() {
                     let options = Config.read('cut-defaults') || {};
                     options = {
-                        zOffset: options.zOffset || 0.05,
+                        zOffset: options.zOffset || 0,
                         overcut: options.overcut || 2,
                         speed: options.speed || 30,
                         bladeRadius: options.bladeRadius || 0.28,
@@ -59,7 +59,7 @@ define([
                 _fetchFormalSettings: function() {
                     let options = Config.read('cut-defaults') || {};
                     return {
-                        cutting_zheight: options.zOffset || 0.05,
+                        cutting_zheight: options.zOffset || 0,
                         overcut: options.overcut || 2,
                         speed: options.speed || 30,
                         blade_radius: options.bladeRadius || 0.28,

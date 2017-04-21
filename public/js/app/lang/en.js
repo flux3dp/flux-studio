@@ -652,15 +652,15 @@ define(function() {
             horizontal_adjustment_completed: 'Horizontal Adjustment Completed',
             height_adjustment_completed: 'Height Adjustment Completed',
             you_can_now_cut: 'Congrats! You can now start cutting sheets.',
-            zOffset: 'Cutting Height',
+            zOffset: 'Height Offset',
             overcut: 'Overcut',
             speed: 'Speed',
             bladeRadius: 'Blade Radius',
             backlash: 'Backlash Compensation',
-            zOffsetTip: 'Adjust cutting height for thicker vinyl and to prevent cutting too hard or too light',
+            zOffsetTip: 'Adjust the cutting height for thicker vinyl or to prevent cutting too hard or too light',
             overcutTip: 'Overcut loops for peeling off easier',
             speedTip: 'The cutting speed',
-            backlashTip: 'Adjust the value if straight lines is not straight enough',
+            backlashTip: 'Adjust the value if straight lines are not straight enough when using third party blade.',
             units: {
                 mms: 'mm/s',
                 mm: 'mm'
