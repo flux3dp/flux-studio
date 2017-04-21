@@ -274,8 +274,8 @@ define(function() {
             usb: 'USB',
             device: '機器',
             setting: '設定',
-            draw: '繪製',
-            cut: '紙藝',
+            draw: '繪圖',
+            cut: '切割',
         },
         settings: {
             on: '開',
