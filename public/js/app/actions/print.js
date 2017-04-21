@@ -851,7 +851,7 @@ define([
                 }
             }
         }
-        else {
+        else if(report.slice_status === 'complete') {
             GlobalActions.sliceComplete(report);
             if(show) { ProgressActions.updating(complete, 100); }
             sliceMaster.addTask('getSlicingResult').then((result) => {
