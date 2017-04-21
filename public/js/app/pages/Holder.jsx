@@ -371,7 +371,7 @@ define([
                                 'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-go': true,
-                                'mini-text': true
+                                'mini-text': i18n.getActiveLang() === 'en'
                             }),
                             dataAttrs: {
                                 'ga-event': 'holder-calibrate'
@@ -385,7 +385,7 @@ define([
                                 'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-go': true,
-                                'mini-text': true
+                                'mini-text': i18n.getActiveLang() === 'en'
                             }),
                             dataAttrs: {
                                 'ga-event': 'holder-calibrate'
