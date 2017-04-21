@@ -116,8 +116,6 @@ define([
                         });
                     }
 
-                    MenuFactory.alignCenter.enable = false;
-
                     MenuFactory.items.clear.onClick = () => {
                         self.state.laserEvents.clearScene();
                     };
