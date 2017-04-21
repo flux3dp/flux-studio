@@ -108,7 +108,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: 'cmd+alt',
+                modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
             rotate: {
@@ -116,7 +116,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'r',
-                modifiers: 'cmd+alt',
+                modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
             reset: {
