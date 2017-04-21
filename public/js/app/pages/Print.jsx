@@ -293,18 +293,7 @@ define([
 
                     // windows & Linux
                     if(navigator.appVersion.indexOf('Mac') === -1) {
-                        shortcuts.on(['ctrl', 'd'], (e) => {
-                            e.preventDefault();
-                            director.duplicateSelected();
-                        });
-
-                        shortcuts.on(['ctrl', 'z'], () => {
-                            director.undo();
-                        });
-
-                        shortcuts.on(['ctrl', 'shift', 'x'], () => {
-                            this._handleClearScene();
-                        });
+                        this._registerNonOsxShortcuts();
                     }
 
                     // copy event - it will listen by top menu as well in nwjs..
@@ -315,6 +304,17 @@ define([
                             director.duplicateSelected();
                         });
                     }
+                },
+
+                _registerNonOsxShortcuts: function() {
+                    shortcuts.on(['ctrl', 'd'], () => { director.duplicateSelected(); });
+                    shortcuts.on(['ctrl', 'z'], () => { director.undo(); });
+                    shortcuts.on(['ctrl', 'shift', 'x'], () => { this._handleClearScene(); });
+                    shortcuts.on(['ctrl', 'shift', 'r'], () => { this._handleModeChange('rotate'); });
+                    shortcuts.on(['ctrl', 'shift', 's'], () => { this._handleModeChange('scale'); });
+                    shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
+                    shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
+                    shortcuts.on(['ctrl', 'n'], () => { location.hash = '#initialize/wifi/connect-machine'; });
                 },
 
                 _registerTutorial: function() {

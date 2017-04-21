@@ -51,7 +51,7 @@ define([
                 location.hash = '#initialize/wifi/connect-machine';
             },
             key: 'n',
-            modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl'
+            modifiers: 'cmd'
         },
         items = {
             import: {
@@ -86,7 +86,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl',
+                modifiers: 'cmd',
                 parent: parentIndex.FILE
             },
             saveScene: {
@@ -100,7 +100,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'd',
-                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl',
+                modifiers: 'cmd',
                 parent: parentIndex.EDIT
             },
             scale: {
@@ -108,7 +108,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd+alt' : 'ctrl+alt',
+                modifiers: 'cmd+alt',
                 parent: parentIndex.EDIT
             },
             rotate: {
@@ -116,7 +116,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'r',
-                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd+alt' : 'ctrl+alt',
+                modifiers: 'cmd+alt',
                 parent: parentIndex.EDIT
             },
             reset: {
@@ -135,7 +135,7 @@ define([
                 label: lang.edit.undo,
                 enabled: false,
                 key: 'Z',
-                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl',
+                modifiers: 'cmd',
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
@@ -144,7 +144,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'x',
-                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd+shift' : 'ctrl+shift',
+                modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
             device: {
@@ -194,7 +194,7 @@ define([
             label: lang.flux.quit,
             enabled: true,
             key: 'q',
-            modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl',
+            modifiers: 'cmd',
             onClick: function() {
                 nw.Window.get().close();
             }
@@ -253,7 +253,7 @@ define([
                             gui.Window.get().minimize();
                         },
                         key: 'm',
-                        modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl'
+                        modifiers: 'cmd'
                     },
                     {
                         label: lang.window.fullscreen,
