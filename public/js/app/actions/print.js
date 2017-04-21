@@ -2909,7 +2909,7 @@ define([
 
         let id = 'SLICER_ERROR',
         message = lang.slicer.error[result.error] || result.info;
-        if (result.error === ErrorConstants.INVALID_PARAMETER) {
+        if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
             message = `${message} ${result.info}`;
         }
         if (!message) {

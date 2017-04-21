@@ -286,6 +286,9 @@ define([
             if (this.support_material_pattern === 'LINES') {
                 this.support_material_pattern = 'rectilinear';
             }
+            if (Object.keys(this).indexOf('support_enable') >=0) {
+                delete this.support_enable;
+            }
         }
 
         if (this.engine === 'cura') {
