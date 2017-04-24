@@ -78,16 +78,20 @@ define([
                     displayName: 'CUT',
                     className: genericClassName,
                     label: lang.menu.cut,
-                    imgSrc: '/img/menu/icon-draw.svg'
+                    imgSrc: '/img/menu/icon-cut.svg'
                 },
-                {
-                    name: 'mill',
-                    displayName: 'Mill',
-                    className: genericClassName,
-                    label: lang.menu.mill,
-                    imgSrc: '/img/menu/icon-draw.svg'
-                }
             ];
+
+        // Special Feature
+        if (window.FLUX && window.FLUX.dev) {
+            options.push({
+                name: 'mill',
+                displayName: 'Mill',
+                className: genericClassName,
+                label: lang.menu.mill,
+                imgSrc: '/img/menu/icon-draw.svg'
+            });
+        }
 
         return React.createClass({
 

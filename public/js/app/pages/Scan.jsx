@@ -26,6 +26,7 @@ define([
     'Rx',
     'helpers/duration-formatter',
     'helpers/firmware-version-checker',
+    'helpers/shortcuts',
     // non-return
     'helpers/array-findindex',
     'helpers/object-assign',
@@ -57,7 +58,8 @@ define([
     PointCloudHelper,
     Rx,
     FormatDuration,
-    FirmwareVersionChecker
+    FirmwareVersionChecker,
+    Shortcuts
 ) {
     'use strict';
 
@@ -179,6 +181,14 @@ define([
                         self.refs.fileUploader.getDOMNode().click();
                     };
                     menuFactory.methods.refresh();
+
+                    Shortcuts.on(['ctrl', 'e'], () => {
+                        ScannedModel.getBlobFromScene();
+                    });
+
+                    Shortcuts.on(['ctrl', 'm'], () => {
+                        alert('checked');
+                    });
                 },
 
                 componentWillUnmount: function() {

@@ -5,24 +5,27 @@ define([
     'jsx!pages/Holder',
     'helpers/api/config',
     'helpers/i18n',
+    'helpers/nwjs/menu-factory',
 ], function(
     $,
     React,
     LaserSetupPanel,
     HolderGenerator,
     ConfigHelper,
-    i18n
+    i18n,
+    menuFactory
 ) {
 
     let Config = ConfigHelper(),
         lang = i18n.lang;
 
     'use strict';
-    
+
     return function(args) {
         args = args || {};
 
-        let Holder = HolderGenerator(args);
+        let Holder = HolderGenerator(args),
+            nwjsMenu = menuFactory.items;
 
         let view = React.createClass({
                 getDefaultProps: function() {
@@ -55,11 +58,26 @@ define([
                         Config.write('laser-defaults', options);
                     }
                     this.setState({options});
+                    this._registerKeyEvents();
+                },
+
+                _registerKeyEvents: function() {
+                    if(navigator.appVersion.indexOf('Mac') === -1) {
+                        this._registerNonOsxShortcuts();
+                    }
+                },
+
+                _registerNonOsxShortcuts: function() {
+                    shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
+                    shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
+                    shortcuts.on(['ctrl', 'n'], () => { location.hash = '#initialize/wifi/connect-machine'; });
+                    shortcuts.on(['ctrl', 'shift', 'x'], () => { nwjsMenu.clear.onClick(); });
                 },
 
                 _fetchFormalSettings: function(holder) {
                     let options = Config.read('laser-defaults') || {},
                         max = lang.laser.advanced.form.power.max;
+
                     return {
                         object_height: options.objectHeight,
                         height_offset: options.heightOffset || 0,
@@ -83,9 +101,8 @@ define([
                 },
 
                 render: function() {
-                    console.log('Load Holder', Holder);
                     // return <div />;
-                    
+
                     return <Holder
                         page={this.props.page}
                         acceptFormat={'image/*'}

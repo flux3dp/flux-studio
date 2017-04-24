@@ -851,7 +851,7 @@ define([
                 }
             }
         }
-        else {
+        else if(report.slice_status === 'complete') {
             GlobalActions.sliceComplete(report);
             if(show) { ProgressActions.updating(complete, 100); }
             sliceMaster.addTask('getSlicingResult').then((result) => {
@@ -1691,6 +1691,7 @@ define([
                         scene.add(mesh);
                         outlineScene.add(mesh.outlineMesh);
                         objects.push(mesh);
+                        addHistory('ADD', mesh);
 
                         doSlicing();
                         syncObjectOutline(mesh);
@@ -2399,7 +2400,7 @@ define([
             });
         }
 
-        saveAs(packer.pack());
+        saveAs(packer.pack(), 'scene.fsc');
     }
 
     function loadScene() {
@@ -2561,6 +2562,26 @@ define([
             }
             history.push(entry);
         }
+    }
+
+    function alignCenterPosition() {
+      if (SELECTED) {
+        alignCenter();
+        setObjectDialoguePosition(SELECTED);
+        blobExpired = true;
+        hasPreviewImage = false;
+        slicingStatus.error = null;
+        startSlicing(slicingType.F);
+        checkOutOfBounds(SELECTED).then(() => {
+            // disable preview when object are all out of bound
+            reactSrc.setState({ hasObject: !allOutOfBound()});
+            if(blobExpired && objects.length > 0 && !allOutOfBound()) {
+                slicingStatus.showProgress = false;
+                doSlicing();
+            }
+        });
+        render();
+      }
     }
 
     function undo() {
@@ -2789,11 +2810,13 @@ define([
         MenuFactory.items.scale.enabled = enabled;
         MenuFactory.items.rotate.enabled = enabled;
         MenuFactory.items.reset.enabled = enabled;
+        MenuFactory.items.alignCenter.enabled = enabled;
 
         MenuFactory.items.duplicate.onClick = duplicateSelected;
         MenuFactory.items.scale.onClick = setScaleMode;
         MenuFactory.items.rotate.onClick = setRotateMode;
         MenuFactory.items.reset.onClick = resetObject;
+        MenuFactory.items.alignCenter.onClick = alignCenterPosition;
         MenuFactory.methods.refresh();
     }
 
@@ -2886,7 +2909,7 @@ define([
 
         let id = 'SLICER_ERROR',
         message = lang.slicer.error[result.error] || result.info;
-        if (result.error === ErrorConstants.INVALID_PARAMETER) {
+        if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
             message = `${message} ${result.info}`;
         }
         if (!message) {
@@ -2938,6 +2961,7 @@ define([
     }
 
     return {
+        alignCenterPosition : alignCenterPosition,
         init                : init,
         appendModel         : appendModel,
         appendModels        : appendModels,

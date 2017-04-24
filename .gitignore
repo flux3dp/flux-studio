@@ -61,3 +61,8 @@ _test/nwjs
 _test/tests_output/CHROME_57.0.2987.98_MAC_printing.xml
 stl.cache
 temp.transform
+_test/example_files/star.png
+_test/example_files/star.svg
+_test/nightwatch/laser.js
+_test/tests_output/CHROME_57.0.2987.133_MAC_laser.xml
+_test/tests_output/CHROME_57.0.2987.133_MAC_printing.xml

@@ -77,7 +77,7 @@ define([
             return line;
         },
         get lang() {
-            return langCache[activeLang]
+            return langCache[activeLang];
         }
     };
 });

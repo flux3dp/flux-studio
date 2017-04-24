@@ -28,6 +28,17 @@ define([
             };
         },
 
+        getInitialState: function() {
+            return {
+                defaultValue: this.props.defaultValue,
+                operatorAmount: 0
+            };
+        },
+
+        componentWillReceiveProps: function (nextProps) {
+            this.value(nextProps.defaultValue);
+        },
+
         // Public methods
         value: function(val) {
             if (false === this.isMounted()) {
@@ -133,6 +144,7 @@ define([
 
         // UI Events
         _onBlur: function(e) {
+            e.preventDefault();
             let textboxValue = this.refs.unitInput.getDOMNode().value;
             var value = this._confirmValue();
             if(textboxValue === '') {
@@ -151,6 +163,8 @@ define([
                 value;
 
             switch (e.keyCode) {
+            case keyCodeConstants.KEY_BACK:
+                return;
             case keyCodeConstants.KEY_RETURN:
                 this._onBlur(e);
                 break;
@@ -216,17 +230,6 @@ define([
                     {...attrs}
                 />
             );
-        },
-
-        getInitialState: function() {
-            return {
-                defaultValue: this.props.defaultValue,
-                operatorAmount: 0
-            };
-        },
-
-        componentWillReceiveProps: function (nextProps) {
-            this.value(nextProps.defaultValue);
         }
     });
 });

@@ -103,12 +103,12 @@ define([
             allowDeleteObject = true,
             tutorialMode = false,
             nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'cura2',
+            defaultSlicingEngine = 'cura',
             tourGuide = TutorialSteps,
             view = React.createClass({
 
                 getInitialState: function() {
-                    var _settings            = Config().read('advanced-settings'),
+                    var _settings           = Config().read('advanced-settings'),
                         tutorialFinished    = Config().read('tutorial-finished'),
                         configuredPrinter   = Config().read('configured-printer');
 
@@ -132,6 +132,9 @@ define([
                         tutorialMode = true;
                     }
 
+                    // processing support
+                    let supportOn = !!advancedSettings.support_material;
+
                     return ({
                         showAdvancedSettings        : false,
                         modelSelected               : null,
@@ -152,7 +155,7 @@ define([
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
                         raftOn                      : advancedSettings.raft === 1,
-                        supportOn                   : advancedSettings.support_material === 1,
+                        supportOn                   : supportOn,
                         displayModelControl         : !Config().read('default-model'),
                         model                       : Config().read('default-model') || Config().read('preferred-model') || 'fd1',
                         quality                     : 'high',
@@ -271,17 +274,27 @@ define([
                         director.undo();
                     });
 
+                    //========for testing only==================
+                    //shortcuts.on(['cmd', 'b'], () => {
+                    //  director.alignCenterPosition();
+                    //});
+                    // shortcuts.on(['ctrl', 'shift', 't'], () => {
+                    //     window.customEvent.onTutorialClick();
+                    // });
+                    //
+                    // shortcuts.on(['cmd', 'shift', 'a'], () => {
+                    //     LocalStorage.clearAllExceptIP();
+                    // });
+                    //==========================================
+
                     shortcuts.on(['cmd', 'shift', 'x'], () => {
                         this._handleClearScene();
                     });
 
-                    shortcuts.on(['ctrl', 'shift', 't'], () => {
-                        window.customEvent.onTutorialClick();
-                    });
-
-                    shortcuts.on(['cmd', 'shift', 'a'], () => {
-                        LocalStorage.clearAllExceptIP();
-                    });
+                    // windows & Linux
+                    if(navigator.appVersion.indexOf('Mac') === -1) {
+                        this._registerNonOsxShortcuts();
+                    }
 
                     // copy event - it will listen by top menu as well in nwjs..
                     if ('undefined' === typeof window.requireNode) {
@@ -291,6 +304,17 @@ define([
                             director.duplicateSelected();
                         });
                     }
+                },
+
+                _registerNonOsxShortcuts: function() {
+                    shortcuts.on(['ctrl', 'd'], () => { director.duplicateSelected(); });
+                    shortcuts.on(['ctrl', 'z'], () => { director.undo(); });
+                    shortcuts.on(['ctrl', 'shift', 'x'], () => { this._handleClearScene(); });
+                    shortcuts.on(['ctrl', 'shift', 'r'], () => { this._handleModeChange('rotate'); });
+                    shortcuts.on(['ctrl', 'shift', 's'], () => { this._handleModeChange('scale'); });
+                    shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
+                    shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
+                    shortcuts.on(['ctrl', 'n'], () => { location.hash = '#initialize/wifi/connect-machine'; });
                 },
 
                 _registerTutorial: function() {
@@ -468,7 +492,8 @@ define([
                         this.setState({displayModelControl: false});
                         this.showSpinner();
 
-                        let device = {},
+                        let self = this,
+                            device = {},
                             callback;
 
                         if (Config().read('configured-printer') !== '') {
@@ -493,7 +518,7 @@ define([
                                 }.bind(this), 100);
                             }.bind(this),
                             onTimeout: function() {
-                                this.hideSpinner();
+                                self.hideSpinner();
                                 setTimeout(function() {
                                     AlertActions.showWarning(sprintf(lang.set_default.error, device.name));
                                 }, 100);
@@ -545,13 +570,13 @@ define([
                     }.bind(this));
 
                     advancedSettings.set('raft', isOn ? 1 : 0, true);
-
                     this._saveSetting();
                 },
 
                 _handleSupportClick: function() {
                     this.setState({ leftPanelReady: false });
                     var isOn = !this.state.supportOn;
+
                     let filteredItem = advancedSettings.filter({ key: 'support_material', value: isOn ? 1 : 0 });
                     director.setParameter(filteredItem.key, filteredItem.value).then(function() {
                         this.setState({
@@ -559,7 +584,8 @@ define([
                             supportOn: isOn
                         });
                     }.bind(this));
-                    advancedSettings.set('support_material', isOn ? 1 : 0);
+
+                    advancedSettings.set('support_material', isOn ? 1 : 0, true);
                     this._saveSetting();
                 },
 
@@ -645,6 +671,8 @@ define([
                         raftOn:  advancedSettings.raft === 1,
                         quality: quality
                     });
+
+
                     if (!setting) {
                         let self = this;
                         let uploadSettings = () => {
@@ -946,6 +974,7 @@ define([
                 },
 
                 _saveSetting: function() {
+                    // extra process for raft (because it's a direct control on left panel)
                     Config().write('advanced-settings', advancedSettings.toString());
                 },
 
@@ -995,7 +1024,7 @@ define([
                             <div className='arrowBox' onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className='file-importer'>
                                     <div className='import-btn'>{lang.print.import}</div>
-                                    <input ref='import' type='file' accept='.stl,.fc,.gcode,.obj' onChange={this._handleImport} multiple />
+                                    <input ref='import' type='file' accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>

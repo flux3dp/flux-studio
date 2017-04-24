@@ -90,6 +90,7 @@ define(function() {
                 scale: '縮放',
                 clear: '清除場景',
                 undo: '復原',
+                alignCenter: '置中',
                 reset: '重設'
             },
             device: {
@@ -273,8 +274,8 @@ define(function() {
             usb: 'USB',
             device: '機器',
             setting: '設定',
-            draw: '繪製',
-            cut: '紙藝',
+            draw: '繪圖',
+            cut: '切割',
         },
         settings: {
             on: '開',
@@ -291,6 +292,10 @@ define(function() {
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
             reset: '重置所有設定',
+            default_machine: '預設機器',
+            default_machine_button: '無',
+            remove_default_machine_button: '刪除',
+            confirm_remove_default: '將會刪除預設機器',
             reset_now: '重置所有設定',
             confirm_reset: '確認要重置 FLUX Studio?',
             language: '語言',
@@ -652,16 +657,23 @@ define(function() {
             }
         },
         cut: {
-            calibrate: '校正',
-            zOffset: '切割高度',
+            horizontal_calibrate: '水平\n校正',
+            height_calibrate: '高度\n校正',
+            running_horizontal_adjustment: '水平校正中',
+            running_height_adjustment: '高度校正中',
+            run_height_adjustment: '請調整刀具，並執行高度校正。',
+            horizontal_adjustment_completed: '水平校正完成',
+            height_adjustment_completed: '高度校正完成',
+            you_can_now_cut: '恭喜您！您可以開始進行切割工作',
+            zOffset: '高度調整',
             overcut: '閉環過切',
             speed: '速度',
             bladeRadius: '刀尖半徑',
             backlash: 'Backlash 補償',
-            zOffsetTip: '刀頭模組底部距離切割平面的距離',
+            zOffsetTip: '刀頭模組底部距離切割平面的高度調整',
             overcutTip: '當切割路徑起始點與結束點座標相同時，切到結束點後再走一些從起始點開始的路徑',
             speedTip: '切割速度',
-            backlashTip: '如果直線不夠直，調整參數',
+            backlashTip: '如果使用第三方刀具直線不夠直，則調整此參數',
             units: {
                 mms: 'mm/s',
                 mm: 'mm'
@@ -955,6 +967,7 @@ define(function() {
             aborted: '已終止',
             completed: '已完成',
             calibrating: '校正中',
+            showOutline: '繪製輪廓中',
             starting: '啟動中',
             resuming: '恢復中',
             scanning: '掃描',
@@ -1093,6 +1106,8 @@ define(function() {
                 PRINT                           : '列印工作',
                 LASER                           : '雕刻工作',
                 DRAW                            : '繪製工作',
+                CUT                             : '切割工作',
+                VINYL                           : '切割工作',
                 'N/A'                           : '繪製工作'
             },
             device: {

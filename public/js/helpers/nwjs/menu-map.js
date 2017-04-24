@@ -66,7 +66,7 @@ define([
                     }
                 },
                 key: 'i',
-                modifiers: 'cmd',
+                modifiers: navigator.appVersion.indexOf('Mac') !== -1 ? 'cmd' : 'ctrl',
                 parent: parentIndex.FILE
             },
             recent: {
@@ -108,7 +108,7 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 's',
-                modifiers: 'cmd+alt',
+                modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
             rotate: {
@@ -116,11 +116,17 @@ define([
                 enabled: false,
                 onClick: emptyFunction,
                 key: 'r',
-                modifiers: 'cmd+alt',
+                modifiers: 'cmd+shift',
                 parent: parentIndex.EDIT
             },
             reset: {
                 label: lang.edit.reset,
+                enabled: false,
+                onClick: emptyFunction,
+                parent: parentIndex.EDIT
+            },
+            alignCenter: {
+                label: lang.edit.alignCenter,
                 enabled: false,
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
@@ -231,6 +237,7 @@ define([
                     items.scale,
                     items.rotate,
                     items.reset,
+                    items.alignCenter,
                     separator,
                     items.clear
                 ]

@@ -83,15 +83,14 @@ define([
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
             slic3rInfill = [
-                { label: lang.rectilinear, value: 'rectilinear' }, 
-                { label: lang.line, value: 'line' }, 
+                { label: lang.rectilinear, value: 'rectilinear' },
+                { label: lang.line, value: 'line' },
                 { label: lang.honeycomb, value: 'honeycomb' }
             ];
             slic3rSupport = [
                 { label: lang.rectilinearGrid, value: 'rectilinear-grid' },
-                { label: lang.line, value: 'line' },
-                { label: lang.rectilinear, value: 'rectilinear' }, 
-                { label: lang.honeycomb, value: 'honeycomb' } 
+                { label: lang.rectilinear, value: 'rectilinear' },
+                { label: lang.honeycomb, value: 'honeycomb' }
             ];
             curaInfill = [
                 { label: lang.curaInfill.automatic, value: 'AUTOMATIC' },
@@ -120,6 +119,7 @@ define([
                 { label: lang.curaSupport.lines, value: 'LINES' },
                 { label: lang.curaSupport.zigzag, value: 'ZIGZAG' }
             ];
+            advancedSetting.engine = this.props.setting.engine;
             advancedSetting.load(this.props.setting, true);
 
             this._updateCustomField();
@@ -304,8 +304,9 @@ define([
             let { engine, fill_density, fill_pattern } = advancedSetting;
 
             if(id === 'engine') {
+                advancedSetting.engine = value;
                 advancedSetting.fill_pattern = {'slic3r': 'honeycomb', 'cura': 'GRID', 'cura2':'TRIANGLES'}[value];
-                advancedSetting.support_material_pattern = {'slic3r': 'line', 'cura': 'LINES', 'cura2':'ZIGZAG'}[value];
+                advancedSetting.support_material_pattern = {'slic3r': 'rectilinear', 'cura': 'LINES', 'cura2':'ZIGZAG'}[value];
                 this.setState({ showBridgeSpeed: value !== 'cura2' });
             }
             else if(id === 'fill_pattern' && value !== 'rectilinear') {
@@ -548,7 +549,7 @@ define([
             if(advancedSetting.engine === 'cura') {
                 infillPattern = curaInfill;
             } else if(advancedSetting.engine === 'cura2') {
-                infillPattern = cura2Infill; 
+                infillPattern = cura2Infill;
             }
             else {
                 infillPattern = slic3rInfill;
@@ -812,7 +813,8 @@ define([
                                         cols="50"
                                         value={this.state[advancedSetting.getExpertKey()]}
                                         onChange={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
-                                        onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')} />
+                                        // onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
+                                    />
                                 </div>
                             </div>
                         </div>

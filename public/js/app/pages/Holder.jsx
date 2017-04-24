@@ -14,7 +14,8 @@ define([
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/i18n',
-    'helpers/dnd-handler'
+    'helpers/dnd-handler',
+    'helpers/nwjs/menu-factory'
 ], function(
     $,
     React,
@@ -31,7 +32,8 @@ define([
     ButtonGroup,
     ConfigHelper,
     i18n,
-    DnDHandler
+    DnDHandler,
+    MenuFactory
 ) {
     'use strict';
 
@@ -75,6 +77,7 @@ define([
 
                     DnDHandler.plug(document, self._handleDragAndDrop);
 
+
                     self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
 
                     self.state.laserEvents.menuFactory.items.import.onClick = function() {
@@ -100,7 +103,6 @@ define([
                         setupPanelDefaults: this.props.panelOptions
                     });
 
-                    console.log('mounted');
                     if(!Config.read('laser-calibrated') && this.props.page === 'laser') {
                         // NOTE: only yes no support this kind of callback
                         AlertActions.showPopupYesNo('do-calibrate', lang.laser.do_calibrate, '', null, {
@@ -113,6 +115,10 @@ define([
                             }
                         });
                     }
+
+                    MenuFactory.items.clear.onClick = () => {
+                        self.state.laserEvents.clearScene();
+                    };
                 },
 
                 componentWillUnmount: function () {
@@ -135,11 +141,25 @@ define([
                         settings: this._fetchFormalSettings()
                     });
                 },
+                _handleShowOutlineClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        machineCommand: 'showOutline',
+                        settings: this._fetchFormalSettings()
+                    });
+                },
 
                 _handleCalibrateClick: function() {
                     this.setState({
                         openPrinterSelectorWindow: true,
                         machineCommand: 'calibrate'
+                    });
+                },
+
+                _handleZProbeClick: function() {
+                    this.setState({
+                        openPrinterSelectorWindow: true,
+                        machineCommand: 'zprobe'
                     });
                 },
 
@@ -326,12 +346,12 @@ define([
                             },
                             onClick: this._handleStartClick
                         }];
-                    
+
                     if (this.props.page === 'laser') {
                         buttons = [{
                             label: lang.laser.showOutline,
                             className: cx({
-                                'btn-disabled': false,
+                                'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,
                                 'btn-hexagon': true,
                                 'btn-go': true
@@ -339,23 +359,38 @@ define([
                             dataAttrs: {
                                 'ga-event': 'holder-outline'
                             },
-                            onClick: this._handleStartClick
+                            onClick: this._handleShowOutlineClick
                         }].concat(buttons);
                     }
 
                     if (this.props.page === 'cut' || this.props.page === 'mill') {
                         buttons = [{
-                            label: lang.cut.calibrate,
+                            label: lang.cut.horizontal_calibrate,
                             className: cx({
                                 'btn-disabled': false,
                                 'btn-default': true,
                                 'btn-hexagon': true,
-                                'btn-go': true
+                                'btn-go': true,
+                                'mini-text': i18n.getActiveLang() === 'en'
                             }),
                             dataAttrs: {
                                 'ga-event': 'holder-calibrate'
                             },
                             onClick: this._handleCalibrateClick
+                        },
+                        {
+                            label: lang.cut.height_calibrate,
+                            className: cx({
+                                'btn-disabled': false,
+                                'btn-default': true,
+                                'btn-hexagon': true,
+                                'btn-go': true,
+                                'mini-text': i18n.getActiveLang() === 'en'
+                            }),
+                            dataAttrs: {
+                                'ga-event': 'holder-calibrate'
+                            },
+                            onClick: this._handleZProbeClick
                         }].concat(buttons);
                     }
 
@@ -369,7 +404,6 @@ define([
                         printerSelector = this._renderPrinterSelectorWindow(),
                         uploader = this._renderFileUploader(),
                         actionButtons = this._renderActionButtons();
-
                     return (
                         <div className="studio-container laser-studio">
                             {printerSelector}

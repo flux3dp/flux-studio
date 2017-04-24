@@ -10,7 +10,6 @@ define(function() {
         opts.threshold = ('number' === typeof opts.threshold ? opts.threshold : 128);
         opts.is_shading = ('boolean' === typeof opts.is_shading ? opts.is_shading : true);
         opts.is_svg = ('boolean' === typeof opts.is_svg ? opts.is_svg : false);
-
         var binary = [],
             WHITE = 255,
             BLACK = 0,

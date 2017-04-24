@@ -34,10 +34,10 @@ define([
                 getInitialState: function() {
                     return {
                         options: {
-                            zOffset: 0.1,
+                            zOffset: 0,
                             overcut: 2,
-                            speed: 20,
-                            bladeRadius: 0.24
+                            speed: 30,
+                            bladeRadius: 0.28
                         }
                     };
                 },
@@ -45,10 +45,10 @@ define([
                 componentDidMount: function() {
                     let options = Config.read('cut-defaults') || {};
                     options = {
-                        zOffset: options.zOffset || 0.1,
+                        zOffset: options.zOffset || 0,
                         overcut: options.overcut || 2,
-                        speed: options.speed || 10,
-                        bladeRadius: options.bladeRadius || 0.24,
+                        speed: options.speed || 30,
+                        bladeRadius: options.bladeRadius || 0.28,
                     };
                     if (!Config.read('cut-defaults')) {
                         Config.write('cut-defaults', options);
@@ -59,10 +59,10 @@ define([
                 _fetchFormalSettings: function() {
                     let options = Config.read('cut-defaults') || {};
                     return {
-                        cutting_zheight: options.zOffset || 0.1,
+                        cutting_zheight: options.zOffset || 0,
                         overcut: options.overcut || 2,
-                        speed: options.speed || 10,
-                        blade_radius: options.bladeRadius || 0.24,
+                        speed: options.speed || 30,
+                        blade_radius: options.bladeRadius || 0.28,
                     };
                 },
 
