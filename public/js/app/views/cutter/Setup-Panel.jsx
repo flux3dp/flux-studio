@@ -61,7 +61,7 @@ define([
                 refs = self.refs,
                 opts = {
                     zOffset: refs.zOffset.value(),
-                    overcut: refs.overcut.value(),
+                    //overcut: refs.overcut.value(),
                     speed: refs.speed.value(),
                     bladeRadius: refs.bladeRadius.value()
                 },
@@ -103,7 +103,7 @@ define([
                             defaultValue={this.state.defaults.zOffset}
                             getValue={this._updateDefaults}
                             min={min}
-                            max={150}
+                            max={5}
                         />
                     </div>
                 )
@@ -152,7 +152,7 @@ define([
                             defaultValue={this.state.defaults.speed}
                             getValue={this._updateDefaults}
                             min={0.8}
-                            max={150}
+                            max={200}
                         />
                     </div>
                 )

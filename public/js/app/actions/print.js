@@ -851,7 +851,7 @@ define([
                 }
             }
         }
-        else {
+        else if(report.slice_status === 'complete') {
             GlobalActions.sliceComplete(report);
             if(show) { ProgressActions.updating(complete, 100); }
             sliceMaster.addTask('getSlicingResult').then((result) => {
@@ -1691,6 +1691,7 @@ define([
                         scene.add(mesh);
                         outlineScene.add(mesh.outlineMesh);
                         objects.push(mesh);
+                        addHistory('ADD', mesh);
 
                         doSlicing();
                         syncObjectOutline(mesh);
@@ -2399,7 +2400,7 @@ define([
             });
         }
 
-        saveAs(packer.pack());
+        saveAs(packer.pack(), 'scene.fsc');
     }
 
     function loadScene() {
@@ -2908,7 +2909,7 @@ define([
 
         let id = 'SLICER_ERROR',
         message = lang.slicer.error[result.error] || result.info;
-        if (result.error === ErrorConstants.INVALID_PARAMETER) {
+        if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
             message = `${message} ${result.info}`;
         }
         if (!message) {

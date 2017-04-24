@@ -118,7 +118,7 @@ define([
                         self.props.onQualityModelSelected(self.state.quality, arg);
                         $('.dialog-opener').prop('checked', false);
                     },
- 
+
                     'QUALITY': function() {
                         self.props.onQualityModelSelected(arg, self.state.model);
                         $('.dialog-opener').prop('checked', false);
@@ -204,7 +204,7 @@ define([
                 disable: this.props.previewModeOnly
             };
         },
-        
+
         _renderModel: function() {
             var _class = ClassNames('display-text model-select', {'disable': this.props.previewModeOnly}),
                 modelSelection;
@@ -233,7 +233,7 @@ define([
         },
 
         _renderRaft: function() {
-            var _class = ClassNames({'disable': !this.props.enable});
+            var _class = ClassNames('raft', {'disable': !this.props.enable});
             return {
                 label: (
                     <div className={_class} title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
@@ -245,7 +245,7 @@ define([
         },
 
         _renderSupport: function() {
-            var _class = ClassNames({'disable': !this.props.enable});
+            var _class = ClassNames('support', {'disable': !this.props.enable});
             return {
                 label: (
                     <div className={_class} title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
@@ -257,7 +257,7 @@ define([
         },
 
         _renderAdvanced: function() {
-            var _class = ClassNames({'disable': !this.props.enable || this.props.previewModeOnly});
+            var _class = ClassNames('advanced', {'disable': !this.props.enable || this.props.previewModeOnly});
             return {
                 label: (
                     <div className={_class} title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
@@ -269,7 +269,7 @@ define([
         },
 
         _renderPreview: function() {
-            var _class = ClassNames('display-text', {'disable': !this.props.enable && !this.props.previewModeOnly});
+            var _class = ClassNames('display-text preview', {'disable': !this.props.enable && !this.props.previewModeOnly});
             return {
                 label: (
                     <div id="preview" className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>

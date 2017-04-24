@@ -634,7 +634,7 @@ define([
                 return useDefaultResponse('play press_button');
             },
 
-            show: (temperature) => {
+            setHeadTemperatureDuringPause: (temperature) => {
                 return useDefaultResponse(`play toolhead heater 0 ${temperature}`);
             },
 
