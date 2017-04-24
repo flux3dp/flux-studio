@@ -608,6 +608,7 @@ define([
             this.reporter = setInterval(() => {
                 // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
+                    clearInterval(this.reporter);
                     this._processReport(error);
                 }).then((result) => {
                     store.dispatch(DeviceActionCreator.updateDeviceStatus(result));

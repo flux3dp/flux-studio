@@ -86,10 +86,11 @@ define([
             case DeviceConstants.status.COMPLETED:
             case DeviceConstants.status.ABORTED:
                 // quit
-                DeviceMaster.selectDevice(printer).then(() => {
+                DeviceMaster.selectDevice(printer)
+                .then(() => {
                     return DeviceMaster.quit();
                 })
-                .done(() => {
+                .then(() => {
                     deferred.resolve('ok');
                 });
                 break;

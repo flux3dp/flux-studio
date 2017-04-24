@@ -23,7 +23,7 @@ define([
             console.log(i, conn.url);
         });
     };
-    
+
     var hadConnected = false,
         showProgramErrorPopup = true,
         WsLogger = new Logger('websocket'),
@@ -121,7 +121,7 @@ define([
 
                         if (window.FLUX.allowTracking && !skipError) {
                             window.Raven.captureException(data);
-                            console.log('ws error', errorStr); 
+                            console.log('ws error', errorStr);
                         }
                         socketOptions.onError(data);
                         break;
@@ -134,7 +134,7 @@ define([
                         }
 
                         if (errorStr === 'AUTH_ERROR') { skipError = true; }
-                        
+
                         // if identify error, reconnect again
                         if (errorStr === 'REMOTE_IDENTIFY_ERROR') {
                             setTimeout(() => {
@@ -145,9 +145,9 @@ define([
 
                         if (window.FLUX.allowTracking && !skipError) {
                             window.Raven.captureException(data);
-                            console.log('ws fatal', errorStr); 
+                            console.log('ws fatal', errorStr);
                         }
-                        
+
                         socketOptions.onFatal(data);
                         break;
                     // ignore below status
