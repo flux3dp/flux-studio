@@ -83,6 +83,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 	//
 	// public methods
 	//
+	
+	this.dIn = dollyIn;
 
 	this.getPolarAngle = function () {
 

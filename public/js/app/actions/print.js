@@ -475,6 +475,11 @@ define([
                         } else {
                             startSlicing(slicingType.F);
                             callback();
+
+                            if (!$.isEmptyObject(SELECTED)) {
+                              _targetAndZoom(SELECTED);
+                            }
+
                         }
                     }
                 });
@@ -1023,11 +1028,22 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         transformAxisChanged = '';
+
+        //targer mesh center when tranformed.
+        if (!$.isEmptyObject(SELECTED)) {
+          _orbitTargetMesh(SELECTED);
+          setObjectDialoguePosition(SELECTED);
+        }
+
         checkOutOfBounds(SELECTED).then(() => {
             // disable preview when object are all out of bound
             reactSrc.setState({ hasObject: !allOutOfBound()});
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
+                //set the OrbitControls target to move around.
+                if (!reactSrc.state.isTransformed) {
+                  _targetAndZoom(SELECTED);
+                }
                 doSlicing();
             }
         });
@@ -1051,6 +1067,9 @@ define([
                     hasPreviewImage = false;
                     slicingStatus.error = null;
                     setObjectDialoguePosition();
+                    reactSrc.setState({
+                        isTransformed: false
+                    });
                     render();
                     return;
                 }
@@ -1090,7 +1109,8 @@ define([
                 objectBeforeTransform.rotation = SELECTED.rotation.clone();
                 transformMode = true;
                 reactSrc.setState({
-                    isTransforming: true
+                    isTransforming: true,
+                    isTransformed: true
                 });
                 break;
             case 'mouseUp':
@@ -2565,7 +2585,7 @@ define([
     }
 
     function alignCenterPosition() {
-      if (SELECTED) {
+      if (!$.isEmptyObject(SELECTED)) {
         alignCenter();
         setObjectDialoguePosition(SELECTED);
         blobExpired = true;
@@ -2793,6 +2813,51 @@ define([
         });
     }
 
+    function _targetAndZoom(mesh){
+      _orbitTargetMesh(mesh);
+      _zoomCamera(mesh);
+      setObjectDialoguePosition(mesh);
+    }
+
+    function _orbitTargetMesh(mesh) {
+      if (!$.isEmptyObject(mesh)) {
+         let x = mesh.position.x,
+             y = mesh.position.y,
+             z = mesh.position.z;
+         orbitControl.target.set(x, y, z);
+         orbitControl.update();
+      }
+    }
+
+    function _zoomCamera(mesh) {
+      // TODO make more efficient calculation.
+        var deltaX, deltaY, deltaZ, distance, vFOV, h, fraction;
+        var obSize = mesh.size;
+        var refDist = Math.max(obSize.x, obSize.y, obSize.z) * 1.5;
+        var obSize = mesh.size;
+
+        orbitControl.dIn(0.1);
+        orbitControl.update();
+        do {
+          deltaX = camera.position.x - mesh.position.x;
+          deltaY = camera.position.y - mesh.position.y;
+          deltaZ = camera.position.z - mesh.position.z;
+          distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+          vFOV = camera.fov * Math.PI / 180;
+          h = 2 * Math.tan( vFOV / 2 ) * distance;
+          fraction = refDist / h;
+
+          orbitControl.dIn(1.2);
+          orbitControl.update();
+        } while(fraction < 0.4);
+    }
+
+    function tester() {
+      console.log('SELECTED',SELECTED);
+      _zoomCamera();
+    }
+
     function _removeAllMeshOutline() {
         objects.forEach(function(obj) {
             obj.outlineMesh.visible = false;
@@ -2996,6 +3061,7 @@ define([
         clearScene          : clearScene,
         changeEngine        : changeEngine,
         takeSnapShot        : takeSnapShot,
+        tester              : tester,
         startSlicing        : startSlicing
     };
 });
