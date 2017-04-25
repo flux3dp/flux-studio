@@ -138,40 +138,54 @@ define([
         }
     }
 
-    SlicerSettings.prototype.toExpert = function(customString = '', slicer = 'slic3r') {
+    SlicerSettings.prototype.toExpert = function(customString = '', engine = 'slic3r') {
         let self = this;
         function slic3r() {
             var custom = ( customString || self.custom ).split('\n');
-            Object.keys(self).filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function')).map((key) => {
-                insertConfig(custom, key, self[key]);
+            Object.keys(self)
+            .filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function'))
+            .map((key) => {
+                // support_enable is for cura 2, we manually reject
+                if(key !== 'support_enable') {
+                    insertConfig(custom, key, self[key]);
+                }
             });
             return custom.join('\n');
         }
 
         function cura2() {
             var customCura2 = ( customString || self.customCura2 ).split('\n');
-            Object.keys(self).filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function')).map((key) => {
-                let value = self[key];
-                if (cura2mapping[key] && cura2mapping[key].key) {
-                    let item = cura2mapping[key];
-                    if (item.key instanceof Array) {
-                        item.key.map((v, i) => {
-                            value = item.fn ? item.fn(value, self)[i] : value;
-                            insertConfig(customCura2, v, value);
-                        });
-                        return;
-                    } else {
-                        key = item.key;
-                        value = item.fn ? item.fn(value, self) : value;
-                    }
-                }
+            Object.keys(self)
+                .filter(((key) => hiddenPresets.indexOf(key) === -1 && typeof self[key] !== 'function'))
+                .map((key) => {
+                    let value = self[key];
+                    if (cura2mapping[key] && cura2mapping[key].key) {
+                        let item = cura2mapping[key];
 
-                if (ALL_CURA2_KEYS.indexOf(key) >= 0) insertConfig(customCura2, key, value);
-            });
+                        if (item.key instanceof Array) {
+                            item.key.map((v, i) => {
+                                value = item.fn ? item.fn(value, self)[i] : value;
+                                insertConfig(customCura2, v, value);
+                            });
+                            return;
+                        } else {
+                            key = item.key;
+                            value = item.fn ? item.fn(value, self) : value;
+                        }
+                    }
+
+                    // support_material is for slic3r and cura, we manually reject
+                    if (
+                        ALL_CURA2_KEYS.indexOf(key) >= 0 &&
+                        key !== 'support_material'
+                    ) {
+                        insertConfig(customCura2, key, value);
+                    }
+                });
             return customCura2.join('\n');
         }
 
-        let result = (slicer === 'slic3r' || slicer === 'cura') ? slic3r() : cura2();
+        let result = (engine === 'slic3r' || engine === 'cura') ? slic3r() : cura2();
         return result;
     };
 
@@ -218,6 +232,10 @@ define([
                         if (_key === 'support_angle') {
                             console.log(rev);
                         }
+                        // dirty code for now, need refactor
+                        if(_key === 'support_enable') {
+                            this[_key] = parseFloat(_value) || _value;
+                        }
                         if (rev && this.hasOwnProperty(rev.key)) {
                             this[rev.key] = rev.fn ? rev.fn(_value, self) : _value;
                         } else if (this.hasOwnProperty(_key)) {
@@ -230,9 +248,8 @@ define([
                     }
                 }
             }.bind(this));
-            console.log('Load settings', this.engine, this.id);
             this.fixSettingsCompatibility();
-            this[this.getExpertKey()] = settings.join('\n');
+            this[this.getEngineType()] = settings.join('\n');
             if(this.custom == null) { throw new Error('null custom error'); }
         }
         if(this.custom == null) { throw new Error('null custom error'); }
@@ -277,7 +294,7 @@ define([
         if(this.custom == null) { throw new Error('null custom error'); }
     };
 
-    SlicerSettings.prototype.getExpertKey = function() {
+    SlicerSettings.prototype.getEngineType = function() {
         return this.engine === 'cura2' ? 'customCura2' : 'custom';
     };
 
