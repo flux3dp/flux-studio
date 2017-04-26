@@ -384,10 +384,16 @@ define([
         else {
             const handleOk = () => { d.resolve(); };
             const handleProgress = (progress) => { d.notify(progress); };
-            const handleError = (error) => { d.reject(error); };
+            const handleError = (error) => {
+                d.reject(error);
+            };
 
-            SocketMaster.addTask('upload', data).then(handleOk).progress(handleProgress).fail(handleError);
-            SocketMaster.addTask('start').then(handleOk).fail(handleError);
+            SocketMaster.addTask('upload', data).then(() => {
+                SocketMaster.addTask('start').then(handleOk).fail(handleError);
+            })
+            .progress(handleProgress)
+            .fail(handleError);
+
         }
 
         return d.promise();
