@@ -37,8 +37,9 @@ define(['react'], function(React){
                         className += ' pull-right';
                     }
 
-                    opt.label = opt.label || '';
-                    className += ' ' + opt.label.toLowerCase();
+                    if(opt.label) {
+                        className += ' ' + opt.label.toLowerCase();
+                    }
 
                     if ('link' === opt.type) {
                         content = (

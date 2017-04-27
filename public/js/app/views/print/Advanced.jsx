@@ -147,8 +147,11 @@ define([
         },
 
         _updateCustomField: function() {
-            this.setState({ custom: advancedSetting.toExpert(this.state.custom, 'slic3r'),
-                            customCura2: advancedSetting.toExpert(this.state.customCura2, 'cura2') });
+            // console.log('updating custom', this.state.custom, this.state.customCura2);
+            this.setState({
+                custom: advancedSetting.toExpert(this.state.custom, 'slic3r'),
+                customCura2: advancedSetting.toExpert(this.state.customCura2, 'cura2')
+            });
         },
 
         _getLineNumber: function(array, key) {
@@ -218,15 +221,15 @@ define([
         },
 
         _processCustomInput: function() {
-            advancedSetting.load(this.state[advancedSetting.getExpertKey()]);
+            let c = this.state[advancedSetting.getEngineType()],
+                i = c.indexOf('support_enable');
+
+            advancedSetting.load(this.state[advancedSetting.getEngineType()]);
         },
 
         _handleNavigate: function(selectedTab, e) {
-            if(this.state.selectedTab === tab.CUSTOM) {
-                this._processCustomInput();
-            }
             e.preventDefault();
-            if(this.state.selectedTab === tab.Custom) {
+            if(this.state.selectedTab === tab.CUSTOM) {
                 this._processCustomInput();
             }
             this.setState({
@@ -319,16 +322,36 @@ define([
                     setFillPatternToRectilinear();
                 }
             }
+            else if(id === 'support_material') {
+                // reset support properties first for each engine
+                // delete advancedSetting['support_material'];
+                // delete advancedSetting['support_enable'];
 
-            console.log("end of fillpattern", fill_pattern);
+                advancedSetting.set('support_material', value ? 1 : 0, true);
+                advancedSetting.set('support_enable', value ? 1 : 0, true);
 
-            this._updateCustomField();
+                // write back to custom fields for each engine type
+                advancedSetting.custom = advancedSetting.custom.replace(`support_material = ${value ? 0 : 1}`, `support_material = ${value ? 1 : 0}`);
+                advancedSetting.customCura2 = advancedSetting.customCura2.replace(`support_enable = ${value ? 0 : 1}`, `support_enable = ${value ? 1 : 0}`);
+
+                this.setState({
+                    custom: advancedSetting.custom,
+                    customCura2: advancedSetting.customCura2
+                });
+            }
+
+            console.log('end of fillpattern', fill_pattern);
+
+            // support already take care of custom fields
+            if(id !== 'support_material') {
+                this._updateCustomField();
+            }
         },
 
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
             advancedSetting.load(JSON.parse(p));
-            var customKey = advancedSetting.getExpertKey();
+            var customKey = advancedSetting.getEngineType();
             this.setState({ [customKey]: advancedSetting[customKey] }, function() {
                 this._updateCustomField();
                 this._handleBackToSetting();
@@ -365,13 +388,17 @@ define([
         },
 
         _handleLoadPreset: function() {
-            this.setState({ custom: DefaultPrintSettings.custom,
-                            customCura2: DefaultPrintSettings.customCura2  });
-            if (advancedSetting.engine == 'cura2') {
+            this.setState({
+                custom: DefaultPrintSettings.custom,
+                customCura2: DefaultPrintSettings.customCura2
+            });
+
+            if (advancedSetting.engine === 'cura2') {
                 advancedSetting.load(DefaultPrintSettings.customCura2);
             } else {
                 advancedSetting.load(DefaultPrintSettings.custom);
             }
+
         },
 
         _renderTabs: function() {
@@ -585,7 +612,13 @@ define([
         },
 
         _renderSupportSection: function() {
-            console.log('render support', advancedSetting);
+            // determin support on / off
+            let supportOn;
+            if(advancedSetting.engine === 'cura2') {
+                supportOn = advancedSetting.support_enable === 1;
+            } else {
+                supportOn = advancedSetting.support_material === 1;
+            }
 
             var supportPattern;
             if(advancedSetting.engine === 'cura'){
@@ -607,7 +640,7 @@ define([
                         <SwitchControl
                             id="support_material"
                             label={lang.generalSupport}
-                            default={advancedSetting.support_material === 1}
+                            default={supportOn}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -811,7 +844,7 @@ define([
                                     <textarea
                                         rows="20"
                                         cols="50"
-                                        value={this.state[advancedSetting.getExpertKey()]}
+                                        value={this.state[advancedSetting.getEngineType()]}
                                         onChange={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
                                         // onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
                                     />

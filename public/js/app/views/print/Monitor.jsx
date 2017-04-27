@@ -512,15 +512,22 @@ define([
 
                 if(fCode) {
                     this._stopReport();
-                    DeviceMaster.go(fCode).then(() => {
+                    DeviceMaster.go(fCode)
+                    .then(() => {
                         this._startReport();
                         store.dispatch(MonitorActionCreator.setUploadProgress(''));
-                    }).progress((progress) => {
+                    })
+                    .progress((progress) => {
                         let p = parseInt(progress.step / progress.total * 100);
                         store.dispatch(MonitorActionCreator.setUploadProgress(p));
                     })
                     .fail((error) => {
+                        // reset status
+                        store.dispatch(MonitorActionCreator.setUploadProgress(''));
+                        store.dispatch(MonitorActionCreator.changeMode(mode.PREVIEW));
+                        this._startReport();
 
+                        AlertActions.showPopupError('', lang.message.unable_to_start + error.error.join('_'));
                     });
                 }
                 else {
@@ -608,6 +615,7 @@ define([
             this.reporter = setInterval(() => {
                 // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
+                    clearInterval(this.reporter);
                     this._processReport(error);
                 }).then((result) => {
                     store.dispatch(DeviceActionCreator.updateDeviceStatus(result));

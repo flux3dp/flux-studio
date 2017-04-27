@@ -133,7 +133,13 @@ define([
                     }
 
                     // processing support
-                    let supportOn = !!advancedSettings.support_material;
+                    let supportOn;
+                    if(advancedSettings.engine === 'cura2') {
+                        supportOn = advancedSettings.support_enable === 1;
+                    }
+                    else {
+                        supportOn = advancedSettings.support_material === 1;
+                    }
 
                     return ({
                         showAdvancedSettings        : false,
@@ -578,14 +584,40 @@ define([
                     var isOn = !this.state.supportOn;
 
                     let filteredItem = advancedSettings.filter({ key: 'support_material', value: isOn ? 1 : 0 });
-                    director.setParameter(filteredItem.key, filteredItem.value).then(function() {
+                    director.setParameter(filteredItem.key, filteredItem.value ? 1 : 0).then(function() {
                         this.setState({
                             leftPanelReady: true,
                             supportOn: isOn
                         });
                     }.bind(this));
 
+                    let {custom} = advancedSettings,
+                        {customCura2} = advancedSettings;
+
                     advancedSettings.set('support_material', isOn ? 1 : 0, true);
+                    advancedSettings.set('support_enable', isOn ? 1 : 0, true);
+
+                    // write support config into custom / customCura2
+
+                    let otherExistSupportEnable = advancedSettings.custom.indexOf('support_enable') >= 0,
+                        cura2ExistSupportMaterial = advancedSettings.customCura2.indexOf('support_material') >= 0;
+
+                    // slic3r & cura shouldn't contain support_enable
+                    if(otherExistSupportEnable) {
+                        let i = custom.indexOf('support_enable');
+                        advancedSettings.custom = custom.slice(0, i) + custom.slice(i + 20);
+                    }
+
+                    // cura2 shouldn't contain support_material
+                    if(cura2ExistSupportMaterial) {
+                        let i = customCura2.indexOf('support_material');
+                        advancedSettings.custom = customCura2.slice(0, i, customCura2.slice(i + 18));
+                    }
+
+                    // write back to custom fields for each engine type
+                    advancedSettings.custom = advancedSettings.custom.replace(`support_material = ${isOn ? 0 : 1}`, `support_material = ${isOn ? 1 : 0}`);
+                    advancedSettings.customCura2 = advancedSettings.customCura2.replace(`support_enable = ${isOn ? 0 : 1}`, `support_enable = ${isOn ? 1 : 0}`);
+
                     this._saveSetting();
                 },
 
@@ -648,7 +680,9 @@ define([
                 },
 
                 _handleApplyAdvancedSetting: function(setting) {
-                    let d = $.Deferred(), quality = 'custom';
+                    let d = $.Deferred(), quality = 'custom',
+                        supportOn;
+
                     advancedSettings.load(setting || {}, true);
                     // remove old properties
                     delete advancedSettings.raft_on;
@@ -665,8 +699,15 @@ define([
                         quality = q;
                     });
 
+                    if(advancedSettings.engine === 'cura2') {
+                        supportOn = advancedSettings.support_enable === 1;
+                    }
+                    else {
+                        supportOn = advancedSettings.support_material === 1;
+                    }
+
                     this.setState({
-                        supportOn: advancedSettings.support_material === 1,
+                        supportOn: supportOn,
                         layerHeight: advancedSettings.layer_height,
                         raftOn:  advancedSettings.raft === 1,
                         quality: quality

@@ -1191,7 +1191,8 @@ define(function() {
             launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
             uploading_fcode: '正在上傳 fcode',
             cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式',
-            unable_to_find_machine: '無法連接到機器 '
+            unable_to_find_machine: '無法連接到機器 ',
+            unable_to_start: '無法開始工作，如果持續發生，請附上錯誤回報，與我們聯絡:\n'
         },
         machine_status: {
             '-10': '原生模式',

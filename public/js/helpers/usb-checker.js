@@ -21,7 +21,6 @@ define([
 
                     if (!response.h2h[availableUsbChannel]) {
                         // Channel not connected
-                        usbConnected = false;
                         ws.send(`open ${availableUsbChannel}`);
                     } else {
                         // Connected, do nothing
@@ -54,7 +53,11 @@ define([
                         hasError = false;
                         callback(availableUsbChannel, false);
                     } else {
+                        if(usbConnected) {
+                            callback(-1, hasError);
+                        }
                         hasError = true;
+                        usbConnected = false;
                     }
                 }
 

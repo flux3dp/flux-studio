@@ -760,6 +760,7 @@ define([
             monitorOn = $('.flux-monitor').length > 0;
 
         if (report.slice_status === 'complete') {
+            slicingStatus.isComplete = true;
             report.percentage = 1;
             // enable go buttons
             reactSrc.setState({
@@ -840,6 +841,7 @@ define([
             AlertActions.showWarning(report.message);
         }
         else if(report.slice_status !== 'complete') {
+            slicingStatus.isComplete = false;
             if(show) {
                 if(willReslice) {
                     ProgressActions.updating(lang.print.reRendering, 0);
