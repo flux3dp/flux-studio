@@ -146,12 +146,11 @@ define([
                         if (options == null || (options && !options.dedicated)) {
                             ProgressActions.close();
                         }
-                        let exist = _devices.some(dev => { dev.uuid === device.uuid; });
+                        let exist = _devices.some(dev => { return dev.uuid === device.uuid; });
                         if(!exist) {
                             _devices.push(device);
                         }
                         d.resolve(DeviceConstants.CONNECTED);
-                        // _devices.push(_device);
                     }
                 },
                 onError: function(response) {
@@ -385,10 +384,16 @@ define([
         else {
             const handleOk = () => { d.resolve(); };
             const handleProgress = (progress) => { d.notify(progress); };
-            const handleError = (error) => { d.reject(error); };
+            const handleError = (error) => {
+                d.reject(error);
+            };
 
-            SocketMaster.addTask('upload', data).then(handleOk).progress(handleProgress).fail(handleError);
-            SocketMaster.addTask('start').then(handleOk).fail(handleError);
+            SocketMaster.addTask('upload', data).then(() => {
+                SocketMaster.addTask('start').then(handleOk).fail(handleError);
+            })
+            .progress(handleProgress)
+            .fail(handleError);
+
         }
 
         return d.promise();
@@ -797,12 +802,12 @@ define([
                 let d = $.Deferred(),
                     timeout;
 
-                timeout = setTimeout(() => {
-                    console.log('play report timeout');
-                    d.reject({ status: 'fata', error: ['TIMEOUT'] });
-                }, 10 * 1000);
-
                 SocketMaster.addTask('report').then((result) => {
+                    // set timeout
+                    timeout = setTimeout(() => {
+                        d.reject({ status: 'fata', error: ['TIMEOUT'] });
+                    }, 10 * 1000);
+
                     // force update st_label for a backend inconsistancy
                     let s = result.device_status;
                     if(s.st_id === DeviceConstants.status.ABORTED) {
@@ -1334,6 +1339,18 @@ define([
         UsbChecker((channel) => {
             channel = parseInt(channel);
             console.log(`availableUsbChannel: ${self.availableUsbChannel} ${channel}`);
+            // when usb is unplugged
+            if(self.availableUsbChannel > 0 && channel === -1) {
+                // remove disconnected device
+                let newList = [];
+                _devices.map((d, i) => {
+                    if(d.addr !== self.availableUsbChannel) {
+                        newList.push(d);
+                    }
+                })
+                _devices = newList;
+                _selectedDevice = {};
+            }
             self.availableUsbChannel = channel;
 
             // to be replaced when redux is implemented

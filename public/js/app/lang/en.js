@@ -1197,7 +1197,8 @@ define(function() {
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
             uploading_fcode: 'Uploading fcode',
             cant_connect_to_device: 'Cannot connect to the machine, please check your connection',
-            unable_to_find_machine: 'Unable to find machine '
+            unable_to_find_machine: 'Unable to find machine ',
+            unable_to_start: 'Unable to start, please try again. If this continue to happen, please contact us with bug report:\n'
         },
         machine_status: {
             '-10': 'Raw mode',
