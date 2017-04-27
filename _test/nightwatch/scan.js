@@ -20,25 +20,7 @@ module.exports = {
 			.click('button[data-ga-event=yes]')
 
 			// test code start -----------
-			.execute(function() {
-				// ???
-			}, [], (result) => {
-				let path = __dirname + '/../scan.png';
-				console.log('--- check ---', path);
-				try {
-					fs.readFile(path, function(err, data) {
-						console.log(err, data);
-						resemble(data).onComplete((d1) => {
-							console.log(d1);
-						});
-					});
-				}
-				catch(ex) {
-					console.log(ex);
-				}
-			})
-			.pause(500 * 1000)
-/*
+
 			// navigate to scan
 			.execute(function() {window.location = '#studio/scan'; })
 			.pause(1000)
@@ -47,14 +29,14 @@ module.exports = {
 			.waitForElementVisible('#nightwatch-scan', 30 * 1000)
 			.click('#nightwatch-scan')
 			.waitForElementVisible('div.modal-alert', 5000, false, function(result){
-					// Input password if needed
-					if (result.value) {
-							browser.waitForElementVisible('.modal-alert input', 30000)
-							.setValue('.modal-alert input', 'flux')
-							.click('button[data-ga-event=confirm]'); // Input default password
-					} else {
-							// No password needed
-					}
+				// Input password if needed
+				if (result.value) {
+					browser.waitForElementVisible('.modal-alert input', 30000)
+					.setValue('.modal-alert input', 'flux')
+					.click('button[data-ga-event=confirm]'); // Input default password
+				} else {
+						// No password needed
+				}
 			})
 			.waitForElementNotPresent('div.modal-alert', 10 * 1000)
 
@@ -63,22 +45,49 @@ module.exports = {
 			.pause(1 * 1000)
 			.waitForElementVisible('.resolution-draft', 3000)
 			.click('.resolution-draft')
+			.pause(1 * 1000)
 
 			// execute scan
 			.click('.go')
 
 			// wait for scan finish
-			// .waitForElementVisible('.btn-scan-again', 5 * 60 * 1000)
+			.waitForElementVisible('.btn-scan-again', 5 * 60 * 1000)
 
-			.pause(5000)
-			.click('.btn-stop-scan')
-			.pause(1000)
+			// .pause(5 * 1000)
+			// .click('.btn-stop-scan')
+			// .pause(1 * 1000)
 
 			// save screenshot
 			.keys(browser.Keys.CONTROL)
 			.keys('e')
 			.pause(2 * 1000)
-*/
+
+			// compare images
+			.execute(function() {
+				// ???
+			}, [], () => {
+				let ref = __dirname + '/../scan.png',
+					img = __dirname + '/../tests_output/mypreview.png';
+
+				try {
+					fs.readFile(ref, function(err, d1) {
+						fs.readFile(img, function(err, d2) {
+							resemble(d1)
+							.compareTo(d2)
+							.ignoreColors()
+							.onComplete((result) => {
+								console.log(result);
+								fs.unlink(img, () => {});
+							});
+						});
+					});
+				}
+				catch(ex) {
+					console.log(ex);
+				}
+			})
+			.pause(500 * 1000)
+
 			// test code end -----------
 			// clean up
 			.keys(browser.Keys.CONTROL)
