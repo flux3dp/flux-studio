@@ -134,14 +134,7 @@ define([
             AlertStore.onCancel(this._handleCancel);
             AlertStore.onYes(this._handleYes);
 
-            // listening to key
-            this.unsubscribeDeleteKey = shortcuts.on(['DEL'], (e) => {
-                e.preventDefault();
-                if(store.getState().Monitor.selectedItem) {
-                    AlertActions.showPopupYesNo('DELETE_FILE', lang.monitor.confirmFileDelete);
-                }
-            });
-
+            this._registerDeleteKey();
             this._startReport();
         },
 
@@ -180,6 +173,15 @@ define([
                 slicingResult: this.props.slicingStatus,
                 lang: this.props.lang
             };
+        },
+
+        _registerDeleteKey: function() {
+            this.unsubscribeDeleteKey = shortcuts.on(['DEL'], (e) => {
+                e.preventDefault();
+                if(store.getState().Monitor.selectedItem && this.state.focused) {
+                    AlertActions.showPopupYesNo('DELETE_FILE', lang.monitor.confirmFileDelete);
+                }
+            });
         },
 
         _preFetchInfo: function() {
@@ -826,11 +828,21 @@ define([
             return infoArray.filter((o) => Object.keys(o).some(o => o === propertyName));
         },
 
+        onBlur: function(e) {
+            e.preventDefault();
+            this.setState({ focused: false });
+        },
+
+        onFocus: function(e) {
+            e.preventDefault();
+            this.setState({ focused: true });
+        },
+
         render: function() {
             let subClass = ClassNames('sub', { 'hide': false });
 
             return (
-                <div className="flux-monitor">
+                <div className="flux-monitor" tabIndex="1" onBlur={this.onBlur} onFocus={this.onFocus}>
                     <div className="main">
                         <MonitorHeader
                             name={DeviceMaster.getSelectedDevice().name}

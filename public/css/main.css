@@ -3969,6 +3969,8 @@ hr {
 
 .flux-monitor {
     left: 50%; }
+    .flux-monitor:focus {
+        outline: none; }
     .flux-monitor .main {
         background-color: white;
         height: 40rem;
