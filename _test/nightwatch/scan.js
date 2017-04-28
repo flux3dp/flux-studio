@@ -45,7 +45,7 @@ module.exports = {
 			.pause(1 * 1000)
 			.waitForElementVisible('.resolution-draft', 3000)
 			.click('.resolution-draft')
-			.pause(1 * 1000)
+			.pause(3 * 1000)
 
 			// execute scan
 			.click('.go')
@@ -86,7 +86,7 @@ module.exports = {
 					console.log(ex);
 				}
 			})
-			.pause(500 * 1000)
+			// .pause(500 * 1000)
 
 			// test code end -----------
 			// clean up
