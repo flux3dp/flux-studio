@@ -119,6 +119,21 @@ define([
 
             AlertStore.onCancel(self._onCancel);
 
+            const existWifiAndUsbConnection = (serial) => {
+                let devices = DeviceMaster.getAvailableDevices(),
+                    num = 0;
+
+                devices.map(device => {
+                    if(device.serial === serial) {
+                        console.log('===', device);
+                        num++;
+                    }
+                });
+
+                console.log(num);
+                return num >= 2;
+            };
+
             const next = (status, preferredDevice) => {
                 if(preferredDevice) {
                     selectedPrinter = preferredDevice;
@@ -182,9 +197,16 @@ define([
                 noDefaultPrinter();
             }
             else {
-                DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
-                .then(next)
-                .fail(noDefaultPrinter);
+                let existBothConnection = existWifiAndUsbConnection(selectedPrinter.serial);
+                console.log('exist both conneciton? ', existBothConnection);
+                if(existBothConnection) {
+                    noDefaultPrinter();
+                }
+                else {
+                    DeviceMaster.selectDevice(selectedPrinter)
+                    .then(next)
+                    .fail(noDefaultPrinter);
+                }
             }
         },
 

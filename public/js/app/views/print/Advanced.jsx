@@ -402,12 +402,12 @@ define([
         },
 
         _renderTabs: function() {
-            var tabGeneral  = ClassNames('tab', {selected: this.state.selectedTab === tab.GENERAL}),
-                tabLayers   = ClassNames('tab', {selected: this.state.selectedTab === tab.LAYERS}),
-                tabInfill   = ClassNames('tab', {selected: this.state.selectedTab === tab.INFILL}),
-                tabSupport  = ClassNames('tab', {selected: this.state.selectedTab === tab.SUPPORT}),
-                tabSpeed    = ClassNames('tab', {selected: this.state.selectedTab === tab.SPEED}),
-                tabCustom   = ClassNames('tab', {selected: this.state.selectedTab === tab.CUSTOM});
+            var tabGeneral  = ClassNames('tab tab-general', {selected: this.state.selectedTab === tab.GENERAL}),
+                tabLayers   = ClassNames('tab tab-layer', {selected: this.state.selectedTab === tab.LAYERS}),
+                tabInfill   = ClassNames('tab tab-infill', {selected: this.state.selectedTab === tab.INFILL}),
+                tabSupport  = ClassNames('tab tab-support', {selected: this.state.selectedTab === tab.SUPPORT}),
+                tabSpeed    = ClassNames('tab tab-speed', {selected: this.state.selectedTab === tab.SPEED}),
+                tabCustom   = ClassNames('tab tab-custom', {selected: this.state.selectedTab === tab.CUSTOM});
 
             return (
                 <div className="tab-container">
