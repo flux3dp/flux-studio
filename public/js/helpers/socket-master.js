@@ -8,7 +8,8 @@ define([
         let _tasks = [],
             _task,
             _ws,
-            processing = false;
+            processing = false,
+            _callback = function() {};
 
         const setWebSocket = (ws) => {
             _ws = ws;
@@ -18,8 +19,8 @@ define([
 
         const addTask = (command, ...args) => {
             // if traffic is jammed, reset
-            if(_tasks.length > 10) {
-                console.log('==== more than 10 ws tasks!');
+            if(_tasks.length > 7) {
+                console.log('==== more than 7 ws tasks!');
                 _tasks = [];
                 _task = null;
                 processing = false;
@@ -87,12 +88,17 @@ define([
             _task = null;
         };
 
+        const onTimeout = (callback) => {
+            _callback = callback;
+        };
+
         return {
             setWebSocket,
             addTask,
             doTask,
             nextTask,
-            clearTasks
+            clearTasks,
+            onTimeout
         };
     }
 
