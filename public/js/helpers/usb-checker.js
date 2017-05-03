@@ -62,7 +62,7 @@ define([
                     }
                 }
 
-                if(response.devopen) {
+                if(response.devopen && !usbConnected) {
                     availableUsbChannel = response.devopen;
                     usbConnected = true;
                     initialized = true;

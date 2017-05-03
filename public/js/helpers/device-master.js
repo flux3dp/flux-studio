@@ -591,19 +591,16 @@ define([
         _stopChangingFilament = false;
         let d = $.Deferred();
         SocketMaster.addTask('enterMaintainMode').then(() => {
-            console.log(_stopChangingFilament);
             if(!_stopChangingFilament) {
                 return SocketMaster.addTask('maintainHome');
             }
         })
         .then(() => {
-            console.log(_stopChangingFilament);
             if(!_stopChangingFilament) {
                 return SocketMaster.addTask('changeFilament', type);
             }
         })
         .then(() => {
-            console.log(_stopChangingFilament);
             if(_stopChangingFilament) {
                 d.reject({ error: ['CANCEL'] });
                 _stopChangingFilamentCallback();
@@ -613,7 +610,6 @@ define([
             }
         })
         .progress((response) => {
-            console.log(_stopChangingFilament);
             if(_stopChangingFilament) {
                 _stopChangingFilamentCallback();
             }
