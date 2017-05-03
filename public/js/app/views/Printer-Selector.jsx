@@ -119,7 +119,10 @@ define([
 
             AlertStore.onCancel(self._onCancel);
 
-            const next = () => {
+            const next = (status, preferredDevice) => {
+                if(preferredDevice) {
+                    selectedPrinter = preferredDevice;
+                }
                 self.setState({
                     discoverMethods: discover(
                         self.state.discoverId,
@@ -181,12 +184,8 @@ define([
             else {
                 DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
                 .then(next)
-                .fail(() => {
-                    console.log('[print selector] select device failed');
-                    noDefaultPrinter();
-                });
+                .fail(noDefaultPrinter);
             }
-
         },
 
         componentWillUnmount: function() {
@@ -273,14 +272,13 @@ define([
                             }
 
                             self._returnSelectedPrinter();
-                        }
+                        };
+
                         if(this.props.bypassCheck === true) {
                             next();
                         }
                         else {
-                            checkDeviceStatus(printer).done(() => {
-                                next();
-                            });
+                            checkDeviceStatus(printer).done(next);
                         }
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
@@ -311,20 +309,21 @@ define([
             opts.onError = opts.onError || function() {};
 
             var self = this,
-                _opts = {
-                    onSuccess: function(data) {
-                        ProgressActions.close();
-                        self._returnSelectedPrinter();
-                    },
-                    onFail: function(data) {
-                        ProgressActions.close();
-                        opts.onError(data);
-                    },
-                    checkPassword: self.props.forceAuth
-                },
-                touch_socket;
+                _opts;
 
-            touch_socket = touch(_opts).send(uuid, password);
+            _opts = {
+                onSuccess: function(data) {
+                    ProgressActions.close();
+                    self._returnSelectedPrinter();
+                },
+                onFail: function(data) {
+                    ProgressActions.close();
+                    opts.onError(data);
+                },
+                checkPassword: self.props.forceAuth
+            };
+
+            touch(_opts).send(uuid, password);
         },
 
         _handleClose: function(e) {
