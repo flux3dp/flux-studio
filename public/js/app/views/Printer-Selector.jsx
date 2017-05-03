@@ -119,7 +119,25 @@ define([
 
             AlertStore.onCancel(self._onCancel);
 
-            const next = () => {
+            const existWifiAndUsbConnection = (serial) => {
+                let devices = DeviceMaster.getAvailableDevices(),
+                    num = 0;
+
+                devices.map(device => {
+                    if(device.serial === serial) {
+                        console.log('===', device);
+                        num++;
+                    }
+                });
+
+                console.log(num);
+                return num >= 2;
+            };
+
+            const next = (status, preferredDevice) => {
+                if(preferredDevice) {
+                    selectedPrinter = preferredDevice;
+                }
                 self.setState({
                     discoverMethods: discover(
                         self.state.discoverId,
@@ -179,14 +197,17 @@ define([
                 noDefaultPrinter();
             }
             else {
-                DeviceMaster.selectDevice(initializeMachine.defaultPrinter.get())
-                .then(next)
-                .fail(() => {
-                    console.log('[print selector] select device failed');
+                let existBothConnection = existWifiAndUsbConnection(selectedPrinter.serial);
+                console.log('exist both conneciton? ', existBothConnection);
+                if(existBothConnection) {
                     noDefaultPrinter();
-                });
+                }
+                else {
+                    DeviceMaster.selectDevice(selectedPrinter)
+                    .then(next)
+                    .fail(noDefaultPrinter);
+                }
             }
-
         },
 
         componentWillUnmount: function() {
@@ -273,14 +294,13 @@ define([
                             }
 
                             self._returnSelectedPrinter();
-                        }
+                        };
+
                         if(this.props.bypassCheck === true) {
                             next();
                         }
                         else {
-                            checkDeviceStatus(printer).done(() => {
-                                next();
-                            });
+                            checkDeviceStatus(printer).done(next);
                         }
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
@@ -311,20 +331,21 @@ define([
             opts.onError = opts.onError || function() {};
 
             var self = this,
-                _opts = {
-                    onSuccess: function(data) {
-                        ProgressActions.close();
-                        self._returnSelectedPrinter();
-                    },
-                    onFail: function(data) {
-                        ProgressActions.close();
-                        opts.onError(data);
-                    },
-                    checkPassword: self.props.forceAuth
-                },
-                touch_socket;
+                _opts;
 
-            touch_socket = touch(_opts).send(uuid, password);
+            _opts = {
+                onSuccess: function(data) {
+                    ProgressActions.close();
+                    self._returnSelectedPrinter();
+                },
+                onFail: function(data) {
+                    ProgressActions.close();
+                    opts.onError(data);
+                },
+                checkPassword: self.props.forceAuth
+            };
+
+            touch(_opts).send(uuid, password);
         },
 
         _handleClose: function(e) {

@@ -3,6 +3,9 @@
     $white: #FFF;
     $light-grey: #DDD;
     left: 50%;
+    &:focus {
+        outline: none;
+    }
     .main {
         background-color: white;
         height: 40rem;

@@ -39,7 +39,7 @@ define([
 
         render: function() {
             return (
-                <div className="controls">
+                <div className="controls" name={this.props.id}>
                     <div className="label pull-left">{this.props.label}</div>
                     <div className="control">
                         <div className="switch-container">
@@ -56,7 +56,7 @@ define([
                                     <span className="onoffswitch-inner"></span>
                                     <span className="onoffswitch-switch"></span>
                                 </label>
-                                
+
                             </div>
 
                         </div>
