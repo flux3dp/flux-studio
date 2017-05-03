@@ -25,7 +25,8 @@ define([
                     } else {
                         // Connected, do nothing
                         if(!usbConnected) {
-                            callback(availableUsbChannel, false);
+                            let profile = response.h2h[Object.keys(response.h2h)[0]];
+                            callback(availableUsbChannel, false, profile);
                         }
                         usbConnected = true;
                     }
@@ -66,7 +67,7 @@ define([
                     usbConnected = true;
                     initialized = true;
                     hasError = false;
-                    callback(availableUsbChannel, false);
+                    callback(availableUsbChannel, false, response.profile);
                 }
             }
         };

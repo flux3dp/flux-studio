@@ -67,9 +67,11 @@ define([
                     }
                 },
                 onError: (response) => {
+                    clearTimeout(timmer);
                     events.onError(response);
                 },
                 onFatal: (response) => {
+                    clearTimeout(timmer);
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
                         setTimeout(() => {
                             createWs();
@@ -81,6 +83,9 @@ define([
                             'unhandle-exception',
                             lang.message.unknown_device
                         );
+                    }
+                    else if(response.error === 'NOT_FOUND' || response.error === 'DISCONNECTED') {
+                        opts.onError(response);
                     }
                     else if(response.code === 1006) {
                         ProgressActions.close();
@@ -96,6 +101,7 @@ define([
                     }
                 },
                 onClose: (response) => {
+                    clearTimeout(timmer);
                     isConnected = false;
                     opts.onFatal(response);
                 },
