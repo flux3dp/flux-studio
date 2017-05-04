@@ -65,7 +65,8 @@ define([
         _availableDevices = [],
         _errors = {},
         availableUsbChannel = -1,
-        usbEventListeners = {};
+        usbEventListeners = {},
+        self = this;
 
     // Better select device
     function select(device, opts) {
@@ -136,7 +137,7 @@ define([
             InputLightboxActions.open('auth', callback);
         };
 
-        const createDeviceActions = (availableUsbChannel = -1) => {
+        const createDeviceActions = (availableUsbChannel = -1, success) => {
             return DeviceController(device.uuid, {
                 availableUsbChannel,
                 onConnect: function(response, options) {
@@ -150,7 +151,7 @@ define([
                         if(!exist) {
                             _devices.push(device);
                         }
-                        d.resolve(DeviceConstants.CONNECTED);
+                        success(true);
                     }
                 },
                 onError: function(response) {
@@ -160,7 +161,7 @@ define([
                     switch (response.error.toUpperCase()) {
                     case DeviceConstants.TIMEOUT:
                         // TODO d.reject, come on...
-                        d.resolve(DeviceConstants.TIMEOUT);
+                        d.reject(DeviceConstants.TIMEOUT);
                         break;
                     case DeviceConstants.AUTH_ERROR:
                     case DeviceConstants.AUTH_FAILED:
@@ -194,14 +195,23 @@ define([
                     default:
                         let message = lang.message.unknown_error;
 
-                        if(response.error === 'NOT_FOUND') {
-                            message = lang.message.unable_to_find_machine;
+                        if(response.error === 'NOT_FOUND' || response.error === 'DISCONNECTED') {
+                            // if connected usb is the usb version of default device
+                            self
+                            if(device.serial === self.usbProfile.serial) {
+                                success(false);
+                                return;
+                            }
+                            else {
+                                message = lang.message.unable_to_find_machine;
+                            }
                         }
 
                         if(response.error === 'UNKNOWN_DEVICE') {
                             message = lang.message.unknown_device;
                         }
 
+                        success(false);
                         AlertActions.showPopupError(
                             'unhandle-exception',
                             message
@@ -214,6 +224,7 @@ define([
                         _selectedDevice = {};
                         _wasKilled = false;
                     }
+                    // success(false);
                     console.log('process fatal', response);
                 }
             });
@@ -232,17 +243,18 @@ define([
             _device.uuid = device.uuid;
             _device.source = device.source;
             _device.name = device.name;
+            _device.serial = device.serial;
             delete _actionMap[device.uuid];
         }
 
         const initSocketMaster = () => {
-
             if(typeof _actionMap[device.uuid] !== 'undefined') {
                 _device.actions = _actionMap[device.uuid];
                 return;
             }
 
             SocketMaster = new Sm();
+            SocketMaster.onTimeout(handleSMTimeout);
 
             // if usb not detected but device us using usb
             if(
@@ -259,10 +271,32 @@ define([
                 typeof self.availableUsbChannel !== 'undefined' &&
                 device.source === 'h2h'
             ) {
-                _device.actions = createDeviceActions(this.availableUsbChannel);
+                _device.actions = createDeviceActions(this.availableUsbChannel, (success) => {
+                    if(success) {
+                        d.resolve(DeviceConstants.CONNECTED);
+                    }
+                    else {
+                        // createDeviceActions will auto reject with errors
+                    }
+                });
             }
             else {
-                _device.actions = createDeviceActions(device.uuid);
+                _device.actions = createDeviceActions(device.uuid, (success) => {
+                    if(success) {
+                        d.resolve(DeviceConstants.CONNECTED);
+                    }
+                    else {
+                        // if default device wifi is not available, we use usb
+                        if(_device.serial === self.usbProfile.serial) {
+                            self.usbProfile.uuid = this.availableUsbChannel;
+                            self.usbProfile.name = self.usbProfile.nickname;
+                            d.resolve(DeviceConstants.CONNECTED, self.usbProfile);
+                        }
+                        else {
+                            console.log('create device action failed');
+                        }
+                    }
+                });
             }
 
             _actionMap[device.uuid] = _device.actions;
@@ -358,8 +392,13 @@ define([
         });
 
         SocketMaster = new Sm();
+        SocketMaster.onTimeout(handleSMTimeout);
         SocketMaster.setWebSocket(_device.actions);
         return d.promise();
+    }
+
+    function handleSMTimeout(status) {
+        console.log('=== sm timeout: ', status);
     }
 
     function uploadToDirectory(data, path, fileName) {
@@ -552,19 +591,16 @@ define([
         _stopChangingFilament = false;
         let d = $.Deferred();
         SocketMaster.addTask('enterMaintainMode').then(() => {
-            console.log(_stopChangingFilament);
             if(!_stopChangingFilament) {
                 return SocketMaster.addTask('maintainHome');
             }
         })
         .then(() => {
-            console.log(_stopChangingFilament);
             if(!_stopChangingFilament) {
                 return SocketMaster.addTask('changeFilament', type);
             }
         })
         .then(() => {
-            console.log(_stopChangingFilament);
             if(_stopChangingFilament) {
                 d.reject({ error: ['CANCEL'] });
                 _stopChangingFilamentCallback();
@@ -574,7 +610,6 @@ define([
             }
         })
         .progress((response) => {
-            console.log(_stopChangingFilament);
             if(_stopChangingFilament) {
                 _stopChangingFilamentCallback();
             }
@@ -717,7 +752,6 @@ define([
     }
 
     function endMaintainMode() {
-        console.log('end maintain mode');
         return SocketMaster.addTask('endMaintainMode');
     }
 
@@ -1335,8 +1369,11 @@ define([
 
         // returns the available channel, -1 otherwise
         this.availableUsbChannel = this.availableUsbChannel || -1;
+        this.usbProfile = {};
+
         let self = this;
-        UsbChecker((channel) => {
+
+        UsbChecker((channel, hasError, profile) => {
             channel = parseInt(channel);
             console.log(`availableUsbChannel: ${self.availableUsbChannel} ${channel}`);
             // when usb is unplugged
@@ -1352,6 +1389,7 @@ define([
                 _selectedDevice = {};
             }
             self.availableUsbChannel = channel;
+            self.usbProfile = profile || {};
 
             // to be replaced when redux is implemented
             Object.keys(usbEventListeners).forEach(id => {

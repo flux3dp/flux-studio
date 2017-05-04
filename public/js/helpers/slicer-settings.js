@@ -212,10 +212,10 @@ define([
                 delete settings.id;
                 Object.assign(this, settings);
                 Object.assign(settings, holdAttrs);
-                console.log('Load settings object', this.engine, this.id);
                 this.fixSettingsCompatibility();
                 this.custom = this.toExpert('', 'slic3r');
             }
+            console.log('Load settings object', this.engine, this.id);
         }
         else {
             var settings = settings.split('\n');

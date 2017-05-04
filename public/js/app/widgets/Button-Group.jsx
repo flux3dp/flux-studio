@@ -37,7 +37,7 @@ define(['react'], function(React){
                         className += ' pull-right';
                     }
 
-                    if(opt.label) {
+                    if(typeof opt.label === 'string') {
                         className += ' ' + opt.label.toLowerCase();
                     }
 

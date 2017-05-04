@@ -115,6 +115,7 @@ define([
                     this._checkDefaultPrintSettingsVersion();
 
                     if (!_settings) {
+                        console.log('settinggs missing: advanced-settings');
                         advancedSettings.load(DefaultPrintSettings);
                         var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
                         advancedSettings.update(defaultMedium, 'slic3r');

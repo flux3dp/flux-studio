@@ -51,12 +51,10 @@ _tools/environment
 .eslintrc.json
 
 _test/selenium-debug.log
-
 _test/tests_output/CHROME_57.0.2987.98_MAC_googleTest.xml
-
 _test/tests_output/CHROME_57.0.2987.98_MAC_dashboard.xml
-
 _test/nwjs
+_test/tests_output/*
 
 _test/tests_output/CHROME_57.0.2987.98_MAC_printing.xml
 stl.cache
