@@ -1075,6 +1075,7 @@ define(function() {
             HARDWARE_ERROR_MAINBOARD_ERROR      : '#401 Critical Error: Mainboard offline. Please contact FLUX Support.',
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 Critical Error: Subsystem no response. Please contact FLUX Support.',
             HARDWARE_ERROR_SENSOR_ERROR         : 'Hardware sensor error, please contact FLUX Support.~',
+            HARDWARE_ERROR_SENSOR_ERROR_FSR     : 'Pressure sensor failed',
             WRONG_HEAD                          : 'Toolhead is unknown, please connect to a correct toolhead',
             USER_OPERATION                      : 'Machine is being operated by (other) user',
             RESOURCE_BUSY                       : 'The machine is busy\nIf it is not running, please restart the machine',
