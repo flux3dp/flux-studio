@@ -639,6 +639,7 @@ define([
 
                         <SwitchControl
                             id="support_material"
+                            name="support_material"
                             label={lang.generalSupport}
                             default={supportOn}
                             onChange={this._handleControlValueChange} />
