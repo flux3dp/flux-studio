@@ -52,7 +52,7 @@ define([
     }
 
     cura2revMapping.support_angle.fn = (v) => { return 90 - v; };
-    cura2revMapping.support_enable.fn = (v) => { return v ? 1 : 0; };
+    cura2revMapping.support_enable.fn = (v) => { return (v === true || v === 1 || v === 'true') ? 1 : 0; };
     cura2revMapping.speed_support_infill = { key: 'support_material_speed' };
     cura2revMapping.infill_line_distance = { key: 'fill_density', fn: (v, settings) => { return Math.min(100, 40/parseFloat(v)); } };
 

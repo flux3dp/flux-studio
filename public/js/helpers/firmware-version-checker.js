@@ -32,6 +32,7 @@ define([
         OPERATE_DURING_PAUSE        : '1.6.20',
         UPGRADE_KIT_PROFILE_SETTING : '1.6.20',
         SCAN_CALIBRATION            : '1.6.25',
+        M666R_MMTEST                : '1.6.40',
         CLOUD                       : '1.5.0'
     };
 
