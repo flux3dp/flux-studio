@@ -480,7 +480,9 @@ define([
                 });
             });
             ProgressActions.updating('Start Loading', 5);
-            fr.readAsArrayBuffer(file);
+
+            let method = ext === 'obj' ? 'readAsDataURL' : 'readAsArrayBuffer';
+            fr[method](file);
         }
         else if (ext === 'fc' || ext === 'gcode') {
             slicingStatus.isComplete = true;
