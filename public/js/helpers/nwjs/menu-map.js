@@ -55,6 +55,7 @@ define([
         },
         items = {
             import: {
+                id: 'import',
                 label: lang.file.import,
                 enabled: true,
                 onClick: function() {
@@ -82,6 +83,7 @@ define([
                 parent: parentIndex.FILE
             },
             saveTask: {
+                id: 'save_fcode',
                 label: lang.file.save_fcode,
                 enabled: false,
                 onClick: emptyFunction,
@@ -90,12 +92,14 @@ define([
                 parent: parentIndex.FILE
             },
             saveScene: {
+                id: 'save_scene',
                 label: lang.file.save_scene,
                 enabled: false,
                 onClick: emptyFunction,
                 parent: parentIndex.FILE
             },
             duplicate: {
+                id: 'duplicate',
                 label: lang.edit.duplicate,
                 enabled: false,
                 onClick: emptyFunction,
@@ -104,6 +108,7 @@ define([
                 parent: parentIndex.EDIT
             },
             scale: {
+                id: 'scale',
                 label: lang.edit.scale,
                 enabled: false,
                 onClick: emptyFunction,
@@ -112,6 +117,7 @@ define([
                 parent: parentIndex.EDIT
             },
             rotate: {
+                id: 'rotate',
                 label: lang.edit.rotate,
                 enabled: false,
                 onClick: emptyFunction,
@@ -120,18 +126,21 @@ define([
                 parent: parentIndex.EDIT
             },
             reset: {
+                id: 'reset',
                 label: lang.edit.reset,
                 enabled: false,
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
             alignCenter: {
+                id: 'align_center',
                 label: lang.edit.alignCenter,
                 enabled: false,
                 onClick: emptyFunction,
                 parent: parentIndex.EDIT
             },
             undo: {
+                id: 'undo',
                 label: lang.edit.undo,
                 enabled: false,
                 key: 'Z',
@@ -140,6 +149,7 @@ define([
                 parent: parentIndex.EDIT
             },
             clear: {
+                id: 'clear',
                 label: lang.edit.clear,
                 enabled: false,
                 onClick: emptyFunction,
@@ -155,6 +165,7 @@ define([
                 parent: parentIndex.DEVICE
             },
             tutorial: {
+                id: 'tutorial',
                 label: lang.help.tutorial,
                 enabled: true,
                 parent: parentIndex.HELP,
