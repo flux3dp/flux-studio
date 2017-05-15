@@ -36,7 +36,6 @@ define([
             _uploadToDevice,
             _onFinishUpdate;
 
-        console.log('forceUpdate', forceUpdate);
         doUpdate = ( 'firmware' === type ? DeviceMaster.updateFirmware : DeviceMaster.updateToolhead );
 
         _uploadToDevice = (file) => {
@@ -90,8 +89,9 @@ define([
                   let file = req.response;
                   _uploadToDevice(file);
               } else {
-                AlertActions.showPopupError(
-                    'firmware-update-fail', 'check internet'
+               AlertActions.showPopupError(
+                    'firmware-update-fail',
+                     lang.update.cannot_reach_internet
                 );
               }
           };

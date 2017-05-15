@@ -66,6 +66,7 @@ define(function() {
             preparing: '準備中...',
             later: '稍候',
             download: '線上更新',
+            cannot_reach_internet: '伺服器無法連接<br/>請確認網路連線',
             install: '下載',
             upload: '上傳'
         },
@@ -1184,7 +1185,9 @@ define(function() {
             },
             unsupport_osx_version: '不支援此 Mac OS X 版本',
             need_password: '需要密碼與機器建立連線',
-            new_app_downloading: '下載中',
+            new_app_downloading: 'FLUX Studio 下載中',
+            new_app_download_canceled: 'FLUX Studio 下載已被取消',
+            new_app_downloaded: '新版FLUX Studio 下載完畢',
             ask_for_upgrade: '馬上升級嗎?',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',

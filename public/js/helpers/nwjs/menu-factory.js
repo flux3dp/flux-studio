@@ -96,7 +96,6 @@ define([
                             message = lang0.update.toolhead.latest_firmware.message;
                         }
 
-                        console.log('needUpdate', response.needUpdate);
                         if (!response.needUpdate) {
                             let forceUpdate = {
                                 custom: () => {

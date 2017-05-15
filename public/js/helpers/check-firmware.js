@@ -1,4 +1,4 @@
-define(['jquery'], function($) {
+define(['jquery', 'helpers/version-compare'], function($, versionCompare) {
     'use strict';
 
     /**
@@ -9,25 +9,6 @@ define(['jquery'], function($) {
      *
      * @return Promise
      */
-
-    function VersionCompare(currVer, promoteVer) {
-      currVer = currVer || "0.0.0";
-      promoteVer = promoteVer || "0.0.0";
-      if (currVer === promoteVer) return false;
-      let currVerArr = currVer.split(".");
-      let promoteVerArr = promoteVer.split(".");
-      let len = Math.max(currVerArr.length, promoteVerArr.length);
-      for (let i = 0; i < len; i++) {
-          let proVal = promoteVerArr[i],
-              curVal = currVerArr[i];
-          if (proVal < curVal) {
-              return false;
-          } else if (proVal > curVal) {
-              return true;
-          }
-      }
-      return false;
-    };
 
     return function(printer, type) {
         var deferred = $.Deferred(),
@@ -67,9 +48,7 @@ define(['jquery'], function($) {
             data: data
         })
         .done(function(response) {
-            //response.require_update = ('boolean' === typeof response.require_update ? response.require_update : false);
-            console.log(printer.version, response.latest_version);
-            response.needUpdate =  VersionCompare(printer.version, response.latest_version );
+            response.needUpdate =  versionCompare(printer.version, response.latest_version );
             response.latestVersion = response.latest_version;
             response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
             response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');

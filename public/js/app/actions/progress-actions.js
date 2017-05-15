@@ -21,11 +21,12 @@ define([
             });
         },
 
-        updating: function(message, percentage) {
+        updating: function(message, percentage, onStop) {
             ProgressDispatcher.dispatch({
                 actionType: ProgressConstants.UPDATE_EVENT,
                 message: message,
-                percentage: percentage
+                percentage: percentage,
+                onStop: onStop
             });
         },
 

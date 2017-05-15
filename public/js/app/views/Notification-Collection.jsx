@@ -4,6 +4,7 @@ define([
     'lib/jquery.growl',
     'helpers/api/config',
     'helpers/check-software-update',
+    'helpers/software-updater',
     // alert dialog
     'app/actions/alert-actions',
     'app/stores/alert-store',
@@ -38,6 +39,7 @@ define([
     Notifier,
     config,
     checkSoftwareUpdate,
+    softwareUpdater,
     // alert
     AlertActions,
     AlertStore,
@@ -152,8 +154,26 @@ define([
                 var self = this,
                     discoverMethods,
                     firstDevice,
+                    defaultPrinter,
                     isUnsupportedMacOSX = /Mac OS X 10_[56789]/.test(navigator.userAgent),
-                    type = 'firmware';
+                    type = 'firmware',
+                    _checkFirmwareOfDefaultPrinter = function() {
+                      let printers = DeviceMaster.getAvailableDevices();
+                      printers.some(function(printer) {
+                        if (defaultPrinter.serial === printer.serial) {
+                          defaultPrinter = printer;
+                          //update default-print's data.
+                          config().write('default-printer', JSON.stringify(printer));
+                          return true ;
+                        }
+                      });
+
+                      checkFirmware(defaultPrinter, type).done(function(response) {
+                          if (response.needUpdate) {
+                            firmwareUpdater(response, defaultPrinter, type);
+                          }
+                      });
+                    };
 
                 AlertStore.onNotify(this._handleNotification);
                 AlertStore.onCloseNotify(this._handleCloseNotification);
@@ -177,38 +197,23 @@ define([
                 GlobalStore.onSliceComplete(this._handleSliceReport);
                 GlobalStore.onCloseMonitor(this._handlecloseMonitor);
 
-                checkSoftwareUpdate();
+                // checking FLUX studio laster version in website that is going to
+                // popup update dialog if newser FLUX Studio has been relwased.
 
-                // check first discovered device firmware
-                discoverMethods = discover(
-                    FIRST_DEVICE_UPDATE,
-                    function(printers, fetchDirectly) {
-                        printers = DeviceList(printers);
-                        firstDevice = printers[0];
-                        discoverMethods.removeListener(FIRST_DEVICE_UPDATE);
-                        checkFirmware(firstDevice, type).done(function(response) {
+              /***waiting for website API done***
+                checkSoftwareUpdate()
+                  .done(function(response) {
+                    softwareUpdater(response);
+                  });
+              /*********************************/
 
-                            if (true === response.require_update) {
-                                self.setState({
-                                    firstDevice: {
-                                        info: firstDevice,
-                                        apiResponse: response
-                                    }
-                                });
-
-                                if(!window.FLUX.dev) {
-                                    AlertActions.showPopupYesNo(
-                                        FIRST_DEVICE_UPDATE,
-                                        lang.message.important_update.message,
-                                        lang.message.important_update.caption
-                                    );
-                                }
-                            }
-                        });
-                    }
-                );
-
-                AlertStore.onYes(self._onYes);
+                // checking firmware of default printer that is going to popup
+                // update dialog if newest firmware has been released.
+                defaultPrinter = config().read('default-printer');
+                // settimeout 3 secs for make sure discover has been done.
+                if (defaultPrinter) {
+                  setTimeout(_checkFirmwareOfDefaultPrinter, 3000);
+                }
 
                 // add information for Raven, to be removed when root.js is implemented
                 if(!window.FLUX.dev) {
@@ -274,6 +279,7 @@ define([
                 if (id === FIRST_DEVICE_UPDATE) {
                     // Use "setTimeout" to avoid dispatch in the middle of a dispatch
                     setTimeout(function() {
+                        console.log('this is firmwate update on initial application');
                         firmwareUpdater(self.state.firstDevice.apiResponse, self.state.firstDevice.info, 'firmware');
                     }, 0);
                 }

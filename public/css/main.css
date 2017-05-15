@@ -3431,8 +3431,7 @@ hr {
     .modal-update .caption,
     .modal-update .update-brief,
     .modal-update .release-note-content {
-        margin: 0 0 20px 0;
-        font-size: 14px; }
+        margin: 0 0 20px 0; }
     .modal-update .update-brief {
         font-size: 12px;
         line-height: 18px; }
