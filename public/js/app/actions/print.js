@@ -255,6 +255,7 @@ define([
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener('mouseup', onMouseUp, false);
+        renderer.domElement.addEventListener('dblclick', onDblClick, false);
 
         renderer.setSize(container.offsetWidth, container.offsetHeight);
 
@@ -475,11 +476,6 @@ define([
                         } else {
                             startSlicing(slicingType.F);
                             callback();
-
-                            if (!$.isEmptyObject(SELECTED)) {
-                              _targetAndZoom(SELECTED);
-                            }
-
                         }
                     }
                 });
@@ -938,6 +934,12 @@ define([
 
     // Events Section ---
 
+    function onDblClick(e) {
+      if (!$.isEmptyObject(SELECTED)) {
+        _targetAndZoom(SELECTED);
+      }
+    }
+
     function onMouseDown(e) {
         e.preventDefault();
         if(previewMode) { return; }
@@ -1029,21 +1031,15 @@ define([
         container.style.cursor = 'auto';
         transformAxisChanged = '';
 
-        //targer mesh center when tranformed.
-        if (!$.isEmptyObject(SELECTED)) {
-          _orbitTargetMesh(SELECTED);
-          setObjectDialoguePosition(SELECTED);
-        }
-
         checkOutOfBounds(SELECTED).then(() => {
             // disable preview when object are all out of bound
             reactSrc.setState({ hasObject: !allOutOfBound()});
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
+
                 //set the OrbitControls target to move around.
-                if (!reactSrc.state.isTransformed) {
-                  _targetAndZoom(SELECTED);
-                }
+                _orbitTargetMesh(SELECTED);
+                setObjectDialoguePosition(SELECTED);
                 doSlicing();
             }
         });
@@ -1067,9 +1063,6 @@ define([
                     hasPreviewImage = false;
                     slicingStatus.error = null;
                     setObjectDialoguePosition();
-                    reactSrc.setState({
-                        isTransformed: false
-                    });
                     render();
                     return;
                 }
@@ -1110,7 +1103,6 @@ define([
                 transformMode = true;
                 reactSrc.setState({
                     isTransforming: true,
-                    isTransformed: true
                 });
                 break;
             case 'mouseUp':
@@ -1118,9 +1110,6 @@ define([
                 reactSrc.setState({
                     isTransforming: false
                 });
-                SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
-                SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
-                SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
                 if(reactSrc.state.mode === 'scale') {
                     // check for inverse transform
                     if(SELECTED.size.x <= 0 || SELECTED.size.y <= 0 || SELECTED.size.z <= 0) {
@@ -1436,9 +1425,9 @@ define([
         src = src || SELECTED;
         syncObjectOutline(src);
 
-        let _x = parseInt(x) || 0,
-            _y = parseInt(y) || 0,
-            _z = parseInt(z) || 0;
+        let _x = Math.round(x) || 0,
+            _y = Math.round(y) || 0,
+            _z = Math.round(z) || 0;
         src.rotation.enteredX = x;
         src.rotation.enteredY = y;
         src.rotation.enteredZ = z;
@@ -2275,7 +2264,7 @@ define([
             return 0;
         }
         let degreeStep = shiftPressed ? 15 : s.degreeStep;
-        return (parseInt(degree / degreeStep) * degreeStep);
+        return (Math.round(degree / degreeStep) * degreeStep);
     }
 
     function updateObjectSize(src) {
@@ -2452,9 +2441,9 @@ define([
                 obj.outlineMesh.position.y = ref.position.y;
 
                 setRotation(
-                    parseInt(ref.rotation.enteredX),
-                    parseInt(ref.rotation.enteredY),
-                    parseInt(ref.rotation.enteredZ), true, obj);
+                    Math.round(ref.rotation.enteredX),
+                    Math.round(ref.rotation.enteredY),
+                    Math.round(ref.rotation.enteredZ), true, obj);
 
                 setSize(ref.size, true, obj);
 
@@ -2854,8 +2843,10 @@ define([
     }
 
     function tester() {
-      console.log('SELECTED',SELECTED);
-      _zoomCamera();
+      orbitControl.dIn(1.2);
+      transformControl.setSize(transformControl.size *1.2);
+      orbitControl.update();
+      render();
     }
 
     function _removeAllMeshOutline() {
@@ -2892,9 +2883,9 @@ define([
         target.outlineMesh.position.y = ref.position.y;
 
         setRotation(
-            parseInt(ref.rotation.enteredX),
-            parseInt(ref.rotation.enteredY),
-            parseInt(ref.rotation.enteredZ), true, target);
+            Math.round(ref.rotation.enteredX),
+            Math.round(ref.rotation.enteredY),
+            Math.round(ref.rotation.enteredZ), true, target);
 
         setSize(ref.size, true, target);
 

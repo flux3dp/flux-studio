@@ -355,7 +355,7 @@ define([
                             defaultValue={this.state.defaults.heightOffset}
                             getValue={this._refreshHeightOffset}
                             min={-10}
-                            max={10}
+                            max={100}
                         />
                     </div>
                 )
