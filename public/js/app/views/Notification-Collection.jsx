@@ -125,6 +125,7 @@ define([
                         latestVersion : '',
                         updateFile    : undefined,
                         device        : {},
+                        onDownload    : function() {},
                         onInstall     : function() {}
                     },
                     // change filament
@@ -308,10 +309,15 @@ define([
 
             _showUpdate: function(payload) {
                 var currentVersion = (
-                    'software' === payload.type ?
-                    payload.updateInfo.currentVersion :
-                    payload.device.version
-                );
+                      'software' === payload.type ?
+                      payload.updateInfo.currentVersion :
+                      payload.device.version
+                    ),
+                    releaseNote = (
+                      'zh-tw' === localStorage['active-lang'] ?
+                      payload.updateInfo.changelog_zh :
+                      payload.updateInfo.changelog_en
+                    );
 
                 this.setState({
                     application: {
@@ -320,7 +326,8 @@ define([
                         type: payload.type,
                         currentVersion: currentVersion,
                         latestVersion: payload.updateInfo.latestVersion,
-                        releaseNote: payload.updateInfo.releaseNote,
+                        releaseNote: releaseNote,
+                        onDownload: payload.onDownload,
                         onInstall: payload.onInstall
                     }
                 });
@@ -344,6 +351,10 @@ define([
                         device: this.state.application.device
                     }
                 });
+            },
+
+            _handleUpdateDownload: function() {
+                this.state.application.onDownload();
             },
 
             _handleUpdateInstall: function() {
@@ -618,6 +629,7 @@ define([
                             currentVersion={this.state.application.currentVersion}
                             latestVersion={latestVersion}
                             releaseNote={this.state.application.releaseNote}
+                            onDownload={this._handleUpdateDownload}
                             onClose={this._handleUpdateClose}
                             onInstall={this._handleUpdateInstall}
                         />

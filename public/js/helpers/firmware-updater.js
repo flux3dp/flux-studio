@@ -2,6 +2,7 @@
  * firmware updater
  */
 define([
+    'jquery',
     'helpers/i18n',
     'helpers/check-firmware',
     'helpers/device-master',
@@ -12,6 +13,7 @@ define([
     'app/constants/input-lightbox-constants',
     'helpers/round'
 ], function(
+    $,
     i18n,
     checkFirmware,
     DeviceMaster,
@@ -23,12 +25,79 @@ define([
     round
 ) {
     'use strict';
+    var lang = i18n.get();
 
-    return function(response, printer, type) {
+    return function(response, printer, type, forceUpdate) {
         var lang = i18n.get(),
-            doUpdate, onInstall, onSubmit;
+            doUpdate,
+            onDownload,
+            onInstall,
+            onSubmit,
+            _uploadToDevice,
+            _onFinishUpdate;
 
+        console.log('forceUpdate', forceUpdate);
         doUpdate = ( 'firmware' === type ? DeviceMaster.updateFirmware : DeviceMaster.updateToolhead );
+
+        _uploadToDevice = (file) => {
+          DeviceMaster.selectDevice(printer).done(function() {
+              ProgressActions.open(ProgressConstants.STEPPING, '', '', false);
+              doUpdate(file).progress((r) => {
+                  r.percentage = round(r.percentage || 0, -2);
+                  ProgressActions.updating(
+                      lang.update.updating + ' (' + r.percentage + '%)',
+                      r.percentage
+                  );
+              }).always(() => {
+                  ProgressActions.close();
+              }).done(
+                  _onFinishUpdate.bind(null, true)
+              ).fail(
+                  _onFinishUpdate.bind(null, false)
+              );
+          });
+        }
+
+        _onFinishUpdate = (isSuccess) => {
+            console.log('finished update', isSuccess, type);
+            if(type === 'toolhead') {
+                quitTask();
+            }
+
+            if (true === isSuccess) {
+                AlertActions.showPopupInfo(
+                    'firmware-update-success',
+                    lang.update.firmware.update_success
+                );
+            }
+            else {
+                AlertActions.showPopupError(
+                    'firmware-update-fail',
+                    lang.update.firmware.update_fail
+                );
+            }
+        };
+
+        onDownload = () => {
+          let req = new XMLHttpRequest();
+
+          // get firmware from flux3dp website.
+          req.open("GET", response.downloadUrl, true);
+          req.responseType = "blob";
+
+          req.onload = function (event) {
+              if (this.status == 200) {
+                  let file = req.response;
+                  _uploadToDevice(file);
+              } else {
+                AlertActions.showPopupError(
+                    'firmware-update-fail', 'check internet'
+                );
+              }
+          };
+          req.send();
+
+        };
 
         onInstall = () => {
             let name = 'upload-firmware',
@@ -53,26 +122,6 @@ define([
             let file = files.item(0),
                 onFinishUpdate;
 
-            onFinishUpdate = (isSuccess) => {
-                console.log('finished update', isSuccess, type);
-                if(type === 'toolhead') {
-                    quitTask();
-                }
-
-                if (true === isSuccess) {
-                    AlertActions.showPopupInfo(
-                        'firmware-update-success',
-                        lang.update.firmware.update_success
-                    );
-                }
-                else {
-                    AlertActions.showPopupError(
-                        'firmware-update-fail',
-                        lang.update.firmware.update_fail
-                    );
-                }
-            };
-
             DeviceMaster.selectDevice(printer).done(function() {
                 ProgressActions.open(ProgressConstants.STEPPING, '', '', false);
                 doUpdate(file).progress((r) => {
@@ -84,9 +133,9 @@ define([
                 }).always(() => {
                     ProgressActions.close();
                 }).done(
-                    onFinishUpdate.bind(null, true)
+                    _onFinishUpdate.bind(null, true)
                 ).fail(
-                    onFinishUpdate.bind(null, false)
+                    _onFinishUpdate.bind(null, false)
                 );
             });
         };
@@ -108,11 +157,16 @@ define([
             });
         };
 
-        AlertActions.showUpdate(
-            printer,
-            type,
-            response || {},
-            onInstall
-        );
-    };
+        if (forceUpdate) {
+          onInstall();
+        } else {
+          AlertActions.showUpdate(
+              printer,
+              type,
+              response || {},
+              onDownload,
+              onInstall
+          );
+        }
+    }
 });

@@ -77,10 +77,10 @@ define([
                 this._updateSizeProperty(nextProp.model.size);
             }
         },
-        
+
         shouldComponentUpdate: function(nextProps, nextState) {
             var tmp = Object.assign({}, rotation);
-            
+
             Object.assign(tmp, nextState);
             Object.assign(tmp, { isTransforming: nextProps.isTransforming, mode: nextProps.mode, size: nextProps.model.size, style: nextProps.style, scaleLocked: nextProps.scaleLocked });
             var updateContent = JSON.stringify(tmp);
@@ -88,7 +88,7 @@ define([
             prevState = updateContent;
             return true;
         },
-        
+
         _hasSameSize: function(size1, size2) {
             return (
                 size1.x === size2.x &&
@@ -106,7 +106,7 @@ define([
             } else {
                 Object.assign(_size, size);
             }
-            
+
             // calculate scale number
             _size.sx = 100 * _size.x / _size.originalX;
             _size.sy = 100 * _size.y / _size.originalY;
@@ -244,7 +244,6 @@ define([
 
         _rotationKeyUp: function(e) {
             if(e.keyCode === 13) {
-                console.log('entered');
             }
 
             if(e.keyCode === 8 && e.target.value === '') {

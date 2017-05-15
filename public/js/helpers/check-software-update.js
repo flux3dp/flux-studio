@@ -25,7 +25,6 @@ define([
             isIgnore,
             filename,
             manifest,
-            firmwareUpdater,
             downloadPercentage = 0,
             ignoreVersions = config().read('software-update-ignore-list') || [],
             installNewApp = function() {

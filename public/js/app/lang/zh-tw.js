@@ -33,7 +33,8 @@ define(function() {
                 message_pattern_2: 'FLUX 韌體 v%s 可使用 - 你的版本為 v%s.',
                 latest_firmware: {
                     caption: '韌體更新',
-                    message: '韌體已經是最新版本'
+                    message: '韌體已經是最新版本',
+                    still_update: '檔案更新'
                 },
                 confirm: '上傳',
                 upload_file: '韌體上傳',
@@ -64,6 +65,7 @@ define(function() {
             checkingHeadinfo: '檢查工具頭資訊',
             preparing: '準備中...',
             later: '稍候',
+            download: '線上更新',
             install: '下載',
             upload: '上傳'
         },

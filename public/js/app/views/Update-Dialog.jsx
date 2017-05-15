@@ -28,6 +28,7 @@ define([
                 latestVersion: '',
                 releaseNote: '',
                 updateFile: undefined,
+                onDownload: function() {},
                 onClose: function() {},
                 onInstall: function() {}
             };
@@ -41,6 +42,11 @@ define([
 
             // save skip version and close
             config().write(key, ignoreList);
+            this._onClose();
+        },
+        _onDownload: function() {
+            console.log('onDownload this.props', this.props);
+            this.props.onDownload();
             this._onClose();
         },
 
@@ -64,6 +70,13 @@ define([
                     'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
                 },
                 onClick: this._onClose.bind(this, true)
+            },
+            {
+                label: lang.update.download,
+                dataAttrs: {
+                    'ga-event': 'download-' + this.props.type.toLowerCase() + '-later'
+                },
+                onClick: this._onDownload
             },
             {
                 label: ('software' === this.props.type ?

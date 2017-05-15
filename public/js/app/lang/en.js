@@ -33,7 +33,8 @@ define(function() {
                 message_pattern_2: 'Machine Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Machine firmware Update',
-                    message: 'You have the latest Machine firmware'
+                    message: 'You have the latest Machine firmware',
+                    still_update: 'UPDATE'
                 },
                 confirm: 'UPLOAD',
                 upload_file: 'Firmware upload (*.bin / *.fxfw)',
@@ -64,6 +65,7 @@ define(function() {
             checkingHeadinfo: 'Checking Toolhead Information',
             preparing: 'Preparing...',
             later: 'LATER',
+            download: 'ONLINE UPDATE',
             install: 'INSTALL',
             upload: 'UPLOAD'
         },
