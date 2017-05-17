@@ -1,17 +1,18 @@
 module.exports = {
   'Printing Basic Testing' : function (browser) {
-    const filePath = require('path').resolve(__dirname + '/../example_files/print.stl');
+
     browser
-    // required for passing all the setup
+    .log('ready flux studio')
     .readyFluxStudio()
+    .log('ready nightwatch-print')
+    .readyPrintDevice()
 
     // test code start -----------
 
-    .setValue('.arrowBox input[type=file]', filePath) // Load STL
-
-    .testEngines()
-
-    .testEditMenu()
+    .testImportFileTypes()
+    // .testEngines()
+    // .testEditMenu()
+    // .testActualPrint()
 
     .p(500)
 
@@ -20,8 +21,6 @@ module.exports = {
     .keys(browser.Keys.CONTROL)
     .keys('q')
     .end();
+
   }
-  // TODO: Test switch slicing engine to slic3r, cura, cura2
-  // TODO: Test if raft, support is working
-  // TODO: Test if save test is working
 };
