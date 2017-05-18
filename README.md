@@ -3,26 +3,42 @@
 
 ## Introduction
 
-FLUX Studio is the companion application for [FLUX Delta](http://flux3dp.com). It gives creators an intuitive interface to control over every function of the machine.
+FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.com). It gives creators an intuitive interface to control over every function of the machine.
 
 ## Requirement
 
-* Unix-like OS
-* Install [Nodejs and npm](https://docs.npmjs.com/getting-started/installing-node)
-* Clone [fluxghost](https://github.com/flux3dp/fluxghost) and [fluxclient](https://github.com/flux3dp/fluxclient)
-* Download [slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list)
+* Unix-like OS.
+* [Nodejs and npm](https://docs.npmjs.com/getting-started/installing-node).
+* FLUX Studio requires websocket api to run. Dowload the source code of [FLUXGhost](https://github.com/flux3dp/fluxghost).
+* Install [FLUXClient](https://github.com/flux3dp/fluxclient).
+* [Slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list) binary files. For OS X users, you can also find them in /Applications/FLUX\ Studio.app folder.
 
-## Setup
-`npm install --save-dev`
+## Installation
+
+1. `$> cd /path/to/flux-studio`
+2. Install necessary node packages `$> npm i --save-dev`
 
 ## Running
-Build flux API first (See [fluxclient](https://github.com/flux3dp/fluxclient/blob/master/README.md) and [fluxghost](https://github.com/flux3dp/fluxghost/blob/master/README.md) for more detail)
 
-`gulp webserver`
 
-## Build
+1. `$> cd /path/to/fluxghost`
 
-1. `$ [PATH]/_tools/nwjs-shell-builder/nwjs-build.sh`
+1. Start the flux api service `$> python3 ghost.py`
+
+1. `$> cd /path/to/flux-studio`
+
+1. Start the gulp service `$> gulp dev`
+
+1. Open http://localhost:8111 in Chrome
+
+If you are using FLUX Studio for the first time:
+1. Open up devtool and then go to console. 
+
+1. Run the command `localStorage.setItem('dev','true')` then refresh the page, your flux-studio will use port 8000 for websocket api.
+
+## Building for distribution
+
+1. `$> [PATH]/_tools/nwjs-shell-builder/nwjs-build.sh`
     > More detail please see [nwjs-shell-builder](https://github.com/Gisto/nwjs-shell-builder)
 
 1. Unzip file in `[PATH]/_tools/nwjs-shell-builder/TMP/output`
