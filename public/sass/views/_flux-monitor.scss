@@ -229,22 +229,22 @@
                 cursor: pointer;
             }
             .btn-go {
-                background-image: url("/img/btn-run.svg");
+                background-image: url("img/btn-run.svg");
             }
             .btn-stop {
-                background-image: url("/img/btn-stop.svg");
+                background-image: url("img/btn-stop.svg");
             }
             .btn-pause {
-                background-image: url("/img/btn-pause.svg");
+                background-image: url("img/btn-pause.svg");
             }
             .btn-download {
-                background-image: url("/img/btn-download.svg");
+                background-image: url("img/btn-download.svg");
             }
             .btn-upload {
-                background-image: url("/img/btn-upload.svg");
+                background-image: url("img/btn-upload.svg");
             }
             .btn-camera {
-                background-image: url("/img/btn-camera.svg");
+                background-image: url("img/btn-camera.svg");
                 &.on {
                     opacity: 1;
                     &~div {

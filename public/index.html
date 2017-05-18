@@ -8,7 +8,7 @@
 </head>
 
 <body>
-    <script src="/js/lib/three/three.min.js"></script>
+    <script src="js/lib/three/three.min.js"></script>
     <div class="wrapper">
         <section class="top-menu"></section>
         <section class="tour-overlay"></section>
@@ -19,7 +19,7 @@
     </div>
 </body>
 <script>
-    (function() {
+    function launcher(ipc) {
         var script = document.createElement('script'),
             cssLink = document.createElement('link'),
             head = document.querySelector('head'),
@@ -39,40 +39,29 @@
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof nw ? undefined : os),
-            ghostPort: location.port || 8000,
-            isNW: ('undefined' !== typeof nw),
+            ghostPort: 8000,
             allowTracking: localStorage['allow-tracking'] === 'true',
             dev: dev
         };
 
-        // it's not node-webkit
-        if ('undefined' === typeof nw) {
-            getStarted();
-        }
-        else {
-            timer = setInterval(function() {
-                var nodeProcess = process || {},
-                    env = nodeProcess.env || {};
-
-                if(window.portReady) {
-                    if ('undefined' !== typeof env.ghostPort &&
-                        'undefined' !== typeof env.osType &&
-                        'undefined' !== typeof env.arch
-                    ) {
-                        window.FLUX.ghostPort = env.ghostPort;
-                        window.FLUX.osType = env.osType;
-                        window.FLUX.arch = env.arch;
-                        clearInterval(timer);
-                        getStarted(env.ghostPort);
-                    }
-                    else {
-                        if (30000 <= (new Date()).getTime() - window.FLUX.timestamp) {
-                            getStarted(env.ghostPort);
-                            clearInterval(timer);
-                        }
-                    }
+        if(ipc) {
+            ipc.on("backend-up", (sender, status) => {
+                getStarted(status.port);
+                console.log(`Backend start at ${status.port}`);
+            });
+            ipc.on("backend-down", () => {});
+            ipc.on("flush-status", (sender, status) => {
+                if(status.backend.alive) {
+                    window.FLUX.ghostPort = status.backend.port;
+                    getStarted(status.backend.port);
+                    console.log(`Backend start at ${status.backend.port}`);
                 }
-            }, 100);
+            });
+            ipc.on("menu-trigger", () => {});
+
+            ipc.send("sync-status");
+        } else {
+            getStarted();
         }
 
         cssLink.setAttribute('rel', 'stylesheet');
@@ -83,7 +72,15 @@
         if(localStorage.getItem('poke-ip-addr') == 'undefined') {
             localStorage.setItem('poke-ip-addr', '192.168.1.1')
         }
-    })();
+    }
+
+    if(typeof process !== "undefined") {
+        const {ipcRenderer} = require("electron");
+        launcher(ipcRenderer);
+        window.ipcRenderer = ipcRenderer;
+    } else {
+        launcher();
+    }
 </script>
 
 </html>

@@ -339,8 +339,8 @@ define([
                 var activeLang = i18n.getActiveLang(),
                     imageSrc = (
                         'en' === activeLang ?
-                        '/img/insert-filament-en.png' :
-                        '/img/insert-filament-zh-tw.png'
+                        'img/insert-filament-en.png' :
+                        'img/insert-filament-zh-tw.png'
                     );
 
                 return {
@@ -393,8 +393,8 @@ define([
 
                 imageSrc = (
                     'en' === activeLang ?
-                    '/img/press-to-accelerate-en.png' :
-                    '/img/press-to-accelerate-zh-tw.png'
+                    'img/press-to-accelerate-en.png' :
+                    'img/press-to-accelerate-zh-tw.png'
                 );
 
                 message = (

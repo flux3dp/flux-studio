@@ -473,12 +473,12 @@ define([
                             const callback = () => { tryMovementTest(); }
                             const imageObject = {
                                 images: [
-                                    '/img/tutorial/' + activeLang + '/n01.png',
-                                    '/img/tutorial/' + activeLang + '/n02.png',
-                                    '/img/tutorial/' + activeLang + '/n03.png',
-                                    '/img/tutorial/' + activeLang + '/n04.png',
-                                    '/img/tutorial/' + activeLang + '/n05.png',
-                                    '/img/tutorial/' + activeLang + '/n06.png'
+                                    'img/tutorial/' + activeLang + '/n01.png',
+                                    'img/tutorial/' + activeLang + '/n02.png',
+                                    'img/tutorial/' + activeLang + '/n03.png',
+                                    'img/tutorial/' + activeLang + '/n04.png',
+                                    'img/tutorial/' + activeLang + '/n05.png',
+                                    'img/tutorial/' + activeLang + '/n06.png'
                                 ],
                                 imgClass: 'img640x480'
                             };

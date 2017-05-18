@@ -1227,7 +1227,7 @@ define([
                                 Notification.requestPermission((permission) => {
                                     if(permission === 'granted') {
                                         let notification = new Notification(device.name, {
-                                            icon: '/img/icon-home-s.png',
+                                            icon: 'img/icon-home-s.png',
                                             body: message
                                         });
                                     }

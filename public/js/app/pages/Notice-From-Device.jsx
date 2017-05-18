@@ -40,12 +40,12 @@ define([
                     successfullyStatement = sprintf(localLang.successfully_statement, wifi.ssid),
                     content = (
                         <div className="notice-from-device text-center">
-                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                            <img className="brand-image" src="img/menu/main_logo.svg"/>
                             <div className="connecting-means">
                                 <h1 className="headline">{localLang.headline}</h1>
                                 <h2 className="subtitle">{localLang.subtitle}</h2>
                                 <div className="signal-means row-fluid clearfix">
-                                    <img className="signal-position col" src="/img/wifi-indicator.png"/>
+                                    <img className="signal-position col" src="img/wifi-indicator.png"/>
                                     <div className="signal-description col">
                                         <article className="row-fluid clearfix">
                                             <span className="green-light col"/>

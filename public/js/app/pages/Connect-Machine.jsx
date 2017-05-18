@@ -184,7 +184,7 @@ define([
                     printersSelection = this._renderPrinters(lang),
                     content = (
                         <div className="connect-machine text-center">
-                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                            <img className="brand-image" src="img/menu/main_logo.svg"/>
                             <div className="connecting-means">
                                 <div className="btn-h-group">
                                     <button
@@ -194,7 +194,7 @@ define([
                                     >
                                         <h1 className="headline">{lang.initialize.connect_flux}</h1>
                                         <p className="subtitle">{lang.initialize.via_wifi}</p>
-                                        <img className="scene" src="/img/via-wifi.png"/>
+                                        <img className="scene" src="img/via-wifi.png"/>
                                     </button>
                                     <button
                                         className="btn btn-action btn-large"
@@ -203,7 +203,7 @@ define([
                                     >
                                         <h1 className="headline">{lang.initialize.connect_flux}</h1>
                                         <p className="subtitle">{lang.initialize.via_usb}</p>
-                                        <img className="scene" src="/img/wifi-plug-01.png"/>
+                                        <img className="scene" src="img/wifi-plug-01.png"/>
                                     </button>
                                 </div>
                                 <a href="#initialize/wifi/setup-complete/with-usb" data-ga-event="skip" className="btn btn-link btn-large">

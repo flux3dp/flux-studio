@@ -50,35 +50,35 @@ define([
                     displayName: 'PRINT',
                     className: genericClassName,
                     label: lang.menu.print,
-                    imgSrc: '/img/menu/icon_print.svg'
+                    imgSrc: 'img/menu/icon_print.svg'
                 },
                 {
                     name: 'laser',
                     displayName: 'ENGRAVE',
                     className: genericClassName,
                     label: lang.menu.laser,
-                    imgSrc: '/img/menu/icon_laser.svg'
+                    imgSrc: 'img/menu/icon_laser.svg'
                 },
                 {
                     name: 'scan',
                     displayName: 'SCAN',
                     className: genericClassName,
                     label: lang.menu.scan,
-                    imgSrc: '/img/menu/icon_scan.svg'
+                    imgSrc: 'img/menu/icon_scan.svg'
                 },
                 {
                     name: 'draw',
                     displayName: 'DRAW',
                     className: genericClassName,
                     label: lang.menu.draw,
-                    imgSrc: '/img/menu/icon-draw.svg'
+                    imgSrc: 'img/menu/icon-draw.svg'
                 },
                 {
                     name: 'cut',
                     displayName: 'CUT',
                     className: genericClassName,
                     label: lang.menu.cut,
-                    imgSrc: '/img/menu/icon-cut.svg'
+                    imgSrc: 'img/menu/icon-cut.svg'
                 },
             ];
 
@@ -89,7 +89,7 @@ define([
                 displayName: 'Mill',
                 className: genericClassName,
                 label: lang.menu.mill,
-                imgSrc: '/img/menu/icon-draw.svg'
+                imgSrc: 'img/menu/icon-draw.svg'
             });
         }
 
@@ -258,7 +258,7 @@ define([
                             progress = '';
                         }
 
-                        let img = `/img/icon_${device.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
+                        let img = `img/icon_${device.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
 
                         return (
                             <li
@@ -307,7 +307,7 @@ define([
                 return (
                     <div className={ClassNames(topClass)}>
                         <div className="brand-logo">
-                            <img className="logo-icon" src="/img/menu/main_logo.svg" draggable="false"/>
+                            <img className="logo-icon" src="img/menu/main_logo.svg" draggable="false"/>
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <div className="arrow arrow-left arrow-top-left-flat"/>
@@ -319,7 +319,7 @@ define([
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
                             <p className="device-icon">
-                                <img src="/img/btn-device.svg" draggable="false"/>
+                                <img src="img/btn-device.svg" draggable="false"/>
                                 <span>{lang.menu.device}</span>
                             </p>
                             <div className={menuClass}>

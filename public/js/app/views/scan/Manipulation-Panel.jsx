@@ -107,13 +107,13 @@ define([
                         <div className="accordion-body">
                             <div className="control">
                                 <button className="btn btn-action btn-merge" data-ga-event="manual-merge" onClick={this._onManualMerge}>
-                                    <img src="/img/icon-merge.png"/>
+                                    <img src="img/icon-merge.png"/>
                                     {lang.scan.manipulation.manual_merge}
                                 </button>
                             </div>
                             <div className="control">
                                 <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSavePCD}>
-                                    <img src="/img/icon-export.png"/>
+                                    <img src="img/icon-export.png"/>
                                     {lang.scan.manipulation.save_pointcloud}
                                 </button>
                             </div>
@@ -159,25 +159,25 @@ define([
                         <div className="accordion-body">
                             <div className="control">
                                 <button className={cx(cropClass)} data-ga-event="crop" onClick={this._onCrop}>
-                                    <img src="/img/icon-crop.png"/>
+                                    <img src="img/icon-crop.png"/>
                                     {lang.scan.manipulation.crop}
                                 </button>
                             </div>
                             <div className="control">
                                 <button className="btn btn-action btn-denoise" data-ga-event="denoise" onClick={this._onClearNoise}>
-                                    <img src="/img/icon-denoise.png"/>
+                                    <img src="img/icon-denoise.png"/>
                                     {lang.scan.manipulation.clear_noise}
                                 </button>
                             </div>
                             <div className="control">
                                 <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSavePCD}>
-                                    <img src="/img/icon-export.png"/>
+                                    <img src="img/icon-export.png"/>
                                     {lang.scan.manipulation.save_pointcloud} PCD
                                 </button>
                             </div>
                             <div className="control">
                                 <button className="btn btn-action btn-save-pcd" data-ga-event="save-point-cloud" onClick={this._onSaveASC}>
-                                    <img src="/img/icon-export.png"/>
+                                    <img src="img/icon-export.png"/>
                                     {lang.scan.manipulation.save_pointcloud} ASC
                                 </button>
                             </div>
