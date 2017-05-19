@@ -1,6 +1,8 @@
 define([
+    'jquery',
     'helpers/api/config',
     'helpers/i18n',
+    'helpers/version-compare',
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/constants/alert-constants',
@@ -8,8 +10,10 @@ define([
     'app/stores/progress-store',
     'app/constants/progress-constants'
 ], function(
+    $,
     config,
     i18n,
+    versionCompare,
     AlertActions,
     AlertStore,
     AlertConstants,
@@ -19,71 +23,41 @@ define([
 ) {
     'use strict';
 
-    return () => {
+    return function() {
         var self = this,
+            deferred = $.Deferred(),
             lang = i18n.get(),
+            currentVersion = window.FLUX.version,
             isIgnore,
             filename,
             manifest,
-            firmwareUpdater,
             downloadPercentage = 0,
-            ignoreVersions = config().read('software-update-ignore-list') || [],
-            installNewApp = function() {
-                nw.App.runInstaller(filename, manifest, function(err, newAppPath) {
-                    if (err) {
-                        AlertActions.showPopupInfo('ruinstalling', 'Upgrade failed');
-                    }
-                });
-                AlertStore.removeYesListener(installNewApp);
-            },
-            handleDownloadProgress = function(data, downloadSize, contentLength) {
-                downloadPercentage = parseInt((downloadSize / contentLength).toFixed(3) * 100, 10);
+            ignoreVersions = config().read('software-update-ignore-list') || [];
 
-                ProgressActions.updating(
-                    lang.message.new_app_downloading + ' (' + downloadPercentage + '%)',
-                    downloadPercentage
-                );
-
-                if (100 === downloadPercentage) {
-                    ProgressActions.close();
-                    AlertActions.showPopupYesNo('install-new-app', lang.message.ask_for_upgrade);
-                    AlertStore.onYes(installNewApp);
-                }
-            };
-
-        if (true === window.FLUX.isNW) {
-            nw.App.checkUpdate(function(error, newVersionExists, _manifest) {
-                if (!error) {
-                    manifest = _manifest;
-                    isIgnore = -1 < ignoreVersions.indexOf(manifest.version);
-                }
-
-                if (!error && true === newVersionExists && false === isIgnore) {
-                    AlertActions.showUpdate(
-                        {},
-                        'software',
-                        {
-                            currentVersion: window.FLUX.version,
-                            latestVersion: manifest.version,
-                            releaseNote: manifest.changelog,
-                        },
-                        () => {
-                            ProgressActions.open(ProgressConstants.STEPPING, '', lang.message.new_app_downloading, true);
-                            updater = nw.App.downloadUpdate(
-                                manifest,
-                                (error, _filename) => {
-                                    if (error) {
-                                        ProgressActions.close();
-                                        nw.Shell.openExternal('https://flux3dp.com/downloads');
-                                    }
-                                    filename = _filename;
-                                },
-                                handleDownloadProgress
-                            );
-                        }
-                    );
-                }
-            });
+        if (!navigator.onLine) {
+          deferred.reject({
+              needUpdate: true
+          });
+          return deferred.promise();
         }
+
+        $.ajax({
+            url: 'http://flux3dp.com/api_entry/',
+            data: { feature: 'check_update', key: 'fluxstudio' }
+        })
+        .done( function(response) {
+          response.needUpdate = versionCompare('0.6.0', response.version);
+          response.latestVersion = response.version;
+          response.currentVersion = currentVersion;
+          response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
+          response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');
+          response.downloadUrl = 'https://s3-us-west-1.amazonaws.com/fluxstudio/fstudio-20170417-0.7.8-osx-stable.dmg';
+          //response.downloadUrl = 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-1.6.64.fxfw'
+          response.thisVerionIsIgnored = !(ignoreVersions.indexOf(response.version) === -1);
+
+          deferred.resolve(response);
+        })
+
+        return deferred.promise();
     };
 });

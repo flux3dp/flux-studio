@@ -38,7 +38,7 @@ define(['react'], function(React){
                     }
 
                     if(typeof opt.label === 'string') {
-                        className += ' ' + opt.label.toLowerCase();
+                        attrs['data-test-key'] = opt.label.toLowerCase();
                     }
 
                     if ('link' === opt.type) {

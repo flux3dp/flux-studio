@@ -46,7 +46,7 @@ define([
 
                             <div className="switch-status">{this.state.checked ? 'ON' : 'OFF'}</div>
 
-                            <div className="onoffswitch">
+                            <div className="onoffswitch" name={this.props.name || ''}>
 
                                 <input type="checkbox" name="onoffswitch" className="onoffswitch-checkbox" id={this.props.id}
                                     onChange={this._handleToggle}

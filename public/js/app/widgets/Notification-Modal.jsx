@@ -98,7 +98,6 @@ define([
             },
 
             _onCustom: function(e, reactid) {
-                console.log("fire onCustom");
                 this.props.onCustom(e);
                 this._onClose.apply(null, [e, reactid, 'custom']);
             },
