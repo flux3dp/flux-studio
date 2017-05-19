@@ -46,6 +46,7 @@
 
         if(ipc) {
             ipc.on("backend-up", (sender, status) => {
+                window.FLUX.ghostPort = status.port;
                 getStarted(status.port);
                 console.log(`Backend start at ${status.port}`);
             });
@@ -54,11 +55,12 @@
                 if(status.backend.alive) {
                     window.FLUX.ghostPort = status.backend.port;
                     getStarted(status.backend.port);
-                    console.log(`Backend start at ${status.backend.port}`);
+                    console.log(`Backend ready at ${status.backend.port}`);
                 }
             });
-            ipc.on("menu-trigger", () => {});
-
+            ipc.on("menu-trigger", (sender, opt) => {
+                console.log(opt);
+            });
             ipc.send("sync-status");
         } else {
             getStarted();

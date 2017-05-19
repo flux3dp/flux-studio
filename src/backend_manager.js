@@ -23,6 +23,10 @@ function uglyJsonParser(data) {
 }
 
 
+process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || "backend/slic3r"
+process.env.GHOST_CURA = process.env.GHOST_CURA || "backend/cura"
+
+
 class BackendManager extends EventEmitter {
     constructor(options) {
         super();
@@ -91,8 +95,12 @@ class BackendManager extends EventEmitter {
             this._wsconn = conn;
             conn.on('message', (message) => {
                 if (message.type === 'utf8') {
-                    let devInfo = uglyJsonParser(message.utf8Data);
-                    this.emit("device_updated", devInfo);
+                    try {
+                        let devInfo = uglyJsonParser(message.utf8Data);
+                        this.emit("device_updated", devInfo);
+                    } catch(err) {
+                        console.error(`Can not handle backend stout: ${message}`);
+                    }
                 }
             });
             conn.on('close', () => {

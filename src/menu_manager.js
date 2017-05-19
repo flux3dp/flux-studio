@@ -10,7 +10,7 @@ function build_menu(callback) {
             label: 'FLUX Studio',
             submenu: [
                 {label: 'About FLUX Studio', role: 'about'},
-                {label: 'Preferences', 'id': '_preferences', 'accelerator': 'Cmd+,'},
+                {label: 'Preferences', 'id': '_preferences', 'accelerator': 'Cmd+,', click: callback},
                 {type: 'separator'},
                 {role: 'services', submenu: []},
                 {type: 'separator'},
@@ -25,8 +25,8 @@ function build_menu(callback) {
     menu.push({
         label: 'File',
         submenu: [
-            {label: 'Open', 'id': '_open'},
-            {label: 'Save', 'id': '_save'}
+            {label: 'Open', 'id': '_open', click: callback},
+            {label: 'Save', 'id': '_save', click: callback}
         ]
     });
 
@@ -40,7 +40,7 @@ function build_menu(callback) {
     menu.push({
         label: 'Machines', id: '_machines',
         submenu: [
-            {label: 'Add a New Machine', 'id': '_new_machine', 'accelerator': 'Cmd+N'},
+            {label: 'Add a New Machine', 'id': '_new_machine', 'accelerator': 'Cmd+N', click: callback},
             {type: "separator"}
         ]
     });
@@ -104,7 +104,7 @@ class MenuManager extends EventEmitter {
     constructor(on_trigger) {
         super();
 
-        this._appmenu = Menu.buildFromTemplate(build_menu(this._on_menu_click));
+        this._appmenu = Menu.buildFromTemplate(build_menu(this._on_menu_click.bind(this)));
 
         for(let i in this._appmenu.items) {
             if(this._appmenu.items[i].id === "_machines") {
@@ -136,7 +136,7 @@ class MenuManager extends EventEmitter {
             this._device_list[uuid].visible = true;
             Menu.setApplicationMenu(this._appmenu);
         } else {
-            let instance = build_device_menu(this._on_menu_click, uuid, data);
+            let instance = build_device_menu(this._on_menu_click.bind(this), uuid, data);
             this._devicemenu.submenu.append(instance);
             this._device_list[uuid] = instance;
             Menu.setApplicationMenu(this._appmenu);

@@ -48,7 +48,9 @@ define([
             defaultOptions = {
                 hostname: customHost ? customHost : (dev ? '127.0.0.1' : 'localhost'),
                 method: '',
-                port: customPort ? customPort : dev ? '8000' : window.FLUX.ghostPort,
+                get port() {
+                    return customPort ? customPort : dev ? '8000' : window.FLUX.ghostPort;
+                },
                 autoReconnect: true,
                 ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,
