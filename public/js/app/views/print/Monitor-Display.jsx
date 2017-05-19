@@ -107,6 +107,7 @@ define([
 
             return (<div style={divStyle} />);
         },
+
         _imageError: function(src) {
             src.target.src = '/img/ph_s.png';
         },
@@ -127,8 +128,10 @@ define([
                 return (
                     <div
                         className="folder"
+                        data-test-key={folder}
                         onClick={this.props.onFolderClick.bind(this, folder)}
-                        onDoubleClick={this.props.onFolderDoubleClick.bind(this, folder)}>
+                        onDoubleClick={this.props.onFolderDoubleClick.bind(this, folder)}
+                    >
                         <div className={folderNameClass}>
                             {folder}
                         </div>
