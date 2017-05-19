@@ -1,11 +1,11 @@
 {
   "name": "flux-studio",
   "version": "1.0.0",
+  "author": "FLUX Inc.",
+  "description": "FLUX Studio",
   "private": true,
   "main": "electron-main.js",
   "dependencies": {
-    "electron": "~1.6.2",
-    "electron-builder": "~17.1.1",
     "jquery": "^1.11.0",
     "jsdom-global": "^1.6.2",
     "nan": "^2.4.0",
@@ -23,6 +23,8 @@
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
     "expect": "^1.14.0",
+    "electron": "~1.6.2",
+    "electron-builder": "~17.1.1",
     "electron-reload": "~1.1.0",
     "gulp": "^3.9.0",
     "gulp-exec": "~2.1.2",
@@ -54,6 +56,7 @@
   },
   "build": {
     "appId": "com.flux3dp.flux-studio",
+    "extraResources": ["backend"],
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",

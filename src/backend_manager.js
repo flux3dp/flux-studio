@@ -23,10 +23,6 @@ function uglyJsonParser(data) {
 }
 
 
-process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || "backend/slic3r"
-process.env.GHOST_CURA = process.env.GHOST_CURA || "backend/cura"
-
-
 class BackendManager extends EventEmitter {
     constructor(options) {
         super();
