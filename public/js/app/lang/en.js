@@ -33,7 +33,8 @@ define(function() {
                 message_pattern_2: 'Machine Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Machine firmware Update',
-                    message: 'You have the latest Machine firmware'
+                    message: 'You have the latest Machine firmware',
+                    still_update: 'UPDATE'
                 },
                 confirm: 'UPLOAD',
                 upload_file: 'Firmware upload (*.bin / *.fxfw)',
@@ -64,6 +65,8 @@ define(function() {
             checkingHeadinfo: 'Checking Toolhead Information',
             preparing: 'Preparing...',
             later: 'LATER',
+            download: 'ONLINE UPDATE',
+            cannot_reach_internet: 'Server is unreachable<br/>Please checking internet connection',
             install: 'INSTALL',
             upload: 'UPLOAD'
         },
@@ -1189,7 +1192,9 @@ define(function() {
             },
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
             need_password: 'Need Password to Connect to the Machine',
-            new_app_downloading: 'Downloading',
+            new_app_downloading: 'FLUX Stduio is Downloading',
+            new_app_download_canceled: 'FLUX Studio download has been canceled',
+            new_app_downloaded: 'Newest FLUX Studio has been downloaded',
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
             need_1_1_7_above: 'Please update Machine Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',

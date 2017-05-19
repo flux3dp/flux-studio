@@ -97,7 +97,7 @@ define([
             }
         },
 
-        showPopupCustomCancel: function(id, message, customText, caption) {
+        showPopupCustomCancel: function(id, message, customText, caption, callback) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_CUSTOM_CANCEL,
                 id: id,
@@ -105,6 +105,10 @@ define([
                 message: message,
                 customText: customText
             });
+            if (callback) {
+                AlertStore.onCustom(callback.custom, true);
+                AlertStore.onCancel(callback.no, true);
+            }
         },
 
         showPopupQuestion: function(id, message, caption) {
@@ -113,12 +117,13 @@ define([
             });
         },
 
-        showUpdate: function(device, type, updateInfo, onInstall) {
+        showUpdate: function(device, type, updateInfo, onDownload, onInstall) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_UPDATE,
                 device: device,
                 type: type,
                 updateInfo: updateInfo,
+                onDownload: onDownload,
                 onInstall: onInstall
             });
         },

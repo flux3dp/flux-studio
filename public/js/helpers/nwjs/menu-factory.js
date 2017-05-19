@@ -97,16 +97,29 @@ define([
                         }
 
                         if (!response.needUpdate) {
-                            AlertActions.showPopupInfo(
+                            let forceUpdate = {
+                                custom: () => {
+                                  firmwareUpdater(response, currentPrinter, type, true);
+                                },
+                                no: () => {
+                                  if ('toolhead' === type) {
+                                      DeviceMaster.quitTask();
+                                  }
+                                }
+                            };
+                            AlertActions.showPopupCustomCancel(
                                 'latest-firmware',
                                 message + ' (v' + latestVersion + ')',
-                                caption
+                                lang0.update.firmware.latest_firmware.still_update,
+                                caption,
+                                forceUpdate
                             );
+                        } else {
+                          firmwareUpdater(response, currentPrinter, type);
                         }
 
-                        firmwareUpdater(response, currentPrinter, type);
-                    }).
-                    fail(function(response) {
+                    })
+                    .fail(function(response) {
                         firmwareUpdater(response, currentPrinter, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
@@ -154,6 +167,7 @@ define([
                         processUpdate();
                     }
                 };
+
 
             DeviceMaster.select(printer).then(function(status) {
                 checkStatus();

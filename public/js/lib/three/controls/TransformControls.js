@@ -976,10 +976,10 @@
 
 				if ( scope.space === "local" ) {
 
+					let sensitivityAdjustment = 5.5; // more is less sensitive
 					if ( scope.axis === "XYZ" || scope.object.scale.locked) {
 
 						// locked is added from print.js to determine if the scaling is locked
-						let sensitivityAdjustment = 5.5; // more is less sensitive
 						let sensitivity = Math.max( oldScale.x, oldScale.y, oldScale.z ) * sensitivityAdjustment;
 
 						if( scope.axis === "XYZ") {
@@ -1000,9 +1000,9 @@
 
 						point.applyMatrix4( tempMatrix.getInverse( worldRotationMatrix ) );
 
-						if ( scope.axis === "X" ) scope.object.scale.x = oldScale.x * ( 1 + point.x / oldScale.x );
-						if ( scope.axis === "Y" ) scope.object.scale.y = oldScale.y * ( 1 + point.y / oldScale.y );
-						if ( scope.axis === "Z" ) scope.object.scale.z = oldScale.z * ( 1 + point.z / oldScale.z );
+						if ( scope.axis === "X" ) scope.object.scale.x = oldScale.x * ( 1 + (point.x / oldScale.x) / sensitivityAdjustment );
+						if ( scope.axis === "Y" ) scope.object.scale.y = oldScale.y * ( 1 + (point.y / oldScale.y) / sensitivityAdjustment );
+						if ( scope.axis === "Z" ) scope.object.scale.z = oldScale.z * ( 1 + (point.z / oldScale.z) / sensitivityAdjustment );
 
 					}
 
@@ -1013,7 +1013,11 @@
 				point.sub( worldPosition );
 				point.multiply( parentScale );
 				tempVector.copy( offset ).sub( worldPosition );
+				//console.log('offset', offset);
 				tempVector.multiply( parentScale );
+				//console.log('tempVector', tempVector);
+				console.log('scope.axis', scope.axis);
+				console.log('scope.space', scope.space);
 
 				if ( scope.axis === "E" ) {
 
@@ -1034,7 +1038,6 @@
 					scope.object.quaternion.copy( tempQuaternion );
 
 				} else if ( scope.axis === "XYZE" ) {
-
 					quaternionE.setFromEuler( point.clone().cross( tempVector ).normalize() ); // rotation axis
 
 					tempQuaternion.setFromRotationMatrix( tempMatrix.getInverse( parentRotationMatrix ) );

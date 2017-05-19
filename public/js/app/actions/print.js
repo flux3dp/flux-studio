@@ -255,6 +255,7 @@ define([
         renderer.domElement.addEventListener('mousemove', onMouseMove, false);
         renderer.domElement.addEventListener('mousedown', onMouseDown, false);
         renderer.domElement.addEventListener('mouseup', onMouseUp, false);
+        renderer.domElement.addEventListener('dblclick', onDblClick, false);
 
         renderer.setSize(container.offsetWidth, container.offsetHeight);
 
@@ -937,6 +938,12 @@ define([
 
     // Events Section ---
 
+    function onDblClick(e) {
+      if (!$.isEmptyObject(SELECTED)) {
+        _targetAndZoom(SELECTED);
+      }
+    }
+
     function onMouseDown(e) {
         e.preventDefault();
         if(previewMode) { return; }
@@ -1027,11 +1034,16 @@ define([
         mouseDown = false;
         container.style.cursor = 'auto';
         transformAxisChanged = '';
+
         checkOutOfBounds(SELECTED).then(() => {
             // disable preview when object are all out of bound
             reactSrc.setState({ hasObject: !allOutOfBound()});
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
+
+                //set the OrbitControls target to move around.
+                _orbitTargetMesh(SELECTED);
+                setObjectDialoguePosition(SELECTED);
                 doSlicing();
             }
         });
@@ -1094,7 +1106,7 @@ define([
                 objectBeforeTransform.rotation = SELECTED.rotation.clone();
                 transformMode = true;
                 reactSrc.setState({
-                    isTransforming: true
+                    isTransforming: true,
                 });
                 break;
             case 'mouseUp':
@@ -1102,9 +1114,6 @@ define([
                 reactSrc.setState({
                     isTransforming: false
                 });
-                SELECTED.rotation.enteredX = updateDegreeWithStep(radianToDegree(SELECTED.rotation.x));
-                SELECTED.rotation.enteredY = updateDegreeWithStep(radianToDegree(SELECTED.rotation.y));
-                SELECTED.rotation.enteredZ = updateDegreeWithStep(radianToDegree(SELECTED.rotation.z));
                 if(reactSrc.state.mode === 'scale') {
                     // check for inverse transform
                     if(SELECTED.size.x <= 0 || SELECTED.size.y <= 0 || SELECTED.size.z <= 0) {
@@ -1420,9 +1429,9 @@ define([
         src = src || SELECTED;
         syncObjectOutline(src);
 
-        let _x = parseInt(x) || 0,
-            _y = parseInt(y) || 0,
-            _z = parseInt(z) || 0;
+        let _x = Math.round(x) || 0,
+            _y = Math.round(y) || 0,
+            _z = Math.round(z) || 0;
         src.rotation.enteredX = x;
         src.rotation.enteredY = y;
         src.rotation.enteredZ = z;
@@ -2259,7 +2268,7 @@ define([
             return 0;
         }
         let degreeStep = shiftPressed ? 15 : s.degreeStep;
-        return (parseInt(degree / degreeStep) * degreeStep);
+        return (Math.round(degree / degreeStep) * degreeStep);
     }
 
     function updateObjectSize(src) {
@@ -2436,9 +2445,9 @@ define([
                 obj.outlineMesh.position.y = ref.position.y;
 
                 setRotation(
-                    parseInt(ref.rotation.enteredX),
-                    parseInt(ref.rotation.enteredY),
-                    parseInt(ref.rotation.enteredZ), true, obj);
+                    Math.round(ref.rotation.enteredX),
+                    Math.round(ref.rotation.enteredY),
+                    Math.round(ref.rotation.enteredZ), true, obj);
 
                 setSize(ref.size, true, obj);
 
@@ -2569,7 +2578,7 @@ define([
     }
 
     function alignCenterPosition() {
-      if (SELECTED) {
+      if (!$.isEmptyObject(SELECTED)) {
         alignCenter();
         setObjectDialoguePosition(SELECTED);
         blobExpired = true;
@@ -2797,6 +2806,53 @@ define([
         });
     }
 
+    function _targetAndZoom(mesh){
+      _orbitTargetMesh(mesh);
+      _zoomCamera(mesh);
+      setObjectDialoguePosition(mesh);
+    }
+
+    function _orbitTargetMesh(mesh) {
+      if (!$.isEmptyObject(mesh)) {
+         let x = mesh.position.x,
+             y = mesh.position.y,
+             z = mesh.position.z;
+         orbitControl.target.set(x, y, z);
+         orbitControl.update();
+      }
+    }
+
+    function _zoomCamera(mesh) {
+      // TODO make more efficient calculation.
+        var deltaX, deltaY, deltaZ, distance, vFOV, h, fraction;
+        var obSize = mesh.size;
+        var refDist = Math.max(obSize.x, obSize.y, obSize.z) * 1.5;
+        var obSize = mesh.size;
+
+        orbitControl.dIn(0.1);
+        orbitControl.update();
+        do {
+          deltaX = camera.position.x - mesh.position.x;
+          deltaY = camera.position.y - mesh.position.y;
+          deltaZ = camera.position.z - mesh.position.z;
+          distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+
+          vFOV = camera.fov * Math.PI / 180;
+          h = 2 * Math.tan( vFOV / 2 ) * distance;
+          fraction = refDist / h;
+
+          orbitControl.dIn(1.2);
+          orbitControl.update();
+        } while(fraction < 0.4);
+    }
+
+    function tester() {
+      orbitControl.dIn(1.2);
+      transformControl.setSize(transformControl.size *1.2);
+      orbitControl.update();
+      render();
+    }
+
     function _removeAllMeshOutline() {
         objects.forEach(function(obj) {
             obj.outlineMesh.visible = false;
@@ -2831,9 +2887,9 @@ define([
         target.outlineMesh.position.y = ref.position.y;
 
         setRotation(
-            parseInt(ref.rotation.enteredX),
-            parseInt(ref.rotation.enteredY),
-            parseInt(ref.rotation.enteredZ), true, target);
+            Math.round(ref.rotation.enteredX),
+            Math.round(ref.rotation.enteredY),
+            Math.round(ref.rotation.enteredZ), true, target);
 
         setSize(ref.size, true, target);
 
@@ -3000,6 +3056,7 @@ define([
         clearScene          : clearScene,
         changeEngine        : changeEngine,
         takeSnapShot        : takeSnapShot,
+        tester              : tester,
         startSlicing        : startSlicing
     };
 });

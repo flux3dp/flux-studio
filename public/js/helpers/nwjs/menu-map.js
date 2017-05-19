@@ -10,6 +10,7 @@ define([
     'plugins/file-saver/file-saver.min',
     'helpers/output-error',
     'helpers/check-software-update',
+    'helpers/software-updater',
     'helpers/api/cloud'
 ], function(
     $,
@@ -20,6 +21,7 @@ define([
     fileSaver,
     outputError,
     checkSoftwareUpdate,
+    softwareUpdater,
     CloudApi
 ) {
     'use strict';
@@ -357,7 +359,12 @@ define([
                 {
                     label: lang.help.software_update,
                     enabled: true,
-                    onClick: checkSoftwareUpdate
+                    onClick: function() {
+                      checkSoftwareUpdate()
+                        .done(function(response) {
+                          softwareUpdater(response);
+                        })
+                    }
                 },
                 {
                     label: lang.help.debug,

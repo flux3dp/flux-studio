@@ -113,7 +113,6 @@ define([
             },
             removeListener: function(_id) {
                 var _index = idList.indexOf(_id);
-
                 idList.splice(_index, 1);
                 dispatchers.splice(_index, 1);
             },
