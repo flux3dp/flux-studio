@@ -59,7 +59,17 @@ define(['helpers/i18n'], function (i18n) {
                         errorOutput = error.join(' ');
                     }
                 }
+
+                // special case for Pressure sensor failed
+                // ["HARDWARE_ERROR",  "SENSOR_ERROR", "FSR", "X-"]
+                // ["HARDWARE_ERROR",  "SENSOR_ERROR", "FSR", "X-", "Y-"]
+                // ["HARDWARE_ERROR",  "SENSOR_ERROR", "FSR", "X-", "Y-", "Z-"]
+                if(error.slice(0,3).join('_') === 'HARDWARE_ERROR_SENSOR_ERROR_FSR') {
+                    errorOutput = lang.monitor[error.slice(0, 3).join('_')];
+                    errorOutput = `${errorOutput} ${error.slice(3).join(' ')}`;
+                }
             }
+
 
             return errorOutput || '';
         },

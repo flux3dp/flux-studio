@@ -183,6 +183,7 @@ define([
                             data.access_points = data.wifi;
                         }
 
+                        data.access_points = data.access_points || [];
                         data.access_points.forEach(function(wifi, i) {
                             wifi.rssi = Math.abs(wifi.rssi || 0);
 

@@ -1,10 +1,11 @@
 module.exports.command = function(engineName, callback) {
     this
+    .p(1)
     .click('.advanced')
-    .p(0.5)
+    .p(1)
     .click('.' + engineName)
-    .p(0.5)
-    .click('button[data-ga-event=apply-preset]');
+    .click('button[data-ga-event=apply-preset]')
+    .p(1);
 
     if (typeof callback === 'function') {
         callback.call(this);

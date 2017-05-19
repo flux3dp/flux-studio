@@ -361,6 +361,7 @@ define([
         _handleBrowseFolder: function() {
             this._addHistory();
             this._dispatchFolderContent('');
+            this.unsubscribeEnterKey();
         },
 
         _dispatchFolderContent: function(path) {
@@ -375,6 +376,13 @@ define([
         },
 
         _handleFolderclick: function(folderName) {
+            this.unsubscribeEnterKey = shortcuts.on(['RETURN'], e => {
+                // if a folder is selected
+                if(folderName) {
+                    this._handleFolderDoubleClick(folderName);
+                    this.unsubscribeEnterKey();
+                }
+            });
             store.dispatch(MonitorActionCreator.selectItem({
                 name: folderName,
                 type: type.FOLDER
@@ -391,6 +399,9 @@ define([
         },
 
         _handleBack: function() {
+            if(typeof this.unsubscribeEnterKey === 'function') {
+                this.unsubscribeEnterKey();
+            }
             if(_history.length === 0) { return; }
             lastAction = _history.pop();
 
@@ -417,13 +428,8 @@ define([
 
         _handleFileClick: function(fileName, action, e) {
             e.stopPropagation();
-            if(action === DeviceConstants.SELECT) {
-                store.dispatch(MonitorActionCreator.selectItem({
-                    name: fileName,
-                    type: type.FILE
-                }));
-            }
-            else {
+
+            const handlePreviewFile = () => {
                 this._addHistory();
                 let { Monitor } = store.getState();
                 start = 0;
@@ -442,6 +448,23 @@ define([
                     store.dispatch(MonitorActionCreator.previewFile(info));
                     this.forceUpdate();
                 });
+            };
+
+            this.unsubscribeEnterKey = shortcuts.on(['RETURN'], e => {
+                e.preventDefault();
+                if(fileName) {
+                    handlePreviewFile();
+                    this.unsubscribeEnterKey();
+                }
+            });
+            if(action === DeviceConstants.SELECT) {
+                store.dispatch(MonitorActionCreator.selectItem({
+                    name: fileName,
+                    type: type.FILE
+                }));
+            }
+            else {
+                handlePreviewFile();
             }
         },
 
