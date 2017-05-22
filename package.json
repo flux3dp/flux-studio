@@ -1,5 +1,6 @@
 {
   "name": "flux-studio",
+  "productName": "FLUX Studio",
   "version": "1.0.0",
   "author": "FLUX Inc.",
   "description": "FLUX Studio",
@@ -61,6 +62,9 @@
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
       "icon": "public/logo.icns"
+    },
+    "linux": {
+      "target": "deb"
     }
   }
 }
