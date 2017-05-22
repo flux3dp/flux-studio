@@ -65,7 +65,7 @@ function onDeviceUpdated(deviceInfo) {
     global.devices[deviceInfo.uuid] = deviceInfo;
 }
 
-const resourcesRoot = defaultApp ? "." : process.resourcesPath;
+const resourcesRoot = process.defaultApp ? "." : process.resourcesPath;
 process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || path.join(resourcesRoot, "backend", "slic3r")
 process.env.GHOST_CURA = process.env.GHOST_CURA || path.join(resourcesRoot, "backend", "CuraEngine")
 process.env.GHOST_CURA2 = process.env.GHOST_CURA || path.join(resourcesRoot, "backend", "CuraEngine2")
