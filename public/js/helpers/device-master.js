@@ -579,6 +579,10 @@ define([
         return SocketMaster.addTask('ls', path);
     }
 
+    function downloadLog(log) {
+        return _device.actions.downloadLog(log);
+    }
+
     function fileInfo(path, fileName) {
         return SocketMaster.addTask('fileInfo', path, fileName);
     }
@@ -1563,6 +1567,7 @@ define([
             this.getCloudValidationCode         = getCloudValidationCode;
             this.enableCloud                    = enableCloud;
             this.getDeviceInfo                  = getDeviceInfo;
+            this.downloadLog                    = downloadLog;
             this.downloadErrorLog               = downloadErrorLog;
             this.killSelf                       = killSelf;
             this.setHeadTemperature             = setHeadTemperature;
