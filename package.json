@@ -58,6 +58,9 @@
   "build": {
     "appId": "com.flux3dp.flux-studio",
     "extraResources": ["backend"],
+    "files": [
+      "!**/*.{jsx,scss}"
+    ],
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
