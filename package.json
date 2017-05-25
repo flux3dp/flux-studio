@@ -3,6 +3,7 @@
   "productName": "FLUX Studio",
   "version": "1.0.0",
   "author": "FLUX Inc.",
+  "email": "dev@flux3dp.com",
   "description": "FLUX Studio",
   "private": true,
   "main": "electron-main.js",
