@@ -79,7 +79,7 @@
       "icon": "app-icons"
     },
     "win": {
-      "icon": "public/win-icon.ico"
+      "icon": "app-icons/win-icon.ico"
     }
   }
 }
