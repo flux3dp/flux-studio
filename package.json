@@ -2,8 +2,10 @@
   "name": "flux-studio",
   "productName": "FLUX Studio",
   "version": "1.0.0",
-  "author": "FLUX Inc.",
-  "email": "dev@flux3dp.com",
+  "author": {
+    "name": "FLUX Inc.",
+    "email": "dev@flux3dp.com"
+  },
   "description": "FLUX Studio",
   "private": true,
   "main": "electron-main.js",
@@ -68,10 +70,16 @@
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
-      "icon": "public/logo.icns"
+      "icon": "app-icons/logo.icns"
     },
     "linux": {
-      "target": "deb"
+      "category": "Utility",
+      "description": "",
+      "target": "deb",
+      "icon": "app-icons"
+    },
+    "win": {
+      "icon": "public/win-icon.ico"
     }
   }
 }
