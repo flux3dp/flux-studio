@@ -424,6 +424,30 @@ define([
                 return d.promise();
             },
 
+            downloadLog: (log) => {
+                let d = $.Deferred(),
+                    file = [];
+
+                events.onMessage = (response) => {
+                    if(response.status === 'transfer') {
+                        d.notify(response);
+                    }
+                    else if (!~Object.keys(response).indexOf('completed')) {
+                        file.push(response);
+                    }
+
+                    if(response instanceof Blob) {
+                        d.resolve(file);
+                    }
+                };
+
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
+
+                ws.send(`fetch_log ${log}`);
+                return d;
+            },
+
             downloadErrorLog: () => {
                 let d = $.Deferred(),
                     file = [];

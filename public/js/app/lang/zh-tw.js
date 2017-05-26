@@ -117,6 +117,19 @@ define(function() {
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 movement_tests_complete: '運動測試完成',
                 movement_tests_failed: '運動測試失敗。<br/>1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a>',
+                download_log: '匯出機器日誌',
+                download_log_canceled: '取消日誌下載',
+                download_log_error: '不明錯誤發生，請稍候再試一次',
+                log: {
+                    network: 'Network',
+                    hardware: 'Hardware',
+                    discover: 'Discover',
+                    usb: 'USB',
+                    camera: 'Camera',
+                    cloud: 'Cloud',
+                    player: 'Player',
+                    robot: 'Robot'
+                },
                 finish: '完成',
                 cancel: '取消',
                 turn_on_head_temperature: '設定列印工具頭溫度'

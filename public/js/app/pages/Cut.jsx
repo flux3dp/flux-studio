@@ -18,7 +18,7 @@ define([
         lang = i18n.lang;
 
     'use strict';
-    
+
     return function(args) {
         args = args || {};
 
@@ -37,7 +37,7 @@ define([
                             zOffset: 0,
                             overcut: 2,
                             speed: 30,
-                            bladeRadius: 0.28
+                            bladeRadius: 0.5
                         }
                     };
                 },
@@ -48,7 +48,7 @@ define([
                         zOffset: options.zOffset || 0,
                         overcut: options.overcut || 2,
                         speed: options.speed || 30,
-                        bladeRadius: options.bladeRadius || 0.28,
+                        bladeRadius: options.bladeRadius || 0.5,
                     };
                     if (!Config.read('cut-defaults')) {
                         Config.write('cut-defaults', options);
@@ -62,7 +62,7 @@ define([
                         cutting_zheight: options.zOffset || 0,
                         overcut: options.overcut || 2,
                         speed: options.speed || 30,
-                        blade_radius: options.bladeRadius || 0.28,
+                        blade_radius: options.bladeRadius || 0.5,
                     };
                 },
 
@@ -78,7 +78,7 @@ define([
 
                 render: function() {
                     // return <div />;
-                    
+
                     return <Holder
                         page={this.props.page}
                         acceptFormat={'image/svg'}
