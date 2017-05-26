@@ -70,7 +70,7 @@
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
-      "icon": "app-icons/logo.icns"
+      "icon": "public/logo.icns"
     },
     "linux": {
       "category": "Utility",
