@@ -22,6 +22,7 @@ define([
     'app/app-settings',
     'helpers/local-storage',
     'helpers/socket-master',
+    'helpers/three/STLExporter',
     // non-return value
     'threeOrbitControls',
     'threeTrackballControls',
@@ -55,7 +56,8 @@ define([
     Rx,
     Settings,
     localStorage,
-    SocketMaster
+    SocketMaster,
+    STLExporter
 ) {
     'use strict';
 
@@ -134,10 +136,14 @@ define([
         allowedMin: 1       // (mm)
     };
 
+    const validImageExtensions = ['jpg','jpeg','png'];
+    const validInputExtensions = ['stl','obj','fc','gcode','fsc'].concat(validImageExtensions);
+
     let commonMaterial = new THREE.MeshPhongMaterial({
         color: s.objectColor,
         specular: Settings.print_config.color_object,
-        shininess: 1
+        shininess: 1,
+        shading: THREE.FlatShading
     });
 
     let slicingType = {
@@ -283,14 +289,21 @@ define([
         });
     }
 
-    function uploadStl(name, file, ext) {
+    function uploadStl(name, file, ext, geometry) {
         // pass to slicer
         let d = $.Deferred();
-        let uploadCaller = file.path ?
-            sliceMaster.addTask('upload_via_path', name, file, ext, file.path)
-            :
-            sliceMaster.addTask('upload', name, file, ext);
+        let uploadCaller;
 
+        if ( _isImageExtension(ext) ) {
+            const exporter = new STLExporter();
+            const stl = exporter.parse(geometry);
+            uploadCaller = sliceMaster.addTask('upload', name, new Blob([stl]), ext);
+        } else {
+            uploadCaller = file.path ?
+                sliceMaster.addTask('upload_via_path', name, file, ext, file.path)
+                :
+                sliceMaster.addTask('upload', name, file, ext);
+        }
         uploadCaller.then((result) => {
             ProgressActions.updating(lang.print.finishingUp, 100);
             d.resolve(result);
@@ -309,7 +322,8 @@ define([
             return;
         }
         let stlLoader = new THREE.STLLoader(),
-            objLoader = new THREE.OBJLoader();
+            objLoader = new THREE.OBJLoader(),
+            imageLoader = new THREE.ImageLoader();
 
         callback = callback || function() {};
 
@@ -327,13 +341,14 @@ define([
             }
             let mesh = new THREE.Mesh(geometry, commonMaterial);
             mesh.up = new THREE.Vector3(0, 0, 1);
+            mesh.isEmbossment = mesh.geometry instanceof EmbossmentBufferGeometry;
 
             setTimeout(() => {
                 console.log('New Mesh:: Py Processing meshes');
                 ProgressActions.updating('Processing meshes', 50);
             }, 1);
 
-            uploadStl(mesh.uuid, file, ext).then(() => {
+            uploadStl(mesh.uuid, file, ext, geometry).then(() => {
                 addToScene();
                 callback();
             }).progress((steps, total) => {
@@ -441,7 +456,7 @@ define([
                 // loadGeometry(new THREE.Geometry().fromBufferGeometry(.geometry))
             });
         }
-        else {
+        else if(ext === 'stl') {
             stlLoader.load(binary, (geometry) => {
                 loadGeometry(geometry);
             }, function() { }, (error) => {
@@ -449,6 +464,29 @@ define([
                 // on error
                 // loadGeometry({vertices: []});
             });
+        }
+        else {
+            imageLoader.load(binary,
+                (image) => {
+                    const canvas = document.createElement( 'canvas' );
+                    const context = canvas.getContext( '2d' );
+                    const w = Math.floor(image.width/20);
+                    const h = Math.floor(image.height/20);
+                    const ratio = h/w;
+
+                    canvas.width = w;
+                    canvas.height = h;
+
+                    context.drawImage( image, 0, 0, canvas.width, canvas.height);
+                    const imgData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                    const geometry = new EmbossmentBufferGeometry(100,100*ratio,imgData,ext,-5,30,false);
+
+                    loadGeometry(geometry);
+                },
+                ()=>{console.log('processing image');},
+                ()=>{console.log('imageLoader failed');}
+            );
         }
     }
 
@@ -462,9 +500,9 @@ define([
 
         let file = files.item ? files.item(index) : files[index];
         let ext = file.name.split('.').pop().toLowerCase();
-
+        
         models.push(file);
-        if(ext === 'stl' || ext === 'obj') {
+        if(ext === 'stl' || ext === 'obj' || _isImageExtension(ext)) {
             let fr = new FileReader();
             fr.addEventListener('load', (e) => {
                 ProgressActions.updating('Loading as ' + ext, 10);
@@ -480,7 +518,8 @@ define([
                 });
             });
             ProgressActions.updating('Start Loading', 5);
-            fr.readAsArrayBuffer(file);
+            if (ext === 'stl' || ext === 'obj') fr.readAsArrayBuffer(file);
+            else fr.readAsDataURL(file);
         }
         else if (ext === 'fc' || ext === 'gcode') {
             slicingStatus.isComplete = true;
@@ -1347,11 +1386,17 @@ define([
         setMode('scale');
     }
 
+    function setEmbossMode() {
+        setMode('emboss');
+    }
+
     function setMode(mode) {
-        removeFromScene('TransformControl');
-        transformControl.setMode(mode);
         reactSrc.setState({ mode: mode });
-        scene.add(transformControl);
+        removeFromScene('TransformControl');
+        if(mode==='scale'||mode==='rotate') {
+            transformControl.setMode(mode);
+            scene.add(transformControl);
+        }
         render();
     }
 
@@ -1444,6 +1489,53 @@ define([
         }
 
         slicingStatus.showProgress = false;
+    }
+
+    function setEmbossment(embossment) {
+        const src = SELECTED;
+        if(
+            (src.geometry.depth ===embossment.depth) &&
+            (src.geometry.baseDepth ===embossment.baseDepth) &&
+            (src.geometry.useBase ===embossment.useBase)
+        )
+        return;
+    
+        const uuid = src.uuid,
+            position = src.position,
+            rotation = src.rotation,
+            scale = src.scale,
+            ext = src.file.name.split('.').pop().toLowerCase();
+            
+        const oldEmbossment = {
+            depth: src.geometry.depth,
+            baseDepth: src.geometry.baseDepth,
+            useBase: src.geometry.useBase
+        };
+
+        addHistory('SETEMBOSSMENT', src, oldEmbossment);
+
+        src.geometry.updateEmbossmentAttribute(embossment);
+        stopSlicing();
+
+
+        const exporter = new STLExporter();
+        const stl = exporter.parse(src.geometry);
+        const stlFile = new Blob([stl]);
+
+        sliceMaster.addTask('delete', src.uuid)
+        .then(sliceMaster.addTask('upload', src.uuid, stlFile, ext))
+        .then(()=>{
+            syncObjectOutline(src);
+            src.plane_boundary = planeBoundary(src);
+            groundIt(src);
+            checkOutOfBounds(src);
+            startSlicing();
+            render();
+        })
+        .fail(()=>{console.log("fail in setEmbossment()")});
+        
+
+    
     }
 
     function setImportWindowPosition() {
@@ -2242,6 +2334,170 @@ define([
         }
     }
 
+    function getValidInputExtensionsString() {
+        return '.'+validInputExtensions.join(',.');
+    }
+
+    class EmbossmentBufferGeometry extends THREE.BufferGeometry {
+        constructor(baseWidth, baseHeight, imgData, ext, depth, baseDepth, useBase) {
+            super();
+            this.ext = ext;
+            this.w = imgData.width;
+            this.h = imgData.height;
+            // this.w = 150;
+            // this.h = 150;
+            this.grayscaleData = new Uint8Array(this.w*this.h);
+            this.maxGrayscale = 0;
+            this.opacityData = new Uint8Array(this.w*this.h);
+
+            const positions = new Float32Array((this.w*this.h+4)*3);
+            const indices = new Uint32Array((2*this.w*this.h+4)*3);
+
+            const w = this.w;
+            const h = this.h;
+            const wlim = w-1;
+            const hlim = h-1;
+            // init all vertices and set z-value
+            const widthUnit = baseWidth/(w-1);
+            const heightUnit = baseHeight/(h-1);
+            for (let i=0; i<w*h;i++) {
+                const x = i%w,
+                      y = Math.floor(i/w);
+                const k = i*3;
+                positions[k+0] = x*widthUnit;
+                positions[k+1] = y*heightUnit;
+                positions[k+2] = 0;
+
+                const j = (w*(hlim-y)+x)*4; //rotate the image;
+                const R = imgData.data[j+0],
+                      G = imgData.data[j+1],
+                      B = imgData.data[j+2],
+                      A = imgData.data[j+3],
+                      gray = 255 - ((R*38 + G*75 + B*15) >> 7); //referrence: http://atlaboratary.blogspot.tw/2013/08/rgb-g-rey-l-gray-r0.html
+
+                this.opacityData[i] = A;
+                if (A===0) this.grayscaleData[i] = 0;
+                else this.grayscaleData[i] = gray;
+                
+                if (this.grayscaleData[i] > this.maxGrayscale) this.maxGrayscale = this.grayscaleData[i];
+            }
+            const CORNER_A = w*h;
+            const CORNER_B = w*h+1;
+            const CORNER_C = w*h+2;
+            const CORNER_D = w*h+3;
+            positions[CORNER_A*3+0] = positions[0+0];
+            positions[CORNER_A*3+1] = positions[0+1];
+            positions[CORNER_A*3+2] = 0;
+            positions[CORNER_B*3+0] = positions[wlim*3+0];
+            positions[CORNER_B*3+1] = positions[wlim*3+1];
+            positions[CORNER_B*3+2] = 0;
+            positions[CORNER_C*3+0] = positions[w*hlim*3+0];
+            positions[CORNER_C*3+1] = positions[w*hlim*3+1];
+            positions[CORNER_C*3+2] = 0;
+            positions[CORNER_D*3+0] = positions[(w*h-1)*3+0];
+            positions[CORNER_D*3+1] = positions[(w*h-1)*3+1];
+            positions[CORNER_D*3+2] = 0;
+
+            // init all faces
+            let indicesEnd = 0;
+            //top
+            for (let i=0; i<(w*h); i++) {
+                if ( i%w == w-1 ) continue;
+                if ( i>=w*hlim ) break;
+
+                indices[indicesEnd++] = i;
+                indices[indicesEnd++] = i+1;
+                indices[indicesEnd++] = i+w;
+
+                indices[indicesEnd++] = i+1;
+                indices[indicesEnd++] = i+w+1;
+                indices[indicesEnd++] = i+w;
+            }
+            //sides
+            // x-z plane
+            for (let k=0; k<wlim; k++) {
+                indices[indicesEnd++] = k+1;
+                indices[indicesEnd++] = k;
+                indices[indicesEnd++] = CORNER_A;
+
+                indices[indicesEnd++] = w*hlim + k;
+                indices[indicesEnd++] = w*hlim + k+1;
+                indices[indicesEnd++] = CORNER_D;
+            }
+            indices[indicesEnd++] = wlim;
+            indices[indicesEnd++] = CORNER_A;
+            indices[indicesEnd++] = CORNER_B;
+
+            indices[indicesEnd++] = CORNER_C;
+            indices[indicesEnd++] = w*hlim;
+            indices[indicesEnd++] = CORNER_D;
+
+            // y-z plane
+            for (let k=0; k<hlim; k++) {
+                indices[indicesEnd++] = w*k;
+                indices[indicesEnd++] = w*(k+1);
+                indices[indicesEnd++] = CORNER_C;
+
+                indices[indicesEnd++] = wlim + w*(k+1);
+                indices[indicesEnd++] = wlim + w*k;
+                indices[indicesEnd++] = CORNER_B;
+            }
+            indices[indicesEnd++] = CORNER_A;
+            indices[indicesEnd++] = 0;
+            indices[indicesEnd++] = CORNER_C;
+
+            indices[indicesEnd++] = w*h-1;
+            indices[indicesEnd++] = CORNER_B;
+            indices[indicesEnd++] = CORNER_D;
+            
+            //bottom
+            indices[indicesEnd++] = CORNER_A;
+            indices[indicesEnd++] = CORNER_C;
+            indices[indicesEnd++] = CORNER_B;
+            indices[indicesEnd++] = CORNER_B;
+            indices[indicesEnd++] = CORNER_C;
+            indices[indicesEnd++] = CORNER_D;
+            
+            this.addAttribute('position', new THREE.BufferAttribute(positions, 3));
+            this.setIndex(new THREE.BufferAttribute(indices, 1));
+
+            this.updateEmbossmentAttribute({
+                        baseDepth: baseDepth,
+                        depth: depth,
+                        useBase: useBase
+                    });
+            
+        }
+        
+        updateEmbossmentAttribute({baseDepth, depth, useBase}) {
+            this.baseDepth = baseDepth;
+            this.depth = depth;
+            this.useBase = useBase;
+
+            if (this.depth*this.maxGrayscale/255+this.baseDepth<0) console.log("ERROR: depth+baseDepth must >= 0");
+            for (let i=0; i<this.w*this.h; i++) {
+                let z;
+                z = this.grayscaleData[i]*this.depth/255 + this.baseDepth;
+                if (!this.useBase) {
+                    if (this.ext === 'png') {
+                        if (this.opacityData[i]===0) z=0;
+                    }
+                    else {
+                        if(this.grayscaleData[i]===0) z=0;
+                    }
+                }
+                this.attributes.position.setZ(i, z);
+            }
+
+            //for unknown reason we need to set this. Because these four point will be change by someone we don't know.
+            for(let i=this.w*this.h; i<this.w*this.h+4; i++) {
+                this.attributes.position.setZ(i, 0);
+            }
+
+            this.attributes.position.needsUpdate = true;
+        }
+    }
+
     // Helper Functions ---
 
     function degreeToRadian(degree) {
@@ -2547,13 +2803,18 @@ define([
         }
     }
 
-    function addHistory(cmd, obj) {
+    function addHistory(cmd, obj, arg) {
         if(SELECTED) {
             let entry = { size: {}, rotation: {}, position: {}, scale: {} };
 
             if(cmd === 'DELETE' || cmd === 'ADD') {
                 entry.cmd = cmd;
                 entry.src = obj;
+            }
+            else if(cmd === 'SETEMBOSSMENT') {
+                entry.cmd = cmd;
+                entry.src = obj;
+                entry.embossment = arg;
             }
             else {
                 entry.uuid = SELECTED.uuid;
@@ -2601,6 +2862,11 @@ define([
             else if(entry.cmd === 'ADD') {
                 SELECTED = entry.src;
                 removeSelected(false);
+            }
+            else if (entry.cmd === 'SETEMBOSSMENT') {
+                SELECTED = entry.src;
+                setEmbossment(entry.embossment);
+                history.pop();
             }
             else {
                 objects.forEach(function(model) {
@@ -2871,6 +3137,10 @@ define([
         }
     }
 
+    function _isImageExtension(ext){
+        return (validImageExtensions.indexOf(ext)!==-1)?true:false;
+    }
+
     function clear() {
         objects = [];
         referenceMeshes = [];
@@ -2968,6 +3238,7 @@ define([
         appendModel         : appendModel,
         appendModels        : appendModels,
         setRotation         : setRotation,
+        setEmbossment       : setEmbossment,
         setScale            : setScale,
         alignCenter         : alignCenter,
         removeSelected      : removeSelected,
@@ -2976,6 +3247,7 @@ define([
         downloadFCode       : downloadFCode,
         setRotateMode       : setRotateMode,
         setScaleMode        : setScaleMode,
+        setEmbossMode       : setEmbossMode,
         setAdvanceParameter : setAdvanceParameter,
         setParameter        : setParameter,
         setParameters       : setParameters,
@@ -2998,6 +3270,7 @@ define([
         clearScene          : clearScene,
         changeEngine        : changeEngine,
         takeSnapShot        : takeSnapShot,
-        startSlicing        : startSlicing
+        startSlicing        : startSlicing,
+        getValidInputExtensionsString : getValidInputExtensionsString
     };
 });

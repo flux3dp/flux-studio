@@ -607,6 +607,7 @@ define(function() {
             },
             scale: 'SCALE',
             rotate: 'ROTATE',
+            emboss: 'EMBOSS',
             delete: 'Delete',
             reset: 'Reset',
             cancel: 'CANCEL',

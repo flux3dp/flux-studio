@@ -23,11 +23,13 @@ define([
             scaleLocked     : React.PropTypes.bool,
             onRotate        : React.PropTypes.func,
             onScale         : React.PropTypes.func,
+            onEmboss        : React.PropTypes.func,
             onScaleLock     : React.PropTypes.func,
             onResize        : React.PropTypes.func,
             onFocus         : React.PropTypes.func,
             onModeChange    : React.PropTypes.func,
             isTransforming  : React.PropTypes.bool,
+            isEmbossment    : React.PropTypes.bool,
             style           : React.PropTypes.object
         },
 
@@ -35,7 +37,12 @@ define([
             this._updateSizeProperty(this.props.model.size);
             return ({
                 _size: _size,
-                scaleLocked: this.props.scaleLocked
+                scaleLocked: this.props.scaleLocked,
+                embossment: {
+                    depth: this.props.model.geometry.depth,
+                    baseDepth: this.props.model.geometry.baseDepth,
+                    useBase: this.props.model.geometry.useBase
+                }
             });
         },
 
@@ -221,7 +228,19 @@ define([
                 rotation['entered' + e.target.id.toUpperCase()] = e.target.value;
                 this.forceUpdate();
             }
+        },
 
+        _handleEmbossmentChange: function(e) {
+            const _tmp = Object.assign({}, this.state.embossment);
+
+            _tmp[e.target.id] = parseInt(e.target.value) || e.target.checked || 0;
+
+            if(e.keyCode === 13 || e.type === 'blur' || e.target.type==="checkbox") {
+                this.setState(
+                    {embossment: _tmp},
+                    ()=>this.props.onEmboss(this.state.embossment)
+                );
+            }
         },
 
         _handleModeChange: function(e) {
@@ -261,8 +280,8 @@ define([
         render: function() {
             var lang            = this.props.lang,
                 dialogueClass   = ClassNames('object-dialogue', {'through': this.props.isTransforming}),
-                lockClass       = ClassNames('lock', { 'unlock': !this.state.scaleLocked });
-
+                lockClass       = ClassNames('lock', { 'unlock': !this.state.scaleLocked }),
+                showEmbossment  = (this.props.isEmbossment)?{}:{'display':'none'};
             return (
                 <div className={dialogueClass} style={this.props.style}>
                     <div className="arrow"/>
@@ -405,6 +424,55 @@ define([
                                     onBlur={this._handleRotationChange.bind(this)}
                                     ref = 'input-rz'
                                     value={rotation.enteredZ} />
+                            </div>
+
+                        </label>
+                    </label>
+                    <label className="controls accordion" style={showEmbossment}>
+                        <input
+                            name="emboss"
+                            type="checkbox"
+                            className="accordion-switcher"
+                            onClick={this._handleModeChange}/>
+                        <p className="caption">
+                            {lang.print.emboss}
+                            <span className="value">{this.state.embossment.depth}, {this.state.embossment.baseDepth}, {(this.state.embossment.useBase)?"use":""} </span>
+                        </p>
+                        
+                        <label className="accordion-body">
+
+                            <div className="control">
+                                <span className="text-center header">Depth</span>
+                                <input
+                                    id="depth"
+                                    type="text"
+                                    onFocus={this._inputFocused}
+                                    onChange={this._handleEmbossmentChange.bind(this)}
+                                    onKeyUp={this._handleEmbossmentChange.bind(this)}
+                                    onBlur={this._handleEmbossmentChange.bind(this)}
+                                    defaultValue={this.state.embossment.depth} />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">Base Depth</span>
+                                <input
+                                    id="baseDepth"
+                                    type="text"
+                                    onFocus={this._inputFocused}
+                                    onChange={this._handleEmbossmentChange.bind(this)}
+                                    onKeyUp={this._handleEmbossmentChange.bind(this)}
+                                    onBlur={this._handleEmbossmentChange.bind(this)}
+                                    defaultValue={this.state.embossment.baseDepth} />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">Base Depth</span>
+                                <input
+                                    id="useBase"
+                                    type="checkbox"
+                                    onFocus={this._inputFocused}
+                                    onChange={this._handleEmbossmentChange.bind(this)}
+                                    onKeyUp={this._handleEmbossmentChange.bind(this)}
+                                    onBlur={this._handleEmbossmentChange.bind(this)}
+                                    defaultValue={this.state.embossment.useBase} />
                             </div>
 
                         </label>

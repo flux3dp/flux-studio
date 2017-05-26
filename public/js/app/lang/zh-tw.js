@@ -620,6 +620,7 @@ define(function() {
             },
             scale: '尺寸',
             rotate: '旋轉',
+            emboss: '浮雕',
             delete: '刪除',
             reset: '重設',
             cancel: '取消',

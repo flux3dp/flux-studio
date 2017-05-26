@@ -253,6 +253,26 @@ define([
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                     GlobalStore.onSliceComplete(this._handleSliceReport);
+                    // === TODO: to remove. just for faster debugging ===
+                    if(false){
+                        const imgUrl = 'image-example.png';
+                        const ext = imgUrl.split('.').pop().toLowerCase();
+                        var oReq = new XMLHttpRequest();
+                        oReq.open('GET', '/'+imgUrl, true);
+                        oReq.responseType = 'blob';
+
+                        oReq.onload = function(oEvent) {
+                            var blob = oReq.response;
+                            var url = URL.createObjectURL(blob);
+                            blob.name = imgUrl;
+                            director.appendModel(url, blob, ext, () => {
+                                director.startSlicing();
+                            });
+                        };
+
+                        oReq.send();
+                    }
+                    // ====================================================
                 },
 
                 componentWillUnmount: function() {
@@ -675,6 +695,10 @@ define([
                     director.setScale(1, 1, 1, true);
                 },
 
+                _handleEmbossmentChange: function(embossment) {
+                    director.setEmbossment(embossment);
+                },
+
                 _handleCloseAdvancedSetting: function() {
                     this.setState({ showAdvancedSettings: false });
                     allowDeleteObject = true;
@@ -855,11 +879,18 @@ define([
 
                 _handleModeChange: function(mode) {
                     this.setState({ mode: mode });
-                    if (mode === 'rotate') {
-                        director.setRotateMode();
-                    }
-                    else {
-                        director.setScaleMode();
+                    switch (mode) {
+                        case 'rotate':
+                            director.setRotateMode();
+                            break;
+                        case 'scale':
+                            director.setScaleMode();
+                            break;
+                        case 'emboss':
+                            director.setEmbossMode();
+                            break;
+                        default:
+                            throw new Error("unknown object-dialogue mode");
                     }
                 },
 
@@ -918,7 +949,7 @@ define([
                                 var blob = oReq.response;
                                 var url = URL.createObjectURL(blob);
                                 blob.name = 'guide-example.stl';
-                                director.appendModel(url, blob, 'st', () => {
+                                director.appendModel(url, blob, 'stl', () => {
                                     director.startSlicing();
                                 });
                             };
@@ -1066,7 +1097,7 @@ define([
                             <div className='arrowBox' onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className='file-importer'>
                                     <div className='import-btn'>{lang.print.import}</div>
-                                    <input ref='import' type='file' accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
+                                    <input ref='import' type='file' accept={director.getValidInputExtensionsString()} onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
@@ -1124,9 +1155,11 @@ define([
                             style           = {this.state.objectDialogueStyle}
                             mode            = {this.state.mode}
                             isTransforming  = {this.state.isTransforming}
+                            isEmbossment    = {this.state.modelSelected.isEmbossment}
                             scaleLocked     = {_scale.locked}
                             onRotate        = {this._handleRotationChange}
                             onResize        = {this._handleResize}
+                            onEmboss        = {this._handleEmbossmentChange}
                             onScaleLock     = {this._handleToggleScaleLock}
                             onFocus         = {this._handleObjectDialogueFocus}
                             onModeChange    = {this._handleModeChange} />
@@ -1234,7 +1267,7 @@ define([
                             <div id='model-displayer' className='model-displayer'>
                                 <div className='import-indicator'></div>
                             </div>
-                            <input className='hide' ref='importBtn' type='file' accept='.stl,.fc,.gcode,.obj' onChange={this._handleImport} multiple/>
+                            <input className='hide' ref='importBtn' type='file' accept={director.getValidInputExtensionsString()} onBlur={this._handleImport} multiple/>
 
                             {tourGuideSection}
 

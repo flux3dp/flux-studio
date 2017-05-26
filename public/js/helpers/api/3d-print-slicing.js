@@ -6,7 +6,7 @@ define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/is-json'
-], (Websocket, convertToTypedArray, isJSON) => {
+    ], (Websocket, convertToTypedArray, isJSON) => {
     'use strict';
     return (opts) => {
 
@@ -48,6 +48,13 @@ define([
             upload: (name, file, ext) => {
                 let d = $.Deferred();
 
+                if(false) {
+                    setTimeout(() => {
+                        d.resolve();                    
+                    }, 1);
+                    return d.promise();
+                }
+            
                 let progress,
                 currentProgress;
 
@@ -89,7 +96,7 @@ define([
                                 ws.send(e.target.result);
                             };
 
-                            fileReader.readAsArrayBuffer(chunk);
+                            fileReader.readAsArrayBuffer(chunk);        
                         }
                         break;
 
