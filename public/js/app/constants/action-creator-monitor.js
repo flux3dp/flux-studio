@@ -3,7 +3,7 @@ define([], () => {
     'use strict';
 
     return {
-        CHANGE_MODE             : 'flux-stduio/moniotr/CHANGE_MODE',
+        CHANGE_MODE             : 'flux-stduio/monitor/CHANGE_MODE',
         CHANGE_PATH             : 'flux-studio/monitor/CHANGE_PATH',
         UPDATE_FOLDER_CONTENT   : 'flux-studio/monitor/UPDATE_FOLDER_CONTENT',
         PREVIEW_FILE            : 'flux-studio/monitor/PREVIEW_FILE',
