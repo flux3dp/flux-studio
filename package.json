@@ -2,7 +2,10 @@
   "name": "flux-studio",
   "productName": "FLUX Studio",
   "version": "1.0.0",
-  "author": "FLUX Inc.",
+  "author": {
+    "name": "FLUX Inc.",
+    "email": "dev@flux3dp.com"
+  },
   "description": "FLUX Studio",
   "private": true,
   "main": "electron-main.js",
@@ -23,31 +26,32 @@
     "babel-preset-stage-0": "^6.3.13",
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
-    "expect": "^1.14.0",
     "electron": "~1.6.2",
-    "electron-builder": "~17.1.1",
+    "electron-builder": "^17.1.2",
     "electron-reload": "~1.1.0",
+    "expect": "^1.14.0",
     "gulp": "^3.9.0",
+    "gulp-babel": "~6.1.2",
+    "gulp-clean-css": "~2.0.10",
     "gulp-exec": "~2.1.2",
     "gulp-mocha": "~2.2.0",
+    "gulp-react": "~3.1.0",
     "gulp-sass": "~2.1.1",
+    "gulp-sourcemaps": "~1.6.0",
+    "gulp-uglify": "~1.5.4",
     "gulp-webserver": "~0.9.1",
     "jsdom": "~7.2.2",
     "jsdom-global": "~1.6.1",
     "mocha": "^2.3.4",
     "mocha-jsdom": "~1.0.0",
+    "pump": "~1.0.1",
     "q": "~1.4.1",
     "react": "^0.14.7",
     "react-addons-test-utils": "^0.14.7",
     "requirejs": "~2.1.22",
-    "style-loader": "^0.13.0",
     "squirejs": "~0.2.1",
-    "webpack": "1.13.1",
-    "pump": "~1.0.1",
-    "gulp-sourcemaps": "~1.6.0",
-    "gulp-uglify": "~1.5.4",
-    "gulp-babel": "~6.1.2",
-    "gulp-clean-css": "~2.0.10"
+    "style-loader": "^0.13.0",
+    "webpack": "1.13.1"
   },
   "scripts": {
     "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register",
@@ -57,14 +61,25 @@
   },
   "build": {
     "appId": "com.flux3dp.flux-studio",
-    "extraResources": ["backend"],
+    "extraResources": [
+      "backend"
+    ],
+    "files": [
+      "!**/*.{jsx,scss}"
+    ],
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
       "icon": "public/logo.icns"
     },
     "linux": {
-      "target": "deb"
+      "category": "Utility",
+      "description": "",
+      "target": "deb",
+      "icon": "app-icons"
+    },
+    "win": {
+      "icon": "app-icons/win-icon.ico"
     }
   }
 }
