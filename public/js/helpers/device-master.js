@@ -1437,8 +1437,8 @@ define([
     }
 
     function getAvailableUsbChannel() {
-        console.log('getting availableUsbChannel');
-        // return this.availableUsbChannel;
+        console.log('availableUsbChannel', this.availableUsbChannel);
+        return this.availableUsbChannel;
     }
 
     // id    : string, required,
