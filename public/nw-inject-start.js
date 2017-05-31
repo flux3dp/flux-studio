@@ -205,7 +205,7 @@ probe(currentPort, findPort);
 delete window.require;
 
 // remove bad profile!
-fs.unlink(nw.App.dataPath + "/Web Data")
+fs.unlink(nw.App.dataPath + "/Web Data", function() {})
 
 nw.App.checkUpdate = function(cb) {
     cb = cb || function() {};
