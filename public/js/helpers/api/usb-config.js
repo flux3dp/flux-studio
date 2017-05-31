@@ -20,7 +20,7 @@ define([
         globalOpts.onFatal = globalOpts.onFatal || function() {};
         globalOpts.onClose = globalOpts.onClose || function() {};
 
-        if(usbChannel !== DeviceMaster.getAvailableUsbChannel()) {
+        if(usbChannel !== DeviceMaster.getAvailableUsbChannel() || usbChannel === undefined) {
             ws = null;
             usbChannel = DeviceMaster.getAvailableUsbChannel();
         }
