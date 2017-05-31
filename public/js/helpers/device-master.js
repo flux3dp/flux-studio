@@ -1399,6 +1399,7 @@ define([
 
             // add new usb connection
             connectedUsbChannels.forEach(c => {
+                this.availableUsbChannel = c;
                 // if not exist, add
                 if(!_devices.some(d => d.addr === connectedUsbChannels)) {
                     // if profile not exist, we grab from discover
