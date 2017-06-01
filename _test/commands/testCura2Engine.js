@@ -4,19 +4,19 @@ module.exports.command = function(callback) {
         .waitUntilSliceFinished()
 
         // raft off + support off = 1h12m
-        .previewTimeShouldBe('54m6s')
+        .previewTimeShouldBe('55m14s')
 
         // raft on + support off = 1h24
         .toggleRaft('on')
-        .previewTimeShouldBe('1h6m')
+        .previewTimeShouldBe('1h7m')
 
         // raft on + support on = 1h59m
         .toggleSupport('on')
-        .previewTimeShouldBe('1h34m')
+        .previewTimeShouldBe('1h35m')
 
         // raft off + support on = 1h41m
         .toggleRaft('off')
-        .previewTimeShouldBe('1h17m')
+        .previewTimeShouldBe('1h18m')
         .toggleSupport('off');
 
     if (typeof callback === 'function') {

@@ -150,6 +150,7 @@ define([
                     <div
                         title={item[0]}
                         className="file"
+                        data-test-key={item[0]}
                         onClick={this.props.onFileClick.bind(null, item[0], DeviceConstants.SELECT)}
                         onDoubleClick={this.props.onFileClick.bind(null, item[0], DeviceConstants.PREVIEW)}>
                         <div className="image-wrapper">
