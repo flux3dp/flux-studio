@@ -50,35 +50,35 @@ define([
                     displayName: 'PRINT',
                     className: genericClassName,
                     label: lang.menu.print,
-                    imgSrc: 'img/menu/icon_print.svg'
+                    imgSrc: '../img/menu/icon_print.svg'
                 },
                 {
                     name: 'laser',
                     displayName: 'ENGRAVE',
                     className: genericClassName,
                     label: lang.menu.laser,
-                    imgSrc: 'img/menu/icon_laser.svg'
+                    imgSrc: '../img/menu/icon_laser.svg'
                 },
                 {
                     name: 'scan',
                     displayName: 'SCAN',
                     className: genericClassName,
                     label: lang.menu.scan,
-                    imgSrc: 'img/menu/icon_scan.svg'
+                    imgSrc: '../img/menu/icon_scan.svg'
                 },
                 {
                     name: 'draw',
                     displayName: 'DRAW',
                     className: genericClassName,
                     label: lang.menu.draw,
-                    imgSrc: 'img/menu/icon-draw.svg'
+                    imgSrc: '../img/menu/icon-draw.svg'
                 },
                 {
                     name: 'cut',
                     displayName: 'CUT',
                     className: genericClassName,
                     label: lang.menu.cut,
-                    imgSrc: 'img/menu/icon-cut.svg'
+                    imgSrc: '../img/menu/icon-cut.svg'
                 },
             ];
 
@@ -89,7 +89,7 @@ define([
                 displayName: 'Mill',
                 className: genericClassName,
                 label: lang.menu.mill,
-                imgSrc: 'img/menu/icon-draw.svg'
+                imgSrc: '../img/menu/icon-draw.svg'
             });
         }
 
