@@ -33,7 +33,8 @@ define(function() {
                 message_pattern_2: 'Machine Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Machine firmware Update',
-                    message: 'You have the latest Machine firmware'
+                    message: 'You have the latest Machine firmware',
+                    still_update: 'UPDATE'
                 },
                 confirm: 'UPLOAD',
                 upload_file: 'Firmware upload (*.bin / *.fxfw)',
@@ -64,6 +65,8 @@ define(function() {
             checkingHeadinfo: 'Checking Toolhead Information',
             preparing: 'Preparing...',
             later: 'LATER',
+            download: 'ONLINE UPDATE',
+            cannot_reach_internet: 'Server is unreachable<br/>Please checking internet connection',
             install: 'INSTALL',
             upload: 'UPLOAD'
         },
@@ -114,6 +117,19 @@ define(function() {
                 scan_laser_complete: 'The machine has turned on its scanning laser. Click "Finish" to turn it off.',
                 movement_tests_complete: 'Movement tests completed',
                 movement_tests_failed: 'Movement tests failed. <br/>1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.',
+                download_log: 'Download Logs',
+                download_log_canceled: 'Log download canceled',
+                download_log_error: 'Unknown error occurred, please try it again later',
+                log: {
+                    network: 'Network',
+                    hardware: 'Hardware',
+                    discover: 'Discover',
+                    usb: 'USB',
+                    camera: 'Camera',
+                    cloud: 'Cloud',
+                    player: 'Player',
+                    robot: 'Robot'
+                },
                 finish: 'FINISH',
                 cancel: 'CANCEL',
                 turn_on_head_temperature: 'Set Toolhead Temperature'
@@ -1077,6 +1093,7 @@ define(function() {
             HARDWARE_ERROR_MAINBOARD_ERROR      : '#401 Critical Error: Mainboard offline. Please contact FLUX Support.',
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 Critical Error: Subsystem no response. Please contact FLUX Support.',
             HARDWARE_ERROR_SENSOR_ERROR         : 'Hardware sensor error, please contact FLUX Support.~',
+            HARDWARE_ERROR_SENSOR_ERROR_FSR     : 'Pressure sensor failed',
             WRONG_HEAD                          : 'Toolhead is unknown, please connect to a correct toolhead',
             USER_OPERATION                      : 'Machine is being operated by (other) user',
             RESOURCE_BUSY                       : 'The machine is busy\nIf it is not running, please restart the machine',
@@ -1188,7 +1205,9 @@ define(function() {
             },
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
             need_password: 'Need Password to Connect to the Machine',
-            new_app_downloading: 'Downloading',
+            new_app_downloading: 'FLUX Stduio is Downloading',
+            new_app_download_canceled: 'FLUX Studio download has been canceled',
+            new_app_downloaded: 'Newest FLUX Studio has been downloaded',
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
             need_1_1_7_above: 'Please update Machine Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',

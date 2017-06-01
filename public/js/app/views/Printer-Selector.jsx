@@ -125,12 +125,10 @@ define([
 
                 devices.map(device => {
                     if(device.serial === serial) {
-                        console.log('===', device);
                         num++;
                     }
                 });
 
-                console.log(num);
                 return num >= 2;
             };
 
@@ -198,7 +196,6 @@ define([
             }
             else {
                 let existBothConnection = existWifiAndUsbConnection(selectedPrinter.serial);
-                console.log('exist both conneciton? ', existBothConnection);
                 if(existBothConnection) {
                     noDefaultPrinter();
                 }

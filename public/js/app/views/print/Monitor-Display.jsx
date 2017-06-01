@@ -107,6 +107,7 @@ define([
 
             return (<div style={divStyle} />);
         },
+
         _imageError: function(src) {
             src.target.src = '/img/ph_s.png';
         },
@@ -127,8 +128,10 @@ define([
                 return (
                     <div
                         className="folder"
+                        data-test-key={folder}
                         onClick={this.props.onFolderClick.bind(this, folder)}
-                        onDoubleClick={this.props.onFolderDoubleClick.bind(this, folder)}>
+                        onDoubleClick={this.props.onFolderDoubleClick.bind(this, folder)}
+                    >
                         <div className={folderNameClass}>
                             {folder}
                         </div>
@@ -141,7 +144,9 @@ define([
                     item = [result.files[i]];
                 }
                 let imgSrc = item[2] instanceof Blob ? URL.createObjectURL(item[2]) : '/img/ph_s.png';
-                let fileNameClass = ClassNames('name', {'selected': Monitor.selectedItem.name === item[0]});
+                let selected = Monitor.selectedItem.name === item[0],
+                    fileNameClass = ClassNames('name', {'selected': selected}),
+                    iNameClass = ClassNames('fa', 'fa-times-circle-o', {'selected': selected});
 
                 return (
                     <div
@@ -151,6 +156,8 @@ define([
                         onDoubleClick={this.props.onFileClick.bind(null, item[0], DeviceConstants.PREVIEW)}>
                         <div className="image-wrapper">
                             <img src={imgSrc} onError={this._imageError.bind(this)}/>
+                            <i className={iNameClass}
+                               onClick={this.props.onFileCrossIconClick.bind(this)}></i>
                         </div>
                         <div className={fileNameClass}>
                             {item[0].length > maxFileNameLength ? item[0].substring(0, maxFileNameLength) + '...' : item[0]}

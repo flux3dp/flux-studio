@@ -3,71 +3,95 @@ define([
 ], function(
     Websocket
 ) {
-    let initialized = false,
-        usbConnected = false,
-        hasError = false,
-        availableUsbChannel,
+    let channels = {},
         interval = 3000,
         ws;
 
     // callback should receive opened usb channel, -1 if not available
     return function(callback) {
 
-        const processResult = (response) => {
-            if(response.cmd === 'list') {
-                if(Object.keys(response.h2h) > 0) {
-                    // try to connect
-                    availableUsbChannel = Object.keys(response.h2h)[0];
+        let channelToOpen,
+            notifyChange = false;
 
-                    if (!response.h2h[availableUsbChannel]) {
-                        // Channel not connected
-                        ws.send(`open ${availableUsbChannel}`);
-                    } else {
-                        // Connected, do nothing
-                        if(!usbConnected) {
-                            let profile = response.h2h[Object.keys(response.h2h)[0]];
-                            callback(availableUsbChannel, false, profile);
-                        }
-                        usbConnected = true;
-                    }
+        const manageChannel = (availableChannels) => {
+            let _channels = {};
+            availableChannels.forEach(c => {
+                if(Object.keys(channels).indexOf(c) >= 0) {
+                    _channels[c] = channels[c];
                 }
                 else {
-                    // if usb is unplugged
-                    if(usbConnected) {
-                        availableUsbChannel = null;
-                        usbConnected = false;
-                        callback(-1, hasError);
+                    _channels[c] = {
+                        connected: false
+                    };
+                }
+            });
+            if(Object.keys(channels).length !== Object.keys(_channels).length) {
+                notifyChange = true;
+            }
+            channels = _channels;
+        };
+
+        const nextUnopenedChannel = () => {
+            let _channel = '';
+            Object.keys(channels).forEach(c => {
+                if(!channels[c].connected && !channels[c].hasError) {
+                    _channel = c;
+                }
+            });
+
+            return _channel;
+        };
+
+        const processResult = (response) => {
+
+            if(response.cmd === 'list') {
+                // record new channels, remove unavailable channels
+                manageChannel(Object.keys(response.h2h));
+
+                if(Object.keys(response.h2h).length > 0) {
+
+                    channelToOpen = nextUnopenedChannel();
+
+                    if(channelToOpen !== '') {
+                        ws.send(`open ${channelToOpen}`);
                     }
-                    else if(!initialized) {
-                        initialized = true;
-                        callback(-1, hasError);
-                    }
+                }
+
+                if(notifyChange) {
+                    notifyChange = false;
+                    callback(channels);
                 }
             }
             else if(response.cmd === 'open') {
+
                 if(response.status === 'error') {
                     // if port has been opened
                     let error = response.error.join('');
                     if(error === 'RESOURCE_BUSY') { // weird logic. need to fix
-                        usbConnected = true;
                         console.log('usb connected and opened!');
-                        hasError = false;
-                        callback(availableUsbChannel, false);
+                        notifyChange = true;
+                        channels[channelToOpen].connected = true;
                     } else {
-                        if(usbConnected) {
-                            callback(-1, hasError);
-                        }
-                        hasError = true;
-                        usbConnected = false;
+                        channels[channelToOpen].hasError = true;
                     }
                 }
 
-                if(response.devopen && !usbConnected) {
-                    availableUsbChannel = response.devopen;
-                    usbConnected = true;
-                    initialized = true;
-                    hasError = false;
-                    callback(availableUsbChannel, false, response.profile);
+                if(response.devopen) {
+                    channels[response.devopen].connected = true;
+                    channels[response.devopen].profile = response.profile;
+                    channels[response.devopen].profile.source = 'h2h';
+                    channels[response.devopen].profile.addr = response.devopen;
+                    notifyChange = true;
+                }
+
+                channelToOpen = nextUnopenedChannel();
+                if(channelToOpen !== '') {
+                    ws.send(`open ${channelToOpen}`);
+                }
+
+                if(notifyChange) {
+                    notifyChange = false;
+                    callback(channels);
                 }
             }
         };

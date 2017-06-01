@@ -100,6 +100,7 @@ requirejs([
 
     if (true === window.FLUX.isNW) {
         window.$ = window.jQuery = $;
+        console.log(`Flux-Studio: ${window.FLUX.version}`);
     }
 
     if(window.FLUX.allowTracking) {

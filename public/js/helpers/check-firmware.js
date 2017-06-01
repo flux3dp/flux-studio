@@ -1,4 +1,4 @@
-define(['jquery'], function($) {
+define(['jquery', 'helpers/version-compare'], function($, versionCompare) {
     'use strict';
 
     /**
@@ -9,52 +9,58 @@ define(['jquery'], function($) {
      *
      * @return Promise
      */
+
     return function(printer, type) {
         var deferred = $.Deferred(),
             typeMap = {
                 firmware: 'pi',
                 toolhead: 'toolhead'
             },
-            versionKeyMap = {
-                firmware: 'version',
-                toolhead: 'toolhead_version'
+            keyMap = {
+                firmware: 'fluxmonitor',
+                toolhead: 'toolhead'
+            },
+            downloadMap = {
+              firmware: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw',
+              toolhead: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxhead_v[version].bin'
             },
             data = {},
-            versionKey = versionKeyMap[type] || '';
+            key = keyMap[type] || '',
+            downloadUrl = downloadMap[type] || '';
 
         type = typeMap[type] || 'pi';
         printer = printer || {};
         data = {
-            os: type,
-            v: printer[versionKey] || ''
+          feature: 'check_update',
+          key: key
         };
 
-        if (true === navigator.onLine) {
-            $.ajax({
-                url: 'http://software.flux3dp.com/check-update/',
-                data: data
-            }).done(function(response) {
-                response.require_update = ('boolean' === typeof response.require_update ? response.require_update : false);
-                response.needUpdate = (
-                    null !== response.latest_version &&
-                    'string' === typeof printer[versionKey] &&
-                    printer[versionKey] !== response.latest_version
-                );
-                response.latestVersion = response.latest_version;
-
-                deferred.resolve(response);
-            }).
-            fail(function() {
-                deferred.reject({
-                    needUpdate: true
-                });
-            });
+        // return deferred.reject if network is unavailable.
+        if (!navigator.onLine) {
+          deferred.reject({
+              needUpdate: true
+          });
+          return deferred.promise();
         }
-        else {
+
+        $.ajax({
+            url: 'http://flux3dp.com/api_entry/',
+            data: data
+        })
+        .done(function(response) {
+            response.needUpdate =  versionCompare(printer.version, response.latest_version );
+            response.latestVersion = response.latest_version;
+            response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
+            response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');
+            response.downloadUrl = downloadUrl.replace('[version]', response.latest_version);
+
+            deferred.resolve(response);
+        })
+        .fail(function() {
             deferred.reject({
                 needUpdate: true
             });
-        }
+        });
 
         return deferred.promise();
     };

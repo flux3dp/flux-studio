@@ -28,6 +28,7 @@ define([
                 latestVersion: '',
                 releaseNote: '',
                 updateFile: undefined,
+                onDownload: function() {},
                 onClose: function() {},
                 onInstall: function() {}
             };
@@ -41,6 +42,11 @@ define([
 
             // save skip version and close
             config().write(key, ignoreList);
+            this._onClose();
+        },
+        _onDownload: function() {
+            console.log('onDownload this.props', this.props);
+            this.props.onDownload();
             this._onClose();
         },
 
@@ -58,23 +64,35 @@ define([
         },
 
         _getButtons: function(lang) {
-            var buttons = [{
-                label: lang.update.later,
-                dataAttrs: {
-                    'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
+            var buttons,
+                laterButton = {
+                  label: lang.update.later,
+                  dataAttrs: {
+                      'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
+                  },
+                  onClick: this._onClose.bind(this, true)
                 },
-                onClick: this._onClose.bind(this, true)
-            },
-            {
-                label: ('software' === this.props.type ?
-                    lang.update.install :
-                    lang.update.upload
-                ),
-                dataAttrs: {
-                    'ga-event': 'install-new-' + this.props.type.toLowerCase()
+                downloadButton = {
+                  label: lang.update.download,
+                  dataAttrs: {
+                      'ga-event': 'download-' + this.props.type.toLowerCase() + '-later'
+                  },
+                  onClick: this._onDownload
                 },
-                onClick: this._onInstall
-            }];
+                installButton = {
+                  label: ('software' === this.props.type ?
+                      lang.update.install :
+                      lang.update.upload
+                  ),
+                  dataAttrs: {
+                      'ga-event': 'install-new-' + this.props.type.toLowerCase()
+                  },
+                  onClick: this._onInstall
+                };
+
+            buttons = (this.props.type === 'software') ?
+                          [laterButton, installButton] :
+                          [laterButton, downloadButton, installButton]
 
             return buttons;
         },

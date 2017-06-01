@@ -4058,8 +4058,20 @@ hr {
                     .flux-monitor .main .body .device-content .file img {
                         border: 1px solid #B3B3B3;
                         width: 60px; }
+                    .flux-monitor .main .body .device-content .file i {
+                        position: absolute;
+                        color: #CCC;
+                        top: -8px;
+                        right: 18px;
+                        visibility: hidden; }
+                        .flux-monitor .main .body .device-content .file i.selected {
+                            visibility: visible; }
+                    .flux-monitor .main .body .device-content .file i:hover {
+                        color: #333 !important; }
                 .flux-monitor .main .body .device-content .file:hover {
                     color: #333; }
+                    .flux-monitor .main .body .device-content .file:hover i {
+                        color: #CCC; }
                 .flux-monitor .main .body .device-content .spinner-wrapper {
                     position: absolute;
                     width: calc(100% - 20px);

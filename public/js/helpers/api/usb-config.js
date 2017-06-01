@@ -20,7 +20,7 @@ define([
         globalOpts.onFatal = globalOpts.onFatal || function() {};
         globalOpts.onClose = globalOpts.onClose || function() {};
 
-        if(usbChannel !== DeviceMaster.getAvailableUsbChannel()) {
+        if(usbChannel !== DeviceMaster.getAvailableUsbChannel() || usbChannel === undefined) {
             ws = null;
             usbChannel = DeviceMaster.getAvailableUsbChannel();
         }
@@ -183,6 +183,7 @@ define([
                             data.access_points = data.wifi;
                         }
 
+                        data.access_points = data.access_points || [];
                         data.access_points.forEach(function(wifi, i) {
                             wifi.rssi = Math.abs(wifi.rssi || 0);
 

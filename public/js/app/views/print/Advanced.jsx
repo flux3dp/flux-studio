@@ -460,7 +460,7 @@ define([
                             id="temperature"
                             key="temperature"
                             label={lang.printing}
-                            min={180}
+                            min={170}
                             max={230}
                             step={1}
                             default={advancedSetting.temperature}
@@ -639,6 +639,7 @@ define([
 
                         <SwitchControl
                             id="support_material"
+                            name="support_material"
                             label={lang.generalSupport}
                             default={supportOn}
                             onChange={this._handleControlValueChange} />
