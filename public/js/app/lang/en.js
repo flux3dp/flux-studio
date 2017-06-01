@@ -117,6 +117,19 @@ define(function() {
                 scan_laser_complete: 'The machine has turned on its scanning laser. Click "Finish" to turn it off.',
                 movement_tests_complete: 'Movement tests completed',
                 movement_tests_failed: 'Movement tests failed. <br/>1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.',
+                download_log: 'Download Logs',
+                download_log_canceled: 'Log download canceled',
+                download_log_error: 'Unknown error occurred, please try it again later',
+                log: {
+                    network: 'Network',
+                    hardware: 'Hardware',
+                    discover: 'Discover',
+                    usb: 'USB',
+                    camera: 'Camera',
+                    cloud: 'Cloud',
+                    player: 'Player',
+                    robot: 'Robot'
+                },
                 finish: 'FINISH',
                 cancel: 'CANCEL',
                 turn_on_head_temperature: 'Set Toolhead Temperature'

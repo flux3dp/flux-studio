@@ -579,6 +579,10 @@ define([
         return SocketMaster.addTask('ls', path);
     }
 
+    function downloadLog(log) {
+        return _device.actions.downloadLog(log);
+    }
+
     function fileInfo(path, fileName) {
         return SocketMaster.addTask('fileInfo', path, fileName);
     }
@@ -1433,8 +1437,8 @@ define([
     }
 
     function getAvailableUsbChannel() {
-        console.log('getting availableUsbChannel');
-        // return this.availableUsbChannel;
+        console.log('availableUsbChannel', this.availableUsbChannel);
+        return this.availableUsbChannel;
     }
 
     // id    : string, required,
@@ -1564,6 +1568,7 @@ define([
             this.getCloudValidationCode         = getCloudValidationCode;
             this.enableCloud                    = enableCloud;
             this.getDeviceInfo                  = getDeviceInfo;
+            this.downloadLog                    = downloadLog;
             this.downloadErrorLog               = downloadErrorLog;
             this.killSelf                       = killSelf;
             this.setHeadTemperature             = setHeadTemperature;

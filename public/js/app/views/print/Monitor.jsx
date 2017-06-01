@@ -364,6 +364,10 @@ define([
             this.unsubscribeEnterKey();
         },
 
+        _handleFileCrossIconClick: function() {
+            AlertActions.showPopupYesNo('DELETE_FILE', lang.monitor.confirmFileDelete);
+        },
+
         _dispatchFolderContent: function(path) {
             let d = $.Deferred();
             this._stopCamera();
@@ -614,7 +618,6 @@ define([
                         p = DeviceMaster.stop();
                     }
                     p.always(() => {
-                        console.log(Monitor);
                         let mode = Monitor.selectedFileInfo.length > 0 ? GlobalConstants.FILE_PREVIEW : GlobalConstants.PREVIEW;
                         if(Device.status.st_id < 0) {
                             mode = GlobalConstants.FILE;
@@ -887,7 +890,8 @@ define([
                             onFolderClick = {this._handleFolderclick}
                             onFolderDoubleClick = {this._handleFolderDoubleClick}
                             onFileClick = {this._handleFileClick}
-                            onFileDoubleClick = {this._handleFileClick} />
+                            onFileDoubleClick = {this._handleFileClick}
+                            onFileCrossIconClick = {this._handleFileCrossIconClick} />
                         <MonitorControl
                             source = {openedFrom}
                             previewUrl = {previewUrl}

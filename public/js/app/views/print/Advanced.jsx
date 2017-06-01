@@ -460,7 +460,7 @@ define([
                             id="temperature"
                             key="temperature"
                             label={lang.printing}
-                            min={180}
+                            min={170}
                             max={230}
                             step={1}
                             default={advancedSetting.temperature}
