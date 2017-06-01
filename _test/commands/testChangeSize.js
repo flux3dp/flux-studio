@@ -6,7 +6,7 @@ module.exports.command = function(callback) {
         .setValue('[data-id=sx]', 50)
         .keys(this.Keys.ENTER)
         .waitUntilSliceFinished()
-        .previewTimeShouldBe('12m32s');
+        .previewTimeShouldBe('12m46s');
 
     if (typeof callback === 'function') {
         callback.call(this);

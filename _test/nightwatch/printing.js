@@ -11,10 +11,10 @@ module.exports = {
 
     // .testImportFileTypes()
     // .testEngines()
-    // .testEditMenu()
+    .testEditMenu()
     .testActualPrint()
 
-    .p(500)
+    // .p(500)
 
     // test code end -----------
 
