@@ -25,7 +25,15 @@ module.exports = {
         run_leveling: 'Run Auto Leveling',
         commands: 'Commands',
         update_firmware: 'Update Firmware',
-        set_as_default: 'Set as Default'
+        set_as_default: 'Set as Default',
+        calibrate_origin: 'Calibrate Origin ( Home )',
+        movement_test: 'Run Movement Test',
+        turn_on_laser: 'Turn On Scanning Laser',
+        auto_leveling_clean: 'Run Auto Leveling with Clean Data',
+        set_toolhead_temperature: 'Set Toolhead Temperature',
+        sign_in: 'Sign In',
+        sign_out: 'Sign Out',
+        my_account: 'My Account'
     },
     'zh-tw': {
         import: '匯入',
@@ -53,6 +61,14 @@ module.exports = {
         run_leveling: '校正平台',
         commands: '指令',
         update_firmware: '韌體更新',
-        set_as_default: '設為預設'
+        set_as_default: '設為預設',
+        calibrate_origin: '回歸原點',
+        movement_test: '執行運動測試',
+        turn_on_laser: '打開掃描雷射',
+        auto_leveling_clean: '校正平台（清除原始資料）',
+        set_toolhead_temperature: '設定列印工具頭溫度',
+        sign_in: '登入',
+        sign_out: '登出',
+        my_account: '我的帳號'
     }
 };

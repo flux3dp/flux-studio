@@ -1253,6 +1253,7 @@ define([
 
     function resetObject() {
         if(SELECTED) {
+            console.log('reset???');
             let s = SELECTED.scale;
             setScale(s._x, s._y, s._z, true, true);
             setRotation(0, 0, 0, true);
@@ -2808,18 +2809,14 @@ define([
     }
 
     function _enableObjectEditMenu(enabled) {
-        MenuFactory.items.duplicate.enabled = enabled;
-        MenuFactory.items.scale.enabled = enabled;
-        MenuFactory.items.rotate.enabled = enabled;
-        MenuFactory.items.reset.enabled = enabled;
-        MenuFactory.items.alignCenter.enabled = enabled;
+        const { ipc, events } = window.electron;
 
-        MenuFactory.items.duplicate.onClick = duplicateSelected;
-        MenuFactory.items.scale.onClick = setScaleMode;
-        MenuFactory.items.rotate.onClick = setRotateMode;
-        MenuFactory.items.reset.onClick = resetObject;
-        MenuFactory.items.alignCenter.onClick = alignCenterPosition;
-        MenuFactory.methods.refresh();
+        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'DUPLICATE');
+        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'SCALE');
+        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'ROTATE');
+        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'RESET');
+        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'ALIGN_CENTER');
+        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'CLEAR_SCENE');
     }
 
     function _setObject(ref, target) {
@@ -2998,6 +2995,7 @@ define([
         clearScene          : clearScene,
         changeEngine        : changeEngine,
         takeSnapShot        : takeSnapShot,
-        startSlicing        : startSlicing
+        startSlicing        : startSlicing,
+        resetObject         : resetObject
     };
 });

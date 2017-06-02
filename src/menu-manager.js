@@ -91,26 +91,47 @@ function build_menu(callback) {
             { 'id': 'UNDO', label: r.undo, click: callback },
             { type:'separator'},
             { 'id': 'DUPLICATE', label: r.duplicate, enabled: false , click: callback },
-            { 'id': 'SCALE', label: r.scale, click: callback },
-            { 'id': 'ROTATE', label: r.rotate, click: callback },
-            { 'id': 'RESET', label: r.reset, click: callback },
-            { 'id': 'ALIGN_CENTER', label: r.align_center, click: callback },
+            { 'id': 'SCALE', label: r.scale, enabled: false, click: callback },
+            { 'id': 'ROTATE', label: r.rotate, enabled: false, click: callback },
+            { 'id': 'RESET', label: r.reset, enabled: false, click: callback },
+            { 'id': 'ALIGN_CENTER', label: r.align_center, enabled: false, click: callback },
             { type: 'separator' },
-            { 'id': 'CLEAR_SCENE', label: r.clear_scene, click: callback },
+            { 'id': 'CLEAR_SCENE', label: r.clear_scene, enabled: false, click: callback },
         ]
     });
 
     menu.push({
-        label: r.machines, id: '_machines',
+        id: '_machines',
+        label: r.machines,
         submenu: [
-            {label: r.add_new_machine, 'id': 'ADD_NEW_MACHINE', 'accelerator': 'Cmd+N', click: callback},
+            { 'id': 'ADD_NEW_MACHINE', label: r.add_new_machine, 'accelerator': 'Cmd+N', click: callback},
             {type: 'separator'}
         ]
     });
 
     menu.push({
+        id: '_account',
         label: 'Account',
-        submenu: []
+        submenu: [
+            {
+                id: 'MY_ACCOUNT',
+                label: r.my_account,
+                click: callback
+            },
+            {
+                type: 'separator'
+            },
+            {
+                id: 'SIGN_IN',
+                label: r.sign_in,
+                click: callback
+            },
+            {
+                id: 'SIGN_OUT',
+                label: r.sign_out,
+                click: callback
+            }
+        ]
     });
 
     if(process.platform === 'darwin') {
@@ -127,7 +148,7 @@ function build_menu(callback) {
         label: 'Help', role: 'help',
         submenu: [
             { id: 'HELP_CENTER', label: r.help_center, click() { shell.openExternal('http://helpcenter.flux3dp.com/'); } },
-            { id: 'CONTACT_US', label: r.contact, click() { shell.openExtern('http://flux3dp.zendesk.com/hc/en-us/requests/new'); } },
+            { id: 'CONTACT_US', label: r.contact, click() { shell.openExternal('http://flux3dp.zendesk.com/hc/en-us/requests/new'); } },
             { type: 'separator' },
             { id: 'TUTORIAL', label: r.tutorial, click: callback },
             { id: 'FORUM', label: r.forum, click() { shell.openExternal('http://forum.flux3dp.com/'); } },
@@ -154,11 +175,24 @@ function build_device_menu(callback, uuid, data) {
             { type: 'separator' },
             { id: 'CHANGE_FILAMENT', uuid, serial, source, label: r.change_material, click: callback },
             { id: 'AUTO_LEVELING', uuid, serial, source, label: r.run_leveling, click: callback },
-            { id: 'COMMANDS', uuid, serial, source, label: r.commands },
+            { id: 'COMMANDS', uuid, serial, source, label: r.commands, submenu: [
+                { id: 'CALIBRATE_ORIGIN', label: r.calibrate_origin, uuid, serial, source, click: callback },
+                { id: 'MOVEMENT_TEST', label: r.movement_test, uuid, serial, source, click: callback },
+                { id: 'TURN_ON_LASER', label: r.turn_on_laser, uuid, serial, source, click: callback },
+                { id: 'AUTO_LEVELING_CLEAN', label: r.auto_leveling_clean, uuid, serial, source, click: callback },
+                { id: 'SET_TOOLHEAD_TEMPERATURE', label: r.set_toolhead_temperature, uuid, serial, source, click: callback }
+            ]},
             { type: 'separator' },
             { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [] },
-            { id: 'set_default', label: r.set_as_default, uuid, serial, source, click: callback }
+            { id: 'SET_AS_DEFAULT', label: r.set_as_default, uuid, serial, source, click: callback, type:'checkbox'}
         ]
+    });
+}
+
+function buildAccountMenu(callback, account) {
+    return new MenuItem({
+        label: account.nickname,
+        click: callback
     });
 }
 
@@ -175,23 +209,42 @@ class MenuManager extends EventEmitter {
             // build_menu(this._on_menu_click.bind(this));
         });
 
-        ipcMain.on(events.DISABLE_MENU_ITEM, (e, id) => {
-            console.log('disable', id);
+        ipcMain.on(events.DISABLE_MENU_ITEM, (e, ids) => {
+            console.log('disable menu', ids);
+            this.toggleMenu(ids, false);
         });
 
         ipcMain.on(events.ENABLE_MENU_ITEM, (e, ids) => {
-            console.log('enable menu item', ids);
-            ids = Array.isArray(ids) ? ids : [ids];
+            console.log('enable menu', ids);
+            this.toggleMenu(ids, true);
+        });
 
-            this._appmenu.items.forEach(mainMenu => {
-                mainMenu.submenu.items.forEach(submenu => {
-                    // if(ids.indexOf(submenu.id) > 0) {
-                        // console.log('=== found id', submenu.id);
-                        submenu.enabled = false;
-                    // }
+        ipcMain.on(events.UPDATE_ACCOUNT, (e, account) => {
+            const toggleSignIn = (nickname) => {
+                this._accountMenu.submenu.items.forEach(item => {
+                    if(item.id === 'SIGN_IN') {
+                        item.visible = !nickname;
+                    }
+                    else if(item.id === 'SIGN_OUT') {
+                        item.visible = !!nickname;
+                    }
+                    else if(item.id === 'MY_ACCOUNT') {
+                        item.visible = !!nickname;
+                        item.label = nickname;
+                    }
                 });
-            });
+            };
 
+            toggleSignIn(account.nickname);
+            Menu.setApplicationMenu(this._appmenu);
+        });
+
+        ipcMain.on(events.SET_AS_DEFAULT, (e, device) => {
+            this._devicemenu.submenu.items.forEach(item => {
+                if(item.label === device.name) {
+                    item.checked = true;
+                }
+            });
             Menu.setApplicationMenu(this._appmenu);
         });
     }
@@ -205,13 +258,31 @@ class MenuManager extends EventEmitter {
             if(this._appmenu.items[i].id === '_machines') {
                 this._devicemenu = this._appmenu.items[i];
             }
+            else if(this._appmenu.items[i].id === '_account') {
+                this._accountMenu = this._appmenu.items[i];
+            }
         }
         this._device_list = {};
         Menu.setApplicationMenu(this._appmenu);
     }
 
+    toggleMenu(ids, enabled) {
+        ids = Array.isArray(ids) ? ids : [ids];
+
+        this._appmenu.items.forEach(mainMenu => {
+            mainMenu.submenu.items.forEach(submenu => {
+                if(ids.indexOf(submenu.id) >= 0) {
+                    submenu.enabled = enabled;
+                }
+            });
+        });
+
+        Menu.setApplicationMenu(this._appmenu);
+    }
+
     _on_menu_click(event) {
         if(event.id) {
+            console.log(event.id);
             this.emit(events.MENU_ITEM_CLICK, event);
         }
     }

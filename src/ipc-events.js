@@ -8,5 +8,7 @@ module.exports = {
     MENU_CLICK              : 'MENU_CLICK',
     MENU_ITEM_CLICK         : 'MENU_ITEM_CLICK',
     DISABLE_MENU_ITEM       : 'DISABLE_MENU_ITEM',
-    ENABLE_MENU_ITEM        : 'ENABLE_MENU_ITEM'
+    ENABLE_MENU_ITEM        : 'ENABLE_MENU_ITEM',
+    UPDATE_ACCOUNT          : 'UPDATE_ACCOUNT',
+    SET_AS_DEFAULT          : 'SET_AS_DEFAULT'
 };

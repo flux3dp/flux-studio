@@ -2,20 +2,20 @@
 <html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'>
     <title>FLUX Studio - {Version}</title>
 </head>
 
 <body>
-    <script src="js/lib/three/three.min.js"></script>
-    <div class="wrapper">
-        <section class="top-menu"></section>
-        <section class="tour-overlay"></section>
-        <section class="content">
-            <div class="spinner-roller absolute-center"></div>
+    <script src='js/lib/three/three.min.js'></script>
+    <div class='wrapper'>
+        <section class='top-menu'></section>
+        <section class='tour-overlay'></section>
+        <section class='content'>
+            <div class='spinner-roller absolute-center'></div>
         </section>
-        <section class="notification"></section>
+        <section class='notification'></section>
     </div>
 </body>
 <script>
@@ -35,33 +35,46 @@
         // set global definition
         window.FLUX = {
             debug: location.search.indexOf('debug') !== -1 || dev,
-            version: "{Version}",
+            version: '{Version}',
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof nw ? undefined : os),
             ghostPort: 8000,
-            allowTracking: localStorage['allow-tracking'] === 'true',
+            allowTracking: false,//localStorage['allow-tracking'] === 'true',
             dev: dev
         };
 
+        // if electron
         if(ipc) {
-            ipc.on("backend-up", (sender, status) => {
+            const events = require('../src/ipc-events');
+
+            window.electron = {};
+            window.electron.ipc = ipc;
+            window.electron.events = events;
+
+            ipc.on(events.BACKEND_UP, (sender, status) => {
                 window.FLUX.ghostPort = status.port;
                 getStarted(status.port);
                 console.log(`Backend start at ${status.port}`);
             });
-            ipc.on("backend-down", () => {});
-            ipc.on("flush-status", (sender, status) => {
+
+            ipc.on(events.BACKEND_DOWN, () => {});
+
+            ipc.on(events.NOTIFY_BACKEND_STATUS, (sender, status) => {
                 if(status.backend.alive) {
                     window.FLUX.ghostPort = status.backend.port;
                     getStarted(status.backend.port);
                     console.log(`Backend ready at ${status.backend.port}`);
                 }
             });
-            ipc.on("menu-trigger", (sender, opt) => {
-                console.log(opt);
-            });
-            ipc.send("sync-status");
+
+            // ipc.on(events.MENU_CLICK, (sender, opt) => {
+            //     console.log('check ===', process.defaultApp);
+            // });
+
+            ipc.send(events.CHECK_BACKEND_STATUS);
+            ipc.send(events.NOTIFY_LANGUAGE, localStorage.getItem('active-lang'));
+
         } else {
             getStarted();
         }
@@ -76,8 +89,8 @@
         }
     }
 
-    if(typeof process !== "undefined") {
-        const {ipcRenderer} = require("electron");
+    if(typeof process !== 'undefined') {
+        const {ipcRenderer} = require('electron');
         launcher(ipcRenderer);
         window.ipcRenderer = ipcRenderer;
     } else {

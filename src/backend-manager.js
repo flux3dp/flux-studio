@@ -126,7 +126,7 @@ class BackendManager extends EventEmitter {
 
         this._proc.stdout.on('data', (data) => {
             let result = uglyJsonParser(data.toString());
-            if(result.type === 'ready') {
+            if(result && result.type === 'ready') {
                 try {
                     this.emit('ready', result);
                 } finally {
@@ -168,7 +168,8 @@ class BackendManager extends EventEmitter {
     }
 
     poke(ipaddr) {
-        if(this._wsconn) {
+        if(this._wsconn !== undefined) {
+            console.log('wsconn is', this._wsconn);
             this._wsconn.send(ipaddr);
             return true;
         } else {

@@ -1,7 +1,9 @@
 <html>
 <script>
 const {ipcRenderer} = require("electron");
-ipcRenderer.on('notify', (event, message) => {
+const events = require('./ipc-events');
+
+ipcRenderer.on(events.NOTIFY_MACHINE_STATUS, (event, message) => {
     let payload = JSON.parse(message);
     let myNotification = new Notification(payload.title, {
       body: payload.body

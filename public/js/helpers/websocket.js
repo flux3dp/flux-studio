@@ -42,6 +42,7 @@ define([
     return function(options) {
         var lang = i18n.get(),
             { dev } = window.FLUX,
+            dev = false,
             customHost = localStorage.getItem('host'),
             customPort = localStorage.getItem('port'),
             defaultCallback = function(result) {},

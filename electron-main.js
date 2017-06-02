@@ -2,16 +2,16 @@
 const electron = require('electron');
 const {ipcMain} = require('electron');
 
-const BackendManager = require('./src/backend_manager.js').BackendManager;
-const MenuManager = require('./src/menu_manager.js').MenuManager;
-const UglyNotify = require('./src/ugly_notify.js').UglyNotify;
+const BackendManager = require('./src/backend-manager.js');
+const MenuManager = require('./src/menu-manager.js');
+const UglyNotify = require('./src/ugly-notify.js').UglyNotify;
+const events = require('./src/ipc-events');
 
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
-
 
 let mainWindow;
 let menuManager;
@@ -23,7 +23,7 @@ global.devices = {};
 function onGhostUp(data) {
     global.backend = {alive: true, port: data.port};
     if(mainWindow) {
-        mainWindow.webContents.send('backend-up', {port: data.port});
+        mainWindow.webContents.send(events.BACKEND_UP, {port: data.port});
     }
 }
 
@@ -103,9 +103,9 @@ function createWindow () {
     mainWindow.webContents.openDevTools();
 }
 
-ipcMain.on('sync-status', () => {
+ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
     if(mainWindow) {
-        mainWindow.send('flush-status', {
+        mainWindow.send(events.NOTIFY_BACKEND_STATUS, {
             backend: global.backend,
             devices: global.devices
         });
@@ -123,9 +123,9 @@ app.on('ready', () => {
     }
 
     menuManager = new MenuManager();
-    menuManager.on('trigger', (data) => {
+    menuManager.on(events.MENU_ITEM_CLICK, (data) => {
         if(mainWindow) {
-            mainWindow.webContents.send('menu-trigger', data);
+            mainWindow.webContents.send(events.MENU_CLICK, data);
         } else {
             console.log('Menu event triggered but window does not exist.');
         }
