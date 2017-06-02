@@ -13,28 +13,18 @@ FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.
 * Install [FLUXClient](https://github.com/flux3dp/fluxclient).
 * [Slic3r](http://slic3r.org/) and [Cura v15.04.5](https://ultimaker.com/en/products/cura-software/list) binary files. For OS X users, you can also find them in /Applications/FLUX\ Studio.app folder.
 
-## Installation
+## Install dependency
 
-1. `$> cd /path/to/flux-studio`
-2. Install necessary node packages `$> npm i --save-dev`
+1. Install necessary node packages `$> npm i --save-dev`
 
-## Running
+## Build javascript/css resources
 
+1. Build resource `$> gulp jsx sass`
 
-1. `$> cd /path/to/fluxghost`
+## Run electron
 
-1. Start the flux api service `$> python3 ghost.py`
-
-1. `$> cd /path/to/flux-studio`
-
-1. Start the gulp service `$> gulp dev`
-
-1. Open http://localhost:8111 in Chrome
-
-If you are using FLUX Studio for the first time:
-1. Open up devtool and then go to console. 
-
-1. Run the command `localStorage.setItem('dev','true')` then refresh the page, your flux-studio will use port 8000 for websocket api.
+* Run default: `npm start`
+* Run with specific backend: `BACKEND=./path/to/your/flux_api npm start`
 
 ## Building for distribution
 
