@@ -48,7 +48,7 @@ module.exports = {
 			.pause(3 * 1000)
 
 			// execute scan
-			.click('.go')
+			.click('.btn-scan')
 
 			// wait for scan finish
 			.waitForElementVisible('.btn-scan-again', 5 * 60 * 1000)

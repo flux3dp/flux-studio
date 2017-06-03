@@ -9,8 +9,8 @@ module.exports = {
 
     // test code start -----------
 
-    // .testImportFileTypes()
-    // .testEngines()
+    .testImportFileTypes()
+    .testEngines()
     .testEditMenu()
     .testActualPrint()
 

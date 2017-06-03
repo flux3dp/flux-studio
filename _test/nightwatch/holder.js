@@ -28,7 +28,7 @@ module.exports = {
 
 			// send to nightwatch-laser
 			.click('.btn-go')
-			.waitForElementVisible('#nightwatch-laser', 5000)
+			.waitForElementVisible('#nightwatch-laser', 20000)
 			.click('#nightwatch-laser')
 			.waitForElementVisible('div.modal-alert', 5000, false, function(result){
 					// Input password if needed
@@ -45,7 +45,7 @@ module.exports = {
 			.waitForElementVisible('div.flux-monitor', 30000)
 
 			// check for shading time
-			.assert.containsText('.status-info-duration', '18 s')
+			.assert.containsText('.status-info-duration', '16 s')
 			.click('.close')
 
 			// test code end -----------
