@@ -7,6 +7,14 @@
         line-height: 40px;
         width: 120px;
     }
+
+    .secondary {
+        font-size: 16px;
+        color: $primaryColor;
+        width: 120px;
+        line-height: 5px;
+    }
+
     .control {
         line-height: 40px;
         position: relative;

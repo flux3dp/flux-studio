@@ -1,4 +1,4 @@
-define(['threejs'], function() {
+define(['jquery', 'threejs'], function($) {
     'use strict';
 
     /**
@@ -14,24 +14,28 @@ define(['threejs'], function() {
 
         constructor: STLExporter,
 
-        parse: ( function () {
+        exportTo: ( function () {
 
             var vector = new THREE.Vector3();
 
-            return function parse( geometry ) {
+            return function exportTo( geometry, fileSystem, path ) {
+                console.log('exporting...');
+                const d = $.Deferred();
 
-                var output = '';
+                fileSystem.writeFileSync(path, ''); //replace old data;
+                const wstream = fileSystem.createWriteStream(path);
+                wstream.on('finish', ()=>{
+                    d.resolve();
+                })
 
-                output += 'solid exported\n';
+                wstream.write('solid exported\n');
 
                 if( geometry instanceof THREE.BufferGeometry ) {
-
                     geometry = new THREE.Geometry().fromBufferGeometry( geometry );
 
                 }
 
                 if ( geometry instanceof THREE.Geometry ) {
-
                     var vertices = geometry.vertices;
                     var faces = geometry.faces;
 
@@ -41,8 +45,7 @@ define(['threejs'], function() {
 
                         vector.copy( face.normal );
 
-                        output += '\tfacet normal ' + vector.x + ' ' + vector.y + ' ' + vector.z + '\n';
-                        output += '\t\touter loop\n';
+                        wstream.write('\tfacet normal ' + vector.x + ' ' + vector.y + ' ' + vector.z + '\n\t\touter loop\n');
 
                         var indices = [ face.a, face.b, face.c ];
 
@@ -50,20 +53,20 @@ define(['threejs'], function() {
 
                             vector.copy( vertices[ indices[ j ] ] );
 
-                            output += '\t\t\tvertex ' + vector.x + ' ' + vector.y + ' ' + vector.z + '\n';
+                            wstream.write('\t\t\tvertex ' + vector.x + ' ' + vector.y + ' ' + vector.z + '\n');
 
                         }
 
-                        output += '\t\tendloop\n';
-                        output += '\tendfacet\n';
+                        wstream.write('\t\tendloop\n\tendfacet\n');
 
                     }
 
                 }
 
-                output += 'endsolid exported\n';
+                wstream.write('endsolid exported\n');
+                wstream.end();
 
-                return output;
+                return d.promise();
 
             };
 

@@ -41,6 +41,11 @@ define(['jquery', 'helpers/i18n'], function($, i18n) {
             var isQuit = window ? window.confirm(lang.topmenu.sure_to_quit) : true;
 
             if (true === isQuit) {
+                
+                fs.readdirSync('tmp').forEach(function(file,index){
+                    fs.unlinkSync('tmp/' + file);
+                });
+
                 window.FLUX.killAPI().always(function() {
                     nw.App.quit();
                 });

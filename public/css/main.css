@@ -2917,6 +2917,11 @@ hr {
         font-size: 13px;
         line-height: 40px;
         width: 120px; }
+    .controls .secondary {
+        font-size: 16px;
+        color: #999;
+        width: 120px;
+        line-height: 5px; }
     .controls .control {
         line-height: 40px;
         position: relative; }

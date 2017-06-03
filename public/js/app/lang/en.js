@@ -595,6 +595,13 @@ define(function() {
                 go: 'Go',
                 preview: 'Preview'
             },
+            object_dialogue: {
+                emboss: {
+                    depth: 'Depth',
+                    baseDepth: 'Thickness',
+                    useBase: 'Keyer Effect'
+                }
+            },
             quality: {
                 high: 'HIGH QUALITY',
                 med: 'MEDIUM QUALITY',

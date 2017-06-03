@@ -233,7 +233,7 @@ define([
         _handleEmbossmentChange: function(e) {
             const _tmp = Object.assign({}, this.state.embossment);
 
-            _tmp[e.target.id] = parseInt(e.target.value) || e.target.checked || 0;
+            _tmp[e.target.id] = parseInt(e.target.value) || !(e.target.checked) || 0;
 
             if(e.keyCode === 13 || e.type === 'blur' || e.target.type==="checkbox") {
                 this.setState(
@@ -436,16 +436,17 @@ define([
                             onClick={this._handleModeChange}/>
                         <p className="caption">
                             {lang.print.emboss}
-                            <span className="value">{this.state.embossment.depth}, {this.state.embossment.baseDepth}, {(this.state.embossment.useBase)?"use":""} </span>
+                            <span className="value">{this.state.embossment.depth}mm, {this.state.embossment.baseDepth}mm{(this.state.embossment.useBase)?"":", on"} </span>
                         </p>
                         
                         <label className="accordion-body">
 
                             <div className="control">
-                                <span className="text-center header">Depth</span>
+                                <span className="secondary">{lang.print.object_dialogue.emboss.depth}</span>
                                 <input
                                     id="depth"
                                     type="text"
+                                    className={"p33"}
                                     onFocus={this._inputFocused}
                                     onChange={this._handleEmbossmentChange.bind(this)}
                                     onKeyUp={this._handleEmbossmentChange.bind(this)}
@@ -453,10 +454,11 @@ define([
                                     defaultValue={this.state.embossment.depth} />
                             </div>
                             <div className="control">
-                                <span className="text-center header">Base Depth</span>
+                                <span className="secondary">{lang.print.object_dialogue.emboss.baseDepth}</span>
                                 <input
                                     id="baseDepth"
                                     type="text"
+                                    className={"p33"}
                                     onFocus={this._inputFocused}
                                     onChange={this._handleEmbossmentChange.bind(this)}
                                     onKeyUp={this._handleEmbossmentChange.bind(this)}
@@ -464,15 +466,16 @@ define([
                                     defaultValue={this.state.embossment.baseDepth} />
                             </div>
                             <div className="control">
-                                <span className="text-center header">Base Depth</span>
+                                <span className="secondary">{lang.print.object_dialogue.emboss.useBase}</span>
                                 <input
                                     id="useBase"
                                     type="checkbox"
+                                    className={"p33"}
                                     onFocus={this._inputFocused}
                                     onChange={this._handleEmbossmentChange.bind(this)}
                                     onKeyUp={this._handleEmbossmentChange.bind(this)}
                                     onBlur={this._handleEmbossmentChange.bind(this)}
-                                    defaultValue={this.state.embossment.useBase} />
+                                    checked={!this.state.embossment.useBase} />
                             </div>
 
                         </label>

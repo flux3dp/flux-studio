@@ -608,6 +608,13 @@ define(function() {
                 go: 'Go',
                 preview: '預覽'
             },
+            object_dialogue: {
+                emboss: {
+                    depth: '浮雕深淺',
+                    baseDepth: '底部厚度',
+                    useBase: '去背'
+                }
+            },
             quality: {
                 high: '品質 精細',
                 med: '品質 中等',

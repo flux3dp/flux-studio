@@ -47,13 +47,6 @@ define([
             connection: ws,
             upload: (name, file, ext) => {
                 let d = $.Deferred();
-
-                if(false) {
-                    setTimeout(() => {
-                        d.resolve();                    
-                    }, 1);
-                    return d.promise();
-                }
             
                 let progress,
                 currentProgress;

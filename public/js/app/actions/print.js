@@ -33,6 +33,7 @@ define([
     'plugins/file-saver/file-saver.min',
     'lib/Canvas-To-Blob',
     'helpers/object-assign',
+    // 'helpers/blur',
 ], function(
     $,
     display,
@@ -295,9 +296,10 @@ define([
         let uploadCaller;
 
         if ( _isImageExtension(ext) ) {
+            const path = `tmp/${name}.stl`;
             const exporter = new STLExporter();
-            const stl = exporter.parse(geometry);
-            uploadCaller = sliceMaster.addTask('upload', name, new Blob([stl]), ext);
+            const doExport = exporter.exportTo(geometry, window.fs, path);            
+            uploadCaller = doExport.then(sliceMaster.addTask('upload_via_path', name, '', 'stl', path));
         } else {
             uploadCaller = file.path ?
                 sliceMaster.addTask('upload_via_path', name, file, ext, file.path)
@@ -347,8 +349,9 @@ define([
                 console.log('New Mesh:: Py Processing meshes');
                 ProgressActions.updating('Processing meshes', 50);
             }, 1);
-
+            console.log('uploadStl...');
             uploadStl(mesh.uuid, file, ext, geometry).then(() => {
+                console.log('uploadStl done');
                 addToScene();
                 callback();
             }).progress((steps, total) => {
@@ -469,22 +472,28 @@ define([
             imageLoader.load(binary,
                 (image) => {
                     const canvas = document.createElement( 'canvas' );
-                    const context = canvas.getContext( '2d' );
-                    const w = Math.floor(image.width/20);
-                    const h = Math.floor(image.height/20);
-                    const ratio = h/w;
+                    // canvas.setAttribute("id", "emboss-canvas");
 
+                    const compression = 1;
+                    const w = Math.floor(image.width/compression);
+                    const h = Math.floor(image.height/compression);
+                    
                     canvas.width = w;
                     canvas.height = h;
 
+                    const context = canvas.getContext( '2d' );
                     context.drawImage( image, 0, 0, canvas.width, canvas.height);
+
+                    // $('#emboss-canvas').blurjs({
+                    //     radius: 50,
+                    // });
+
                     const imgData = context.getImageData(0, 0, canvas.width, canvas.height);
-
-                    const geometry = new EmbossmentBufferGeometry(100,100*ratio,imgData,ext,-5,30,false);
-
+                    
+                    const geometry = new EmbossmentBufferGeometry(imgData,ext,5,5,false);
                     loadGeometry(geometry);
                 },
-                ()=>{console.log('processing image');},
+                ()=>{},
                 ()=>{console.log('imageLoader failed');}
             );
         }
@@ -750,6 +759,12 @@ define([
                 o.scale.y,
                 o.scale.z
             ];
+            if(o.isEmbossment) {
+                const depth= o.geometry.depth;
+                const baseDepth= o.geometry.baseDepth;
+                const useBase= o.geometry.useBase;
+                fullSliceParameters.objs[o.uuid].push(depth, baseDepth, useBase);
+            }
         });
 
         let sliceParams = JSON.stringify(fullSliceParameters, (key, val) => {
@@ -1494,18 +1509,13 @@ define([
     function setEmbossment(embossment) {
         const src = SELECTED;
         if(
-            (src.geometry.depth ===embossment.depth) &&
-            (src.geometry.baseDepth ===embossment.baseDepth) &&
-            (src.geometry.useBase ===embossment.useBase)
-        )
-        return;
-    
-        const uuid = src.uuid,
-            position = src.position,
-            rotation = src.rotation,
-            scale = src.scale,
-            ext = src.file.name.split('.').pop().toLowerCase();
-            
+            (src.geometry.depth === embossment.depth) &&
+            (src.geometry.baseDepth === embossment.baseDepth) &&
+            (src.geometry.useBase === embossment.useBase)
+        ) return;
+       
+        stopSlicing();
+        
         const oldEmbossment = {
             depth: src.geometry.depth,
             baseDepth: src.geometry.baseDepth,
@@ -1515,26 +1525,15 @@ define([
         addHistory('SETEMBOSSMENT', src, oldEmbossment);
 
         src.geometry.updateEmbossmentAttribute(embossment);
-        stopSlicing();
 
-
-        const exporter = new STLExporter();
-        const stl = exporter.parse(src.geometry);
-        const stlFile = new Blob([stl]);
-
-        sliceMaster.addTask('delete', src.uuid)
-        .then(sliceMaster.addTask('upload', src.uuid, stlFile, ext))
-        .then(()=>{
-            syncObjectOutline(src);
-            src.plane_boundary = planeBoundary(src);
-            groundIt(src);
-            checkOutOfBounds(src);
-            startSlicing();
-            render();
-        })
-        .fail(()=>{console.log("fail in setEmbossment()")});
         
-
+        syncObjectOutline(src);
+        src.plane_boundary = planeBoundary(src);
+        groundIt(src);
+        checkOutOfBounds(src);
+        render();
+        
+        _reuploadEmbossment(src);
     
     }
 
@@ -2339,7 +2338,7 @@ define([
     }
 
     class EmbossmentBufferGeometry extends THREE.BufferGeometry {
-        constructor(baseWidth, baseHeight, imgData, ext, depth, baseDepth, useBase) {
+        constructor(imgData, ext, depth, baseDepth, useBase) {
             super();
             this.ext = ext;
             this.w = imgData.width;
@@ -2358,8 +2357,8 @@ define([
             const wlim = w-1;
             const hlim = h-1;
             // init all vertices and set z-value
-            const widthUnit = baseWidth/(w-1);
-            const heightUnit = baseHeight/(h-1);
+            const widthUnit = 0.25;
+            const heightUnit = 0.25;
             for (let i=0; i<w*h;i++) {
                 const x = i%w,
                       y = Math.floor(i/w);
@@ -2489,10 +2488,12 @@ define([
                 this.attributes.position.setZ(i, z);
             }
 
-            //for unknown reason we need to set this. Because these four point will be change by someone we don't know.
+            //set everything and then center it. Because slicer engine will center stl by default.
             for(let i=this.w*this.h; i<this.w*this.h+4; i++) {
                 this.attributes.position.setZ(i, 0);
             }
+
+            this.center();
 
             this.attributes.position.needsUpdate = true;
         }
@@ -2956,6 +2957,34 @@ define([
                 });
             }
         }
+    }
+
+    function _reuploadEmbossment(mesh) {
+        const name = mesh.uuid;
+        let path = `tmp/${name}.stl`;
+
+        const exporter = new STLExporter();
+
+        exporter.exportTo(mesh.geometry, window.fs, path)
+        .then(sliceMaster.addTask('delete', name))
+        .then(sliceMaster.addTask('upload_via_path', name, '', 'stl', path))
+        .then(sliceMaster.addTask('set',
+            mesh.uuid,
+            mesh.position.x,
+            mesh.position.y,
+            mesh.position.z,
+            mesh.rotation.x,
+            mesh.rotation.y,
+            mesh.rotation.z,
+            mesh.scale.x,
+            mesh.scale.y,
+            mesh.scale.z
+         ))
+        .then(()=>{
+            doSlicing();
+        })
+        .fail(()=>{console.log("fail in _reuploadEmbossment()")});        
+       
     }
 
     function _showWait(message, stopButton, onCloseFunction) {
