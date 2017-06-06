@@ -844,6 +844,7 @@ define(function() {
                 load_preset_title: 'Load Config',
                 background: 'Background',
                 removeBackground: ' Remove Background',
+                removePreset: 'selected preset is going to be revomved',
                 load_calibrate_image: 'Load Calibration Image',
                 apply: 'APPLY',
                 cancel: 'CANCEL',

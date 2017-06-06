@@ -6008,6 +6008,8 @@ img.img640x480 {
                 .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list input[type="radio"]:checked + .preset-item-name {
                     background-color: #E0E0E0;
                     color: #FFF; }
+                    .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list input[type="radio"]:checked + .preset-item-name i {
+                        visibility: visible; }
             .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list .preset-item-name {
                 border-bottom: 1px solid #E0E0DF;
                 color: #999;
@@ -6016,6 +6018,9 @@ img.img640x480 {
                 line-height: 40px;
                 margin: 0;
                 padding: 0 0 0 10px; }
+                .laser-studio .operating-panel .custom-presets-wrapper .custom-presets-list .preset-item-name i {
+                    float: right;
+                    visibility: hidden; }
         .laser-studio .operating-panel .custom-presets-wrapper .custom-preset-buttons {
             height: 69px;
             position: static;
