@@ -237,6 +237,7 @@ define([
                         }
                         else {
                             counter++;
+                            console.log('retry report');
                             ws.send('play report');
                         }
                     }
@@ -245,6 +246,7 @@ define([
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 
+                setTimeout(function() { d.reject( {status: "Timeout"} )}, 3000);
                 ws.send('play report');
                 return d.promise();
             },

@@ -182,7 +182,6 @@ define([
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
-                    console.log('Select device ', status);
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
                         GlobalActions.showMonitor(device);

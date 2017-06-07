@@ -84,24 +84,6 @@ define([
 
     // Deprecated!
     function selectDevice(device, deferred) {
-        if (
-            _selectedDevice &&
-            _selectedDevice.serial === device.serial &&
-            _selectedDevice.source === device.source
-        ) {
-            let d = $.Deferred();
-            ProgressActions.close();
-            d.resolve(DeviceConstants.CONNECTED);
-            return d.promise();
-        }
-
-        // match the device from the newest received device list
-        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
-            self = this;
-
-        Object.assign(_selectedDevice, latestDevice[0]);
-        let d = deferred || $.Deferred();
-
         const goAuth = (uuid) => {
             ProgressActions.close();
             _selectedDevice = {};
@@ -136,7 +118,6 @@ define([
 
             InputLightboxActions.open('auth', callback);
         };
-
         const createDeviceActions = (availableUsbChannel = -1, success) => {
             return DeviceController(device.uuid, {
                 availableUsbChannel,
@@ -236,28 +217,9 @@ define([
                     }
 
                     removeTimedOutConnection(availableUsbChannel);
-                    console.log('process fatal', response, _devices, availableUsbChannel);
                 }
             });
         };
-
-        ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
-
-        if(_existConnection(device.uuid, device.source)) {
-            ProgressActions.close();
-            _device = _switchDevice(device.uuid);
-            SocketMaster.setWebSocket(_actionMap[device.uuid]);
-            d.resolve(DeviceConstants.CONNECTED);
-        }
-        else {
-            _device = {};
-            _device.uuid = device.uuid;
-            _device.source = device.source;
-            _device.name = device.name;
-            _device.serial = device.serial;
-            delete _actionMap[device.uuid];
-        }
-
         const initSocketMaster = () => {
             if(typeof _actionMap[device.uuid] !== 'undefined') {
                 _device.actions = _actionMap[device.uuid];
@@ -267,6 +229,8 @@ define([
             SocketMaster = new Sm();
             SocketMaster.onTimeout(handleSMTimeout);
 
+        /********************************************************************
+        // just for backup, can be delete if everything is fine
             // if usb not detected but device us using usb
             if(
                 typeof self !== 'undefined' &&
@@ -276,6 +240,7 @@ define([
             ) {
                 device = getDeviceBySerialFromAvailableList(device.serial, false);
             }
+        ********************************************************************/
 
             // if availableUsbChannel has been defined
             if(
@@ -322,6 +287,50 @@ define([
             _actionMap[device.uuid] = _device.actions;
             SocketMaster.setWebSocket(_device.actions);
         };
+
+      //  if (
+      //      _selectedDevice &&
+      //      _selectedDevice.serial === device.serial &&
+      //      _selectedDevice.source === device.source
+      //  ) {
+      //      let d = $.Deferred();
+      //      ProgressActions.close();
+      //      d.resolve(DeviceConstants.CONNECTED);
+      //      //d.resolve(DeviceConstants.TIMEOUT);
+//
+      //      console.log('has have connected')
+      //      return d.promise();
+      //  }
+
+        // match the device from the newest received device list
+        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
+            self = this;
+
+        Object.assign(_selectedDevice, latestDevice[0]);
+        let d = deferred || $.Deferred();
+
+
+        ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
+
+        if(_existConnection(device.uuid, device.source)) {
+            ProgressActions.close();
+            _device = _switchDevice(device.uuid);
+            SocketMaster.setWebSocket(_actionMap[device.uuid]);
+            //SocketMaster.addTask('report')
+            //SocketMaster.addTask('report');
+            //SocketMaster.addTask('report');
+            //SocketMaster.addTask('report');
+            d.resolve(DeviceConstants.CONNECTED);
+            //d.resolve(DeviceConstants.TIMEOUT);
+        }
+        else {
+            _device = {};
+            _device.uuid = device.uuid;
+            _device.source = device.source;
+            _device.name = device.name;
+            _device.serial = device.serial;
+            delete _actionMap[device.uuid];
+        }
 
         initSocketMaster();
 
@@ -1367,6 +1376,7 @@ define([
         const createWebSocket = (availableUsbChannel = -1) => {
             if(availableUsbChannel === -1) { return; }
             let url = `control/usb/${availableUsbChannel}`;
+            console.log('createWebSocket', url);
 
             return SimpleWebsocket(url, handleMessage, handleError);
         };
@@ -1375,6 +1385,7 @@ define([
             if(response.cmd === 'play report') {
                 // specify nickname with usb
                 usbDeviceReport = Object.assign(deviceInfo, response.device_status);
+                console.log('usbDeviceReport', usbDeviceReport);
                 clearTimeout(requestingReport);
                 requestingReport = setTimeout(() => {
                     getUsbDeviceReport();
@@ -1437,7 +1448,6 @@ define([
     }
 
     function getAvailableUsbChannel() {
-        console.log('availableUsbChannel', this.availableUsbChannel);
         return this.availableUsbChannel;
     }
 
@@ -1459,7 +1469,6 @@ define([
         });
 
         if (matchedDevice.length > 0) {
-            console.log('Found serial device' , matchedDevice[0], matchedDevice);
             callback.onSuccess(matchedDevice[0]);
             return;
         }
@@ -1486,7 +1495,6 @@ define([
     }
 
     function usbDefaultDeviceCheck(device) {
-        console.log('usbDefaultDeviceCheck', device);
         if(device.source !== 'h2h') {
             return device;
         }
@@ -1496,7 +1504,6 @@ define([
             // get wifi version instead of h2h
             let dev = _availableDevices.filter(_dev => _dev.serial === device.serial);
             if(dev[0]) {
-                console.log(dev[0]);
                 return dev[0];
             }
         }

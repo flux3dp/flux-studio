@@ -361,7 +361,8 @@ define([
         _handleBrowseFolder: function() {
             this._addHistory();
             this._dispatchFolderContent('');
-            this.unsubscribeEnterKey();
+            // avoid error occur, but don't know that will cause any bug, so mark it only.
+            //this.unsubscribeEnterKey();
         },
 
         _handleFileCrossIconClick: function() {
