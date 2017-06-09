@@ -1,14 +1,12 @@
 
 const electron = require('electron');
-const {ipcMain} = require('electron');
+const {app, ipcMain, BrowserWindow} = require('electron');
 
+require("./src/bootstrap.js");
 const BackendManager = require('./src/backend-manager.js');
 const MenuManager = require('./src/menu-manager.js');
 const UglyNotify = require('./src/ugly-notify.js').UglyNotify;
 const events = require('./src/ipc-events');
-
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
@@ -65,13 +63,8 @@ function onDeviceUpdated(deviceInfo) {
     global.devices[deviceInfo.uuid] = deviceInfo;
 }
 
-const resourcesRoot = process.defaultApp ? '.' : process.resourcesPath;
-process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || path.join(resourcesRoot, 'backend', 'slic3r');
-process.env.GHOST_CURA = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine');
-process.env.GHOST_CURA2 = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine2');
-
 const backendManager = new BackendManager({
-    location: process.env.BACKEND || path.join(resourcesRoot, 'backend', 'flux_api', 'flux_api'),
+    location: process.env.BACKEND,
     trace_pid: process.pid,
     on_ready: onGhostUp,
     on_device_updated: onDeviceUpdated,

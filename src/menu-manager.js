@@ -20,60 +20,10 @@ function build_menu(callback) {
                 { label: 'Hide', role: 'hide' },
                 { role: 'hideothers' },
                 { type: 'separator' },
-                { label: 'Quit', role: 'quit '}
+                { label: 'Quit', role: 'quit'}
             ]
         });
     }
-
-    // console.log('check menu');
-    // console.log(menu);
-
-    // console.log('menu json', JSON.stringify(menu));
-    // console.log('menu length', menu.length);
-    // if(menu.length > 0) {
-    //     menu.forEach(mainMenu => {ㄑ
-    //         console.log('processing', mainMenu);
-    //         // construct sub menu
-    //         let submenu = [];
-    //         mainMenu.submenu.forEach(item => {
-    //             if(item.label === 'separator') {
-    //                 submenu.push({ type: 'separator' });
-    //             }
-    //             else {
-    //                 submenu.push({
-    //                     label: item.label,
-    //                     enabled: item.enabled
-    //                 });
-    //             }
-    //         });
-    //
-    //         _menu.push({
-    //             label: mainMenu.title,
-    //             submenu
-    //         });
-    //     });
-    // }
-
-    // if(menu.file && menu.file.length > 0) {
-    //     let submenu = [];
-    //     menu.file.forEach(item => {
-    //         console.log('processing', item);
-    //         if(item.label === 'separator') {
-    //             submenu.push({ type: 'separator' });
-    //         }
-    //         else if{
-    //             submenu.push({
-    //                 label: menu.file[itemName].label,
-    //                 enabled: menu.file[itemName].enabled
-    //             });
-    //         }
-    //     });
-    //     _menu.push({
-    //         label: menu.file.label,
-    //         submenu
-    //     });
-    //     console.log('menu is', JSON.stringify(_menu));
-    // }
 
     menu.push({
         label: 'File',
@@ -206,7 +156,6 @@ class MenuManager extends EventEmitter {
             language = language === 'tw' ? 'tw' : 'en';
             r = resource[language];
             this.constructMenu();
-            // build_menu(this._on_menu_click.bind(this));
         });
 
         ipcMain.on(events.DISABLE_MENU_ITEM, (e, ids) => {
@@ -282,7 +231,6 @@ class MenuManager extends EventEmitter {
 
     _on_menu_click(event) {
         if(event.id) {
-            console.log(event.id);
             this.emit(events.MENU_ITEM_CLICK, event);
         }
     }

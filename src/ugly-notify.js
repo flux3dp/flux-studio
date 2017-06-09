@@ -3,12 +3,8 @@
 //
 // working with public/ugly_notify.html
 
-// const electron = require('electron');
 const { BrowserWindow, ipcMain, app } = require('electron');
 const events = require('./ipc-events');
-// const BrowserWindow = electron.BrowserWindow;
-// const {ipcMain} = require('electron');
-// const app = electron.app
 
 const path = require('path')
 const url = require('url')

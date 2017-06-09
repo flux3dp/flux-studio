@@ -35,7 +35,7 @@ class BackendManager extends EventEmitter {
 
         this._args = ['--port', '0'];
 
-        if(!options.location) { throw 'location not given'; }
+        if(!options.location) { throw 'backend location not given'; }
         this._ghost_location = options.location;
 
         if(options.trace_pid) {
@@ -96,6 +96,7 @@ class BackendManager extends EventEmitter {
                         this.emit('device_updated', devInfo);
                     } catch(err) {
                         console.error(`Can not handle backend stout: ${err}`);
+                        console.trace();
                     }
                 }
             });

@@ -68,10 +68,6 @@
                 }
             });
 
-            // ipc.on(events.MENU_CLICK, (sender, opt) => {
-            //     console.log('check ===', process.defaultApp);
-            // });
-
             ipc.send(events.CHECK_BACKEND_STATUS);
             ipc.send(events.NOTIFY_LANGUAGE, localStorage.getItem('active-lang'));
 
