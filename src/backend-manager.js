@@ -123,7 +123,7 @@ class BackendManager extends EventEmitter {
     }
 
     _spawn() {
-        this._proc = spawn(this._ghost_location, this._args);
+        this._proc = spawn(this._ghost_location, this._args, {shell: true});
 
         this._proc.stdout.on('data', (data) => {
             let result = uglyJsonParser(data.toString());
