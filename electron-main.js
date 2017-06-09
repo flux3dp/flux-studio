@@ -5,7 +5,7 @@ const {app, ipcMain, BrowserWindow} = require('electron');
 require("./src/bootstrap.js");
 const BackendManager = require('./src/backend-manager.js');
 const MenuManager = require('./src/menu-manager.js');
-const UglyNotify = require('./src/ugly-notify.js').UglyNotify;
+const UglyNotify = require('./src/ugly-notify.js');
 const events = require('./src/ipc-events');
 
 const path = require('path');

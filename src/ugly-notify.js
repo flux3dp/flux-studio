@@ -27,9 +27,11 @@ class _UglyNotify {
               'title': title,
               'body': body
             }));
+        } else {
+            console.log("Ugly notify window missing");
         }
     }
 }
 
-
-module.exports = new _UglyNotify();
+const UglyNotify = new _UglyNotify();
+module.exports = UglyNotify;
