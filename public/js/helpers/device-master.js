@@ -136,6 +136,7 @@ define([
                     }
                 },
                 onError: function(response) {
+                    console.log('createDeviceActions onError', response);
                     ProgressActions.close();
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
@@ -200,6 +201,7 @@ define([
                     }
                 },
                 onFatal: function(response) {
+                    console.log('createDeviceActions onFatal', response);
                     // process fatal
                     if(!_wasKilled) {
                         _selectedDevice = {};
@@ -229,7 +231,7 @@ define([
             SocketMaster = new Sm();
             SocketMaster.onTimeout(handleSMTimeout);
 
-        /********************************************************************
+        /*/*******************************************************************
         // just for backup, can be delete if everything is fine
             // if usb not detected but device us using usb
             if(
@@ -240,7 +242,7 @@ define([
             ) {
                 device = getDeviceBySerialFromAvailableList(device.serial, false);
             }
-        ********************************************************************/
+        //********************************************************************/
 
             // if availableUsbChannel has been defined
             if(
@@ -249,6 +251,8 @@ define([
                 device.source === 'h2h'
             ) {
                 _device.actions = createDeviceActions(this.availableUsbChannel, (success) => {
+                    console.log('_device.actions', _device.actions);
+                    console.log('success', success);
                     if(success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
@@ -272,6 +276,7 @@ define([
                                 foundDevice = d;
                             }
                         });
+                        console.log('foundDevice', foundDevice);
                         if(foundDevice) {
                             foundDevice.uuid = foundDevice.addr;
                             foundDevice.name = foundDevice.nickname;
@@ -316,12 +321,7 @@ define([
             ProgressActions.close();
             _device = _switchDevice(device.uuid);
             SocketMaster.setWebSocket(_actionMap[device.uuid]);
-            //SocketMaster.addTask('report')
-            //SocketMaster.addTask('report');
-            //SocketMaster.addTask('report');
-            //SocketMaster.addTask('report');
             d.resolve(DeviceConstants.CONNECTED);
-            //d.resolve(DeviceConstants.TIMEOUT);
         }
         else {
             _device = {};
@@ -789,6 +789,7 @@ define([
     }
 
     function reconnect() {
+        let d = $.Deferred();
         _devices.some(function(device, i) {
             if(device.uuid === _selectedDevice.uuid) {
                 _devices.splice(i, 1);
@@ -798,6 +799,19 @@ define([
         killSelf().always(() => {
             selectDevice(_selectedDevice);
         });
+        return d.promise();
+    }
+
+    function KickChangeFilament() {
+      let d = $.Deferred();
+      //return result is success always even the USB disconnected on device side.
+      //need to be figure it out.
+      selectDevice(_selectedDevice).then((result) => {
+        kick();
+        d.resolve();
+
+      });
+      return d.promise();
     }
 
     // get functions
@@ -1532,6 +1546,7 @@ define([
 
     DeviceSingleton.prototype = {
         init: function() {
+            this.KickChangeFilament             = KickChangeFilament;
             this.select                         = select;
             this.selectDevice                   = selectDevice;
             this.uploadToDirectory              = uploadToDirectory;

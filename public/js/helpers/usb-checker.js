@@ -4,7 +4,7 @@ define([
     Websocket
 ) {
     let channels = {},
-        interval = 3000,
+        interval = 5000,
         ws;
 
     // callback should receive opened usb channel, -1 if not available

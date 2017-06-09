@@ -30,12 +30,13 @@ define([
     var lang = i18n.get(),
         maxTemperature = 220,
         steps = {
-            HOME      : 'HOME',
-            GUIDE     : 'GUIDE',
-            HEATING   : 'HEATING',
-            EMERGING  : 'EMERGING',
-            UNLOADING : 'UNLOADING',
-            COMPLETED : 'COMPLETED'
+            HOME         : 'HOME',
+            GUIDE        : 'GUIDE',
+            HEATING      : 'HEATING',
+            EMERGING     : 'EMERGING',
+            UNLOADING    : 'UNLOADING',
+            COMPLETED    : 'COMPLETED',
+            DISCONNECTED : 'DISCONNECTED'
         },
         View = React.createClass({
 
@@ -134,7 +135,7 @@ define([
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING);
 
                 const progress = function(response) {
-                    console.log('changing filament progress', response);
+                    console.log('changing filament progress', response, response.stage);
                     let status = response.stage[1];
                     switch (status) {
                     case 'WAITTING':
@@ -152,7 +153,7 @@ define([
                     default:
                         if(response.error) {
                             if(response.error[0] === 'KICKED') {
-                                this._onCancel();
+                                self._onCancel();
                             }
                         }
                         else {
@@ -255,6 +256,11 @@ define([
                                     this._onCancel();
                                     break;
                                 case 'CANCEL': break;
+                                case 'DISCONNECTED':
+                                    DeviceMaster.KickChangeFilament().done(function() {
+                                      self._next(steps.DISCONNECTED);
+                                    });
+                                    break;
                                 default:
                                     errorMessageHandler(response);
                             }
@@ -476,6 +482,21 @@ define([
                         className: 'btn-default btn-alone-right',
                         dataAttrs: {
                             'ga-event': 'completed'
+                        },
+                        onClick: this.props.onClose
+                    }]
+                };
+            },
+            _sectionDisconnected: function() {
+                return {
+                    message: (
+                      <div className="message-container">{lang.change_filament.disconnected}</div>
+                    ),
+                    buttons: [{
+                        label: lang.change_filament.ok,
+                        className: 'btn-default btn-alone-right',
+                        dataAttrs: {
+                            'ga-event': 'disconnected'
                         },
                         onClick: this.props.onClose
                     }]

@@ -1275,6 +1275,7 @@ define(function() {
             auto_emerging: 'Please insert filament',
             loading_filament: 'Loading filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
+            disconnected: 'Connection unstable, Please check device connection and try again later', 
             maintain_zombie: 'Please restart the machine',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
             NA: 'Toolhead is not connected'

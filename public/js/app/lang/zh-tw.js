@@ -1271,6 +1271,7 @@ define(function() {
             auto_emerging: '請插入線料',
             loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
+            disconnected: '連線不穩，請確認機器連線狀況並稍後再試一次',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印工具頭沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
         },

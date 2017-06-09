@@ -686,13 +686,25 @@ define([
              * @return {Promise}
              */
             changeFilament: (type) => {
-                let d = $.Deferred();
+                let d = $.Deferred(),
+                    timeout;
 
                 const getType = (t) => {
                     return t === DeviceConstants.LOAD_FILAMENT ? 'load_filament' : 'unload_filament';
                 };
 
                 events.onMessage = (response) => {
+
+                    clearTimeout(timeout);
+                    timeout = setTimeout( () => {
+                        response = {
+                          stage  : "error",
+                          status : "error",
+                          error  : ["DISCONNECTED", ""]
+                        }
+                        d.reject(response);
+                    }, 10 * 1000);
+
                     response.status !== 'ok' ? d.notify(response) : d.resolve(response);
                 };
 
