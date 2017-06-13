@@ -10,7 +10,7 @@ define(function() {
         },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
-            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            no_vcredist: 'Please install Visual C++ Redistributable 2015<br/>That can be downloaded on flux3dp.com',
             osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
         generic_error: {
@@ -1275,7 +1275,7 @@ define(function() {
             auto_emerging: 'Please insert filament',
             loading_filament: 'Loading filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
-            disconnected: 'Connection unstable, Please check device connection and try again later', 
+            disconnected: 'Connection unstable, Please check device connection and try again later',
             maintain_zombie: 'Please restart the machine',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
             NA: 'Toolhead is not connected'

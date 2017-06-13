@@ -2966,19 +2966,27 @@ define([
     }
 
     function processSlicerError(result) {
-
         let id = 'SLICER_ERROR',
-        message = lang.slicer.error[result.error] || result.info;
-        if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
-            message = `${message} ${result.info}`;
+            no_vcredist = result.error === ErrorConstants.LIBRARY_NOT_FOUND,
+            message = lang.slicer.error[result.error] || result.info;
+
+        if (no_vcredist) {
+            message = lang.support.no_vcredist;
+            AlertActions.showPopupInfo(id, message);
+            //window.open('https://flux3dp.com/downloads/');
+
+        } else {
+          if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
+              message = `${message} ${result.info}`;
+
+          } else if (!message) {
+              message = result.error;
+
+          } else if (result.code === 1006) {
+              message = lang.slicer.error[result.code];
+          }
+          AlertActions.showPopupError(id, message);
         }
-        if (!message) {
-            message = result.error;
-        }
-        if (result.code === 1006) {
-            message = lang.slicer.error[result.code];
-        }
-        AlertActions.showPopupError(id, message);
     }
 
     function allOutOfBound() {
