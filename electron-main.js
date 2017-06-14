@@ -76,7 +76,9 @@ backendManager.start();
 
 function createWindow () {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1024, height: 768, vibrancy: 'light'});
+    mainWindow = new BrowserWindow({
+        width: 1024, height: 768, title: `FLUX Studio - ${app.getVersion()}`,
+        vibrancy: 'light'});
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
@@ -91,6 +93,9 @@ function createWindow () {
         if (process.platform !== 'darwin') {
             app.quit();
         }
+    });
+    mainWindow.on('page-title-updated', function(event) {
+        event.preventDefault();
     });
 
     mainWindow.webContents.openDevTools();
