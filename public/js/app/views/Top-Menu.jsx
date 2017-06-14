@@ -540,7 +540,6 @@ define([
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(device).then(function(status) {
-                    console.log('Select device ', status);
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
                         GlobalActions.showMonitor(device);
@@ -621,7 +620,9 @@ define([
                         return (
                             <li
                                 name={device.uuid}
-                                onClick={this._handleSelectDevice.bind(null, device)}>
+                                onClick={this._handleSelectDevice.bind(null, device)}
+                                data-test-key={device.serial}
+                            >
                                 <label className="name">{device.name}</label>
                                 <label className="status">{headText} {statusText}</label>
                                 <label className="progress">{progress}</label>

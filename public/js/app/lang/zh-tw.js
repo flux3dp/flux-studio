@@ -10,7 +10,7 @@ define(function() {
         },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
-            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            no_vcredist: '請安裝 Visual C++ Redistributable 2015<br/>可以在flux3dp.com找到',
             osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         generic_error: {
@@ -33,7 +33,8 @@ define(function() {
                 message_pattern_2: 'FLUX 韌體 v%s 可使用 - 你的版本為 v%s.',
                 latest_firmware: {
                     caption: '韌體更新',
-                    message: '韌體已經是最新版本'
+                    message: '韌體已經是最新版本',
+                    still_update: '檔案更新'
                 },
                 confirm: '上傳',
                 upload_file: '韌體上傳',
@@ -64,6 +65,8 @@ define(function() {
             checkingHeadinfo: '檢查工具頭資訊',
             preparing: '準備中...',
             later: '稍候',
+            download: '線上更新',
+            cannot_reach_internet: '伺服器無法連接<br/>請確認網路連線',
             install: '下載',
             upload: '上傳'
         },
@@ -114,6 +117,19 @@ define(function() {
                 scan_laser_complete: '掃描雷射已開啟，點擊 "完成" 以關閉雷射',
                 movement_tests_complete: '運動測試完成',
                 movement_tests_failed: '運動測試失敗。<br/>1. 請確工具頭連接線被正確拉直<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a>',
+                download_log: '匯出機器日誌',
+                download_log_canceled: '取消日誌下載',
+                download_log_error: '不明錯誤發生，請稍候再試一次',
+                log: {
+                    network: 'Network',
+                    hardware: 'Hardware',
+                    discover: 'Discover',
+                    usb: 'USB',
+                    camera: 'Camera',
+                    cloud: 'Cloud',
+                    player: 'Player',
+                    robot: 'Robot'
+                },
                 finish: '完成',
                 cancel: '取消',
                 turn_on_head_temperature: '設定列印工具頭溫度'
@@ -824,6 +840,7 @@ define(function() {
                 load_preset_title: '載入',
                 background: '自訂背景',
                 removeBackground: '移除背景',
+                removePreset: '設定值將會移除',
                 load_calibrate_image: '載入校正圖片',
                 apply: '套用',
                 cancel: '取消',
@@ -1073,6 +1090,7 @@ define(function() {
             HARDWARE_ERROR_MAINBOARD_ERROR      : '#401 主板沒有回應。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 子系統沒有回應。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SENSOR_ERROR         : '溫度偵測器發生問題。請聯繫 FLUX 客服。',
+            HARDWARE_ERROR_SENSOR_ERROR_FSR     : '壓力感測晶片讀數錯誤',
             WRONG_HEAD                          : '請更換成列印工具頭',
             USER_OPERATION                      : '別的使用者正在佔用機器',
             RESOURCE_BUSY                       : '機器忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
@@ -1184,7 +1202,9 @@ define(function() {
             },
             unsupport_osx_version: '不支援此 Mac OS X 版本',
             need_password: '需要密碼與機器建立連線',
-            new_app_downloading: '下載中',
+            new_app_downloading: 'FLUX Studio 下載中',
+            new_app_download_canceled: 'FLUX Studio 下載已被取消',
+            new_app_downloaded: '新版FLUX Studio 下載完畢',
             ask_for_upgrade: '馬上升級嗎?',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
@@ -1251,6 +1271,7 @@ define(function() {
             auto_emerging: '請插入線料',
             loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
+            disconnected: '連線不穩，請確認機器連線狀況並稍後再試一次',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印工具頭沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
         },

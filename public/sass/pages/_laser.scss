@@ -117,6 +117,9 @@
                     &:checked + .preset-item-name {
                         background-color: #E0E0E0;
                         color: #FFF;
+                        i {
+                          visibility: visible;
+                        }
                     }
                 }
 
@@ -128,6 +131,11 @@
                     line-height: 40px;
                     margin: 0;
                     padding: 0 0 0 10px;
+                    i {
+                      float: right;
+                      visibility: hidden;
+
+                    }
                 }
             }
 

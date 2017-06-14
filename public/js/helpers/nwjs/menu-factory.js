@@ -57,6 +57,30 @@ define([
     var emptyFunction = function(object) {
             return object || {};
         },
+
+        getLog = async function(printer, log) {
+            await DeviceMaster.select(printer);
+            ProgressActions.open(ProgressConstants.WAITING, '');
+            let downloader = DeviceMaster.downloadLog(log);
+            downloader.then((file) => {
+                ProgressActions.close();
+                saveAs(file[1], log);
+
+            }).progress((progress) => {
+                ProgressActions.open(ProgressConstants.STEPPING);
+                ProgressActions.updating(
+                    'downloading',
+                    progress.completed/progress.size * 100,
+                    function() { downloader.reject('canceled'); }
+                );
+
+            }).fail((data) => {
+              let msg = data === 'canceled' ?
+                    lang.device.download_log_canceled : lang.device.download_log_error;
+              AlertActions.showPopupInfo('', msg);
+            });
+        },
+
         executeFirmwareUpdate = function(printer, type) {
             var currentPrinter = discoverMethods.getLatestPrinter(printer),
                 checkToolheadFirmware = function() {
@@ -97,16 +121,29 @@ define([
                         }
 
                         if (!response.needUpdate) {
-                            AlertActions.showPopupInfo(
+                            let forceUpdate = {
+                                custom: () => {
+                                  firmwareUpdater(response, currentPrinter, type, true);
+                                },
+                                no: () => {
+                                  if ('toolhead' === type) {
+                                      DeviceMaster.quitTask();
+                                  }
+                                }
+                            };
+                            AlertActions.showPopupCustomCancel(
                                 'latest-firmware',
                                 message + ' (v' + latestVersion + ')',
-                                caption
+                                lang0.update.firmware.latest_firmware.still_update,
+                                caption,
+                                forceUpdate
                             );
+                        } else {
+                          firmwareUpdater(response, currentPrinter, type);
                         }
 
-                        firmwareUpdater(response, currentPrinter, type);
-                    }).
-                    fail(function(response) {
+                    })
+                    .fail(function(response) {
                         firmwareUpdater(response, currentPrinter, type);
                         AlertActions.showPopupInfo(
                             'latest-firmware',
@@ -154,6 +191,7 @@ define([
                         processUpdate();
                     }
                 };
+
 
             DeviceMaster.select(printer).then(function(status) {
                 checkStatus();
@@ -706,6 +744,68 @@ define([
                         }
                     }
                 ]
+            });
+
+            subItems.push({
+              label: lang.device.download_log,
+              subItems: [
+                {
+                  label:lang.device.log.network,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxnetworkd.log');
+                  }
+                },
+                {
+                  label:lang.device.log.hardware,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxhald.log');
+                  }
+                },
+                {
+                  label:lang.device.log.discover,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxupnpd.log');
+                  }
+                },
+                {
+                  label:lang.device.log.usb,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxusbd.log');
+                  }
+                },
+                {
+                  label:lang.device.log.camera,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxcamerad.log');
+                  }
+                },
+                {
+                  label:lang.device.log.cloud,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxcloudd.log');
+                  }
+                },
+                {
+                  label:lang.device.log.player,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxplayerd.log');
+                  }
+                },
+                {
+                  label:lang.device.log.robot,
+                  enabled: true,
+                  onClick: function() {
+                    getLog(printer, 'fluxrobotd.log');
+                  }
+                }
+              ]
             });
 
             // default device

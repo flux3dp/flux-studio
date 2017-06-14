@@ -237,6 +237,7 @@ define([
                         }
                         else {
                             counter++;
+                            console.log('retry report');
                             ws.send('play report');
                         }
                     }
@@ -245,6 +246,7 @@ define([
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 
+                setTimeout(function() { d.reject( {status: "Timeout"} )}, 3000);
                 ws.send('play report');
                 return d.promise();
             },
@@ -422,6 +424,30 @@ define([
 
                 ws.send(`file download ${fileNameWithPath}`);
                 return d.promise();
+            },
+
+            downloadLog: (log) => {
+                let d = $.Deferred(),
+                    file = [];
+
+                events.onMessage = (response) => {
+                    if(response.status === 'transfer') {
+                        d.notify(response);
+                    }
+                    else if (!~Object.keys(response).indexOf('completed')) {
+                        file.push(response);
+                    }
+
+                    if(response instanceof Blob) {
+                        d.resolve(file);
+                    }
+                };
+
+                events.onError = (response) => { d.reject(response); };
+                events.onFatal = (response) => { d.resolve(response); };
+
+                ws.send(`fetch_log ${log}`);
+                return d;
             },
 
             downloadErrorLog: () => {
@@ -660,13 +686,25 @@ define([
              * @return {Promise}
              */
             changeFilament: (type) => {
-                let d = $.Deferred();
+                let d = $.Deferred(),
+                    timeout;
 
                 const getType = (t) => {
                     return t === DeviceConstants.LOAD_FILAMENT ? 'load_filament' : 'unload_filament';
                 };
 
                 events.onMessage = (response) => {
+
+                    clearTimeout(timeout);
+                    timeout = setTimeout( () => {
+                        response = {
+                          stage  : "error",
+                          status : "error",
+                          error  : ["DISCONNECTED", ""]
+                        }
+                        d.reject(response);
+                    }, 10 * 1000);
+
                     response.status !== 'ok' ? d.notify(response) : d.resolve(response);
                 };
 

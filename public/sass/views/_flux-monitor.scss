@@ -108,9 +108,25 @@
                         border: 1px solid #B3B3B3;
                         width: 60px;
                     }
+                    i {
+                      position: absolute;
+                      color: #CCC;
+                      top: -8px;
+                      right: 18px;
+                      visibility: hidden;
+                      &.selected {
+                        visibility: visible;
+                      }
+                    }
+                    i:hover {
+                      color: #333 !important;
+                    }
                 }
                 .file:hover {
                     color: #333;
+                    i {
+                      color: #CCC;
+                    }
                 }
                 .spinner-wrapper {
                     position: absolute;

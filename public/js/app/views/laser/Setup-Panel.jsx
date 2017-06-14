@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Unit-Input',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Alert',
+    'app/actions/alert-actions',
     'jsx!widgets/Dialog-Menu',
     'helpers/api/config',
     'helpers/i18n',
@@ -25,6 +26,7 @@ define([
     UnitInput,
     ButtonGroup,
     Alert,
+    AlertActions,
     DialogMenu,
     config,
     i18n,
@@ -115,8 +117,7 @@ define([
             var customPresets = config().read('laser-custom-presets') || [],
                 sameNamePresets = customPresets.some(function(preset) {
                     return preset.label === material.label;
-                }),
-                lang = this.props.lang;
+                });
 
             if (false === sameNamePresets) {
                 customPresets.push(material);
@@ -237,6 +238,34 @@ define([
                         elCustomPresets.dataset.selectedMaterial = JSON.stringify(meta);
                     }
                 },
+                handleDelPreset = function(e) {
+                  let elCustomPresets = self.refs.customPresets.getDOMNode(),
+                      customPresets = config().read('laser-custom-presets') || [],
+                      selectedPreset = JSON.parse(elCustomPresets.dataset.selectedMaterial),
+                      isSelected,
+                      selectedIdx;
+
+                  AlertActions.showPopupYesNo(
+                    'removePreset',
+                    lang.laser.advanced.removePreset,
+                    '',
+                    '',
+                    {
+                      yes: function() {
+                        customPresets.some(function(preset, idx) {
+                          isSelected = selectedPreset.value === preset.value ? true : false;
+                          selectedIdx = idx;
+                          return isSelected
+                        });
+
+                        customPresets.splice(selectedIdx, 1);
+                        config().write('laser-custom-presets', customPresets);
+                        self.forceUpdate();
+                      },
+                      no:  function() {}
+                    }
+                  );
+                },
                 advancedLang = lang.laser.advanced,
                 content;
 
@@ -244,7 +273,9 @@ define([
                 opt.label = (
                     <label>
                         <input name="custom-preset-item" type="radio"/>
-                        <p className="preset-item-name" data-meta={JSON.stringify(opt)}>{opt.label}</p>
+                        <p className="preset-item-name" data-meta={JSON.stringify(opt)}>{opt.label}
+                          <i className="fa fa-times" onClick={handleDelPreset}></i>
+                        </p>
                     </label>
                 );
 
@@ -355,7 +386,7 @@ define([
                             defaultValue={this.state.defaults.heightOffset}
                             getValue={this._refreshHeightOffset}
                             min={-10}
-                            max={10}
+                            max={100}
                         />
                     </div>
                 )

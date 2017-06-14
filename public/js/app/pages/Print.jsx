@@ -286,7 +286,7 @@ define([
 
                     //========for testing only==================
                     //shortcuts.on(['cmd', 'b'], () => {
-                    //  director.alignCenterPosition();
+                    //  director.tester();
                     //});
                     // shortcuts.on(['ctrl', 'shift', 't'], () => {
                     //     window.customEvent.onTutorialClick();
