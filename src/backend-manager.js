@@ -95,8 +95,7 @@ class BackendManager extends EventEmitter {
                         let devInfo = uglyJsonParser(message.utf8Data);
                         this.emit('device_updated', devInfo);
                     } catch(err) {
-                        console.error(`Can not handle backend stout: ${err}`);
-                        console.trace();
+                        console.error("Can not handle backend stout: %s", err);
                     }
                 }
             });
@@ -109,13 +108,13 @@ class BackendManager extends EventEmitter {
                 }
             });
             conn.on('error', (error) => {
-                console.error('Discover WebSocket error: ' + error.toString());
+                console.error('Discover WebSocket error: %s', error);
             });
         });
         this._ws.on('connectFailed', (error) => {
             this._ws = undefined;
             if(this._running) {
-                console.error('Discover connect failed: ' + error.toString());
+                console.error('Discover connect failed: %s', error);
                 this._setRecover();
             }
         });

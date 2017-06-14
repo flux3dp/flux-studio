@@ -150,6 +150,7 @@ function buildAccountMenu(callback, account) {
 class MenuManager extends EventEmitter {
     constructor(on_trigger) {
         super();
+        this._device_list = {};
         this.constructMenu();
 
         ipcMain.on(events.NOTIFY_LANGUAGE, (e, language) => {
@@ -159,12 +160,10 @@ class MenuManager extends EventEmitter {
         });
 
         ipcMain.on(events.DISABLE_MENU_ITEM, (e, ids) => {
-            console.log('disable menu', ids);
             this.toggleMenu(ids, false);
         });
 
         ipcMain.on(events.ENABLE_MENU_ITEM, (e, ids) => {
-            console.log('enable menu', ids);
             this.toggleMenu(ids, true);
         });
 
@@ -189,7 +188,7 @@ class MenuManager extends EventEmitter {
         });
 
         ipcMain.on(events.SET_AS_DEFAULT, (e, device) => {
-            this._devicemenu.submenu.items.forEach(item => {
+            this._deviceMenu.submenu.items.forEach(item => {
                 if(item.label === device.name) {
                     item.checked = true;
                 }
@@ -197,7 +196,6 @@ class MenuManager extends EventEmitter {
             Menu.setApplicationMenu(this._appmenu);
         });
     }
-
     constructMenu() {
         this._appmenu = Menu.buildFromTemplate(
             build_menu(this._on_menu_click.bind(this))
@@ -205,16 +203,20 @@ class MenuManager extends EventEmitter {
 
         for(let i in this._appmenu.items) {
             if(this._appmenu.items[i].id === '_machines') {
-                this._devicemenu = this._appmenu.items[i];
+                this._deviceMenu = this._appmenu.items[i];
             }
             else if(this._appmenu.items[i].id === '_account') {
                 this._accountMenu = this._appmenu.items[i];
             }
         }
-        this._device_list = {};
+
+        for(let uuid in this._device_list) {
+            let data = this._device_list[uuid];
+            let instance = build_device_menu(this._on_menu_click.bind(this), uuid, data);
+            this._deviceMenu.submenu.append(instance);
+        }
         Menu.setApplicationMenu(this._appmenu);
     }
-
     toggleMenu(ids, enabled) {
         ids = Array.isArray(ids) ? ids : [ids];
 
@@ -228,7 +230,6 @@ class MenuManager extends EventEmitter {
 
         Menu.setApplicationMenu(this._appmenu);
     }
-
     _on_menu_click(event) {
         if(event.id) {
             this.emit(events.MENU_ITEM_CLICK, event);
@@ -239,23 +240,42 @@ class MenuManager extends EventEmitter {
     setWindowsClosed() {
     }
     appendDevice(uuid, data) {
-        if(this._device_list[uuid]) {
-            this._device_list[uuid].visible = true;
+        if(this._deviceMenu) {
+            for(let menuitem of this._deviceMenu.submenu.items) {
+                if(menuitem.id === `device:${uuid}`) {
+                    menuitem.visible = true;
+                    this.updateDevice(uuid, data);
+                    Menu.setApplicationMenu(this._appmenu);
+                    return;
+                }
+            }
+
+            this._device_list[uuid] = data;
+            let instance = build_device_menu(this._on_menu_click.bind(this), uuid, data);
+            this._deviceMenu.submenu.append(instance);
             Menu.setApplicationMenu(this._appmenu);
         } else {
-            let instance = build_device_menu(this._on_menu_click.bind(this), uuid, data);
-            this._devicemenu.submenu.append(instance);
-            this._device_list[uuid] = instance;
-            Menu.setApplicationMenu(this._appmenu);
+            this._device_list[uuid] = data;
+            return;
         }
     }
     updateDevice(uuid, data) {
+        this._device_list[uuid] = data;
+
+        if(this._deviceMenu) {
+            return;
+        }
         // NOTE: update this._appmenu and call Menu.setApplicationMenu(this._appmenu); to make changes effect.
     }
     removeDevice(uuid) {
-        let target = this._device_list[uuid];
-        if(target) {
-            target.visible = false;
+        delete this._device_list[uuid];
+
+        if(this._deviceMenu) {
+            for(let menuitem of this._deviceMenu.submenu.items) {
+                if(menuitem.id === `device:${uuid}`) {
+                    menuitem.visible = false;
+                }
+            }
             Menu.setApplicationMenu(this._appmenu);
         }
     }
