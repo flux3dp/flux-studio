@@ -10,7 +10,7 @@ function bootstrap_macos() {
     process.env.BACKEND = process.env.BACKEND || path.join(resourcesRoot, 'backend', 'flux_api', 'flux_api');
     process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || path.join(resourcesRoot, 'backend', 'slic3r');
     process.env.GHOST_CURA = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine');
-    process.env.GHOST_CURA2 = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine2');
+    process.env.GHOST_CURA2 = process.env.GHOST_CURA2 || path.join(resourcesRoot, 'backend', 'CuraEngine2');
     console.log(`### backend: ${process.env.BACKEND}`);
 }
 
@@ -25,7 +25,7 @@ function bootstrap_windows() {
     process.env.BACKEND = process.env.BACKEND || path.join(resourcesRoot, 'backend', 'flux_api', 'flux_api.exe');
     process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || path.join(resourcesRoot, 'backend', 'Slic3r', 'slic3r.exe');
     process.env.GHOST_CURA = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine', 'CuraEngine.exe');
-    process.env.GHOST_CURA2 = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine2', 'CuraEngine2.exe');
+    process.env.GHOST_CURA2 = process.env.GHOST_CURA2 || path.join(resourcesRoot, 'backend', 'CuraEngine2', 'CuraEngine2.exe');
     console.log(`### backend: ${process.env.BACKEND}`);
 }
 
