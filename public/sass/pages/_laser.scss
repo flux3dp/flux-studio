@@ -239,7 +239,7 @@
 
     .laser-object {
         @include absolute-center();
-        background: url(img/laser-platform.png);
+        background: url(../img/laser-platform.png);
         background-size: 100% 100%;
         height: 510px;
         overflow: hidden;

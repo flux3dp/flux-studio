@@ -12,6 +12,8 @@ function bootstrap_macos() {
     process.env.GHOST_CURA = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine');
     process.env.GHOST_CURA2 = process.env.GHOST_CURA2 || path.join(resourcesRoot, 'backend', 'CuraEngine2');
     console.log(`### backend: ${process.env.BACKEND}`);
+    console.log(`### cura: ${process.env.GHOST_CURA}`);
+    console.log(`### cura2: ${process.env.GHOST_CURA2}`);
 }
 
 function bootstrap_linux() {

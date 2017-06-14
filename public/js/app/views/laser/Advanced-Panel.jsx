@@ -11,13 +11,13 @@ define([
     'jsx!widgets/File-Uploader',
     'helpers/i18n',
     'plugins/jquery/serializeObject',
-    'helpers/array-findindex', 
+    'helpers/array-findindex',
 ], function(
     React,
     SelectView,
     ButtonGroup,
     TextInput,
-    UnitInput, 
+    UnitInput,
     config,
     classNames,
     round,
@@ -29,7 +29,7 @@ define([
 
     var laserLang = i18n.lang.laser,
         advancedLang = laserLang.advanced;
-    
+
     return React.createClass({
 
         getDefaultProps: function() {

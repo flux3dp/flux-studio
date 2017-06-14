@@ -6097,7 +6097,7 @@ img.img640x480 {
     position: absolute;
     right: 0;
     top: 0;
-    background: url(img/laser-platform.png);
+    background: url(../img/laser-platform.png);
     background-size: 100% 100%;
     height: 510px;
     overflow: hidden;

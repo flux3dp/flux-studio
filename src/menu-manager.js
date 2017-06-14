@@ -26,7 +26,8 @@ function build_menu(callback) {
     }
 
     menu.push({
-        label: 'File',
+        id: '_file',
+        label: r.file,
         submenu: [
             { 'id': 'IMPORT', label: r.import || 'open', click: callback },
             { type: 'separator' },
@@ -36,7 +37,8 @@ function build_menu(callback) {
     });
 
     menu.push({
-        label: 'Edit',
+        id: '_edit',
+        label: r.edit,
         submenu: [
             { 'id': 'UNDO', label: r.undo, click: callback },
             { type:'separator'},
@@ -61,7 +63,7 @@ function build_menu(callback) {
 
     menu.push({
         id: '_account',
-        label: 'Account',
+        label: r.account,
         submenu: [
             {
                 id: 'MY_ACCOUNT',
@@ -95,7 +97,9 @@ function build_menu(callback) {
     }
 
     menu.push({
-        label: 'Help', role: 'help',
+        id: '_help',
+        label: r.help,
+        role: 'help',
         submenu: [
             { id: 'HELP_CENTER', label: r.help_center, click() { shell.openExternal('http://helpcenter.flux3dp.com/'); } },
             { id: 'CONTACT_US', label: r.contact, click() { shell.openExternal('http://flux3dp.zendesk.com/hc/en-us/requests/new'); } },
@@ -154,7 +158,7 @@ class MenuManager extends EventEmitter {
         this.constructMenu();
 
         ipcMain.on(events.NOTIFY_LANGUAGE, (e, language) => {
-            language = language === 'tw' ? 'tw' : 'en';
+            language = language === 'zh-tw' ? 'zh-tw' : 'en';
             r = resource[language];
             this.constructMenu();
         });

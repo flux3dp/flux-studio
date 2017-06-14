@@ -1,5 +1,8 @@
 module.exports = {
     'en': {
+        file: 'File',
+        edit: 'Edit',
+        help: 'Help',
         import: 'Import',
         export_flux_task: 'Export FLUX task',
         save_scene: 'Save Scene',
@@ -33,9 +36,13 @@ module.exports = {
         set_toolhead_temperature: 'Set Toolhead Temperature',
         sign_in: 'Sign In',
         sign_out: 'Sign Out',
+        account: 'Account',
         my_account: 'My Account'
     },
     'zh-tw': {
+        file: '檔案',
+        edit: '編輯',
+        help: '說明',
         import: '匯入',
         export_flux_task: '匯出工作',
         save_scene: '匯出場景',
@@ -69,6 +76,7 @@ module.exports = {
         set_toolhead_temperature: '設定列印工具頭溫度',
         sign_in: '登入',
         sign_out: '登出',
+        account: '帳號',
         my_account: '我的帳號'
     }
 };
