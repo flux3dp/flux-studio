@@ -80,7 +80,6 @@ function createWindow () {
         width: 1024, height: 768, title: `FLUX Studio - ${app.getVersion()}`,
         vibrancy: 'light'});
 
-    // and load the index.html of the app.
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'public/index.html'),
         protocol: 'file:',
@@ -94,11 +93,28 @@ function createWindow () {
             app.quit();
         }
     });
+
     mainWindow.on('page-title-updated', function(event) {
         event.preventDefault();
     });
 
-    mainWindow.webContents.openDevTools();
+    menuManager.on("DEBUG-RELOAD", () => {
+        mainWindow.loadURL(url.format({
+            pathname: path.join(__dirname, 'public/index.html'),
+            protocol: 'file:',
+            slashes: true,
+        }));
+    });
+
+    menuManager.on("DEBUG-INSPECT", () => {
+        mainWindow.webContents.openDevTools();
+    });
+    ipcMain.on("DEBUG-INSPECT", () => {
+        mainWindow.webContents.openDevTools();
+    });
+    if(process.defaultApp) {
+        mainWindow.webContents.openDevTools();
+    }
 }
 
 ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
@@ -111,9 +127,6 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
         console.error('Recv async-status request but main window not exist');
     }
 });
-
-ipcMain.on('open-devtool', () => { mainWindow.webContents.openDevTools(); });
-ipcMain.on('discover-poke', (ipaddr) => { backendManager.poke(ipaddr); });
 
 app.on('ready', () => {
     app.makeSingleInstance((commandLine, workingDirectory) => {
