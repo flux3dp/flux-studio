@@ -137,7 +137,20 @@ function build_device_menu(callback, uuid, data) {
                 { id: 'SET_TOOLHEAD_TEMPERATURE', label: r.set_toolhead_temperature, uuid, serial, source, click: callback }
             ]},
             { type: 'separator' },
-            { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [] },
+            { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [
+                { id: 'UPDATE_DELTA', label: r.update_delta, uuid, serial, source, click: callback },
+                { id: 'UPDATE_TOOLHEAD', label: r.update_toolhead, uuid, serial, source, click: callback }
+            ]},
+            { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [
+                { id: 'LOG_NETWORK', label: r.log.network, uuid, serial, source, click: callback },
+                { id: 'LOG_HARDWARE', label: r.log.hardware, uuid, serial, source, click: callback },
+                { id: 'LOG_DISCOVER', label: r.log.discover, uuid, serial, source, click: callback },
+                { id: 'LOG_USB', label: r.log.usb, uuid, serial, source, click: callback },
+                { id: 'LOG_CAMERA', label: r.log.camera, uuid, serial, source, click: callback },
+                { id: 'LOG_CLOUD', label: r.log.cloud, uuid, serial, source, click: callback },
+                { id: 'LOG_PLAYER', label: r.log.player, uuid, serial, source, click: callback },
+                { id: 'LOG_ROBOT', label: r.log.robot, uuid, serial, source, click: callback }
+            ]},
             { id: 'SET_AS_DEFAULT', label: r.set_as_default, uuid, serial, source, click: callback, type:'checkbox'}
         ]
     });

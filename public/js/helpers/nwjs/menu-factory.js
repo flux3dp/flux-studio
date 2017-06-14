@@ -1,3 +1,4 @@
+/**** !!! have been deprecated when change to Electron !!!
 /**
  * nwjs menu factory
  */

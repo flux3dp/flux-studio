@@ -7,6 +7,8 @@ define([
     'helpers/api/discover',
     'helpers/device-master',
     'helpers/check-device-status',
+    'helpers/check-firmware',
+    'helpers/firmware-updater',
     'helpers/firmware-version-checker',
     'helpers/api/3d-scan-control',
     'helpers/api/cloud',
@@ -33,6 +35,8 @@ define([
     Discover,
     DeviceMaster,
     checkDeviceStatus,
+    checkFirmware,
+    firmwareUpdater,
     FirmwareVersionChecker,
     ScanControl,
     CloudApi,
@@ -98,7 +102,151 @@ define([
                     label: lang.menu.cut,
                     imgSrc: 'img/menu/icon-cut.svg'
                 },
-            ];
+            ],
+
+            getLog = async function(printer, log) {
+                await DeviceMaster.select(printer);
+                ProgressActions.open(ProgressConstants.WAITING, '');
+                let downloader = DeviceMaster.downloadLog(log);
+                downloader.then((file) => {
+                    ProgressActions.close();
+                    saveAs(file[1], log);
+
+                }).progress((progress) => {
+                    ProgressActions.open(ProgressConstants.STEPPING);
+                    ProgressActions.updating(
+                        'downloading',
+                        progress.completed/progress.size * 100,
+                        function() { downloader.reject('canceled'); }
+                    );
+
+                }).fail((data) => {
+                  let msg = data === 'canceled' ?
+                        lang.device.download_log_canceled : lang.device.download_log_error;
+                  AlertActions.showPopupInfo('', msg);
+                });
+            },
+
+            executeFirmwareUpdate = function(printer, type) {
+                //var currentPrinter = discoverMethods.getLatestPrinter(printer),
+                var currentPrinter = printer,
+                    checkToolheadFirmware = function() {
+                        var $deferred = $.Deferred();
+
+                        ProgressActions.open(ProgressConstants.NONSTOP, lang.update.checkingHeadinfo);
+
+                        if ('toolhead' === type) {
+                            DeviceMaster.headInfo().done(function(response) {
+                                currentPrinter.toolhead_version = response.version || '';
+
+                                if ('undefined' === typeof response.version) {
+                                    $deferred.reject();
+                                }
+                                else {
+                                    $deferred.resolve({ status: 'ok' });
+                                }
+                            }).fail(() => {
+                                $deferred.reject();
+                            });
+                        }
+                        else {
+                            $deferred.resolve({ status: 'ok' });
+                        }
+
+                        return $deferred;
+                    },
+                    updateFirmware = function() {
+                        checkFirmware(currentPrinter, type).done(function(response) {
+                            var latestVersion = currentPrinter.version,
+                                caption = lang.update.firmware.latest_firmware.caption,
+                                message = lang.update.firmware.latest_firmware.message;
+
+                            if ('toolhead' === type) {
+                                latestVersion = currentPrinter.toolhead_version;
+                                caption = lang.update.toolhead.latest_firmware.caption;
+                                message = lang.update.toolhead.latest_firmware.message;
+                            }
+
+                            if (!response.needUpdate) {
+                                let forceUpdate = {
+                                    custom: () => {
+                                      firmwareUpdater(response, currentPrinter, type, true);
+                                    },
+                                    no: () => {
+                                      if ('toolhead' === type) {
+                                          DeviceMaster.quitTask();
+                                      }
+                                    }
+                                };
+                                AlertActions.showPopupCustomCancel(
+                                    'latest-firmware',
+                                    message + ' (v' + latestVersion + ')',
+                                    lang.update.firmware.latest_firmware.still_update,
+                                    caption,
+                                    forceUpdate
+                                );
+                            } else {
+                              firmwareUpdater(response, currentPrinter, type);
+                            }
+
+                        })
+                        .fail(function(response) {
+                            firmwareUpdater(response, currentPrinter, type);
+                            AlertActions.showPopupInfo(
+                                'latest-firmware',
+                                lang.monitor.cant_get_toolhead_version
+                            );
+                        });
+                    },
+                    checkStatus = function() {
+                        const processUpdate = () => {
+                            checkToolheadFirmware().always(function() {
+                                ProgressActions.close();
+                                updateFirmware();
+                            }).fail(function() {
+                                AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
+                            });
+                        };
+
+                        const handleYes = (id) => {
+                            if(id === 'head-missing') {
+                                processUpdate();
+                            }
+                        };
+
+                        const handleCancel = (id) => {
+                            if(id === 'head-missing') {
+                                AlertStore.removeYesListener(handleYes);
+                                AlertStore.removeCancelListener(handleCancel);
+                                DeviceMaster.endMaintainMode();
+                            }
+                        };
+
+                        AlertStore.onRetry(handleYes);
+                        AlertStore.onCancel(handleCancel);
+
+                        ProgressActions.open(ProgressConstants.NONSTOP, lang.update.preparing);
+                        if(type === 'toolhead') {
+                            DeviceMaster.enterMaintainMode().then(() => {
+                                setTimeout(() => {
+                                    ProgressActions.close();
+                                    processUpdate();
+                                }, 3000);
+                            });
+                        }
+                        else {
+                            processUpdate();
+                        }
+                    };
+
+
+                DeviceMaster.select(printer).then(function(status) {
+                    checkStatus();
+                }).fail((resp) => {
+                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                });
+            };
+        //============ end var================================================
 
         // Special Feature
         if (window.FLUX && window.FLUX.dev) {
@@ -168,6 +316,11 @@ define([
                 console.log('clicked menu item: ', menuItem);
                 let _action = {},
                     lang = i18n.get();
+
+                _action['ADD_NEW_MACHINE'] = () => {
+                   console.log('add new');
+                    location.hash = '#initialize/wifi/connect-machine';
+                };
 
                 _action['DASHBOARD'] = (device) => {
                     DeviceMaster.selectDevice(device).then(status => {
@@ -393,6 +546,50 @@ define([
                     });
                 };
 
+                _action['UPDATE_DELTA'] = (device) => {
+                    checkDeviceStatus(device).then(() => {
+                      executeFirmwareUpdate(device, 'firmware');
+                    })
+                };
+
+                _action['UPDATE_TOOLHEAD'] = (device) => {
+                    checkDeviceStatus(device).then(() => {
+                      executeFirmwareUpdate(device, 'toolhead');
+                    })
+                };
+
+                _action['LOG_NETWORK'] = (device) => {
+                    getLog(device, 'fluxnetworkd.log');
+                };
+
+                _action['LOG_HARDWARE'] = (device) => {
+                    getLog(device, 'fluxhald.log');
+                };
+
+                _action['LOG_DISCOVER'] = (device) => {
+                    getLog(device, 'fluxupnpd.log');
+                };
+
+                _action['LOG_USB'] = (device) => {
+                    getLog(device, 'fluxusbd.log');
+                };
+
+                _action['LOG_CAMERA'] = (device) => {
+                    getLog(device, 'fluxcamerad.log');
+                };
+
+                _action['LOG_CLOUD'] = (device) => {
+                    getLog(device, 'fluxcloudd.log');
+                };
+
+                _action['LOG_PLAYER'] = (device) => {
+                    getLog(device, 'fluxplayerd.log');
+                };
+
+                _action['LOG_ROBOT'] = (device) => {
+                    getLog(device, 'fluxrobotd.log');
+                };
+
                 _action['SET_AS_DEFAULT'] = (device) => {
                     InitializeMachine.defaultPrinter.clear();
                     InitializeMachine.defaultPrinter.set(device);
@@ -420,6 +617,7 @@ define([
                 console.log('device info id', menuItem.id);
                 if(typeof _action[menuItem.id] === 'function') {
                     if(
+                        menuItem.id === 'ADD_NEW_MACHINE' ||
                         menuItem.id === 'SIGN_IN' ||
                         menuItem.id === 'SIGN_OUT' ||
                         menuItem.id === 'MY_ACCOUNT' ||

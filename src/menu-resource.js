@@ -28,6 +28,8 @@ module.exports = {
         run_leveling: 'Run Auto Leveling',
         commands: 'Commands',
         update_firmware: 'Update Firmware',
+        update_delta: 'Mechine Firmware',
+        update_toolhead: 'Toolhead Firmware',
         set_as_default: 'Set as Default',
         calibrate_origin: 'Calibrate Origin ( Home )',
         movement_test: 'Run Movement Test',
@@ -37,7 +39,21 @@ module.exports = {
         sign_in: 'Sign In',
         sign_out: 'Sign Out',
         account: 'Account',
-        my_account: 'My Account'
+        my_account: 'My Account',
+        download_log: 'Download Logs',
+        download_log_canceled: 'Log download canceled',
+        download_log_error: 'Unknown error occurred, please try it again later',
+        log: {
+          network: 'Network',
+          hardware: 'Hardware',
+          discover: 'Discover',
+          usb: 'USB',
+          camera: 'Camera',
+          cloud: 'Cloud',
+          player: 'Player',
+          robot: 'robot'
+        }
+
     },
     'zh-tw': {
         file: '檔案',
@@ -68,6 +84,8 @@ module.exports = {
         run_leveling: '校正平台',
         commands: '指令',
         update_firmware: '韌體更新',
+        update_delta: '機器韌體',
+        update_toolhead: '工具頭韌體',
         set_as_default: '設為預設',
         calibrate_origin: '回歸原點',
         movement_test: '執行運動測試',
@@ -77,6 +95,19 @@ module.exports = {
         sign_in: '登入',
         sign_out: '登出',
         account: '帳號',
-        my_account: '我的帳號'
+        my_account: '我的帳號',
+        download_log: '匯出機器日誌',
+        download_log_canceled: '取消日誌下載',
+        download_log_error: '不明錯誤發生，請稍候再試一次',
+        log: {
+          network: 'Network',
+          hardware: 'Hardware',
+          discover: 'Discover',
+          usb: 'USB',
+          camera: 'Camera',
+          cloud: 'Cloud',
+          player: 'Player',
+          robot: 'robot'
+        }
     }
 };
