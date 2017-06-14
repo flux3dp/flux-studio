@@ -54,7 +54,7 @@ define([
     DeviceErrorHandler
 ) {
     'use strict';
-
+    return;
     var emptyFunction = function(object) {
             return object || {};
         },

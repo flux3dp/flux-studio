@@ -216,8 +216,16 @@ class MenuManager extends EventEmitter {
 
         ipcMain.on(events.POPUP_MENU, (e, show, options) => {
             this._popup_menu = Menu.buildFromTemplate([
-                {label: "Display 1"},
-                {label: "Display 2"}
+                {
+                    label: "Reload App", click: () => {
+                        this.emit("DEBUG-RELOAD")
+                    }
+                },
+                {
+                    label: "Inspect", click: () => {
+                        this.emit("DEBUG-INSPECT");
+                    }
+                }
             ]);
             this._popup_menu.popup(options);
         });

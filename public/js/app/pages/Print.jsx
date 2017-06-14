@@ -11,7 +11,8 @@ define([
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Printer-Selector',
-    'helpers/nwjs/menu-factory',
+    // TODO
+    // 'helpers/nwjs/menu-factory',
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
@@ -49,7 +50,8 @@ define([
     Modal,
     Config,
     PrinterSelector,
-    menuFactory,
+    // TODO
+    // menuFactory,
     DeviceMaster,
     GlobalStore,
     GlobalActions,
@@ -102,7 +104,7 @@ define([
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
-            nwjsMenu = menuFactory.items,
+            // nwjsMenu = menuFactory.items,
             defaultSlicingEngine = 'cura',
             tourGuide = TutorialSteps,
             view = React.createClass({
@@ -189,8 +191,9 @@ define([
 
                                 console.log('account is', content);
                                 ipc.send(events.UPDATE_ACCOUNT, content);
-                                menuFactory.methods.updateAccountDisplay(displayName);
-                                menuFactory.methods.refresh();
+                                // TODO
+                                // menuFactory.methods.updateAccountDisplay(displayName);
+                                // menuFactory.methods.refresh();
                             });
                         }
                         else {
@@ -223,7 +226,8 @@ define([
                         });
                     };
 
-                    menuFactory.methods.refresh();
+                    // TODO
+                    // menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
                     this._registerTracking();
@@ -256,8 +260,9 @@ define([
                     director.clear();
                     director.willUnmount();
 
-                    nwjsMenu.tutorial.enabled = false;
-                    menuFactory.methods.refresh();
+                    // TODO
+                    // nwjsMenu.tutorial.enabled = false;
+                    // menuFactory.methods.refresh();
 
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
@@ -322,8 +327,9 @@ define([
                     shortcuts.on(['ctrl', 'shift', 'x'], () => { this._handleClearScene(); });
                     shortcuts.on(['ctrl', 'shift', 'r'], () => { this._handleModeChange('rotate'); });
                     shortcuts.on(['ctrl', 'shift', 's'], () => { this._handleModeChange('scale'); });
-                    shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
-                    shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
+                    // TODO
+                    // shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
+                    // shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
                     shortcuts.on(['ctrl', 'n'], () => { location.hash = '#initialize/wifi/connect-machine'; });
                 },
 
@@ -1187,16 +1193,17 @@ define([
                     );
                 },
 
-                _renderNwjsMenu: function() {
-                    if(nwjsMenu.undo.enabled !== this.state.hasObject) {
-                        nwjsMenu.undo.enabled = this.state.hasObject;
-                        nwjsMenu.saveTask.enabled = this.state.hasObject;
-                        nwjsMenu.saveScene.enabled = this.state.hasObject;
-                        nwjsMenu.clear.enabled = this.state.hasObject;
-                        nwjsMenu.signIn = { label: this.state.nickname, enabled: true, parent: 5}
-                        menuFactory.methods.refresh();
-                    }
-                },
+                // TODO
+                // _renderNwjsMenu: function() {
+                //     if(nwjsMenu.undo.enabled !== this.state.hasObject) {
+                //         nwjsMenu.undo.enabled = this.state.hasObject;
+                //         nwjsMenu.saveTask.enabled = this.state.hasObject;
+                //         nwjsMenu.saveScene.enabled = this.state.hasObject;
+                //         nwjsMenu.clear.enabled = this.state.hasObject;
+                //         nwjsMenu.signIn = { label: this.state.nickname, enabled: true, parent: 5}
+                //         menuFactory.methods.refresh();
+                //     }
+                // },
 
                 _renderTourGuide: function() {
                     return (
@@ -1222,7 +1229,8 @@ define([
                         percentageBar           = this._renderPercentageBar(),
                         tourGuideSection        = this.state.tutorialOn ? this._renderTourGuide() : '';
 
-                    this._renderNwjsMenu();
+                    // TODO
+                    // this._renderNwjsMenu();
 
                     return (
                         <div className='studio-container print-studio'>

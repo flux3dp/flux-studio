@@ -761,6 +761,9 @@ define([
                 });
             },
 
+            _handleContextMenu: function(event) {
+                electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY});
+            },
             _renderStudioFunctions: function() {
                 var itemClass = '',
                     label = '',
@@ -863,7 +866,7 @@ define([
 
                 return (
                     <div className={ClassNames(topClass)}>
-                        <div className="brand-logo">
+                        <div className="brand-logo" onContextMenu={this._handleContextMenu.bind(this)}>
                             <img className="logo-icon" src="img/menu/main_logo.svg" draggable="false"/>
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
