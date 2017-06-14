@@ -143,6 +143,7 @@ function build_device_menu(callback, uuid, data) {
     });
 }
 
+
 function buildAccountMenu(callback, account) {
     return new MenuItem({
         label: account.nickname,
@@ -198,6 +199,14 @@ class MenuManager extends EventEmitter {
                 }
             });
             Menu.setApplicationMenu(this._appmenu);
+        });
+
+        ipcMain.on(events.POPUP_MENU, (e, show, options) => {
+            this._popup_menu = Menu.buildFromTemplate([
+                {label: "Display 1"},
+                {label: "Display 2"}
+            ]);
+            this._popup_menu.popup(options);
         });
     }
     constructMenu() {
