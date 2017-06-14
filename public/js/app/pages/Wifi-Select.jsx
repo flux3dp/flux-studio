@@ -663,7 +663,7 @@ define([
                     joinNetworkForm = this._renderJoinNetworkForm(lang),
                     content = (
                         <div className="select-wifi text-center">
-                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                            <img className="brand-image" src="img/menu/main_logo.svg"/>
                             <div>
                                 <h1 className="headline">{lang.initialize.wifi_setup}</h1>
                                 <p className="notice">{lang.initialize.select_preferred_wifi}</p>

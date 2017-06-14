@@ -21,15 +21,15 @@ define([
                             <div className="usb-sidebar-header">My Drive</div>
                             <div className="usb-sidebar-body">
                                 <div className="folder">
-                                    <div className="folder-icon"><img src="/img/icon-folder.png" height="30px" /></div>
+                                    <div className="folder-icon"><img src="img/icon-folder.png" height="30px" /></div>
                                     <div className="folder-name">Folder Name</div>
-                                    <div className="expand-icon"><img src="/img/icon-arrow-d.png" height="35px" /></div>
+                                    <div className="expand-icon"><img src="img/icon-arrow-d.png" height="35px" /></div>
                                 </div>
                                 <div className="folder">
-                                    <div className="folder-icon"><img src="/img/icon-folder.png" height="30px" /></div>
+                                    <div className="folder-icon"><img src="img/icon-folder.png" height="30px" /></div>
                                     <div className="folder-name">Folder Name</div>
                                     <div className="expand-icon">
-                                        <img src="/img/icon-arrow-d.png" height="35px" data-target="exp" onClick={this._handleSlideToggle} /></div>
+                                        <img src="img/icon-arrow-d.png" height="35px" data-target="exp" onClick={this._handleSlideToggle} /></div>
                                 </div>
                                 <div className="hide" id="exp">
                                     <div className="file level2">

@@ -49,7 +49,7 @@ define([
                         <h2>{lang.wifi.set_printer.caption}</h2>
                         <div className="wifi-form row-fluid clearfix">
                             <div className="col span5 flux-printer">
-                                <img src="/img/img-flux-printer.png"/>
+                                <img src="img/img-flux-printer.png"/>
                             </div>
                             <div className="col span7 text-left">
                                 <p>

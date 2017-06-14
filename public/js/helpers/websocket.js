@@ -42,13 +42,16 @@ define([
     return function(options) {
         var lang = i18n.get(),
             { dev } = window.FLUX,
+            dev = false,
             customHost = localStorage.getItem('host'),
             customPort = localStorage.getItem('port'),
             defaultCallback = function(result) {},
             defaultOptions = {
                 hostname: customHost ? customHost : (dev ? '127.0.0.1' : 'localhost'),
                 method: '',
-                port: customPort ? customPort : dev ? '8000' : window.FLUX.ghostPort,
+                get port() {
+                    return customPort ? customPort : dev ? '8000' : window.FLUX.ghostPort;
+                },
                 autoReconnect: true,
                 ignoreAbnormalDisconnect: false,
                 onMessage: defaultCallback,

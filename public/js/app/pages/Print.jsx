@@ -180,16 +180,24 @@ define([
                 },
 
                 componentWillMount: function() {
+                    let { ipc, events } = window.electron;
                     CloudApi.getMe().then(response => {
                         if(response.ok) {
-                            return response.json();
+                            response.json().then(content => {
+                                let { nickname, email } = content || {};
+                                let displayName = (nickname || email || '');
+
+                                console.log('account is', content);
+                                ipc.send(events.UPDATE_ACCOUNT, content);
+                                menuFactory.methods.updateAccountDisplay(displayName);
+                                menuFactory.methods.refresh();
+                            });
                         }
-                    }).then(content => {
-                        let { nickname, email } = content || {};
-                        let displayName = (nickname || email || '');
-                        menuFactory.methods.updateAccountDisplay(displayName);
-                        menuFactory.methods.refresh();
-                    });;
+                        else {
+                            ipc.send(events.UPDATE_ACCOUNT, {});
+                        }
+                    });
+                    ipc.send(events.UPDATE_ACCOUNT, {});
                 },
 
                 componentDidMount: function() {
@@ -205,18 +213,7 @@ define([
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
-                    this._prepareMenu();
-                    nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { console.log('undo'); director.undo(); };
-                    nwjsMenu.tutorial.onClick = () => { console.log('undo'); director.undo(); };
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
-                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
-                    nwjsMenu.clear.onClick = this._handleClearScene;
-
-                    // to catch the tutorial click from menuMap
-                    // this mod is implemented after menu-map refactored, using cache to reduce refresh, boot performance
+                    this._registerMenuClickEvents();
                     if(!window.customEvent) {
                         window.customEvent = {};
                     }
@@ -267,6 +264,12 @@ define([
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                     GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
+                },
+
+                _startTutorial: function() {
+                    this.setState({ currentTutorialStep: 0 }, () => {
+                        this._handleYes('tour');
+                    });
                 },
 
                 _registerKeyEvents: function() {
@@ -337,24 +340,38 @@ define([
                     }
                 },
 
-                _prepareMenu: function() {
-                    nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
-                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
-                    nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.enabled = true;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this._handleYes('tour');
-                    };
-                    nwjsMenu.undo.enabled = false;
-                    nwjsMenu.saveTask.enabled = false;
-                    nwjsMenu.saveScene.enabled = false;
-                    nwjsMenu.clear.enabled = false;
+                _registerMenuClickEvents: function() {
+                    let { ipc, events } = window.electron,
+                        _action = {};
 
-                    menuFactory.methods.refresh();
+                    ipc.on(events.MENU_CLICK, (sender, opt) => {
+                        console.log('from print.jsx', opt);
+
+                        _action['IMPORT'] = () => {
+                            setTimeout(() => {
+                                $importBtn.click();
+                            }, 10);
+                            // $importBtn.click();
+                        };
+
+                        _action['PREFERENCE'] = () => { location.hash = '#studio/settings'; };
+                        _action['EXPORT_FLUX_TASK'] = this._handleDownloadFCode;
+                        _action['SAVE_SCENE'] = this._handleDownloadScene;
+
+                        _action['UNDO'] = director.undo;
+                        _action['DUPLICATE'] = director.duplicateSelected;
+                        _action['ROTATE'] = this._handleModeChange.bind(null, 'rotate');
+                        _action['SCALE'] = this._handleModeChange.bind(null, 'scale');
+                        _action['RESET'] = director.resetObject;
+                        _action['ALIGN_CENTER'] = director.alignCenterPosition;
+                        _action['CLEAR_SCENE'] = this._handleClearScene;
+
+                        _action['TUTORIAL'] = this._startTutorial;
+
+                        if(typeof _action[opt.id] === 'function') {
+                            _action[opt.id]();
+                        }
+                    });
                 },
 
                 showSpinner: function(caption) {
@@ -473,12 +490,12 @@ define([
                             const callback = () => { tryMovementTest(); }
                             const imageObject = {
                                 images: [
-                                    '/img/tutorial/' + activeLang + '/n01.png',
-                                    '/img/tutorial/' + activeLang + '/n02.png',
-                                    '/img/tutorial/' + activeLang + '/n03.png',
-                                    '/img/tutorial/' + activeLang + '/n04.png',
-                                    '/img/tutorial/' + activeLang + '/n05.png',
-                                    '/img/tutorial/' + activeLang + '/n06.png'
+                                    'img/tutorial/' + activeLang + '/n01.png',
+                                    'img/tutorial/' + activeLang + '/n02.png',
+                                    'img/tutorial/' + activeLang + '/n03.png',
+                                    'img/tutorial/' + activeLang + '/n04.png',
+                                    'img/tutorial/' + activeLang + '/n05.png',
+                                    'img/tutorial/' + activeLang + '/n06.png'
                                 ],
                                 imgClass: 'img640x480'
                             };

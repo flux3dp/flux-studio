@@ -16,7 +16,7 @@ define([
 
     'use strict';
 
-    const defaultImage = '/img/ph_l.png';
+    const defaultImage = 'img/ph_l.png';
     const maxFileNameLength = 12;
 
     let selectedItem = '',
@@ -109,7 +109,7 @@ define([
         },
 
         _imageError: function(src) {
-            src.target.src = '/img/ph_s.png';
+            src.target.src = 'img/ph_s.png';
         },
 
         _listFolderContent: function() {
@@ -143,7 +143,7 @@ define([
                 if(!item[0]) {
                     item = [result.files[i]];
                 }
-                let imgSrc = item[2] instanceof Blob ? URL.createObjectURL(item[2]) : '/img/ph_s.png';
+                let imgSrc = item[2] instanceof Blob ? URL.createObjectURL(item[2]) : 'img/ph_s.png';
                 let selected = Monitor.selectedItem.name === item[0],
                     fileNameClass = ClassNames('name', {'selected': selected}),
                     iNameClass = ClassNames('fa', 'fa-times-circle-o', {'selected': selected});

@@ -78,12 +78,12 @@ define([
                     },
                     imgSrc = (
                         'en' === i18n.getActiveLang() ?
-                        '/img/wifi-error-notify-en.png' :
-                        '/img/wifi-error-notify-zh.png'
+                        'img/wifi-error-notify-en.png' :
+                        'img/wifi-error-notify-zh.png'
                     ),
                     content = (
                         <div className="device-not-found text-center">
-                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                            <img className="brand-image" src="img/menu/main_logo.svg"/>
                             <div>
                                 <img className="not-found-img" src={imgSrc}/>
                                 <div className="button-group btn-v-group">

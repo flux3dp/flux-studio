@@ -250,7 +250,7 @@ define([
 
                 content = (
                     <div className="set-machine-generic text-center">
-                        <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                        <img className="brand-image" src="img/menu/main_logo.svg"/>
 
                         <form className="form h-form" onSubmit={this._handleSetPrinter}>
                             <h1 className="headline">{lang.initialize.name_your_flux}</h1>

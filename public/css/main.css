@@ -2387,7 +2387,7 @@ img {
 
 select {
     background-color: transparent;
-    background-image: url("/img/icon-3d-arrow-down.png");
+    background-image: url("img/icon-3d-arrow-down.png");
     background-position: calc(100% - 4px) center;
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -2469,16 +2469,16 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         font-size: 11px;
         text-transform: uppercase; }
     .setup-panel .print-speed {
-        background-image: url("/img/icon-speed.png");
+        background-image: url("img/icon-speed.png");
         background-repeat: no-repeat; }
     .setup-panel .material {
-        background-image: url("/img/icon-material.png");
+        background-image: url("img/icon-material.png");
         background-repeat: no-repeat; }
     .setup-panel .platform {
-        background-image: url("/img/icon-platform.png");
+        background-image: url("img/icon-platform.png");
         background-repeat: no-repeat; }
     .setup-panel .support {
-        background-image: url("/img/icon-support.png");
+        background-image: url("img/icon-support.png");
         background-repeat: no-repeat; }
     .setup-panel .control {
         height: 1.1875rem; }
@@ -2932,13 +2932,13 @@ hr {
         .controls .radio > div {
             width: 15px;
             height: 15px;
-            background-image: url("/img/icon-radio-off.png");
+            background-image: url("../img/icon-radio-off.png");
             background-size: 15px 15px;
             display: inline-block;
             margin-right: 10px;
             cursor: pointer; }
         .controls .radio .selected {
-            background-image: url("/img/icon-radio-on.png"); }
+            background-image: url("../img/icon-radio-on.png"); }
         .controls .radio .grey-out {
             cursor: auto; }
         .controls .radio .grey-out + span {
@@ -2948,13 +2948,13 @@ hr {
         .controls .checkbox > div {
             width: 15px;
             height: 15px;
-            background-image: url("/img/icon-checkbox-off.png");
+            background-image: url("../img/icon-checkbox-off.png");
             background-size: 15px 15px;
             display: inline-block;
             margin-right: 10px;
             cursor: pointer; }
         .controls .checkbox .selected {
-            background-image: url("/img/icon-checkbox-on.png"); }
+            background-image: url("../img/icon-checkbox-on.png"); }
         .controls .checkbox .grey-out {
             cursor: auto; }
         .controls .checkbox .grey-out + span {
@@ -2979,7 +2979,7 @@ hr {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background: url("/img/arrow-down.png") no-repeat;
+            background: url("../img/arrow-down.png") no-repeat;
             background-position: 245px 9px;
             background-size: 16px 10px;
             height: 30px;
@@ -3009,7 +3009,7 @@ hr {
         border: 2px solid #E0E0DF; }
     .controls select {
         border: 1px solid #d8d8d8;
-        background-image: url("/img/icon-3d-arrow-down.png");
+        background-image: url("img/icon-3d-arrow-down.png");
         background-repeat: no-repeat;
         background-size: 8px 8px;
         background-color: transparent;
@@ -3466,7 +3466,7 @@ hr {
 
 .modal-change-filament .modal-alert {
     width: 440px;
-    min-height: 320px;
+    /* min-height: 320px; */
     padding: 22px 0 0 0; }
 
 .modal-change-filament .caption,
@@ -4035,7 +4035,7 @@ hr {
                     width: 33%;
                     height: 80px;
                     position: relative;
-                    background-image: url("../../img/folder.svg");
+                    background-image: url("../img/folder.svg");
                     background-repeat: no-repeat;
                     background-size: 72px 60px;
                     background-position: top;
@@ -4157,17 +4157,17 @@ hr {
                 background-repeat: no-repeat;
                 cursor: pointer; }
             .flux-monitor .main .operation .btn-go {
-                background-image: url("/img/btn-run.svg"); }
+                background-image: url("../img/btn-run.svg"); }
             .flux-monitor .main .operation .btn-stop {
-                background-image: url("/img/btn-stop.svg"); }
+                background-image: url("../img/btn-stop.svg"); }
             .flux-monitor .main .operation .btn-pause {
-                background-image: url("/img/btn-pause.svg"); }
+                background-image: url("../img/btn-pause.svg"); }
             .flux-monitor .main .operation .btn-download {
-                background-image: url("/img/btn-download.svg"); }
+                background-image: url("../img/btn-download.svg"); }
             .flux-monitor .main .operation .btn-upload {
-                background-image: url("/img/btn-upload.svg"); }
+                background-image: url("../img/btn-upload.svg"); }
             .flux-monitor .main .operation .btn-camera {
-                background-image: url("/img/btn-camera.svg"); }
+                background-image: url("../img/btn-camera.svg"); }
                 .flux-monitor .main .operation .btn-camera.on {
                     opacity: 1; }
                     .flux-monitor .main .operation .btn-camera.on ~ div {
@@ -4451,34 +4451,34 @@ hr {
     margin-top: 30px; }
 
 .operating-panel .operation.command .scale {
-    background-image: url("/img/icon-scale.png"); }
+    background-image: url("img/icon-scale.png"); }
 
 .operating-panel .operation.command .scale:hover {
-    background-image: url("/img/icon-scale-a.png"); }
+    background-image: url("img/icon-scale-a.png"); }
 
 .operating-panel .operation.command .scale.active {
-    background-image: url("/img/icon-scale-a.png"); }
+    background-image: url("img/icon-scale-a.png"); }
 
 .operating-panel .operation.command .rotate {
-    background-image: url("/img/icon-rotate.png"); }
+    background-image: url("img/icon-rotate.png"); }
 
 .operating-panel .operation.command .rotate:hover {
-    background-image: url("/img/icon-rotate-a.png"); }
+    background-image: url("img/icon-rotate-a.png"); }
 
 .operating-panel .operation.command .rotate.active {
-    background-image: url("/img/icon-rotate-a.png"); }
+    background-image: url("img/icon-rotate-a.png"); }
 
 .operating-panel .operation.command .center {
-    background-image: url("/img/icon-center.png"); }
+    background-image: url("img/icon-center.png"); }
 
 .operating-panel .operation.command .center:hover {
-    background-image: url("/img/icon-center-a.png"); }
+    background-image: url("img/icon-center-a.png"); }
 
 .operating-panel .operation.command .delete {
-    background-image: url("/img/icon-delete.png"); }
+    background-image: url("img/icon-delete.png"); }
 
 .operating-panel .operation.command .delete:hover {
-    background-image: url("/img/icon-delete-a.png"); }
+    background-image: url("img/icon-delete-a.png"); }
 
 .operating-panel .zoom {
     position: fixed;
@@ -4573,7 +4573,7 @@ hr {
 
 .print-studio .setup-panel select {
     background-color: transparent;
-    background-image: url("/img/icon-3d-arrow-down.png");
+    background-image: url("img/icon-3d-arrow-down.png");
     background-position: 83px 6px;
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -4586,19 +4586,19 @@ hr {
     appearance: none; }
 
 .print-studio .setup-panel .print-speed {
-    background-image: url("/img/icon-speed.png");
+    background-image: url("img/icon-speed.png");
     background-repeat: no-repeat; }
 
 .print-studio .setup-panel .material {
-    background-image: url("/img/icon-material.png");
+    background-image: url("img/icon-material.png");
     background-repeat: no-repeat; }
 
 .print-studio .setup-panel .platform {
-    background-image: url("/img/icon-platform.png");
+    background-image: url("img/icon-platform.png");
     background-repeat: no-repeat; }
 
 .print-studio .setup-panel .support {
-    background-image: url("/img/icon-support.png");
+    background-image: url("img/icon-support.png");
     background-repeat: no-repeat; }
 
 .print-studio .setup-panel .control label {
@@ -4968,7 +4968,7 @@ input.switch:checked ~ label:after {
         line-height: 30px;
         justify-content: space-between; }
     .print-studio .object-dialogue .accordion .lock {
-        background-image: url("../../img/lock.svg");
+        background-image: url("../img/lock.svg");
         background-position: top;
         background-repeat: no-repeat;
         background-size: 12px 36px;
@@ -5383,13 +5383,13 @@ img.img640x480 {
 .settings .connection-list .select {
     width: 30px;
     height: 30px;
-    background-image: url("/img/icon-select.png");
+    background-image: url("img/icon-select.png");
     float: right;
     margin-top: 15px;
     cursor: pointer; }
 
 .settings .connection-list .select.active {
-    background-image: url("/img/icon-selected.png"); }
+    background-image: url("img/icon-selected.png"); }
 
 .settings .connection-list .actions {
     text-align: center;
@@ -5640,7 +5640,7 @@ img.img640x480 {
         font-size: 24px;
         font-weight: 200; }
     .initialization select {
-        background: url("/img/arrow-down.png") #fff no-repeat;
+        background: url("../img/arrow-down.png") #fff no-repeat;
         background-position: calc(100% - 5px) center;
         background-size: 16px 10px;
         border: none;
@@ -6097,7 +6097,7 @@ img.img640x480 {
     position: absolute;
     right: 0;
     top: 0;
-    background: url(/img/laser-platform.png);
+    background: url(img/laser-platform.png);
     background-size: 100% 100%;
     height: 510px;
     overflow: hidden;
@@ -6765,7 +6765,7 @@ img.img640x480 {
         width: 32px;
         height: 13px;
         margin-top: 5px;
-        background-image: url("/img/connect-icon.svg");
+        background-image: url("../img/connect-icon.svg");
         background-repeat: no-repeat; }
     .cloud .change-password.container .title {
         margin-top: 80px; }

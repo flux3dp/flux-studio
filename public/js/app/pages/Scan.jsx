@@ -1245,13 +1245,13 @@ define([
 
                     switch (message) {
                     case 'not open':
-                        imageSrc = '/img/not-open.png';
+                        imageSrc = 'img/not-open.png';
                         break;
                     case 'no object':
-                        imageSrc = '/img/no-object.png';
+                        imageSrc = 'img/no-object.png';
                         break;
                     case 'no laser':
-                        imageSrc = '/img/no-laser.png';
+                        imageSrc = 'img/no-laser.png';
                     default:
                         break;
                     }
@@ -1451,7 +1451,7 @@ define([
                         closeSubPopup = function(e) {
                             self.refs.setupPanel.openSubPopup(e);
                         },
-                        cameraImage = (self.state.cameraImageSrc || '/img/menu/main_logo.svg');
+                        cameraImage = (self.state.cameraImageSrc || 'img/menu/main_logo.svg');
 
                     camera_image_class = cx({
                         'camera-image' : true === this.state.showCamera,

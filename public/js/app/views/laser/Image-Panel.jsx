@@ -132,7 +132,7 @@ define([
                     left: state.initialPosition.left
                 },
                 lockerImage = {
-                    size: (false === state.sizeLock ? '/img/unlock.svg' : '/img/lock.svg')
+                    size: (false === state.sizeLock ? 'img/unlock.svg' : 'img/lock.svg')
                 };
 
             return (
