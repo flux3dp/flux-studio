@@ -25,7 +25,7 @@ define([
     CloudApi
 ) {
     'use strict';
-    return;
+
     var emptyFunction = function(object) {
             return object || {};
         },
