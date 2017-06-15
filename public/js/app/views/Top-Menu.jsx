@@ -318,7 +318,7 @@ define([
                     lang = i18n.get();
 
                 _action['ADD_NEW_MACHINE'] = () => {
-                   console.log('add new');
+                    console.log('add new');
                     location.hash = '#initialize/wifi/connect-machine';
                 };
 

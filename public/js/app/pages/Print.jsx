@@ -50,8 +50,6 @@ define([
     Modal,
     Config,
     PrinterSelector,
-    // TODO
-    // menuFactory,
     DeviceMaster,
     GlobalStore,
     GlobalActions,
@@ -191,9 +189,6 @@ define([
 
                                 console.log('account is', content);
                                 ipc.send(events.UPDATE_ACCOUNT, content);
-                                // TODO
-                                // menuFactory.methods.updateAccountDisplay(displayName);
-                                // menuFactory.methods.refresh();
                             });
                         }
                         else {
@@ -226,9 +221,6 @@ define([
                         });
                     };
 
-                    // TODO
-                    // menuFactory.methods.refresh();
-
                     this._registerKeyEvents();
                     this._registerTracking();
 
@@ -259,10 +251,6 @@ define([
                 componentWillUnmount: function() {
                     director.clear();
                     director.willUnmount();
-
-                    // TODO
-                    // nwjsMenu.tutorial.enabled = false;
-                    // menuFactory.methods.refresh();
 
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
@@ -354,9 +342,8 @@ define([
                         console.log('from print.jsx', opt);
 
                         _action['IMPORT'] = () => {
-                            setTimeout(() => {
-                                $importBtn.click();
-                            }, 10);
+                            eval('$("input[type=file]")[0].click(); console.log("OK", $("input[type=file]")[0]);');
+
                             // $importBtn.click();
                         };
 
@@ -1089,7 +1076,7 @@ define([
                             <div className='arrowBox' onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className='file-importer'>
                                     <div className='import-btn'>{lang.print.import}</div>
-                                    <input ref='import' type='file' accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
+                                    <input ref='import' type='file' id='3dmodel_import' accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>

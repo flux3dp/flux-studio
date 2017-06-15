@@ -77,7 +77,11 @@ backendManager.start();
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1024, height: 768, title: `FLUX Studio - ${app.getVersion()}`,
+        width: 1024, height: 768,
+        title: `FLUX Studio - ${app.getVersion()}`,
+        webPreferences: {
+            preload: path.join(__dirname, 'src', 'main-window-entry.js')
+        },
         vibrancy: 'light'});
 
     mainWindow.loadURL(url.format({

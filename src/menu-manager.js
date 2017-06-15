@@ -29,7 +29,7 @@ function build_menu(callback) {
         id: '_file',
         label: r.file,
         submenu: [
-            { 'id': 'IMPORT', label: r.import || 'open', click: callback },
+            { 'id': 'IMPORT', label: r.import || 'open', click: callback, 'accelerator': 'Cmd+O'},
             { type: 'separator' },
             { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task, click: callback },
             { 'id': 'SAVE_SCENE', label: r.save_scene, click: callback } ,

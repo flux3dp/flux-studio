@@ -19,7 +19,7 @@
     </div>
 </body>
 <script>
-    function launcher(ipc) {
+    function launch() {
         var script = document.createElement('script'),
             cssLink = document.createElement('link'),
             head = document.querySelector('head'),
@@ -44,13 +44,9 @@
             dev: dev
         };
 
-        // if electron
-        if(ipc) {
-            const events = require('../src/ipc-events');
-
-            window.electron = {};
-            window.electron.ipc = ipc;
-            window.electron.events = events;
+        if(electron) {
+            let ipc = electron.ipc,
+                events = electron.events;
 
             ipc.on(events.BACKEND_UP, (sender, status) => {
                 window.FLUX.ghostPort = status.port;
@@ -85,13 +81,7 @@
         }
     }
 
-    if(typeof process !== 'undefined') {
-        const {ipcRenderer} = require('electron');
-        launcher(ipcRenderer);
-        window.ipcRenderer = ipcRenderer;
-    } else {
-        launcher();
-    }
+    launch();
 </script>
 
 </html>
