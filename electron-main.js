@@ -146,7 +146,7 @@ app.on('ready', () => {
     }
 
     menuManager = new MenuManager();
-    menuManager.on(events.MENU_ITEM_CLICK, (data) => {
+    menuManager.on(events.MENU_CLICK, (data) => {
         if(mainWindow) {
             mainWindow.webContents.send(events.MENU_CLICK, data);
         } else {

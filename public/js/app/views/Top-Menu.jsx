@@ -313,14 +313,8 @@ define([
             };
 
             ipc.on(events.MENU_CLICK, (e, menuItem) => {
-                console.log('clicked menu item: ', menuItem);
                 let _action = {},
                     lang = i18n.get();
-
-                _action['ADD_NEW_MACHINE'] = () => {
-                    console.log('add new');
-                    location.hash = '#initialize/wifi/connect-machine';
-                };
 
                 _action['DASHBOARD'] = (device) => {
                     DeviceMaster.selectDevice(device).then(status => {

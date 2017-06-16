@@ -11,8 +11,6 @@ define([
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Printer-Selector',
-    // TODO
-    // 'helpers/nwjs/menu-factory',
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
@@ -102,7 +100,6 @@ define([
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
-            // nwjsMenu = menuFactory.items,
             defaultSlicingEngine = 'cura',
             tourGuide = TutorialSteps,
             view = React.createClass({
@@ -180,22 +177,24 @@ define([
                 },
 
                 componentWillMount: function() {
-                    let { ipc, events } = window.electron;
-                    CloudApi.getMe().then(response => {
-                        if(response.ok) {
-                            response.json().then(content => {
-                                let { nickname, email } = content || {};
-                                let displayName = (nickname || email || '');
+                    if(electron) {
+                        let { ipc, events } = window.electron;
+                        CloudApi.getMe().then(response => {
+                            if(response.ok) {
+                                response.json().then(content => {
+                                    let { nickname, email } = content || {};
+                                    let displayName = (nickname || email || '');
 
-                                console.log('account is', content);
-                                ipc.send(events.UPDATE_ACCOUNT, content);
-                            });
-                        }
-                        else {
-                            ipc.send(events.UPDATE_ACCOUNT, {});
-                        }
-                    });
-                    ipc.send(events.UPDATE_ACCOUNT, {});
+                                    console.log('account is', content);
+                                    ipc.send(events.UPDATE_ACCOUNT, content);
+                                });
+                            }
+                            else {
+                                ipc.send(events.UPDATE_ACCOUNT, {});
+                            }
+                        });
+                        ipc.send(events.UPDATE_ACCOUNT, {});
+                    }
                 },
 
                 componentDidMount: function() {
@@ -211,7 +210,6 @@ define([
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
-                    this._registerMenuClickEvents();
                     if(!window.customEvent) {
                         window.customEvent = {};
                     }
@@ -273,52 +271,6 @@ define([
                         }
                     });
 
-                    shortcuts.on(['cmd', 'z'], () => {
-                        director.undo();
-                    });
-
-                    //========for testing only==================
-                    //shortcuts.on(['cmd', 'b'], () => {
-                    //  director.tester();
-                    //});
-                    // shortcuts.on(['ctrl', 'shift', 't'], () => {
-                    //     window.customEvent.onTutorialClick();
-                    // });
-                    //
-                    // shortcuts.on(['cmd', 'shift', 'a'], () => {
-                    //     LocalStorage.clearAllExceptIP();
-                    // });
-                    //==========================================
-
-                    shortcuts.on(['cmd', 'shift', 'x'], () => {
-                        this._handleClearScene();
-                    });
-
-                    // windows & Linux
-                    if(navigator.appVersion.indexOf('Mac') === -1) {
-                        this._registerNonOsxShortcuts();
-                    }
-
-                    // copy event - it will listen by top menu as well in nwjs..
-                    if ('undefined' === typeof window.requireNode) {
-                        // copy event
-                        shortcuts.on(['cmd', 'd'], (e) => {
-                            e.preventDefault();
-                            director.duplicateSelected();
-                        });
-                    }
-                },
-
-                _registerNonOsxShortcuts: function() {
-                    shortcuts.on(['ctrl', 'd'], () => { director.duplicateSelected(); });
-                    shortcuts.on(['ctrl', 'z'], () => { director.undo(); });
-                    shortcuts.on(['ctrl', 'shift', 'x'], () => { this._handleClearScene(); });
-                    shortcuts.on(['ctrl', 'shift', 'r'], () => { this._handleModeChange('rotate'); });
-                    shortcuts.on(['ctrl', 'shift', 's'], () => { this._handleModeChange('scale'); });
-                    // TODO
-                    // shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
-                    // shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
-                    shortcuts.on(['ctrl', 'n'], () => { location.hash = '#initialize/wifi/connect-machine'; });
                 },
 
                 _registerTutorial: function() {
@@ -332,39 +284,6 @@ define([
                     if(allowTracking === '') {
                         AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
                     }
-                },
-
-                _registerMenuClickEvents: function() {
-                    let { ipc, events } = window.electron,
-                        _action = {};
-
-                    ipc.on(events.MENU_CLICK, (sender, opt) => {
-                        console.log('from print.jsx', opt);
-
-                        _action['IMPORT'] = () => {
-                            eval('$("input[type=file]")[0].click(); console.log("OK", $("input[type=file]")[0]);');
-
-                            // $importBtn.click();
-                        };
-
-                        _action['PREFERENCE'] = () => { location.hash = '#studio/settings'; };
-                        _action['EXPORT_FLUX_TASK'] = this._handleDownloadFCode;
-                        _action['SAVE_SCENE'] = this._handleDownloadScene;
-
-                        _action['UNDO'] = director.undo;
-                        _action['DUPLICATE'] = director.duplicateSelected;
-                        _action['ROTATE'] = this._handleModeChange.bind(null, 'rotate');
-                        _action['SCALE'] = this._handleModeChange.bind(null, 'scale');
-                        _action['RESET'] = director.resetObject;
-                        _action['ALIGN_CENTER'] = director.alignCenterPosition;
-                        _action['CLEAR_SCENE'] = this._handleClearScene;
-
-                        _action['TUTORIAL'] = this._startTutorial;
-
-                        if(typeof _action[opt.id] === 'function') {
-                            _action[opt.id]();
-                        }
-                    });
                 },
 
                 showSpinner: function(caption) {
@@ -1076,7 +995,7 @@ define([
                             <div className='arrowBox' onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className='file-importer'>
                                     <div className='import-btn'>{lang.print.import}</div>
-                                    <input ref='import' type='file' id='3dmodel_import' accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
+                                    <input ref='import' type='file' data-file-input="stl_import" accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
@@ -1180,18 +1099,6 @@ define([
                     );
                 },
 
-                // TODO
-                // _renderNwjsMenu: function() {
-                //     if(nwjsMenu.undo.enabled !== this.state.hasObject) {
-                //         nwjsMenu.undo.enabled = this.state.hasObject;
-                //         nwjsMenu.saveTask.enabled = this.state.hasObject;
-                //         nwjsMenu.saveScene.enabled = this.state.hasObject;
-                //         nwjsMenu.clear.enabled = this.state.hasObject;
-                //         nwjsMenu.signIn = { label: this.state.nickname, enabled: true, parent: 5}
-                //         menuFactory.methods.refresh();
-                //     }
-                // },
-
                 _renderTourGuide: function() {
                     return (
                         <TourGuide
@@ -1215,9 +1122,6 @@ define([
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
                         percentageBar           = this._renderPercentageBar(),
                         tourGuideSection        = this.state.tutorialOn ? this._renderTourGuide() : '';
-
-                    // TODO
-                    // this._renderNwjsMenu();
 
                     return (
                         <div className='studio-container print-studio'>

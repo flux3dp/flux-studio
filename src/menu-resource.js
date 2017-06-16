@@ -1,5 +1,6 @@
 module.exports = {
     'en': {
+        preferences: 'Preferences',
         file: 'File',
         edit: 'Edit',
         help: 'Help',
@@ -56,6 +57,7 @@ module.exports = {
 
     },
     'zh-tw': {
+        preferences: '偏好設定',
         file: '檔案',
         edit: '編輯',
         help: '說明',

@@ -3,6 +3,7 @@ define([
     'react',
     'app/actions/laser',
     'app/actions/alert-actions',
+    'app/actions/global-interaction',
     'app/actions/progress-actions',
     'jsx!widgets/Select',
     'jsx!views/laser/Setup-Panel',
@@ -14,13 +15,13 @@ define([
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/i18n',
-    'helpers/dnd-handler',
-    'helpers/nwjs/menu-factory'
+    'helpers/dnd-handler'
 ], function(
     $,
     React,
     laserEvents,
     AlertActions,
+    GlobalInteraction,
     ProgressActions,
     SelectView,
     LaserSetupPanel,
@@ -32,16 +33,48 @@ define([
     ButtonGroup,
     ConfigHelper,
     i18n,
-    DnDHandler,
-    MenuFactory
+    DnDHandler
 ) {
     'use strict';
 
     let Config = ConfigHelper(),
         lang = i18n.lang;
 
+    class HolderGlobalInteraction extends GlobalInteraction {
+        constructor() {
+            super();
+            this._instance = undefined;
+            this._actions = {
+                "IMPORT": () => {
+                    if(electron) {
+                        electron.trigger_file_input_click("file-upload-widget")
+                    }
+                },
+                "EXPORT_FLUX_TASK": () => this._instance._handleExportClick("-f"),
+                "CLEAR_SCENE": () => this._instance.state.laserEvents.clearScene(),
+            }
+        }
+        attach(instance) {
+            this._instance = instance
+            this._hasImage = false;
+            super.attach(["IMPORT"]);
+        }
+        onImageChanged(hasImage) {
+            if(this._hasImage !== hasImage) {
+                this._hasImage = hasImage;
+                if(hasImage) {
+                    this.enableMenuItems(["EXPORT_FLUX_TASK", "CLEAR_SCENE"]);
+                } else {
+                    this.disableMenuItems(["EXPORT_FLUX_TASK", "CLEAR_SCENE"]);
+                }
+            }
+        }
+    }
+
     return function(args) {
         args = args || {};
+
+        let globalInteraction = new HolderGlobalInteraction();
 
         let view = React.createClass({
                 getDefaultProps: function() {
@@ -75,23 +108,16 @@ define([
                 componentDidMount: function() {
                     var self = this;
 
+                    globalInteraction.attach(this);
+
                     DnDHandler.plug(document, self._handleDragAndDrop);
 
 
                     self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
 
-                    self.state.laserEvents.menuFactory.items.import.onClick = function() {
-                        self.refs.fileUploader.getDOMNode().click();
-                    };
-
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
                         self._handleStartClick();
-                    };
-
-                    self.state.laserEvents.menuFactory.items.saveTask.enabled = false;
-                    self.state.laserEvents.menuFactory.items.saveTask.onClick = function() {
-                        self._handleExportClick('-f');
                     };
 
                     var laser_custom_bg = Config.read('laser-custom-bg') && this.props.page === 'laser';
@@ -115,13 +141,10 @@ define([
                             }
                         });
                     }
-
-                    MenuFactory.items.clear.onClick = () => {
-                        self.state.laserEvents.clearScene();
-                    };
                 },
 
                 componentWillUnmount: function () {
+                    globalInteraction.detach()
                     this.state.laserEvents.destroySocket();
                     this.state.laserEvents.destroy();
                     DnDHandler.unplug(document);
@@ -320,6 +343,8 @@ define([
                 },
 
                 _renderActionButtons: function() {
+                    globalInteraction.onImageChanged(this.state.hasImage);
+
                     var cx = React.addons.classSet,
                         buttons = [{
                             label: lang.laser.get_fcode,

@@ -13,7 +13,7 @@ function build_menu(callback) {
             label: 'FLUX Studio',
             submenu: [
                 { label: 'About FLUX Studio', role: 'about'},
-                { 'id': 'PREFERENCE',  label: 'Preferences', 'accelerator': 'Cmd+,', click: callback },
+                { 'id': 'PREFERENCE',  label: r.preferences || 'Preferences', 'accelerator': 'Cmd+,', click: callback },
                 { type: 'separator' },
                 { role: 'services', submenu: [] },
                 { type: 'separator' },
@@ -29,10 +29,10 @@ function build_menu(callback) {
         id: '_file',
         label: r.file,
         submenu: [
-            { 'id': 'IMPORT', label: r.import || 'open', click: callback, 'accelerator': 'Cmd+O'},
+            { 'id': 'IMPORT', label: r.import || 'Import', click: callback, 'accelerator': 'Cmd+I'},
             { type: 'separator' },
-            { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task, click: callback },
-            { 'id': 'SAVE_SCENE', label: r.save_scene, click: callback } ,
+            { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': 'Cmd+E' },
+            { 'id': 'SAVE_SCENE', label: r.save_scene || 'Save Scene', click: callback, 'accelerator': 'Cmd+S' } ,
         ]
     });
 
@@ -40,23 +40,23 @@ function build_menu(callback) {
         id: '_edit',
         label: r.edit,
         submenu: [
-            { 'id': 'UNDO', label: r.undo, click: callback },
+            { 'id': 'UNDO', label: r.undo || 'Undo', click: callback, 'accelerator': 'Cmd+Z'},
             { type:'separator'},
-            { 'id': 'DUPLICATE', label: r.duplicate, enabled: false , click: callback },
-            { 'id': 'SCALE', label: r.scale, enabled: false, click: callback },
-            { 'id': 'ROTATE', label: r.rotate, enabled: false, click: callback },
-            { 'id': 'RESET', label: r.reset, enabled: false, click: callback },
-            { 'id': 'ALIGN_CENTER', label: r.align_center, enabled: false, click: callback },
+            { 'id': 'DUPLICATE', label: r.duplicate || 'Duplicate', enabled: false , click: callback, 'accelerator': 'Cmd+D' },
+            { 'id': 'SCALE', label: r.scale || 'Scale', enabled: false, click: callback },
+            { 'id': 'ROTATE', label: r.rotate || 'Rotate', enabled: false, click: callback },
+            { 'id': 'RESET', label: r.reset || 'Reset', enabled: false, click: callback },
+            { 'id': 'ALIGN_CENTER', label: r.align_center || 'Align Center', enabled: false, click: callback },
             { type: 'separator' },
-            { 'id': 'CLEAR_SCENE', label: r.clear_scene, enabled: false, click: callback },
+            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': 'Cmd+Shift+X' },
         ]
     });
 
     menu.push({
         id: '_machines',
-        label: r.machines,
+        label: r.machines || 'Machines',
         submenu: [
-            { 'id': 'ADD_NEW_MACHINE', label: r.add_new_machine, 'accelerator': 'Cmd+N', click: callback},
+            { 'id': 'ADD_NEW_MACHINE', label: r.add_new_machine || 'Add New Machine', 'accelerator': 'Cmd+N', click: callback},
             {type: 'separator'}
         ]
     });
@@ -67,7 +67,7 @@ function build_menu(callback) {
         submenu: [
             {
                 id: 'MY_ACCOUNT',
-                label: r.my_account,
+                label: r.my_account || 'My Account',
                 click: callback
             },
             {
@@ -75,12 +75,12 @@ function build_menu(callback) {
             },
             {
                 id: 'SIGN_IN',
-                label: r.sign_in,
+                label: r.sign_in || 'Sign In',
                 click: callback
             },
             {
                 id: 'SIGN_OUT',
-                label: r.sign_out,
+                label: r.sign_out || 'Sign Out',
                 click: callback
             }
         ]
@@ -98,17 +98,17 @@ function build_menu(callback) {
 
     menu.push({
         id: '_help',
-        label: r.help,
+        label: r.help || 'Help',
         role: 'help',
         submenu: [
-            { id: 'HELP_CENTER', label: r.help_center, click() { shell.openExternal('http://helpcenter.flux3dp.com/'); } },
-            { id: 'CONTACT_US', label: r.contact, click() { shell.openExternal('http://flux3dp.zendesk.com/hc/en-us/requests/new'); } },
+            { id: 'HELP_CENTER', label: r.help_center || 'Help Center', click() { shell.openExternal('http://helpcenter.flux3dp.com/'); } },
+            { id: 'CONTACT_US', label: r.contact || 'Contact Us', click() { shell.openExternal('http://flux3dp.zendesk.com/hc/en-us/requests/new'); } },
             { type: 'separator' },
-            { id: 'TUTORIAL', label: r.tutorial, click: callback },
-            { id: 'FORUM', label: r.forum, click() { shell.openExternal('http://forum.flux3dp.com/'); } },
+            { id: 'TUTORIAL', label: r.tutorial || 'Tutorial', click: callback },
+            { id: 'FORUM', label: r.forum || 'Forum', click() { shell.openExternal('http://forum.flux3dp.com/'); } },
             { type: 'separator' },
-            { id: 'SOFTWARE_UPDATE', label: r.software_update, click() { shell.openExternal('http://flux3dp.com/downloads/'); } },
-            { id: 'BUG_REPORT', label: r.bug_report, click: callback }
+            { id: 'SOFTWARE_UPDATE', label: r.software_update || 'Software Update', click() { shell.openExternal('http://flux3dp.com/downloads/'); } },
+            { id: 'BUG_REPORT', label: r.bug_report || 'Bug Report', click: callback }
         ]
     });
 
@@ -266,7 +266,7 @@ class MenuManager extends EventEmitter {
     }
     _on_menu_click(event) {
         if(event.id) {
-            this.emit(events.MENU_ITEM_CLICK, event);
+            this.emit(events.MENU_CLICK, event);
         }
     }
     setWindowOpened() {

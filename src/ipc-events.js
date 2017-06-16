@@ -8,12 +8,10 @@ module.exports = {
     NOTIFY_BACKEND_STATUS   : 'NOTIFY_BACKEND_STATUS',
 
     MENU_CLICK              : 'MENU_CLICK',
-    MENU_ITEM_CLICK         : 'MENU_ITEM_CLICK',
     DISABLE_MENU_ITEM       : 'DISABLE_MENU_ITEM',
     ENABLE_MENU_ITEM        : 'ENABLE_MENU_ITEM',
 
     POPUP_MENU              : 'POPUP_MENU_ITEM',
-    // Target: ipcMain
 
     UPDATE_ACCOUNT          : 'UPDATE_ACCOUNT',
 

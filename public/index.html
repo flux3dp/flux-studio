@@ -35,12 +35,12 @@
         // set global definition
         window.FLUX = {
             debug: location.search.indexOf('debug') !== -1 || dev,
-            version: '{Version}',
+            version: electron ? electron.version : "web-dev",
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof nw ? undefined : os),
             ghostPort: 8000,
-            allowTracking: false,//localStorage['allow-tracking'] === 'true',
+            allowTracking: false, //localStorage['allow-tracking'] === 'true',
             dev: dev
         };
 

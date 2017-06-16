@@ -6,6 +6,7 @@ define([
     'helpers/api/fcode-reader',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
+    'app/actions/global-interaction',
     'app/stores/progress-store',
     'app/constants/global-constants',
     'app/constants/device-constants',
@@ -40,6 +41,7 @@ define([
     fcodeReader,
     AlertActions,
     ProgressActions,
+    GlobalInteraction,
     ProgressStore,
     GlobalConstants,
     DeviceConstants,
@@ -58,6 +60,45 @@ define([
     SocketMaster
 ) {
     'use strict';
+
+    class PrintGlobalInteraction extends GlobalInteraction {
+        constructor() {
+            super();
+            this._actions = {
+                "IMPORT": () => {
+                    if(electron) {
+                        electron.trigger_file_input_click("stl_import")
+                    }
+                },
+                "SAVE_SCENE": () => reactSrc._handleDownloadScene(),
+                "EXPORT_FLUX_TASK": () => downloadFCode(),
+                "UNDO": () => undo(),
+                "DUPLICATE": () => duplicateSelected(),
+                "ROTATE": () => reactSrc._handleModeChange('rotate'),
+                "SCALE": () => reactSrc._handleModeChange('scale'),
+                "RESET": () => resetObject(),
+                "ALIGN_CENTER": () => alignCenterPosition(),
+                "CLEAR_SCENE": () => clearScene(),
+                "TUTORIAL": () => reactSrc._startTutorial()
+            }
+        }
+        attach() {
+            super.attach(["IMPORT", "TUTORIAL"]);
+        }
+        onObjectFocus() {
+            this.enableMenuItems(["DUPLICATE", "SCALE", "ROTATE", "RESET", "ALIGN_CENTER"]);
+        }
+        onObjectBlur() {
+            this.disableMenuItems(["DUPLICATE", "SCALE", "ROTATE", "RESET", "ALIGN_CENTER"]);
+        }
+        onObjectChanged(canUndo) {
+            if(canUndo) {
+                this.enableMenuItems(["UNDO"]);
+            } else {
+                this.disableMenuItems(["UNDO"]);
+            }
+        }
+    }
 
     let THREE = window.THREE || {},
         container, slicer, fcodeConsole;
@@ -165,7 +206,11 @@ define([
         vertexColors: THREE.VertexColors
     });
 
+    let globalInteraction;
+
     function init(src) {
+        globalInteraction = new PrintGlobalInteraction();
+        globalInteraction.attach();
 
         reactSrc = src;
         container = document.getElementById('model-displayer');
@@ -743,7 +788,6 @@ define([
                 startSlicing(slicingType.F);
             }
         }, 100);
-
     }
 
     function updateSlicingProgressFromReport(report) {
@@ -878,6 +922,7 @@ define([
     }
 
     function willUnmount() {
+        globalInteraction.detach();
         previewMode = false;
         importFromFCode = false;
         importFromGCode = false;
@@ -1542,8 +1587,7 @@ define([
         SELECTED = obj || {};
 
         if (!$.isEmptyObject(obj)) {
-
-            _enableObjectEditMenu(true);
+            globalInteraction.onObjectFocus()
 
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
@@ -1569,10 +1613,10 @@ define([
             }
         }
         else {
+            globalInteraction.onObjectBlur()
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();
-            _enableObjectEditMenu(false);
             reactSrc.setState({ openObjectDialogue: false });
         }
         render();
@@ -2574,6 +2618,8 @@ define([
                 Object.assign(entry.rotation, SELECTED.rotation);
                 Object.assign(entry.scale, SELECTED.scale);
             }
+
+            globalInteraction.onObjectChanged(true);
             history.push(entry);
         }
     }
@@ -2622,6 +2668,9 @@ define([
                         selectObject(model);
                     }
                 });
+            }
+            if(history.length == 0) {
+                globalInteraction.onObjectChanged(false);
             }
         }
     }
@@ -2864,17 +2913,6 @@ define([
         let vector = new THREE.Vector3(0, 0, -1);
         vector.applyEuler(_camera.rotation, _camera.rotation.order);
         return vector;
-    }
-
-    function _enableObjectEditMenu(enabled) {
-        const { ipc, events } = window.electron;
-
-        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'DUPLICATE');
-        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'SCALE');
-        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'ROTATE');
-        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'RESET');
-        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'ALIGN_CENTER');
-        ipc.send(events[enabled ? 'ENABLE_MENU_ITEM' : 'DISABLE_MENU_ITEM'], 'CLEAR_SCENE');
     }
 
     function _setObject(ref, target) {
