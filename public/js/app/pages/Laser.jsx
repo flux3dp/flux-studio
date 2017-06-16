@@ -65,7 +65,7 @@ define([
                         object_height: options.objectHeight,
                         height_offset: options.heightOffset || 0,
                         laser_speed: options.material.data.laser_speed,
-                        focus_by_color: holder.state.debug || 0,
+                        calibration: holder.state.debug || 0,
                         power: options.material.data.power / max,
                         shading: (true === holder.refs.setupPanel.isShading() ? 1 : 0)
                     };
@@ -85,7 +85,6 @@ define([
 
                 render: function() {
                     // return <div />;
-
                     return <Holder
                         page={this.props.page}
                         acceptFormat={'image/*'}

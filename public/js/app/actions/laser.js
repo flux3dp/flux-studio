@@ -891,7 +891,7 @@ define([
                 var fileEntry = {};
                 fileEntry.name = 'laser-calibration.png';
                 fileEntry.toURL = function() {
-                    return '/laser-calibration.png';
+                    return 'laser-calibration.png';
                 };
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = 'blob';
@@ -909,7 +909,7 @@ define([
                     bitmapWebSocket.upload([file]).always(_onUploadResponse).done(_onUploaded);
                 };
 
-                oReq.open('GET', '/laser-calibration.png', true);
+                oReq.open('GET', 'laser-calibration.png', true);
                 oReq.send();
             },
             onReadFileStarted: function(e) {

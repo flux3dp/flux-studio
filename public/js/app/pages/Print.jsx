@@ -356,6 +356,7 @@ define([
                             this.setState({ tutorialOn: true });
                             tutorialMode = true;
                         };
+                        /* ====== leave code for backup, but not be used =========
 
                         const tryMovementTest = () => {
                             let device = this._getDevice();
@@ -397,9 +398,10 @@ define([
                                 });
                             }
                         };
+                        */
 
                         setTimeout(() => {
-                            const callback = () => { tryMovementTest(); }
+                            const callback = () => { startTutorial(); }
                             const imageObject = {
                                 images: [
                                     'img/tutorial/' + activeLang + '/n01.png',
@@ -837,10 +839,10 @@ define([
                             var fileEntry = {};
                             fileEntry.name = 'guide-example.stl';
                             fileEntry.toURL = function() {
-                                return '/guide-example.stl';
+                                return 'guide-example.stl';
                             };
                             var oReq = new XMLHttpRequest();
-                            oReq.open('GET', '/guide-example.stl', true);
+                            oReq.open('GET', 'guide-example.stl', true);
                             oReq.responseType = 'blob';
 
                             oReq.onload = function(oEvent) {
