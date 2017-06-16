@@ -50,6 +50,7 @@
 
             ipc.on(events.BACKEND_UP, (sender, status) => {
                 window.FLUX.ghostPort = status.port;
+                window.FLUX.logfile = status.logfile;
                 getStarted(status.port);
                 console.log(`Backend start at ${status.port}`);
             });
@@ -59,6 +60,7 @@
             ipc.on(events.NOTIFY_BACKEND_STATUS, (sender, status) => {
                 if(status.backend.alive) {
                     window.FLUX.ghostPort = status.backend.port;
+                    window.FLUX.logfile = status.backend.logfile;
                     getStarted(status.backend.port);
                     console.log(`Backend ready at ${status.backend.port}`);
                 }

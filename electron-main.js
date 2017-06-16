@@ -2,7 +2,6 @@
 const electron = require('electron');
 const {app, ipcMain, BrowserWindow} = require('electron');
 
-require("./src/bootstrap.js");
 const BackendManager = require('./src/backend-manager.js');
 const MenuManager = require('./src/menu-manager.js');
 const UglyNotify = require('./src/ugly-notify.js');
@@ -10,6 +9,7 @@ const events = require('./src/ipc-events');
 
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
 
 let mainWindow;
 let menuManager;
@@ -17,17 +17,30 @@ let menuManager;
 global.backend = {alive: false};
 global.devices = {};
 
+function createLogFile() {
+    let filename = path.join(app.getPath("userData"), "backend.log");
+    let f = fs.createWriteStream(filename, {flags: 'w'});
+    global.backend.logfile = filename;
+    console._stdout = f;
+    console._stderr = f;
+    return f;
+}
+
+const logger = process.stderr.isTTY ? process.stderr : createLogFile();
+
 
 function onGhostUp(data) {
-    global.backend = {alive: true, port: data.port};
+    global.backend.alive = true;
+    global.backend.port = data.port;
     if(mainWindow) {
-        mainWindow.webContents.send(events.BACKEND_UP, {port: data.port});
+        mainWindow.webContents.send(events.BACKEND_UP, global.backend);
     }
 }
 
 
 function onGhostDown() {
-    global.backend = {alive: false};
+    global.backend.alive = false;
+    global.backend.port = undefined;
     if(mainWindow) {
         mainWindow.webContents.send('backend-down');
     }
@@ -63,13 +76,16 @@ function onDeviceUpdated(deviceInfo) {
     global.devices[deviceInfo.uuid] = deviceInfo;
 }
 
+require("./src/bootstrap.js");
+
 const backendManager = new BackendManager({
     location: process.env.BACKEND,
     trace_pid: process.pid,
     on_ready: onGhostUp,
     on_device_updated: onDeviceUpdated,
-    on_stderr: (data) => { console.log(`${data}`.trim()); },
-    on_stopped: onGhostDown
+    on_stderr: (data) => logger.write(`${data}`),
+    on_stopped: onGhostDown,
+    c: console
 });
 backendManager.start();
 
