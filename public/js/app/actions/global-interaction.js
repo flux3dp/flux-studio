@@ -17,7 +17,7 @@ define([
         }
 
         ipc.on(events.MENU_CLICK, (event, menuItem, ...args) => {
-            var action = defaultAction[name];
+            var action = defaultAction[menuItem.id];
             if(action) {
                 action(menuItem.id, ...args);
             } else if(currentHandler) {
