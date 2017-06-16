@@ -40,7 +40,6 @@ define(['helpers/i18n'], function (i18n) {
 		 */
 		guessFromIP: (targetIP) => {
 			const ipv4Pattern = /^(\d{1,3}\.\d{1,3}\.\d{1,3})\.(\d{1,3})$/g;
-			console.log("ip", targetIP);
 			// if(ipv4Pattern.test(targetIP) === false) return false;
 			var match = ipv4Pattern.exec(targetIP),
 				i = 0,

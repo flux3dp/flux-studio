@@ -608,10 +608,8 @@ define([
                     location.hash = '#studio/cloud/bind-machine';
                 };
 
-                console.log('device info id', menuItem.id);
                 if(typeof _action[menuItem.id] === 'function') {
                     if(
-                        menuItem.id === 'ADD_NEW_MACHINE' ||
                         menuItem.id === 'SIGN_IN' ||
                         menuItem.id === 'SIGN_OUT' ||
                         menuItem.id === 'MY_ACCOUNT' ||
