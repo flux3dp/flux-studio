@@ -5,13 +5,11 @@ define([
     'jquery',
     'helpers/i18n',
     'html2canvas',
-    'helpers/ghost-log-reader',
     'helpers/logger'
 ], function(
     $,
     i18n,
     html2canvas,
-    ghostLogReader,
     Logger
 ) {
     'use strict';
@@ -47,31 +45,44 @@ define([
 
             allLog = null;
 
-            for (var key in localStorage) {
-                if (false === key.startsWith('lang')) {
-                    report_info.localStorage[key] = localStorage[key];
-                }
+            var output = [];
+
+            if(electron) {
+                let os = require("os");
+                output.push('======::os::======\n')
+                output.push(`OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n`);
+                output.push(`USER-AGENT: ${navigator.userAgent}\n`);
             }
 
-            report_info = JSON.stringify(report_info, null, 2);
+            output.push('\n\n======::devices::======\n');
+            output.push(JSON.stringify(report_info.discoverDeviceList, null, 2))
 
-            if (!window.FLUX.debug) {
-                report_info = obfuse(btoa(report_info));
+            if(FLUX.logfile) {
+                let fs = require("fs");
+                let buf = fs.readFileSync(FLUX.logfile, {encoding: "utf8"})
+
+                output.push('\n\n======::backend::======\n');
+                output.push(buf)
             }
 
-            ghostLogReader().done(function(log) {
-                let header = '';
-                if(typeof os === 'undefined') {
-                    header = `FS: ${window.FLUX.version}\nOS: NA\nARCH: NA\nRELEASE: NA\n`;
-                }
-                else {
-                    header = `OS: ${os.type()}\nARCH: ${os.arch()}\nRELEASE: ${os.release()}\n`;
-                }
-                header += `USER-AGENT: ${navigator.userAgent}\n\n`;
+            output.push('\n\n======::ws::======\n');
+            output.push(JSON.stringify(report_info.ws, null, 2))
 
-                report_blob = new Blob([header, log, report_info], { type : 'text/html' });
-                saveAs(report_blob, 'bugreport_' + Math.floor(Date.now() / 1000) + '.txt');
-            });
+            output.push('\n\n======::storage::======\n');
+
+            for(let key in localStorage) {
+                let value = localStorage[key];
+                if(value.startsWith("-----BEGIN RSA PRIVATE KEY-----\n")) {
+                    value = "[hidden]";
+                }
+                output.push(`${key}=${value}\n\n`);
+            }
+
+            output.push('\n\n======::generic::======\n');
+            output.push(JSON.stringify(report_info.generic, null, 2))
+
+            report_blob = new Blob(output, {type: 'text/html'});
+            saveAs(report_blob, 'bugreport_' + Math.floor(Date.now() / 1000) + '.txt');
 
             $deferred.resolve();
         });
