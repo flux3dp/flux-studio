@@ -314,7 +314,7 @@ class MenuManager extends EventEmitter {
         this._device_list[uuid] = data;
 
         for(let menuitem of this._deviceMenu.submenu.items) {
-            if(menuitem.id === `device:${uuid}` && enuitem.label !== data.name) {
+            if(menuitem.id === `device:${uuid}` && menuitem.label !== data.name) {
                 menuitem.label = data.name;
                 Menu.setApplicationMenu(this._appmenu);
             }

@@ -91,11 +91,17 @@ class BackendManager extends EventEmitter {
             this._wsconn = conn;
             conn.on('message', (message) => {
                 if (message.type === 'utf8') {
+                    let devInfo;
+
                     try {
-                        let devInfo = uglyJsonParser(message.utf8Data);
+                        devInfo = uglyJsonParser(message.utf8Data);
+                    } catch(err) {
+                        console.error("Can not parse backend stout: %s", err);
+                    }
+                    try {
                         this.emit('device_updated', devInfo);
                     } catch(err) {
-                        console.error("Can not handle backend stout: %s", err);
+                        console.error("Update device info error: %s", err);
                     }
                 }
             });
