@@ -5,50 +5,67 @@ const events = require('./ipc-events');
 
 let r = {};
 
-function build_menu(callback) {
-    let menu = [];
+function _buildOSXAppMenu(callback) {
+    return {
+        label: 'FLUX Studio',
+        submenu: [
+            { label: 'About FLUX Studio', role: 'about'},
+            { 'id': 'PREFERENCE',  label: r.preferences || 'Preferences', 'accelerator': `Cmd+,`, click: callback },
+            { type: 'separator' },
+            { role: 'services', submenu: [] },
+            { type: 'separator' },
+            { label: 'Hide', role: 'hide' },
+            { role: 'hideothers' },
+            { type: 'separator' },
+            { label: 'Quit', role: 'quit'}
+        ]
+    }
+}
 
-    if(process.platform === 'darwin') {
-        menu.push({
-            label: 'FLUX Studio',
-            submenu: [
-                { label: 'About FLUX Studio', role: 'about'},
-                { 'id': 'PREFERENCE',  label: r.preferences || 'Preferences', 'accelerator': 'Cmd+,', click: callback },
-                { type: 'separator' },
-                { role: 'services', submenu: [] },
-                { type: 'separator' },
-                { label: 'Hide', role: 'hide' },
-                { role: 'hideothers' },
-                { type: 'separator' },
-                { label: 'Quit', role: 'quit'}
-            ]
-        });
+
+function _buildFileMenu(fnKey, callback) {
+    let menuItems = [
+        { 'id': 'IMPORT', label: r.import || 'Import', click: callback, 'accelerator': `${fnKey}+I` },
+        { type: 'separator' },
+        { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': `${fnKey}+E` },
+        { 'id': 'SAVE_SCENE', label: r.save_scene || 'Save Scene', click: callback, 'accelerator': `${fnKey}+S` }
+    ];
+
+    if(process.platform !== 'darwin') {
+        menuItems.push({ 'id': 'PREFERENCE',  label: r.preferences || 'Preferences', 'accelerator': `${fnKey}+,`, click: callback });
     }
 
-    menu.push({
+    return {
         id: '_file',
         label: r.file,
-        submenu: [
-            { 'id': 'IMPORT', label: r.import || 'Import', click: callback, 'accelerator': 'Cmd+I'},
-            { type: 'separator' },
-            { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': 'Cmd+E' },
-            { 'id': 'SAVE_SCENE', label: r.save_scene || 'Save Scene', click: callback, 'accelerator': 'Cmd+S' } ,
-        ]
-    });
+        submenu: menuItems,
+    }
+}
+
+
+function buildMenu(callback) {
+    let menu = [];
+    let fnKey =  process.platform === 'darwin' ? 'Cmd' : 'Ctrl';
+
+    if(process.platform === 'darwin') {
+        menu.push(_buildOSXAppMenu(callback));
+    }
+
+    menu.push(_buildFileMenu(fnKey, callback));
 
     menu.push({
         id: '_edit',
         label: r.edit,
         submenu: [
-            { 'id': 'UNDO', label: r.undo || 'Undo', click: callback, 'accelerator': 'Cmd+Z'},
+            { 'id': 'UNDO', label: r.undo || 'Undo', click: callback, 'accelerator': `${fnKey}+Z`},
             { type:'separator'},
-            { 'id': 'DUPLICATE', label: r.duplicate || 'Duplicate', enabled: false , click: callback, 'accelerator': 'Cmd+D' },
+            { 'id': 'DUPLICATE', label: r.duplicate || 'Duplicate', enabled: false , click: callback, 'accelerator': `${fnKey}+D` },
             { 'id': 'SCALE', label: r.scale || 'Scale', enabled: false, click: callback },
             { 'id': 'ROTATE', label: r.rotate || 'Rotate', enabled: false, click: callback },
             { 'id': 'RESET', label: r.reset || 'Reset', enabled: false, click: callback },
             { 'id': 'ALIGN_CENTER', label: r.align_center || 'Align Center', enabled: false, click: callback },
             { type: 'separator' },
-            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': 'Cmd+Shift+X' },
+            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Sift+X` },
         ]
     });
 
@@ -56,7 +73,7 @@ function build_menu(callback) {
         id: '_machines',
         label: r.machines || 'Machines',
         submenu: [
-            { 'id': 'ADD_NEW_MACHINE', label: r.add_new_machine || 'Add New Machine', 'accelerator': 'Cmd+N', click: callback},
+            { 'id': 'ADD_NEW_MACHINE', label: r.add_new_machine || 'Add New Machine', 'accelerator': `${fnKey}+N`, click: callback},
             {type: 'separator'}
         ]
     });
@@ -116,7 +133,7 @@ function build_menu(callback) {
 }
 
 
-function build_device_menu(callback, uuid, data) {
+function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
     return new MenuItem({
         label: data.name,
@@ -232,7 +249,7 @@ class MenuManager extends EventEmitter {
     }
     constructMenu() {
         this._appmenu = Menu.buildFromTemplate(
-            build_menu(this._on_menu_click.bind(this))
+            buildMenu(this._on_menu_click.bind(this))
         );
 
         for(let i in this._appmenu.items) {
@@ -246,7 +263,7 @@ class MenuManager extends EventEmitter {
 
         for(let uuid in this._device_list) {
             let data = this._device_list[uuid];
-            let instance = build_device_menu(this._on_menu_click.bind(this), uuid, data);
+            let instance = buildDeviceMenu(this._on_menu_click.bind(this), uuid, data);
             this._deviceMenu.submenu.append(instance);
         }
         Menu.setApplicationMenu(this._appmenu);
@@ -285,7 +302,7 @@ class MenuManager extends EventEmitter {
             }
 
             this._device_list[uuid] = data;
-            let instance = build_device_menu(this._on_menu_click.bind(this), uuid, data);
+            let instance = buildDeviceMenu(this._on_menu_click.bind(this), uuid, data);
             this._deviceMenu.submenu.append(instance);
             Menu.setApplicationMenu(this._appmenu);
         } else {
@@ -296,10 +313,12 @@ class MenuManager extends EventEmitter {
     updateDevice(uuid, data) {
         this._device_list[uuid] = data;
 
-        if(this._deviceMenu) {
-            return;
+        for(let menuitem of this._deviceMenu.submenu.items) {
+            if(menuitem.id === `device:${uuid}` && enuitem.label !== data.name) {
+                menuitem.label = data.name;
+                Menu.setApplicationMenu(this._appmenu);
+            }
         }
-        // NOTE: update this._appmenu and call Menu.setApplicationMenu(this._appmenu); to make changes effect.
     }
     removeDevice(uuid) {
         delete this._device_list[uuid];
