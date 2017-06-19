@@ -1083,11 +1083,14 @@ define([
         checkOutOfBounds(SELECTED).then(() => {
             // disable preview when object are all out of bound
             reactSrc.setState({ hasObject: !allOutOfBound()});
+
+            if (!allOutOfBound()) {
+                //set the OrbitControls target to move around.
+                _orbitTargetMesh(SELECTED);
+            }
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
 
-                //set the OrbitControls target to move around.
-                _orbitTargetMesh(SELECTED);
                 setObjectDialoguePosition(SELECTED);
                 doSlicing();
             }
