@@ -1,3 +1,4 @@
+'use strict';
 
 const electron = require('electron');
 const {app, ipcMain, BrowserWindow} = require('electron');
@@ -26,7 +27,14 @@ function createLogFile() {
     return f;
 }
 
+var DEBUG = false;
 const logger = process.stderr.isTTY ? process.stderr : createLogFile();
+
+if(process.argv.indexOf('--debug') > 0) {
+    DEBUG = true;
+    console.log("DEBUG Mode");
+    // require('electron-reload')(__dirname);
+}
 
 
 function onGhostUp(data) {
@@ -109,9 +117,11 @@ function createWindow () {
     mainWindow.on('closed', function () {
         mainWindow = null;
 
-        // if (process.platform !== 'darwin') {
+        if (process.platform === 'darwin' && DEBUG) {
+            console.log("Main window closed.");
+        } else {
             app.quit();
-        // }
+        }
     });
 
     mainWindow.on('page-title-updated', function(event) {
@@ -132,7 +142,7 @@ function createWindow () {
     ipcMain.on("DEBUG-INSPECT", () => {
         mainWindow.webContents.openDevTools();
     });
-    if(process.defaultApp) {
+    if(process.defaultApp || DEBUG) {
         mainWindow.webContents.openDevTools();
     }
 }
@@ -156,10 +166,6 @@ app.on('ready', () => {
             mainWindow.focus();
         }
     });
-
-    if(process.argv.indexOf('--debug') > 0) {
-        require('electron-reload')(__dirname);
-    }
 
     menuManager = new MenuManager();
     menuManager.on(events.MENU_CLICK, (data) => {

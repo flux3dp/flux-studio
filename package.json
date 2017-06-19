@@ -80,6 +80,9 @@
     },
     "win": {
       "icon": "app-icons/win-icon.ico"
+    },
+    "nsis": {
+      "include": "win-install.nsh"
     }
   }
 }
