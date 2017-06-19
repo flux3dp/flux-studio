@@ -109,9 +109,9 @@ function createWindow () {
     mainWindow.on('closed', function () {
         mainWindow = null;
 
-        if (process.platform !== 'darwin') {
+        // if (process.platform !== 'darwin') {
             app.quit();
-        }
+        // }
     });
 
     mainWindow.on('page-title-updated', function(event) {
