@@ -619,6 +619,7 @@ define([
                     }
                     else {
                         let callback = {
+                            timeout: 20000,
                             onSuccess: (device) => { _action[menuItem.id](device); },
                             onTimeout: () => { console.log('select device timeout');}
                         };
