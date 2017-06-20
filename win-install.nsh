@@ -3,19 +3,33 @@
   ${If} ${RunningX64}
     StrCpy $R1 "SOFTWARE\Classes\Installer\Dependencies\{d992c12e-cab2-426f-bde3-fb8c53950b0d}"
     StrCpy $R2 "${PROJECT_DIR}\backend\VC_redist.x64.exe /passive"
+    StrCpy $R3 "${PROJECT_DIR}\backend\UsbDriver\dpinst_x64.exe /S /Q"
   ${Else}
     StrCpy $R1 "SOFTWARE\Classes\Installer\Dependencies\{e2803110-78b3-4664-a479-3611a381656a}"
     StrCpy $R2 "${PROJECT_DIR}\backend\VC_redist.x32.exe /passive"
+    StrCpy $R3 "${PROJECT_DIR}\backend\UsbDriver\dpinst_x32.exe /S /Q"
   ${EndIf}
 
-  ReadRegDword $R3 HKLM $R1 "DisplayName"
+  ReadRegDword $R4 HKLM $R1 "DisplayName"
 
-  ${If} $R3 == ""
-    ExecWait $R2 $R4
-    ${If} $R4 > 0
-      MessageBox MB_OK "Visual C++ Redistributable install failed. Maybe you have to install manually. (Return $R4)"
+  ${If} $R4 == ""
+    ExecWait $R2 $R5
+    ${If} $R5 > 0
+      MessageBox MB_OK "Visual C++ Redistributable install failed. Maybe you have to install manually. (Return $R5)"
     ${Else}
     ${EndIf}
+  ${Else}
+  ${EndIf}
+
+  ExecWait $R2 $R5
+  ${If} $R5 > 0
+      MessageBox MB_OK "FLUX USB Link Cable driver install failed. Maybe you have to install manually. (Return $R5)"
+  ${Else}
+  ${EndIf}
+
+  ExecWait 'netsh advfirewall firewall show rule name="FLUX Discover Port 1901"' $R5
+  ${If} $R5 > 0
+    ExecWait 'netsh advfirewall firewall add rule name="FLUX Discover Port 1901" dir=in action=allow protocol=UDP localport=1901' $R5
   ${Else}
   ${EndIf}
 !macroend
