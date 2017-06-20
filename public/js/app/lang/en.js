@@ -989,6 +989,7 @@ define(function() {
             completed: 'Completed',
             calibrating: 'Calibrating',
             showOutline: 'frame showing',
+            aborting: 'Aborting',
             starting: 'Starting',
             resuming: 'Resuming',
             scanning: 'Scanning',

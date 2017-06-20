@@ -59,6 +59,11 @@ define([
             currentStatus: ''
         }),
 
+        ABORTING: () => ({
+            displayStatus: lang.device.aborting,
+            currentStatus: ''
+        }),
+
         ABORTED: () => ({
             displayStatus: lang.device.aborted,
             currentStatus: ''
