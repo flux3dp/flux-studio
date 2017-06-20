@@ -3,7 +3,7 @@ const {app, Menu, MenuItem, shell, ipcMain} = require('electron');
 const resource = require('./menu-resource');
 const events = require('./ipc-events');
 
-let r = {};
+let r = resource['en'];
 
 function _buildOSXAppMenu(callback) {
     return {
@@ -133,11 +133,16 @@ function buildMenu(callback) {
 }
 
 
+function getDeviceMenuId(uuid, data) {
+    return `device:${data.source}:${uuid}`
+}
+
 function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
+    let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`; 
     return new MenuItem({
-        label: data.name,
-        id: 'device:' + uuid,
+        label: menuLabel,
+        id: getDeviceMenuId(uuid, data),
         visible: true,
         submenu: [
             { id: 'DASHBOARD', uuid, serial, source, label: r.dashboard, click: callback },
@@ -291,42 +296,56 @@ class MenuManager extends EventEmitter {
     setWindowsClosed() {
     }
     appendDevice(uuid, data) {
-        if(this._deviceMenu) {
-            for(let menuitem of this._deviceMenu.submenu.items) {
-                if(menuitem.id === `device:${uuid}`) {
-                    menuitem.visible = true;
-                    this.updateDevice(uuid, data);
-                    Menu.setApplicationMenu(this._appmenu);
-                    return;
-                }
-            }
+        let menuId = getDeviceMenuId(uuid, data);
 
-            this._device_list[uuid] = data;
+        if(this._deviceMenu) {
+            // for(let menuitem of this._deviceMenu.submenu.items) {
+            //     if(menuitem.id === menuId) {
+            //         console.log("SHOW", menuitem.label);
+            //         menuitem.visible = true;
+            //         this.updateDevice(uuid, data);
+            //         Menu.setApplicationMenu(this._appmenu);
+            //         return;
+            //     }
+            // }
+
+            this._device_list[menuId] = data;
             let instance = buildDeviceMenu(this._on_menu_click.bind(this), uuid, data);
-            this._deviceMenu.submenu.append(instance);
+
+            if(data.source === "h2h") {
+                this._deviceMenu.submenu.insert(2, instance);
+            } else {
+                this._deviceMenu.submenu.append(instance);
+            }
             Menu.setApplicationMenu(this._appmenu);
         } else {
-            this._device_list[uuid] = data;
+            this._device_list[menuId] = data;
             return;
         }
     }
     updateDevice(uuid, data) {
-        this._device_list[uuid] = data;
+        let menuId = getDeviceMenuId(uuid, data);
+        this._device_list[menuId] = data;
 
         for(let menuitem of this._deviceMenu.submenu.items) {
-            if(menuitem.id === `device:${uuid}` && menuitem.label !== data.name) {
+            if(menuitem.id === menuId && menuitem.label !== data.name) {
                 menuitem.label = data.name;
                 Menu.setApplicationMenu(this._appmenu);
             }
         }
     }
-    removeDevice(uuid) {
-        delete this._device_list[uuid];
+    removeDevice(uuid, data) {
+        let menuId = getDeviceMenuId(uuid, data);
+        delete this._device_list[menuId];
 
         if(this._deviceMenu) {
-            for(let menuitem of this._deviceMenu.submenu.items) {
-                if(menuitem.id === `device:${uuid}`) {
-                    menuitem.visible = false;
+            let current = this._deviceMenu.submenu.items;
+            this._deviceMenu.submenu.items = [];
+            this._deviceMenu.submenu.clear();
+
+            for(let menuitem of current) {
+                if(menuitem.id !== menuId) {
+                    this._deviceMenu.submenu.append(menuitem);
                 }
             }
             Menu.setApplicationMenu(this._appmenu);

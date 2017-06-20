@@ -56,7 +56,9 @@ function onGhostDown() {
 
 
 function onDeviceUpdated(deviceInfo) {
-    let origDeviceInfo = global.devices[deviceInfo.uuid];
+    let deviceID = `${deviceInfo.source}:${deviceInfo.uuid}`;
+
+    let origDeviceInfo = global.devices[deviceID];
     if(origDeviceInfo && origDeviceInfo.st_id !== null && origDeviceInfo.st_id !== deviceInfo.st_id) {
         switch(deviceInfo.st_id) {
             case 48:
@@ -75,13 +77,20 @@ function onDeviceUpdated(deviceInfo) {
         mainWindow.webContents.send('device-status', deviceInfo);
     }
 
-    if(global.devices[deviceInfo.uuid]) {
-        menuManager.updateDevice(deviceInfo.uuid, deviceInfo);
+    if(deviceInfo.alive) {
+        if(global.devices[deviceID]) {
+            menuManager.updateDevice(deviceInfo.uuid, deviceInfo);
+        } else {
+            menuManager.appendDevice(deviceInfo.uuid, deviceInfo);
+        }
     } else {
-        menuManager.appendDevice(deviceInfo.uuid, deviceInfo);
+        if(global.devices[deviceID]) {
+            menuManager.removeDevice(deviceInfo.uuid, global.devices[deviceID]);
+            delete global.devices[deviceID]
+        }
     }
 
-    global.devices[deviceInfo.uuid] = deviceInfo;
+    global.devices[deviceID] = deviceInfo;
 }
 
 require("./src/bootstrap.js");
