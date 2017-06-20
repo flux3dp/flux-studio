@@ -1268,6 +1268,7 @@ define(function() {
             loaded: '進料完成',
             unloaded: '退料完成',
             ok: '確定',
+            kicked: '進料程序被中斷',
             auto_emerging: '請插入線料',
             loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',

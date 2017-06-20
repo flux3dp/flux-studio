@@ -36,6 +36,7 @@ define([
             EMERGING     : 'EMERGING',
             UNLOADING    : 'UNLOADING',
             COMPLETED    : 'COMPLETED',
+            KICKED       : 'KICKED',
             DISCONNECTED : 'DISCONNECTED'
         },
         View = React.createClass({
@@ -126,8 +127,15 @@ define([
                     DeviceMaster.stopChangingFilament().then(() => {
                         DeviceMaster.killSelf();
                     });
-                    this.setState(this.getInitialState());
+                    if (e === steps.KICKED) {
+                      AlertActions.showPopupInfo(
+                        'change filament kicked',
+                        lang.change_filament.kicked,
+                        lang.change_filament.home_caption
+                      );
+                    }
                 }
+                this.setState(this.getInitialState());
             },
 
             _goMaintain: function(type) {
@@ -149,6 +157,11 @@ define([
                         break;
                     case 'UNLOADING':
                         self._next(steps.UNLOADING);
+                        break;
+                    case 'DISCONNECTED' :
+                        DeviceMaster.KickChangeFilament().always(function() {
+                          self._next(steps.DISCONNECTED);
+                        });
                         break;
                     default:
                         if(response.error) {
@@ -226,9 +239,6 @@ define([
                             if (response && response.info === 'TYPE_ERROR') {
                                 response.error = ['HEAD_ERROR', 'TYPE_ERROR', 'EXTRUDER', 'N/A'];
                             }
-                            if (response && response.error[1] === 'TYPE_ERROR') {
-                                response.error = ['TYPE_ERROR'];
-                            }
 
                             switch(response.error[0]) {
                                 case 'RESOURCE_BUSY':
@@ -239,7 +249,7 @@ define([
                                     AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
                                     self.props.onClose();
                                     break;
-                                case 'TYPE_ERROR':
+                                case 'HEAD_ERROR':
                                     if (response.error[3] === 'N/A') {
                                         AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                                     } else {
@@ -253,14 +263,9 @@ define([
                                     AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
                                     break;
                                 case 'KICKED':
-                                    this._onCancel();
+                                    self._onCancel(steps.KICKED);
                                     break;
                                 case 'CANCEL': break;
-                                case 'DISCONNECTED':
-                                    DeviceMaster.KickChangeFilament().done(function() {
-                                      self._next(steps.DISCONNECTED);
-                                    });
-                                    break;
                                 default:
                                     errorMessageHandler(response);
                             }
@@ -498,7 +503,9 @@ define([
                         dataAttrs: {
                             'ga-event': 'disconnected'
                         },
-                        onClick: this.props.onClose
+                        onClick: () => {
+                            this.setState(this.getInitialState());
+                        }
                     }]
                 };
             },

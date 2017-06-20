@@ -698,12 +698,12 @@ define([
                     clearTimeout(timeout);
                     timeout = setTimeout( () => {
                         response = {
-                          stage  : "error",
+                          stage  : ["DISCONNECTED", "DISCONNECTED"],
                           status : "error",
                           error  : ["DISCONNECTED", ""]
                         }
-                        d.reject(response);
-                    }, 10 * 1000);
+                        d.notify(response);
+                    }, 10 * 500);
 
                     response.status !== 'ok' ? d.notify(response) : d.resolve(response);
                 };

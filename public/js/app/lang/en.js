@@ -1272,6 +1272,7 @@ define(function() {
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
             ok: 'OK',
+            kicked: 'Has been kicked',
             auto_emerging: 'Please insert filament',
             loading_filament: 'Loading filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
