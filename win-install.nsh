@@ -21,7 +21,7 @@
   ${Else}
   ${EndIf}
 
-  ExecWait $R2 $R5
+  ExecWait $R3 $R5
   ${If} $R5 > 0
       MessageBox MB_OK "FLUX USB Link Cable driver install failed. Maybe you have to install manually. (Return $R5)"
   ${Else}
