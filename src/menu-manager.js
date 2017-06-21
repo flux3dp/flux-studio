@@ -317,6 +317,7 @@ class MenuManager extends EventEmitter {
         let menuId = getDeviceMenuId(uuid, data);
         this._device_list[menuId] = data;
 
+        var labelName = data.source === "h2h" ? `${menuitem.label} (USB)` : menuitem.label;
         for(let menuitem of this._deviceMenu.submenu.items) {
             if(menuitem.id === menuId && menuitem.label !== data.name) {
                 menuitem.label = data.name;
