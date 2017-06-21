@@ -79,7 +79,8 @@
       "icon": "app-icons"
     },
     "win": {
-      "icon": "app-icons/win-icon.ico"
+      "icon": "app-icons/win-icon.ico",
+      "certificateSubjectName": " "
     },
     "nsis": {
       "include": "win-install.nsh"

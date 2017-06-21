@@ -299,16 +299,6 @@ class MenuManager extends EventEmitter {
         let menuId = getDeviceMenuId(uuid, data);
 
         if(this._deviceMenu) {
-            // for(let menuitem of this._deviceMenu.submenu.items) {
-            //     if(menuitem.id === menuId) {
-            //         console.log("SHOW", menuitem.label);
-            //         menuitem.visible = true;
-            //         this.updateDevice(uuid, data);
-            //         Menu.setApplicationMenu(this._appmenu);
-            //         return;
-            //     }
-            // }
-
             this._device_list[menuId] = data;
             let instance = buildDeviceMenu(this._on_menu_click.bind(this), uuid, data);
 
