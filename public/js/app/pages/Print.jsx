@@ -34,7 +34,8 @@ define([
     'helpers/i18n',
     'helpers/check-device-status',
     'app/tutorial-steps',
-    'helpers/slicer-settings'
+    'helpers/slicer-settings',
+    'helpers/get-device'
 ], function(
     $,
     React,
@@ -71,7 +72,8 @@ define([
     i18n,
     CheckDeviceStatus,
     TutorialSteps,
-    SlicerSettings
+    SlicerSettings,
+    GetDevice
 ) {
 
     return function(args) {
@@ -319,29 +321,7 @@ define([
                 },
 
                 _getDevice: function() {
-                    let selectedDevice = {},
-                        defaultDevice = InitializeMachine.defaultPrinter.get(),
-                        configuredDevice = {},
-                        firstDevice = DeviceMaster.getFirstDevice();
-
-                    const isNotEmptyObject = o => Object.keys(o).length > 0;
-
-                    if (Config().read('configured-printer') !== '') {
-                        configuredDevice = Config().read('configured-printer');
-                    }
-
-                    // determin selected Device
-                    if (isNotEmptyObject(defaultDevice)) {
-                        selectedDevice = defaultDevice;
-                    }
-                    else if (isNotEmptyObject(configuredDevice)) {
-                        selectedDevice = configuredDevice;
-                    }
-                    else {
-                        selectedDevice = firstDevice;
-                    }
-
-                    return selectedDevice;
+                    return GetDevice();
                 },
 
                 _handleYes: function(answer, args) {

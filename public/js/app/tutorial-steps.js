@@ -1,6 +1,6 @@
 define([
     'helpers/i18n',
-    'helpers/api/config',
+    'helpers/api/config'
 ], function(
     i18n,
     Config
@@ -44,14 +44,14 @@ define([
         },
         {
             selector: '',
-            text: Config().read('configured-model') === 'fd1p' ? lang.tutorial.startPrintDeltaPlus : lang.tutorial.startPrint,
+            text: Config().read('configured-model') === 'fd1' ? lang.tutorial.startPrint : lang.tutorial.startPrintDeltaPlus,
             offset_y: 25,
             r: 80,
             position: 'top'
         },
         {
             selector: '.flux-monitor .operation',
-            text: Config().read('configured-model') === 'fd1p' ? lang.tutorial.startPrintDeltaPlus : lang.tutorial.startPrint,
+            text: Config().read('configured-model') === 'fd1' ? lang.tutorial.startPrint : lang.tutorial.startPrintDeltaPlus,
             offset_y: 25,
             r: 80,
             position: 'top'
