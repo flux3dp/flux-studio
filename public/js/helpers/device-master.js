@@ -836,7 +836,7 @@ define([
     }
 
     function getFirstDevice() {
-        return _deviceNameMap[0];
+        return _deviceNameMap[Object.keys(_deviceNameMap)[0]];
     }
 
     function getDeviceByName(name) {
