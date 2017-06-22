@@ -95,17 +95,17 @@ class BackendManager extends EventEmitter {
                 // prevent timeout disconnect
                 let now = new Date();
                 if (now - this._ws_tm > 30000) {
-                    conn.send("ping");
+                    conn.send('ping');
                     this._ws_tm = now;
                 }
 
-                if (message.type === 'utf8' && message.utf8Data !=== "pong") {
+                if (message.type === 'utf8' && message.utf8Data !== 'pong') {
                     let devInfo;
 
                     try {
                         devInfo = uglyJsonParser(message.utf8Data);
                     } catch(err) {
-                        console.error("Can not parse backend stout: %s", err);
+                        console.error('Can not parse backend stout: %s', err);
                     }
                     this.emit('device_updated', devInfo);
                 }
