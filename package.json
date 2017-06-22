@@ -27,7 +27,7 @@
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
     "electron": "~1.6.2",
-    "electron-builder": "^17.1.2",
+    "electron-builder": "^19.7.1",
     "electron-reload": "~1.1.0",
     "expect": "^1.14.0",
     "gulp": "^3.9.0",
@@ -67,6 +67,11 @@
     "files": [
       "!**/*.{jsx,scss}"
     ],
+    "publish": [{
+    "provider": "s3",
+    "bucket": "${env.PUBLISH_BUCKET}",
+    "path": "${os}${env.PUBLISH_PATH}"
+  }],
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
@@ -83,11 +88,11 @@
       "certificateSubjectName": " "
     },
     "dmg": {
-      "artifactName": "flux-studio-${version}.${ext}"
+      "artifactName": "FLUX Studio ${version}.${ext}"
     },
     "nsis": {
       "include": "win-install.nsh",
-      "artifactName": "flux-studio-${version}-${arch}.${ext}"
+      "artifactName": "FLUX Studio Installer ${version}.${ext}"
     }
   }
 }
