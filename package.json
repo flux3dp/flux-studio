@@ -82,8 +82,12 @@
       "icon": "app-icons/win-icon.ico",
       "certificateSubjectName": " "
     },
+    "dmg": {
+      "artifactName": "flux-studio-${version}.${ext}"
+    },
     "nsis": {
-      "include": "win-install.nsh"
+      "include": "win-install.nsh",
+      "artifactName": "flux-studio-${arch}-${version}.${ext}"
     }
   }
 }
