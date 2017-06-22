@@ -19,6 +19,9 @@ define([
             Object.keys(availableChannels).forEach(c => {
                 if(Object.keys(channels).indexOf(c) >= 0) {
                     _channels[c] = channels[c];
+                } else {
+                    _channels[c] = availableChannels[c];
+                    _channels[c].connected = true;
                 }
                 if (!availableChannels[c]) {
                     _channels[c] = {
@@ -26,6 +29,7 @@ define([
                     };
                 }
             });
+
             if(Object.keys(channels).length !== Object.keys(_channels).length) {
                 notifyChange = true;
             }
@@ -55,7 +59,7 @@ define([
                       setTimeout(() => {
                         ws.send(`open ${channelToOpen}`);
                         this.t = setInterval(() => { ws.send('list'); }, interval);
-                      }, interval)
+                      }, interval);
                     }
                 }
 
@@ -93,6 +97,7 @@ define([
 
             if(notifyChange) {
                notifyChange = false;
+               console.log('Change ', response, channels);
                callback(channels);
             }
         };

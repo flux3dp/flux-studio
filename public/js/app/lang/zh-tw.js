@@ -98,7 +98,7 @@ define(function() {
             },
             device: {
                 label: '機器',
-                new: '新增機器',
+                new: '新增或設定機器',
                 device_monitor: '儀表板',
                 device_info: '機器資訊',
                 head_info: '工具頭資訊',
@@ -164,7 +164,7 @@ define(function() {
             connect: '連接',
             back: '返回',
             retry: '重試',
-            no_machine : '目前沒有機器，跳過此步驟',
+            no_machine : '目前沒有機器或已設定過連線，跳過此步驟',
 
             // specific caption/content
             invalid_device_name: '機器名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
@@ -232,11 +232,11 @@ define(function() {
             errors: {
                 error: '錯誤',
                 not_found: '無法找到 FLUX Delta',
-                not_support: '請更新 Delta 韌體到 v1.1 以上',
+                not_support: '請透過隨身碟更新 Delta 韌體到 v1.6 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。無法安裝驅動程式，請查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>'
+                    content: '別擔心！請確認 1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮 2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a> 3. 重新插拔線並稍等 10 秒鐘'
                 },
 
                 wifi_connection: {
