@@ -28,6 +28,7 @@
     "chai": "3.5.0",
     "electron": "~1.6.2",
     "electron-builder": "^19.7.1",
+    "electron-publisher-s3": "^19.7.0",
     "electron-reload": "~1.1.0",
     "expect": "^1.14.0",
     "gulp": "^3.9.0",
@@ -67,11 +68,13 @@
     "files": [
       "!**/*.{jsx,scss}"
     ],
-    "publish": [{
-    "provider": "s3",
-    "bucket": "${env.PUBLISH_BUCKET}",
-    "path": "${os}${env.PUBLISH_PATH}"
-  }],
+    "publish": [
+      {
+        "provider": "s3",
+        "bucket": "${env.PUBLISH_BUCKET}",
+        "path": "${os}${env.PUBLISH_PATH}"
+      }
+    ],
     "mac": {
       "category": "com.flux3dp.flux-studio",
       "target": "dmg",
