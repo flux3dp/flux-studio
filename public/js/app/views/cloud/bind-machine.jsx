@@ -165,10 +165,9 @@ define([
 							}
 						};
 
-						const getCloudValidationCodeAndBind = () => {
+						const getCloudValidationCodeAndBind = (uuid) => {
 							DeviceMaster.getCloudValidationCode().then(r => {
 								let { token, signature } = r.code,
-									{ uuid } = this.state.selectedDevice,
 									accessId = r.code.access_id;
 
 								signature = encodeURIComponent(signature);
@@ -177,7 +176,7 @@ define([
 						};
 
 						if(response.cloud[0] === true) {
-							getCloudValidationCodeAndBind();
+							getCloudValidationCodeAndBind(response.uuid);
 						}
 						else {
 							if(response.cloud[1].join('') === 'DISABLE') {
@@ -196,6 +195,7 @@ define([
 
 		_handleUnbind: function(uuid) {
 			let lang = this.props.lang.settings.flux_cloud;
+			console.log('unbind', uuid);
 
 			const removeDevice = (uuid) => {
 				let me = this.state.me;
@@ -252,7 +252,13 @@ define([
 			else {
 				deviceList = this.state.deviceList.map((d) => {
 					let { me } = this.state,
-						rowClass, linkedClass;
+							uuid = d.source === 'h2h' ? d.h2h_uuid : d.uuid,
+							rowClass,
+							linkedClass;
+
+					const isLinked = () => {
+						return Object.keys(me.devices || {}).indexOf(uuid) !== -1;
+					}
 
 					rowClass = ClassNames(
 						'device',
@@ -260,14 +266,14 @@ define([
 					);
 
 					linkedClass = ClassNames({
-						'linked': Object.keys(me.devices || {}).indexOf(d.uuid) !== -1
+						'linked': isLinked()
 					});
 
 					return (
 						<div className={rowClass} onClick={this._handleSelectDevice.bind(null, d)}>
 							<div className="name">{d.name}</div>
 							<div className="status">{this.lang.machine_status[d.st_id]}</div>
-							<div className={linkedClass} onClick={this._handleUnbind.bind(null, d.uuid)}></div>
+							<div className={linkedClass} onClick={this._handleUnbind.bind(null, uuid)}></div>
 						</div>
 					);
 				});

@@ -4,7 +4,7 @@ define([
     Websocket
 ) {
     let channels = {},
-        interval = 5000,
+        interval = 3000,
         ws;
 
     // callback should receive opened usb channel, -1 if not available
@@ -51,7 +51,11 @@ define([
                 if(Object.keys(response.h2h).length > 0) {
                     channelToOpen = nextUnopenedChannel();
                     if(channelToOpen !== '') {
+                      clearInterval(this.t);
+                      setTimeout(() => {
                         ws.send(`open ${channelToOpen}`);
+                        this.t = setInterval(() => { ws.send('list'); }, interval);
+                      }, interval)
                     }
                 }
 
