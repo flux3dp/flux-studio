@@ -87,7 +87,7 @@
     },
     "nsis": {
       "include": "win-install.nsh",
-      "artifactName": "flux-studio-${arch}-${version}.${ext}"
+      "artifactName": "flux-studio-${version}-${arch}.${ext}"
     }
   }
 }
