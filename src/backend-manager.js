@@ -99,7 +99,7 @@ class BackendManager extends EventEmitter {
                     this._ws_tm = now;
                 }
 
-                if (message.type === 'utf8') {
+                if (message.type === 'utf8' && message.utf8Data !=== "pong") {
                     let devInfo;
 
                     try {

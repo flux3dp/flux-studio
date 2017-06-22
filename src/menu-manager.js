@@ -319,11 +319,15 @@ class MenuManager extends EventEmitter {
 
         var labelName = data.source === "h2h" ? `${data.name} (USB)` : data.name;
         for(let menuitem of this._deviceMenu.submenu.items) {
-            if(menuitem.id === menuId && menuitem.label !== data.name) {
-                menuitem.label = data.name;
-                Menu.setApplicationMenu(this._appmenu);
+            if(menuitem.id === menuId) {
+                if(menuitem.label !== data.name) {
+                    menuitem.label = data.name;
+                    Menu.setApplicationMenu(this._appmenu);
+                }
+                return;
             }
         }
+        this.appendDevice(uuid, data);
     }
     removeDevice(uuid, data) {
         let menuId = getDeviceMenuId(uuid, data);
