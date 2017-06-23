@@ -331,7 +331,7 @@ define([
                         true === ipv4Pattern.test(response.ipaddr[0]) &&
                         '' !== response.ssid
                     ) {
-                        response.action = 'GOOD';
+                        response.action = 'PREVIOUS_SSID';
                         $deferred.resolve(response);
                     }
                     else {

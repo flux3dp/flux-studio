@@ -231,6 +231,7 @@ define(function() {
             // errors
             errors: {
                 error: '錯誤',
+                close: '關閉',
                 not_found: '無法找到 FLUX Delta',
                 not_support: '請透過隨身碟更新 Delta 韌體到 v1.6 以上',
 

@@ -231,6 +231,7 @@ define(function() {
             // errors
             errors: {
                 error: 'Error',
+                close: 'close',
                 not_found: 'Not Found',
                 not_support: 'Please update Machine Firmware to v1.6+, through USB',
 
