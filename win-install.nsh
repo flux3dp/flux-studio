@@ -32,4 +32,9 @@
     ExecWait 'netsh advfirewall firewall add rule name="FLUX Discover Port 1901" dir=in action=allow protocol=UDP localport=1901' $R5
   ${Else}
   ${EndIf}
-!macroend
+
+  ${If} $R5 > 0
+      MessageBox MB_OK "Firewall configuration failed. (Return $R5)"
+  ${Else}
+  ${EndIf}
+  !macroend
