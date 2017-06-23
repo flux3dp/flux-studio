@@ -39,6 +39,13 @@
         }
     }
 
+
+
+    .usb-disabled {
+        opacity: 0.6 !important;
+        cursor: normal !important;
+    }
+
     .connect-machine {
         .scene {
             height: 209px;

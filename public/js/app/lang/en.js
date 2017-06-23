@@ -98,7 +98,7 @@ define(function() {
             },
             device: {
                 label: 'Machines',
-                new: 'Add a New Machine',
+                new: 'Machine Setup',
                 device_monitor: 'Dashboard',
                 device_info: 'Machine Info',
                 head_info: 'Toolhead Info',
@@ -236,7 +236,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try unplug and plug it back in again.'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.'
                 },
 
                 wifi_connection: {

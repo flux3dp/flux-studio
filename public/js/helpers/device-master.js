@@ -1420,7 +1420,9 @@ define([
 
         UsbChecker((connectedUsbDevices) => {
             let newList = [],
-                connectedUsbChannels = Object.keys(connectedUsbDevices);
+                connectedUsbChannels = Object.keys(connectedUsbDevices).filter(c => {
+                    return connectedUsbDevices[c].connected
+                });
 
             // remove old usb connection
             _devices.forEach(d => {
@@ -1450,6 +1452,11 @@ define([
                     }
                 }
             });
+
+            console.log("Connected Channels", connectedUsbChannels);
+            if (connectedUsbChannels.length == 0) {
+                self.availableUsbChannel = -1;
+            }
 
             // to be replaced when redux is implemented
             // notify if usb is unplugged

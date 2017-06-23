@@ -95,7 +95,7 @@ class BackendManager extends EventEmitter {
                 // prevent timeout disconnect
                 let now = new Date();
                 if (now - this._ws_tm > 30000) {
-                    conn.send("ping");
+                    conn.send('ping');
                     this._ws_tm = now;
                 }
 
@@ -109,7 +109,7 @@ class BackendManager extends EventEmitter {
                         }
                         
                     } catch(err) {
-                        console.error("Can not parse backend stout: %s", err);
+                        console.error('Can not parse backend stout: %s', err);
                     }
                     this.emit('device_updated', devInfo);
                 }
