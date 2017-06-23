@@ -59,10 +59,16 @@ define([
 
             if(FLUX.logfile) {
                 let fs = require("fs");
-                let buf = fs.readFileSync(FLUX.logfile, {encoding: "utf8"})
-
-                output.push('\n\n======::backend::======\n');
-                output.push(buf)
+                try {
+                    let buf = fs.readFileSync(FLUX.logfile, {encoding: "utf8"})
+                    output.push('\n\n======::backend::======\n');
+                    output.push(buf)
+                } catch(err) {
+                    output.push('\n\n======::backend::======\n');
+                    output.push(`Open backend log failed: ${err}\n`);
+                }
+            } else {
+                output.push('\n\n======::backend::======\nNot available\n');
             }
 
             output.push('\n\n======::ws::======\n');
