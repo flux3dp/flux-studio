@@ -295,7 +295,7 @@ class MenuManager extends EventEmitter {
     }
     setWindowsClosed() {
     }
-    appendDevice(uuid, data) {
+    _appendDevice(uuid, data) {
         let menuId = getDeviceMenuId(uuid, data);
 
         if(this._deviceMenu) {
@@ -318,6 +318,7 @@ class MenuManager extends EventEmitter {
         this._device_list[menuId] = data;
 
         var labelName = data.source === "h2h" ? `${data.name} (USB)` : data.name;
+
         for(let menuitem of this._deviceMenu.submenu.items) {
             if(menuitem.id === menuId) {
                 if(menuitem.label !== data.name) {
@@ -327,7 +328,7 @@ class MenuManager extends EventEmitter {
                 return;
             }
         }
-        this.appendDevice(uuid, data);
+        this._appendDevice(uuid, data);
     }
     removeDevice(uuid, data) {
         let menuId = getDeviceMenuId(uuid, data);

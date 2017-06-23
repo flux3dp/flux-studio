@@ -78,11 +78,7 @@ function onDeviceUpdated(deviceInfo) {
     }
 
     if(deviceInfo.alive) {
-        if(global.devices[deviceID]) {
-            menuManager.updateDevice(deviceInfo.uuid, deviceInfo);
-        } else {
-            menuManager.appendDevice(deviceInfo.uuid, deviceInfo);
-        }
+        menuManager.updateDevice(deviceInfo.uuid, deviceInfo);
     } else {
         if(global.devices[deviceID]) {
             menuManager.removeDevice(deviceInfo.uuid, global.devices[deviceID]);
