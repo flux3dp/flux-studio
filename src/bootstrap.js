@@ -23,6 +23,7 @@ function bootstrap_linux() {
     console.log(`### slic3r: ${process.env.BACKEND}`);
 }
 
+
 function bootstrap_windows() {
     console.log("Bootstrap windows");
     let winApi = require("node-windows");
@@ -35,9 +36,20 @@ function bootstrap_windows() {
     try {
         execSync('netsh advfirewall firewall show rule name="FLUX Discover Port 1901');
     } catch(err) {
-        winApi.elevate('netsh advfirewall firewall add rule name="FLUX Discover Port 1901" dir=in action=allows protocol=UDP localport=1901', {}, function(error, stdout, stderr) {});
+        setupWindowsFirewall();
     }
 }
+
+
+function setupWindowsFirewall() {
+    try {
+        let cmd = path.join(resourcesRoot, 'backend', 'elevate.cmd')
+        execSync(cmd + ' netsh advfirewall firewall show rule name="FLUX Discover Port 1901');
+    } catch(err) {
+        console.log("setup windows firewall error: %s", err);
+    }
+}
+
 
 process.env.appVersion = app.getVersion();
 
