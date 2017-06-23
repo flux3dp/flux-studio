@@ -26,15 +26,4 @@
       MessageBox MB_OK "FLUX USB Link Cable driver install failed. Maybe you have to install manually. (Return $R5)"
   ${Else}
   ${EndIf}
-
-  ExecWait 'netsh advfirewall firewall show rule name="FLUX Discover Port 1901"' $R5
-  ${If} $R5 > 0
-    ExecWait 'netsh advfirewall firewall add rule name="FLUX Discover Port 1901" dir=in action=allow protocol=UDP localport=1901' $R5
-  ${Else}
-  ${EndIf}
-
-  ${If} $R5 > 0
-      MessageBox MB_OK "Firewall configuration failed. (Return $R5)"
-  ${Else}
-  ${EndIf}
-  !macroend
+!macroend
