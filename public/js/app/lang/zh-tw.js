@@ -409,8 +409,9 @@ define(function() {
                 sign_out: '登出',
                 not_supported_firmware: '支援 FLUX cloud 需要機器韌體 v1.5＋',
                 unbind_device: '確認要不再綁定此機器?',
-                CLOUD_SESSION_CONNECTION_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (Session)',
                 CLOUD_UNKNOWN_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (General)',
+                CLOUD_SESSION_CONNECTION_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (Session)',
+                SERVER_INTERNAL_ERROR: '伺服器發生錯誤，請稍後再試.',
             }
         },
         print: {

@@ -96,6 +96,13 @@ define([
 
                 }
                 else {
+                    if (response.status !== 200) {
+                        this.setState({
+                            errorMessage: lang["SERVER_INTERNAL_ERROR"] || "SERVER_INTERNAL_ERROR",
+                            processing: false
+                        });
+                        return;
+                    }
                     response.json().then(error => {
                         this.setState({
                             showResendVerificationEmail: error.message === 'NOT_VERIFIED',

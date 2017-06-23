@@ -399,6 +399,7 @@ define(function() {
                 unbind_device: 'Would you like to unbind this machine?',
                 CLOUD_SESSION_CONNECTION_ERROR: 'The machine is unable to access to the cloud server. Please reboot the machine.',
                 CLOUD_UNKNOWN_ERROR: 'The machine is unable to connected to the cloud server. Please reboot the machine.',
+                SERVER_INTERNAL_ERROR: 'Server internal error, please try again later.',
             }
         },
         print: {
