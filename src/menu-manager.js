@@ -134,7 +134,7 @@ function buildMenu(callback) {
 
 
 function getDeviceMenuId(uuid, data) {
-    return `device:${data.source}:${uuid}`
+    return `device:${data.source}:${uuid}`;
 }
 
 function buildDeviceMenu(callback, uuid, data) {
@@ -266,9 +266,9 @@ class MenuManager extends EventEmitter {
             }
         }
 
-        for(let uuid in this._device_list) {
-            let data = this._device_list[uuid];
-            let instance = buildDeviceMenu(this._on_menu_click.bind(this), uuid, data);
+        for(let devMenuId in this._device_list) {
+            let data = this._device_list[devMenuId];
+            let instance = buildDeviceMenu(this._on_menu_click.bind(this), data.uuid, data);
             this._deviceMenu.submenu.append(instance);
         }
         Menu.setApplicationMenu(this._appmenu);
