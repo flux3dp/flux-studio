@@ -91,7 +91,11 @@ define([
 
                 channelToOpen = nextUnopenedChannel();
                 if(channelToOpen !== '') {
-                    ws.send(`open ${channelToOpen}`);
+                    clearInterval(this.t);
+                    setTimeout(() => {
+                      ws.send(`open ${channelToOpen}`);
+                      this.t = setInterval(() => { ws.send('list'); }, interval);
+                    }, interval);
                 }
             }
 

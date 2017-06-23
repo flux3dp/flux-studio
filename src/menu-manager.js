@@ -139,7 +139,7 @@ function getDeviceMenuId(uuid, data) {
 
 function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
-    let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`; 
+    let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`;
     return new MenuItem({
         label: menuLabel,
         id: getDeviceMenuId(uuid, data),

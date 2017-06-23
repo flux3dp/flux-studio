@@ -276,7 +276,7 @@ define([
                                 className={{ 'value-text': true }}
                                 step={0.8}
                                 min={advancedLang.form.laser_speed.min}
-                                max={advancedLang.form.laser_speed.max}
+                                max={5000}
                                 defaultUnit="mm/s"
                                 defaultUnitType="speed"
                                 operators={['+', '-', '*']}
