@@ -35,7 +35,7 @@ function bootstrap_windows() {
     try {
         execSync('netsh advfirewall firewall show rule name="FLUX Discover Port 1901');
     } catch(err) {
-        winApi.elevate('netsh advfirewall firewall add rule name="FLUX Discover Port 1901" dir=in action=allows protocol=UDP localport=1901', options, function(error, stdout, stderr) {});
+        winApi.elevate('netsh advfirewall firewall add rule name="FLUX Discover Port 1901" dir=in action=allows protocol=UDP localport=1901', {}, function(error, stdout, stderr) {});
     }
 }
 
