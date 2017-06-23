@@ -99,11 +99,15 @@ class BackendManager extends EventEmitter {
                     this._ws_tm = now;
                 }
 
-                if (message.type === 'utf8' && message.utf8Data !=== "pong") {
+                if (message.type === 'utf8' ) {
                     let devInfo;
 
                     try {
                         devInfo = uglyJsonParser(message.utf8Data);
+                        if (devInfo.status === 'pong') {
+                            return
+                        }
+                        
                     } catch(err) {
                         console.error("Can not parse backend stout: %s", err);
                     }
