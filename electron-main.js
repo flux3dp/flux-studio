@@ -19,6 +19,19 @@ global.backend = {alive: false};
 global.devices = {};
 
 function createLogFile() {
+    var storageDir = app.getPath("userData");
+
+    function chkDir(target) {
+        if (fs.existsSync(target)) {
+            return;
+        } else {
+            chkDir(path.dirname(target));
+            fs.mkdirSync(target);
+        }
+
+    }
+    chkDir(storageDir);
+
     let filename = path.join(app.getPath("userData"), "backend.log");
     let f = fs.createWriteStream(filename, {flags: 'w'});
     global.backend.logfile = filename;
