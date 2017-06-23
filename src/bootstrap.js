@@ -4,7 +4,6 @@ const os = require('os');
 const path = require('path');
 const {app} = require('electron');
 const execSync = require('child_process').execSync;
-const sudo = require('sudo-prompt');
 const resourcesRoot = process.defaultApp ? '.' : process.resourcesPath;
 
 function bootstrap_macos() {
