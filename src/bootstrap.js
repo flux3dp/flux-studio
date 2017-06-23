@@ -26,7 +26,6 @@ function bootstrap_linux() {
 
 function bootstrap_windows() {
     console.log("Bootstrap windows");
-    let winApi = require("node-windows");
     process.env.BACKEND = process.env.BACKEND || path.join(resourcesRoot, 'backend', 'flux_api', 'flux_api.exe');
     process.env.GHOST_SLIC3R = process.env.GHOST_SLIC3R || path.join(resourcesRoot, 'backend', 'Slic3r', 'slic3r.exe');
     process.env.GHOST_CURA = process.env.GHOST_CURA || path.join(resourcesRoot, 'backend', 'CuraEngine', 'CuraEngine.exe');
