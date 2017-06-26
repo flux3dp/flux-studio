@@ -2,12 +2,12 @@
 !macro customInstall
   ${If} ${RunningX64}
     StrCpy $R1 "SOFTWARE\Classes\Installer\Dependencies\{d992c12e-cab2-426f-bde3-fb8c53950b0d}"
-    StrCpy $R2 "${PROJECT_DIR}\backend\VC_redist.x64.exe /passive"
-    StrCpy $R3 "${PROJECT_DIR}\backend\UsbDriver\dpinst_x64.exe /SW"
+    StrCpy $R2 "$INSTDIR\backend\VC_redist.x64.exe /passive"
+    StrCpy $R3 "$INSTDIR\backend\UsbDriver\dpinst_x64.exe /SW"
   ${Else}
     StrCpy $R1 "SOFTWARE\Classes\Installer\Dependencies\{e2803110-78b3-4664-a479-3611a381656a}"
-    StrCpy $R2 "${PROJECT_DIR}\backend\VC_redist.x32.exe /passive"
-    StrCpy $R3 "${PROJECT_DIR}\backend\UsbDriver\dpinst_x32.exe /SW"
+    StrCpy $R2 "$INSTDIR\backend\VC_redist.x32.exe /passive"
+    StrCpy $R3 "$INSTDIR\backend\UsbDriver\dpinst_x32.exe /SW"
   ${EndIf}
 
   ReadRegDword $R4 HKLM $R1 "DisplayName"
