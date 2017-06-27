@@ -102,7 +102,7 @@ define([
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
-            defaultSlicingEngine = 'cura',
+            defaultSlicingEngine = 'cura2',
             tourGuide = TutorialSteps,
             view = React.createClass({
 
@@ -115,6 +115,7 @@ define([
 
                     if (!_settings) {
                         console.log('settinggs missing: advanced-settings');
+                        console.log('DefaultPrintSettings', DefaultPrintSettings);
                         advancedSettings.load(DefaultPrintSettings);
                         var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
                         advancedSettings.update(defaultMedium, 'slic3r');
@@ -123,8 +124,8 @@ define([
                         advancedSettings.load(_settings, true);
                         // Load new default cura2 config
                         if (!_settings.customCura2) {
-                            advancedSettings.customCura2 = DefaultPrintSettings.customCura2;
-                            advancedSettings.customCura2 = advancedSettings.toExpert(advancedSettings.customCura2, 'cura2');
+                            advancedSettings.setCustomCura2(DefaultPrintSettings.customCura2);
+                            advancedSettings.setCustomCura2(advancedSettings.toExpert(advancedSettings.customCura2, 'cura2'));
                         }
                     }
 
@@ -528,7 +529,7 @@ define([
 
                     // write back to custom fields for each engine type
                     advancedSettings.custom = advancedSettings.custom.replace(`support_material = ${isOn ? 0 : 1}`, `support_material = ${isOn ? 1 : 0}`);
-                    advancedSettings.customCura2 = advancedSettings.customCura2.replace(`support_enable = ${isOn ? 0 : 1}`, `support_enable = ${isOn ? 1 : 0}`);
+                    advancedSettings.setCustomCura2(advancedSettings.customCura2.replace(`support_enable = ${isOn ? 0 : 1}`, `support_enable = ${isOn ? 1 : 0}`));
 
                     this._saveSetting();
                 },
