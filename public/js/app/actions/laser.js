@@ -887,11 +887,12 @@ define([
                 });
             },
             uploadDefaultLaserImage: function() {
-                // TODO make this work
+                let activeLang = i18n.getActiveLang(),
+                    calibrationLocation = 'img/' + activeLang + '/laser-calibration.png';
                 var fileEntry = {};
-                fileEntry.name = 'laser-calibration.png';
+                fileEntry.name = calibrationLocation;
                 fileEntry.toURL = function() {
-                    return 'laser-calibration.png';
+                    return calibrationLocation;
                 };
                 var oReq = new XMLHttpRequest();
                 oReq.responseType = 'blob';
@@ -900,16 +901,16 @@ define([
                 oReq.onload = function(oEvent) {
                     console.log('on load laser c');
                     var blob = oReq.response;
-                    blob.name = 'laser-calibration.png';
+                    blob.name = calibrationLocation;
                     var file = {
                         blob: blob,
-                        name: 'laser-calibration.png',
+                        name: calibrationLocation,
                         type: 'image/png'
                     }
                     bitmapWebSocket.upload([file]).always(_onUploadResponse).done(_onUploaded);
                 };
 
-                oReq.open('GET', 'laser-calibration.png', true);
+                oReq.open('GET', calibrationLocation, true);
                 oReq.send();
             },
             onReadFileStarted: function(e) {
