@@ -42,13 +42,13 @@ gulp.task('babel', function() {
 gulp.task('sass', function () {
     gulp.src('./public/sass/**/*.scss')
         .pipe(sass({
-            indentWidth: 4 
+            indentWidth: 4
         }).on('error', sass.logError))
         .pipe(gulp.dest('./public/css/'));
 });
 
 gulp.task('jsx', function () {
-    gulp.src('./public/js/**/*.jsx') 
+    gulp.src('./public/js/**/*.jsx')
         .pipe(react())
         .pipe(gulp.dest('./public/js/jsx/'));
 });
@@ -61,6 +61,10 @@ gulp.task('jsx:watch', function () {
     gulp.watch('./public/js/**/*.jsx', ['jsx']);
 });
 
+gulp.task('electron', function() {
+    gulp.watch('./src/*', ['jsx']);
+});
+
 gulp.task('webserver', ['sass:watch'], function() {
     gulp.src('public')
         .pipe(webserver({
@@ -70,7 +74,7 @@ gulp.task('webserver', ['sass:watch'], function() {
         }));
 });
 
-gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'webserver']);
+gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'electron', 'webserver']);
 
 gulp.task('unit-test', function() {
     return gulp.

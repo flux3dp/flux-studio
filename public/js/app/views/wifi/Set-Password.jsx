@@ -31,7 +31,7 @@ define([
         _renderActions: function(lang) {
             return this.state.connecting ? (
                 <div>
-                    <div><img className="loading" src="/img/ring.svg" /></div>
+                    <div><img className="loading" src="img/ring.svg" /></div>
                     <div>{lang.wifi.set_password.connecting}</div>
                 </div>
             ) : (
@@ -47,7 +47,7 @@ define([
 
             return (
                 <div className="wifi text-center">
-                    <img className="wifi-symbol" src="/img/img-wifi-lock.png"/>
+                    <img className="wifi-symbol" src="img/img-wifi-lock.png"/>
                     <div className="wifi-form">
                         <h2>
                             {lang.wifi.set_password.line1}

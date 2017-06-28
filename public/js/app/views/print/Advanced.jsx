@@ -134,7 +134,6 @@ define([
         _validateValue: function(e) {
             e.preventDefault();
             if(!this._isValidValue(currentKey, this.state[currentKey])) {
-                console.log('validate ', this.state);
                 this.setState(this._createState(currentKey, lastValidValue));
             }
         },
@@ -332,7 +331,7 @@ define([
 
                 // write back to custom fields for each engine type
                 advancedSetting.custom = advancedSetting.custom.replace(`support_material = ${value ? 0 : 1}`, `support_material = ${value ? 1 : 0}`);
-                advancedSetting.customCura2 = advancedSetting.customCura2.replace(`support_enable = ${value ? 0 : 1}`, `support_enable = ${value ? 1 : 0}`);
+                advancedSetting.setCustomCura2(dvancedSetting.customCura2.replace(`support_enable = ${value ? 0 : 1}`, `support_enable = ${value ? 1 : 0}`));
 
                 this.setState({
                     custom: advancedSetting.custom,
@@ -394,6 +393,7 @@ define([
             });
 
             if (advancedSetting.engine === 'cura2') {
+                console.log('in advanced');
                 advancedSetting.load(DefaultPrintSettings.customCura2);
             } else {
                 advancedSetting.load(DefaultPrintSettings.custom);

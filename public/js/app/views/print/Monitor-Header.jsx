@@ -51,7 +51,7 @@ define([
 
             const folder = () => (
                 <div className="back" onClick={this.props.onFolderClick}>
-                    <img src="../../img/folder.svg" />
+                    <img src="img/folder.svg" />
                 </div>
             );
 

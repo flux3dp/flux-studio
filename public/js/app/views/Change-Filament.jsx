@@ -30,12 +30,14 @@ define([
     var lang = i18n.get(),
         maxTemperature = 220,
         steps = {
-            HOME      : 'HOME',
-            GUIDE     : 'GUIDE',
-            HEATING   : 'HEATING',
-            EMERGING  : 'EMERGING',
-            UNLOADING : 'UNLOADING',
-            COMPLETED : 'COMPLETED'
+            HOME         : 'HOME',
+            GUIDE        : 'GUIDE',
+            HEATING      : 'HEATING',
+            EMERGING     : 'EMERGING',
+            UNLOADING    : 'UNLOADING',
+            COMPLETED    : 'COMPLETED',
+            KICKED       : 'KICKED',
+            DISCONNECTED : 'DISCONNECTED'
         },
         View = React.createClass({
 
@@ -125,8 +127,15 @@ define([
                     DeviceMaster.stopChangingFilament().then(() => {
                         DeviceMaster.killSelf();
                     });
-                    this.setState(this.getInitialState());
+                    if (e === steps.KICKED) {
+                      AlertActions.showPopupInfo(
+                        'change filament kicked',
+                        lang.change_filament.kicked,
+                        lang.change_filament.home_caption
+                      );
+                    }
                 }
+                this.setState(this.getInitialState());
             },
 
             _goMaintain: function(type) {
@@ -134,7 +143,7 @@ define([
                     nextStep = (self.state.type === DeviceConstants.LOAD_FILAMENT ? steps.EMERGING : steps.UNLOADING);
 
                 const progress = function(response) {
-                    console.log('changing filament progress', response);
+                    console.log('changing filament progress', response, response.stage);
                     let status = response.stage[1];
                     switch (status) {
                     case 'WAITTING':
@@ -149,10 +158,15 @@ define([
                     case 'UNLOADING':
                         self._next(steps.UNLOADING);
                         break;
+                    case 'DISCONNECTED' :
+                        DeviceMaster.KickChangeFilament().always(function() {
+                          self._next(steps.DISCONNECTED);
+                        });
+                        break;
                     default:
                         if(response.error) {
                             if(response.error[0] === 'KICKED') {
-                                this._onCancel();
+                                self._onCancel();
                             }
                         }
                         else {
@@ -225,9 +239,6 @@ define([
                             if (response && response.info === 'TYPE_ERROR') {
                                 response.error = ['HEAD_ERROR', 'TYPE_ERROR', 'EXTRUDER', 'N/A'];
                             }
-                            if (response && response.error[1] === 'TYPE_ERROR') {
-                                response.error = ['TYPE_ERROR'];
-                            }
 
                             switch(response.error[0]) {
                                 case 'RESOURCE_BUSY':
@@ -238,7 +249,7 @@ define([
                                     AlertActions.showPopupError('change-filament-toolhead-no-response', lang.change_filament.toolhead_no_response);
                                     self.props.onClose();
                                     break;
-                                case 'TYPE_ERROR':
+                                case 'HEAD_ERROR':
                                     if (response.error[3] === 'N/A') {
                                         AlertActions.showPopupError('change-filament-device-error', DeviceErrorHandler.translate(['HEAD_ERROR','HEAD_OFFLINE']));
                                     } else {
@@ -252,7 +263,7 @@ define([
                                     AlertActions.showDeviceBusyPopup('change-filament-zombie', lang.change_filament.maintain_zombie);
                                     break;
                                 case 'KICKED':
-                                    this._onCancel();
+                                    self._onCancel(steps.KICKED);
                                     break;
                                 case 'CANCEL': break;
                                 default:
@@ -339,8 +350,8 @@ define([
                 var activeLang = i18n.getActiveLang(),
                     imageSrc = (
                         'en' === activeLang ?
-                        '/img/insert-filament-en.png' :
-                        '/img/insert-filament-zh-tw.png'
+                        'img/insert-filament-en.png' :
+                        'img/insert-filament-zh-tw.png'
                     );
 
                 return {
@@ -393,8 +404,8 @@ define([
 
                 imageSrc = (
                     'en' === activeLang ?
-                    '/img/press-to-accelerate-en.png' :
-                    '/img/press-to-accelerate-zh-tw.png'
+                    'img/press-to-accelerate-en.png' :
+                    'img/press-to-accelerate-zh-tw.png'
                 );
 
                 message = (
@@ -478,6 +489,23 @@ define([
                             'ga-event': 'completed'
                         },
                         onClick: this.props.onClose
+                    }]
+                };
+            },
+            _sectionDisconnected: function() {
+                return {
+                    message: (
+                      <div className="message-container">{lang.change_filament.disconnected}</div>
+                    ),
+                    buttons: [{
+                        label: lang.change_filament.ok,
+                        className: 'btn-default btn-alone-right',
+                        dataAttrs: {
+                            'ga-event': 'disconnected'
+                        },
+                        onClick: () => {
+                            this.setState(this.getInitialState());
+                        }
                     }]
                 };
             },

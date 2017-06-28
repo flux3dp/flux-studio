@@ -1,3 +1,4 @@
+/**** !!! have been deprecated when change to Electron !!!
 /**
  * nwjs menu factory
  */
@@ -71,11 +72,11 @@ define([
                 ProgressActions.updating(
                     'downloading',
                     progress.completed/progress.size * 100,
-                    function() { downloader.reject('canceled'); } 
+                    function() { downloader.reject('canceled'); }
                 );
 
             }).fail((data) => {
-              let msg = data === 'canceled' ? 
+              let msg = data === 'canceled' ?
                     lang.device.download_log_canceled : lang.device.download_log_error;
               AlertActions.showPopupInfo('', msg);
             });

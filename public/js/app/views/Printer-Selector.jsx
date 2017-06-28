@@ -415,7 +415,7 @@ define([
                 console.log(ex, printer);
             }
 
-            let img = `/img/icon_${printer.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
+            let img = `img/icon_${printer.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
 
             return (
                 <div className="device printer-item" id={printer.name} data-status={statusId} data-meta={meta} onClick={this._selectPrinter.bind(null, printer)}>

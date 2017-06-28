@@ -6,6 +6,7 @@ define([
     'helpers/api/fcode-reader',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
+    'app/actions/global-interaction',
     'app/stores/progress-store',
     'app/constants/global-constants',
     'app/constants/device-constants',
@@ -40,6 +41,7 @@ define([
     fcodeReader,
     AlertActions,
     ProgressActions,
+    GlobalInteraction,
     ProgressStore,
     GlobalConstants,
     DeviceConstants,
@@ -58,6 +60,45 @@ define([
     SocketMaster
 ) {
     'use strict';
+
+    class PrintGlobalInteraction extends GlobalInteraction {
+        constructor() {
+            super();
+            this._actions = {
+                "IMPORT": () => {
+                    if(electron) {
+                        electron.trigger_file_input_click("stl_import")
+                    }
+                },
+                "SAVE_SCENE": () => reactSrc._handleDownloadScene(),
+                "EXPORT_FLUX_TASK": () => downloadFCode(),
+                "UNDO": () => undo(),
+                "DUPLICATE": () => duplicateSelected(),
+                "ROTATE": () => reactSrc._handleModeChange('rotate'),
+                "SCALE": () => reactSrc._handleModeChange('scale'),
+                "RESET": () => resetObject(),
+                "ALIGN_CENTER": () => alignCenterPosition(),
+                "CLEAR_SCENE": () => clearScene(),
+                "TUTORIAL": () => reactSrc._startTutorial()
+            }
+        }
+        attach() {
+            super.attach(["IMPORT", "TUTORIAL"]);
+        }
+        onObjectFocus() {
+            this.enableMenuItems(["DUPLICATE", "SCALE", "ROTATE", "RESET", "ALIGN_CENTER"]);
+        }
+        onObjectBlur() {
+            this.disableMenuItems(["DUPLICATE", "SCALE", "ROTATE", "RESET", "ALIGN_CENTER"]);
+        }
+        onObjectChanged(canUndo) {
+            if(canUndo) {
+                this.enableMenuItems(["UNDO"]);
+            } else {
+                this.disableMenuItems(["UNDO"]);
+            }
+        }
+    }
 
     let THREE = window.THREE || {},
         container, slicer, fcodeConsole;
@@ -165,7 +206,11 @@ define([
         vertexColors: THREE.VertexColors
     });
 
+    let globalInteraction;
+
     function init(src) {
+        globalInteraction = new PrintGlobalInteraction();
+        globalInteraction.attach();
 
         reactSrc = src;
         container = document.getElementById('model-displayer');
@@ -743,7 +788,6 @@ define([
                 startSlicing(slicingType.F);
             }
         }, 100);
-
     }
 
     function updateSlicingProgressFromReport(report) {
@@ -878,6 +922,7 @@ define([
     }
 
     function willUnmount() {
+        globalInteraction.detach();
         previewMode = false;
         importFromFCode = false;
         importFromGCode = false;
@@ -1038,11 +1083,14 @@ define([
         checkOutOfBounds(SELECTED).then(() => {
             // disable preview when object are all out of bound
             reactSrc.setState({ hasObject: !allOutOfBound()});
+
+            if (!allOutOfBound()) {
+                //set the OrbitControls target to move around.
+                _orbitTargetMesh(SELECTED);
+            }
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
 
-                //set the OrbitControls target to move around.
-                _orbitTargetMesh(SELECTED);
                 setObjectDialoguePosition(SELECTED);
                 doSlicing();
             }
@@ -1264,6 +1312,7 @@ define([
 
     function resetObject() {
         if(SELECTED) {
+            console.log('reset???');
             let s = SELECTED.scale;
             setScale(s._x, s._y, s._z, true, true);
             setRotation(0, 0, 0, true);
@@ -1541,8 +1590,7 @@ define([
         SELECTED = obj || {};
 
         if (!$.isEmptyObject(obj)) {
-
-            _enableObjectEditMenu(true);
+            globalInteraction.onObjectFocus()
 
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
@@ -1568,10 +1616,10 @@ define([
             }
         }
         else {
+            globalInteraction.onObjectBlur()
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();
-            _enableObjectEditMenu(false);
             reactSrc.setState({ openObjectDialogue: false });
         }
         render();
@@ -2573,6 +2621,8 @@ define([
                 Object.assign(entry.rotation, SELECTED.rotation);
                 Object.assign(entry.scale, SELECTED.scale);
             }
+
+            globalInteraction.onObjectChanged(true);
             history.push(entry);
         }
     }
@@ -2621,6 +2671,9 @@ define([
                         selectObject(model);
                     }
                 });
+            }
+            if(history.length == 0) {
+                globalInteraction.onObjectChanged(false);
             }
         }
     }
@@ -2865,21 +2918,6 @@ define([
         return vector;
     }
 
-    function _enableObjectEditMenu(enabled) {
-        MenuFactory.items.duplicate.enabled = enabled;
-        MenuFactory.items.scale.enabled = enabled;
-        MenuFactory.items.rotate.enabled = enabled;
-        MenuFactory.items.reset.enabled = enabled;
-        MenuFactory.items.alignCenter.enabled = enabled;
-
-        MenuFactory.items.duplicate.onClick = duplicateSelected;
-        MenuFactory.items.scale.onClick = setScaleMode;
-        MenuFactory.items.rotate.onClick = setRotateMode;
-        MenuFactory.items.reset.onClick = resetObject;
-        MenuFactory.items.alignCenter.onClick = alignCenterPosition;
-        MenuFactory.methods.refresh();
-    }
-
     function _setObject(ref, target) {
         target.position.x = ref.position.x;
         target.position.y = ref.position.y;
@@ -2966,19 +3004,27 @@ define([
     }
 
     function processSlicerError(result) {
-
         let id = 'SLICER_ERROR',
-        message = lang.slicer.error[result.error] || result.info;
-        if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
-            message = `${message} ${result.info}`;
+            no_vcredist = result.error === ErrorConstants.LIBRARY_NOT_FOUND,
+            message = lang.slicer.error[result.error] || result.info;
+
+        if (no_vcredist) {
+            message = lang.support.no_vcredist;
+            AlertActions.showPopupInfo(id, message);
+            //window.open('https://flux3dp.com/downloads/');
+
+        } else {
+          if (result.error == ErrorConstants.INVALID_PARAMETER) { // somehow it returns as array
+              message = `${message} ${result.info}`;
+
+          } else if (!message) {
+              message = result.error;
+
+          } else if (result.code === 1006) {
+              message = lang.slicer.error[result.code];
+          }
+          AlertActions.showPopupError(id, message);
         }
-        if (!message) {
-            message = result.error;
-        }
-        if (result.code === 1006) {
-            message = lang.slicer.error[result.code];
-        }
-        AlertActions.showPopupError(id, message);
     }
 
     function allOutOfBound() {
@@ -3057,6 +3103,7 @@ define([
         changeEngine        : changeEngine,
         takeSnapShot        : takeSnapShot,
         tester              : tester,
-        startSlicing        : startSlicing
+        startSlicing        : startSlicing,
+        resetObject         : resetObject
     };
 });

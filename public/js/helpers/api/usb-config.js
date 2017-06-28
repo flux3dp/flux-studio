@@ -23,6 +23,11 @@ define([
         if(usbChannel !== DeviceMaster.getAvailableUsbChannel() || usbChannel === undefined) {
             ws = null;
             usbChannel = DeviceMaster.getAvailableUsbChannel();
+        } else if (globalOpts.forceReconnect) {
+            if (ws !== null) {
+                ws.close();
+            }
+            ws = null;
         }
 
         const initializeWebSocket = () => {
@@ -61,14 +66,14 @@ define([
 
         return {
             connection: ws,
-            // list available port
+            // connect available port
             list: function(opts) {
                 opts = reorganizeOptions(opts);
 
                 var self = this,
                     goNext = true,
                     timer = setTimeout(() => {
-                        opts.onError("timeout");
+                        opts.onError('timeout');
                     }, 30000);
 
                 const reset = () => {
@@ -94,6 +99,12 @@ define([
                         }
                     };
 
+                    if (!port) {
+                        goNext = true;
+                        opts.onError(response);
+                        reset();
+                    }
+
                     self.connect(port, callback );
                 };
 
@@ -103,8 +114,8 @@ define([
                     }
                 };
 
-                if(usbChannel === -1) {
-                    ws.send('list');
+                if(usbChannel === -1 || usbChannel === undefined) {
+                    opts.onError({});
                 }
                 else {
                     events.onMessage = (r) => {
@@ -130,7 +141,7 @@ define([
                         ws.onError(globalOpts.onError);
                         reset();
                     });
-
+                    console.log(usbChannel);
                     ws.send(rsaKey());
                 }
             },
@@ -320,7 +331,7 @@ define([
                         true === ipv4Pattern.test(response.ipaddr[0]) &&
                         '' !== response.ssid
                     ) {
-                        response.action = 'GOOD';
+                        response.action = 'PREVIOUS_SSID';
                         $deferred.resolve(response);
                     }
                     else {

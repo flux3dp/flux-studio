@@ -11,13 +11,13 @@ define([
     'jsx!widgets/File-Uploader',
     'helpers/i18n',
     'plugins/jquery/serializeObject',
-    'helpers/array-findindex', 
+    'helpers/array-findindex',
 ], function(
     React,
     SelectView,
     ButtonGroup,
     TextInput,
-    UnitInput, 
+    UnitInput,
     config,
     classNames,
     round,
@@ -29,7 +29,7 @@ define([
 
     var laserLang = i18n.lang.laser,
         advancedLang = laserLang.advanced;
-    
+
     return React.createClass({
 
         getDefaultProps: function() {
@@ -164,7 +164,7 @@ define([
             var self = this;
             if (this.state.customBg) {
                 config().write('laser-custom-bg', '');
-                $('.laser-object').css({background :'url(/img/laser-platform.png)', 'background-size': '100% 100%'});
+                $('.laser-object').css({background :'url(img/laser-platform.png)', 'background-size': '100% 100%'});
                 self.setState({customBg: false });
             }else {
                 $('input[data-ref=importBg]').click();
@@ -276,7 +276,7 @@ define([
                                 className={{ 'value-text': true }}
                                 step={0.8}
                                 min={advancedLang.form.laser_speed.min}
-                                max={advancedLang.form.laser_speed.max}
+                                max={5000}
                                 defaultUnit="mm/s"
                                 defaultUnitType="speed"
                                 operators={['+', '-', '*']}

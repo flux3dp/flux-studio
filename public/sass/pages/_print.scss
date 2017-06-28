@@ -203,34 +203,34 @@
     margin-top: 30px;
 }
 .operating-panel .operation.command .scale {
-    background-image: url("/img/icon-scale.png");
+    background-image: url("img/icon-scale.png");
 }
 .operating-panel .operation.command .scale:hover {
-    background-image: url("/img/icon-scale-a.png");
+    background-image: url("img/icon-scale-a.png");
 }
 .operating-panel .operation.command .scale.active {
-    background-image: url("/img/icon-scale-a.png");
+    background-image: url("img/icon-scale-a.png");
 }
 .operating-panel .operation.command .rotate {
-    background-image: url("/img/icon-rotate.png");
+    background-image: url("img/icon-rotate.png");
 }
 .operating-panel .operation.command .rotate:hover {
-    background-image: url("/img/icon-rotate-a.png");
+    background-image: url("img/icon-rotate-a.png");
 }
 .operating-panel .operation.command .rotate.active {
-    background-image: url("/img/icon-rotate-a.png");
+    background-image: url("img/icon-rotate-a.png");
 }
 .operating-panel .operation.command .center {
-    background-image: url("/img/icon-center.png");
+    background-image: url("img/icon-center.png");
 }
 .operating-panel .operation.command .center:hover {
-    background-image: url("/img/icon-center-a.png");
+    background-image: url("img/icon-center-a.png");
 }
 .operating-panel .operation.command .delete {
-    background-image: url("/img/icon-delete.png");
+    background-image: url("img/icon-delete.png");
 }
 .operating-panel .operation.command .delete:hover {
-    background-image: url("/img/icon-delete-a.png");
+    background-image: url("img/icon-delete-a.png");
 }
 .operating-panel .zoom {
     position: fixed;
@@ -325,7 +325,7 @@
 }
 .print-studio .setup-panel select {
     background-color: transparent;
-    background-image: url("/img/icon-3d-arrow-down.png");
+    background-image: url("img/icon-3d-arrow-down.png");
     background-position: 83px 6px;
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -338,19 +338,19 @@
     appearance: none;
 }
 .print-studio .setup-panel .print-speed {
-    background-image: url("/img/icon-speed.png");
+    background-image: url("img/icon-speed.png");
     background-repeat: no-repeat;
 }
 .print-studio .setup-panel .material {
-    background-image: url("/img/icon-material.png");
+    background-image: url("img/icon-material.png");
     background-repeat: no-repeat;
 }
 .print-studio .setup-panel .platform {
-    background-image: url("/img/icon-platform.png");
+    background-image: url("img/icon-platform.png");
     background-repeat: no-repeat;
 }
 .print-studio .setup-panel .support {
-    background-image: url("/img/icon-support.png");
+    background-image: url("img/icon-support.png");
     background-repeat: no-repeat;
 }
 .print-studio .setup-panel .control label {
@@ -808,7 +808,7 @@ input.switch:checked ~ label:after {
 
         .accordion {
             .lock {
-                background-image: url("../../img/lock.svg");
+                background-image: url("../img/lock.svg");
                 background-position: top;
                 background-repeat: no-repeat;
                 background-size: 12px 36px;

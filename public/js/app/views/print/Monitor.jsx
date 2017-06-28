@@ -361,7 +361,8 @@ define([
         _handleBrowseFolder: function() {
             this._addHistory();
             this._dispatchFolderContent('');
-            this.unsubscribeEnterKey();
+            // avoid error occur, but don't know that will cause any bug, so mark it only.
+            //this.unsubscribeEnterKey();
         },
 
         _handleFileCrossIconClick: function() {
@@ -441,10 +442,10 @@ define([
 
                 DeviceMaster.fileInfo(Monitor.currentPath, fileName).then((info) => {
                     if(info[1] instanceof Blob) {
-                        previewUrl = info[1].size === 0 ? '/img/ph_l.png' : URL.createObjectURL(info[1]);
+                        previewUrl = info[1].size === 0 ? 'img/ph_l.png' : URL.createObjectURL(info[1]);
                     }
                     else {
-                        previewUrl = '/img/ph_l.png';
+                        previewUrl = 'img/ph_l.png';
                     }
                     if(info[2]) {
                         this._generatePreview([info[2]]);

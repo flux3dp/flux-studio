@@ -1,7 +1,9 @@
 define([
-    'jquery'
+    'jquery',
+    'app/default-print-settings',
 ], (
-    $
+    $,
+    DefaultPrintSettings
 ) => {
     let hiddenPresets = ['engine', 'custom', 'customCura2', 'raft_on', 'id'];
 
@@ -85,7 +87,7 @@ define([
             s4() + '-' + s4() + s4() + s4());
 
         // General
-        this.engine                              = 'cura';
+        this.engine                              = 'cura2';
         this.temperature                         = 200;
         this.first_layer_temperature             = 230;
         this.detect_filament_runout              = 1;
@@ -127,9 +129,9 @@ define([
 
         // Custom
         this.custom                              = '';
-        this.custom                              = this.toExpert('');
+        this.custom                              = DefaultPrintSettings.custom;
         this.customCura2                         = '';
-        this.customCura2                         = this.toExpert('', 'cura2');
+        this.customCura2                         = DefaultPrintSettings.customCura2;
 
         if (opts) {
             for (var i in opts) {
@@ -189,13 +191,19 @@ define([
         return result;
     };
 
+    SlicerSettings.prototype.setCustomCura2 = function (v) {
+      this.customCura2 = v;
+    }
+    SlicerSettings.prototype.fixCura2CustomString = function () {
+        this.setCustomCura2(this.toExpert('', 'cura2'));
+    }
     SlicerSettings.prototype.load = function (settings, withCustom = false) {
         if (typeof settings === 'object') {
             if (settings.defaultSetting) {
                 this.custom = settings.custom;
-                this.customCura2 = settings.customCura2;
+                this.setCustomCura2(settings.customCura2);
                 this.load(this.custom);
-                this.customCura2 = this.toExpert('', 'cura2');
+                this.setCustomCura2(this.toExpert('', 'cura2'));
                 if(this.custom === null) { throw new Error('null custom error'); }
             }
             else {
@@ -218,6 +226,8 @@ define([
             console.log('Load settings object', this.engine, this.id);
         }
         else {
+            var cura2Settings = settings.indexOf('avoid_crossing_perimeters') < 0;
+            //var cura2Settings = settings.indexOf('accelecration_enabled') < 0;
             var settings = settings.split('\n');
 
             settings.forEach(function(line) {
@@ -227,7 +237,8 @@ define([
                     let _key = item[0].replace(/ /g, ''),
                         _value = item[1].trim();
 
-                    if (this.engine === 'cura2') {
+
+                    if (cura2Settings) {
                         let rev = cura2revMapping[_key];
                         if (_key === 'support_angle') {
                             console.log(rev);
@@ -249,7 +260,12 @@ define([
                 }
             }.bind(this));
             this.fixSettingsCompatibility();
-            this[this.getEngineType()] = settings.join('\n');
+            //TODO fix the disgusting code
+            if (this.getEngineType() === 'customCura2' && cura2Settings) {
+                this['customCura2'] = settings.join('\n');
+            } else {
+                this['custom'] = settings.join('\n');
+            }
             if(this.custom == null) { throw new Error('null custom error'); }
         }
         if(this.custom == null) { throw new Error('null custom error'); }
@@ -261,7 +277,7 @@ define([
         if (this.custom == null) { throw new Error('null custom error'); }
         if (updateCustom) {
             this.custom = this.toExpert('', 'slic3r');
-            this.customCura2 = this.toExpert('', 'cura2');
+            this.setCustomCura2(this.toExpert('', 'cura2'));
         }
     };
 
@@ -290,7 +306,7 @@ define([
             this.set(key, opts[key]);
         }
         this.custom = this.toExpert(this.custom, 'slic3r');
-        this.customCura2 = this.toExpert(this.customCura2, 'cura2');
+        this.setCustomCura2(this.toExpert(this.customCura2, 'cura2'));
         if(this.custom == null) { throw new Error('null custom error'); }
     };
 

@@ -11,7 +11,6 @@ define([
     'jsx!widgets/Modal',
     'helpers/api/config',
     'jsx!views/Printer-Selector',
-    'helpers/nwjs/menu-factory',
     'helpers/device-master',
     'app/stores/global-store',
     'app/actions/global-actions',
@@ -35,7 +34,8 @@ define([
     'helpers/i18n',
     'helpers/check-device-status',
     'app/tutorial-steps',
-    'helpers/slicer-settings'
+    'helpers/slicer-settings',
+    'helpers/get-device'
 ], function(
     $,
     React,
@@ -49,7 +49,6 @@ define([
     Modal,
     Config,
     PrinterSelector,
-    menuFactory,
     DeviceMaster,
     GlobalStore,
     GlobalActions,
@@ -73,7 +72,8 @@ define([
     i18n,
     CheckDeviceStatus,
     TutorialSteps,
-    SlicerSettings
+    SlicerSettings,
+    GetDevice
 ) {
 
     return function(args) {
@@ -102,8 +102,7 @@ define([
             defaultRaftLayer = 4,
             allowDeleteObject = true,
             tutorialMode = false,
-            nwjsMenu = menuFactory.items,
-            defaultSlicingEngine = 'cura',
+            defaultSlicingEngine = 'cura2',
             tourGuide = TutorialSteps,
             view = React.createClass({
 
@@ -116,6 +115,7 @@ define([
 
                     if (!_settings) {
                         console.log('settinggs missing: advanced-settings');
+                        console.log('DefaultPrintSettings', DefaultPrintSettings);
                         advancedSettings.load(DefaultPrintSettings);
                         var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
                         advancedSettings.update(defaultMedium, 'slic3r');
@@ -124,8 +124,8 @@ define([
                         advancedSettings.load(_settings, true);
                         // Load new default cura2 config
                         if (!_settings.customCura2) {
-                            advancedSettings.customCura2 = DefaultPrintSettings.customCura2;
-                            advancedSettings.customCura2 = advancedSettings.toExpert(advancedSettings.customCura2, 'cura2');
+                            advancedSettings.setCustomCura2(DefaultPrintSettings.customCura2);
+                            advancedSettings.setCustomCura2(advancedSettings.toExpert(advancedSettings.customCura2, 'cura2'));
                         }
                     }
 
@@ -180,16 +180,24 @@ define([
                 },
 
                 componentWillMount: function() {
-                    CloudApi.getMe().then(response => {
-                        if(response.ok) {
-                            return response.json();
-                        }
-                    }).then(content => {
-                        let { nickname, email } = content || {};
-                        let displayName = (nickname || email || '');
-                        menuFactory.methods.updateAccountDisplay(displayName);
-                        menuFactory.methods.refresh();
-                    });;
+                    if(electron) {
+                        let { ipc, events } = window.electron;
+                        CloudApi.getMe().then(response => {
+                            if(response.ok) {
+                                response.json().then(content => {
+                                    let { nickname, email } = content || {};
+                                    let displayName = (nickname || email || '');
+
+                                    console.log('account is', content);
+                                    ipc.send(events.UPDATE_ACCOUNT, content);
+                                });
+                            }
+                            else {
+                                ipc.send(events.UPDATE_ACCOUNT, {});
+                            }
+                        });
+                        ipc.send(events.UPDATE_ACCOUNT, {});
+                    }
                 },
 
                 componentDidMount: function() {
@@ -205,18 +213,6 @@ define([
 
                     $importBtn = this.refs.importBtn.getDOMNode();
 
-                    this._prepareMenu();
-                    nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { console.log('undo'); director.undo(); };
-                    nwjsMenu.tutorial.onClick = () => { console.log('undo'); director.undo(); };
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
-                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
-                    nwjsMenu.clear.onClick = this._handleClearScene;
-
-                    // to catch the tutorial click from menuMap
-                    // this mod is implemented after menu-map refactored, using cache to reduce refresh, boot performance
                     if(!window.customEvent) {
                         window.customEvent = {};
                     }
@@ -225,8 +221,6 @@ define([
                             this._handleYes('tour');
                         });
                     };
-
-                    menuFactory.methods.refresh();
 
                     this._registerKeyEvents();
                     this._registerTracking();
@@ -259,14 +253,17 @@ define([
                     director.clear();
                     director.willUnmount();
 
-                    nwjsMenu.tutorial.enabled = false;
-                    menuFactory.methods.refresh();
-
                     AlertStore.removeYesListener(this._handleYes);
                     AlertStore.removeCancelListener(this._handleDefaultCancel);
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                     GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
+                },
+
+                _startTutorial: function() {
+                    this.setState({ currentTutorialStep: 0 }, () => {
+                        this._handleYes('tour');
+                    });
                 },
 
                 _registerKeyEvents: function() {
@@ -277,51 +274,6 @@ define([
                         }
                     });
 
-                    shortcuts.on(['cmd', 'z'], () => {
-                        director.undo();
-                    });
-
-                    //========for testing only==================
-                    //shortcuts.on(['cmd', 'b'], () => {
-                    //  director.tester();
-                    //});
-                    // shortcuts.on(['ctrl', 'shift', 't'], () => {
-                    //     window.customEvent.onTutorialClick();
-                    // });
-                    //
-                    // shortcuts.on(['cmd', 'shift', 'a'], () => {
-                    //     LocalStorage.clearAllExceptIP();
-                    // });
-                    //==========================================
-
-                    shortcuts.on(['cmd', 'shift', 'x'], () => {
-                        this._handleClearScene();
-                    });
-
-                    // windows & Linux
-                    if(navigator.appVersion.indexOf('Mac') === -1) {
-                        this._registerNonOsxShortcuts();
-                    }
-
-                    // copy event - it will listen by top menu as well in nwjs..
-                    if ('undefined' === typeof window.requireNode) {
-                        // copy event
-                        shortcuts.on(['cmd', 'd'], (e) => {
-                            e.preventDefault();
-                            director.duplicateSelected();
-                        });
-                    }
-                },
-
-                _registerNonOsxShortcuts: function() {
-                    shortcuts.on(['ctrl', 'd'], () => { director.duplicateSelected(); });
-                    shortcuts.on(['ctrl', 'z'], () => { director.undo(); });
-                    shortcuts.on(['ctrl', 'shift', 'x'], () => { this._handleClearScene(); });
-                    shortcuts.on(['ctrl', 'shift', 'r'], () => { this._handleModeChange('rotate'); });
-                    shortcuts.on(['ctrl', 'shift', 's'], () => { this._handleModeChange('scale'); });
-                    shortcuts.on(['ctrl', 'i'], () => { nwjsMenu.import.onClick(); });
-                    shortcuts.on(['ctrl', 's'], () => { nwjsMenu.saveTask.onClick(); });
-                    shortcuts.on(['ctrl', 'n'], () => { location.hash = '#initialize/wifi/connect-machine'; });
                 },
 
                 _registerTutorial: function() {
@@ -335,26 +287,6 @@ define([
                     if(allowTracking === '') {
                         AlertActions.showPopupYesNo('allow_tracking', lang.settings.allow_tracking);
                     }
-                },
-
-                _prepareMenu: function() {
-                    nwjsMenu.import.enabled = true;
-                    nwjsMenu.import.onClick = () => { $importBtn.click(); };
-                    nwjsMenu.undo.onClick = () => { director.undo(); };
-                    nwjsMenu.duplicate.onClick = () => { director.duplicateSelected(); };
-                    nwjsMenu.saveTask.onClick = this._handleDownloadFCode;
-                    nwjsMenu.saveScene.onClick = this._handleDownloadScene;
-                    nwjsMenu.clear.onClick = this._handleClearScene;
-                    nwjsMenu.tutorial.enabled = true;
-                    nwjsMenu.tutorial.onClick = () => {
-                        this._handleYes('tour');
-                    };
-                    nwjsMenu.undo.enabled = false;
-                    nwjsMenu.saveTask.enabled = false;
-                    nwjsMenu.saveScene.enabled = false;
-                    nwjsMenu.clear.enabled = false;
-
-                    menuFactory.methods.refresh();
                 },
 
                 showSpinner: function(caption) {
@@ -390,29 +322,7 @@ define([
                 },
 
                 _getDevice: function() {
-                    let selectedDevice = {},
-                        defaultDevice = InitializeMachine.defaultPrinter.get(),
-                        configuredDevice = {},
-                        firstDevice = DeviceMaster.getFirstDevice();
-
-                    const isNotEmptyObject = o => Object.keys(o).length > 0;
-
-                    if (Config().read('configured-printer') !== '') {
-                        configuredDevice = Config().read('configured-printer');
-                    }
-
-                    // determin selected Device
-                    if (isNotEmptyObject(defaultDevice)) {
-                        selectedDevice = defaultDevice;
-                    }
-                    else if (isNotEmptyObject(configuredDevice)) {
-                        selectedDevice = configuredDevice;
-                    }
-                    else {
-                        selectedDevice = firstDevice;
-                    }
-
-                    return selectedDevice;
+                    return GetDevice();
                 },
 
                 _handleYes: function(answer, args) {
@@ -427,6 +337,7 @@ define([
                             this.setState({ tutorialOn: true });
                             tutorialMode = true;
                         };
+                        /* ====== leave code for backup, but not be used =========
 
                         const tryMovementTest = () => {
                             let device = this._getDevice();
@@ -468,17 +379,18 @@ define([
                                 });
                             }
                         };
+                        */
 
                         setTimeout(() => {
-                            const callback = () => { tryMovementTest(); }
+                            const callback = () => { startTutorial(); }
                             const imageObject = {
                                 images: [
-                                    '/img/tutorial/' + activeLang + '/n01.png',
-                                    '/img/tutorial/' + activeLang + '/n02.png',
-                                    '/img/tutorial/' + activeLang + '/n03.png',
-                                    '/img/tutorial/' + activeLang + '/n04.png',
-                                    '/img/tutorial/' + activeLang + '/n05.png',
-                                    '/img/tutorial/' + activeLang + '/n06.png'
+                                    'img/tutorial/' + activeLang + '/n01.png',
+                                    'img/tutorial/' + activeLang + '/n02.png',
+                                    'img/tutorial/' + activeLang + '/n03.png',
+                                    'img/tutorial/' + activeLang + '/n04.png',
+                                    'img/tutorial/' + activeLang + '/n05.png',
+                                    'img/tutorial/' + activeLang + '/n06.png'
                                 ],
                                 imgClass: 'img640x480'
                             };
@@ -617,7 +529,7 @@ define([
 
                     // write back to custom fields for each engine type
                     advancedSettings.custom = advancedSettings.custom.replace(`support_material = ${isOn ? 0 : 1}`, `support_material = ${isOn ? 1 : 0}`);
-                    advancedSettings.customCura2 = advancedSettings.customCura2.replace(`support_enable = ${isOn ? 0 : 1}`, `support_enable = ${isOn ? 1 : 0}`);
+                    advancedSettings.setCustomCura2(advancedSettings.customCura2.replace(`support_enable = ${isOn ? 0 : 1}`, `support_enable = ${isOn ? 1 : 0}`));
 
                     this._saveSetting();
                 },
@@ -908,10 +820,10 @@ define([
                             var fileEntry = {};
                             fileEntry.name = 'guide-example.stl';
                             fileEntry.toURL = function() {
-                                return '/guide-example.stl';
+                                return 'guide-example.stl';
                             };
                             var oReq = new XMLHttpRequest();
-                            oReq.open('GET', '/guide-example.stl', true);
+                            oReq.open('GET', 'guide-example.stl', true);
                             oReq.responseType = 'blob';
 
                             oReq.onload = function(oEvent) {
@@ -1066,7 +978,7 @@ define([
                             <div className='arrowBox' onClick={this._handleCloseAllView}>
                                 <div title={lang.print.importTitle} className='file-importer'>
                                     <div className='import-btn'>{lang.print.import}</div>
-                                    <input ref='import' type='file' accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
+                                    <input ref='import' type='file' data-file-input="stl_import" accept='.stl,.fc,.gcode,.obj,.fsc' onChange={this._handleImport} multiple />
                                 </div>
                             </div>
                         </div>
@@ -1170,17 +1082,6 @@ define([
                     );
                 },
 
-                _renderNwjsMenu: function() {
-                    if(nwjsMenu.undo.enabled !== this.state.hasObject) {
-                        nwjsMenu.undo.enabled = this.state.hasObject;
-                        nwjsMenu.saveTask.enabled = this.state.hasObject;
-                        nwjsMenu.saveScene.enabled = this.state.hasObject;
-                        nwjsMenu.clear.enabled = this.state.hasObject;
-                        nwjsMenu.signIn = { label: this.state.nickname, enabled: true, parent: 5}
-                        menuFactory.methods.refresh();
-                    }
-                },
-
                 _renderTourGuide: function() {
                     return (
                         <TourGuide
@@ -1204,8 +1105,6 @@ define([
                         progressWindow          = this.state.progressMessage ? this._renderProgressWindow() : '',
                         percentageBar           = this._renderPercentageBar(),
                         tourGuideSection        = this.state.tutorialOn ? this._renderTourGuide() : '';
-
-                    this._renderNwjsMenu();
 
                     return (
                         <div className='studio-container print-studio'>

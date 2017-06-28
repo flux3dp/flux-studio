@@ -21,7 +21,7 @@
     }
 
     select {
-        background: url('/img/arrow-down.png') #fff no-repeat;
+        background: url('../img/arrow-down.png') #fff no-repeat;
         background-position: calc(100% - 5px) center;
         background-size: 16px 10px;
         border: none;
@@ -37,6 +37,13 @@
         .language {
             margin: 0 0 8px 0;
         }
+    }
+
+
+
+    .usb-disabled {
+        opacity: 0.6 !important;
+        cursor: normal !important;
     }
 
     .connect-machine {

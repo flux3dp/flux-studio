@@ -8,7 +8,10 @@ _tools/nwjs*
 _tools/build
 public/lib
 public/js/jsx
+public/css/main.css
 public/node_modules/*
+backend
+dist
 
 osx-cache
 win-x86-cache

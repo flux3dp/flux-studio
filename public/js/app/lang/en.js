@@ -10,7 +10,7 @@ define(function() {
         },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
-            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            no_vcredist: 'Please install Visual C++ Redistributable 2015<br/>That can be downloaded on flux3dp.com',
             osx_10_9: 'OS X 10.9 is not supported. Please update to newer version'
         },
         generic_error: {
@@ -98,7 +98,7 @@ define(function() {
             },
             device: {
                 label: 'Machines',
-                new: 'Add a New Machine',
+                new: 'Machine Setup',
                 device_monitor: 'Dashboard',
                 device_info: 'Machine Info',
                 head_info: 'Toolhead Info',
@@ -231,12 +231,13 @@ define(function() {
             // errors
             errors: {
                 error: 'Error',
+                close: 'close',
                 not_found: 'Not Found',
                 not_support: 'Please update Machine Firmware to v1.6+, through USB',
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. Your machine has been powered on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try unplug and plug it back in again.'
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.'
                 },
 
                 wifi_connection: {
@@ -399,6 +400,7 @@ define(function() {
                 unbind_device: 'Would you like to unbind this machine?',
                 CLOUD_SESSION_CONNECTION_ERROR: 'The machine is unable to access to the cloud server. Please reboot the machine.',
                 CLOUD_UNKNOWN_ERROR: 'The machine is unable to connected to the cloud server. Please reboot the machine.',
+                SERVER_INTERNAL_ERROR: 'Server internal error, please try again later.',
             }
         },
         print: {
@@ -844,6 +846,7 @@ define(function() {
                 load_preset_title: 'Load Config',
                 background: 'Background',
                 removeBackground: ' Remove Background',
+                removePreset: 'selected preset is going to be revomved',
                 load_calibrate_image: 'Load Calibration Image',
                 apply: 'APPLY',
                 cancel: 'CANCEL',
@@ -988,6 +991,7 @@ define(function() {
             completed: 'Completed',
             calibrating: 'Calibrating',
             showOutline: 'frame showing',
+            aborting: 'Aborting',
             starting: 'Starting',
             resuming: 'Resuming',
             scanning: 'Scanning',
@@ -1271,9 +1275,11 @@ define(function() {
             loaded: 'Filament Loaded',
             unloaded: 'Filament Unloaded',
             ok: 'OK',
+            kicked: 'Has been kicked',
             auto_emerging: 'Please insert filament',
             loading_filament: 'Loading filament',
             maintain_head_type_error: 'Toolhead not installed correctly',
+            disconnected: 'Connection unstable, Please check device connection and try again later',
             maintain_zombie: 'Please restart the machine',
             toolhead_no_response: '#117 Module no response <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/218347477">More</a>',
             NA: 'Toolhead is not connected'

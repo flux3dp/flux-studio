@@ -130,6 +130,7 @@ define([
             return (
                 <input
                     data-ga-event="upload-file"
+                    data-file-input="file-upload-widget"
                     id="file-uploader"
                     ref="uploader"
                     type="file"
