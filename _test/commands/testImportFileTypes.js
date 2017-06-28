@@ -21,7 +21,8 @@ module.exports.command = function(callback) {
 
         .setValue('.arrowBox input[type=file]', scene)
         .waitUntilSliceFinished()
-        .selectFromMenu('clear');
+        .selectFromMenu('clear')
+        .log('done testing different file type import');
 
     if (typeof callback === 'function') {
         callback.call(this);

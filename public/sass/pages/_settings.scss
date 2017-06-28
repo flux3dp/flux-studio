@@ -381,14 +381,14 @@
 .settings .connection-list .select {
     width: 30px;
     height: 30px;
-    background-image: url('/img/icon-select.png');
+    background-image: url('img/icon-select.png');
     float: right;
     margin-top: 15px;
     cursor: pointer;
 }
 
 .settings .connection-list .select.active {
-    background-image: url('/img/icon-selected.png');
+    background-image: url('img/icon-selected.png');
 }
 
 .settings .connection-list .actions {

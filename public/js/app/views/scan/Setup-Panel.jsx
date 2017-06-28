@@ -70,10 +70,18 @@ define([
                 });
             });
 
+            // for avoid a strange issue happened on windows 64 that display 
+            // "TypeError": Cannot read property 'text' of undefined. cause scan function crashed.
+            try {
+              var quality = this.state.defaults.resolution.text;
+            } catch (err) {
+              console.log(err);
+              var quality = '';
+            }
             return {
                 label: (
                     <div>
-                        <span className="caption resolution">{this.state.defaults.resolution.text}</span>
+                        <span className="caption resolution">{quality}</span>
                         <span>{lang.scan.quality}</span>
                     </div>
                 ),

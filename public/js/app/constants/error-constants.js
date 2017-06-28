@@ -14,6 +14,7 @@ define([], function(){
         EMPTY_FILE          : '12', // upload
         NAME_NOT_EXIST      : '13', // duplicate
         NAME_NOT_UPLOADED   : '14', // set
-        FILE_BROKEN         : '15'  // upload
+        FILE_BROKEN         : '15', // upload
+        LIBRARY_NOT_FOUND   : 'LIBRARY_NOT_FOUND'
     };
 });

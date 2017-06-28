@@ -37,6 +37,7 @@ define([
             if (device.alive) {
                 // console.log(device);
                 if(device.source === 'h2h') {
+                    device.h2h_uuid = device.uuid;
                     device.uuid = device.addr.toString();
                 }
                 // console.log(device);

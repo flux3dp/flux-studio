@@ -25,6 +25,7 @@ define([
 
     var lang = i18n.get();
     // prevent delete (back) behavior
+
     var genericLogger = new Logger('generic'),
         defaultKeyBehavior = function() {
             shortcuts.on(['BACK'], function(e) {
@@ -79,34 +80,24 @@ define([
                 }
             });
 
-            const quitApp = () => {
-                nw.App.quit();
-            };
+            var FN_KEY = process.platform === "darwin" ? "cmd" : "ctrl";
 
-            shortcuts.on(['cmd', 'r'], function() { forceReload(); });
-            shortcuts.on(['ctrl', 'r'], function() { forceReload(); });
-            shortcuts.on(['cmd', 'c'], function() { window.document.execCommand('copy'); });
-            shortcuts.on(['cmd', 'a'], function() { window.document.execCommand('selectAll'); });
-            shortcuts.on(['cmd', 'x'], function() { window.document.execCommand('cut'); });
-            shortcuts.on(['cmd', 'v'], function() { window.document.execCommand('paste'); });
-            shortcuts.on(['ctrl', 'q'], quitApp);
-            shortcuts.on(['cmd', 'q'], quitApp);
+            shortcuts.on([FN_KEY, 'r'], function() { forceReload(); });
+            shortcuts.on([FN_KEY, 'c'], function() { window.document.execCommand('copy'); });
+            shortcuts.on([FN_KEY, 'a'], function() { window.document.execCommand('selectAll'); });
+            shortcuts.on([FN_KEY, 'x'], function() { window.document.execCommand('cut'); });
+            shortcuts.on([FN_KEY, 'v'], function() { window.document.execCommand('paste'); });
 
-            if(window.nw) {
-                shortcuts.on(['cmd', 'h'], () => { nw.Window.get().hide(); });
-                // for unhide / show app
-                window.nw.App.onReopen.addListener(function() { nw.Window.get().show(); });
-            }
+            shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
+                if(electron) {
+                    electron.ipc.send("DEBUG-INSPECT");
+                }
+            });
 
-            if (true === window.FLUX.debug && true === window.FLUX.isNW) {
-                shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
-                    e.preventDefault();
-                    nw.Window.get().showDevTools();
-                });
-                shortcuts.on(['ctrl', 'alt', 'shift', 'd'], function() {
-                    window.location.href = '/debug-panel/index.html';
-                });
-            }
+            shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
+                // TODO:
+                window.location.href = '/debug-panel/index.html';
+            });
         };
 
     defaultKeyBehavior();
@@ -117,7 +108,8 @@ define([
             window.analytics.event('send', 'pageview', location.hash);
         }
         shortcuts.disableAll();
-        menuFactory.methods.refresh();
+        // TODO
+        // menuFactory.methods.refresh();
         defaultKeyBehavior();
     });
 
@@ -134,10 +126,6 @@ define([
     window.onerror = function(message, source, lineno, colno, error) {
         genericLogger.append([message, source, lineno].join(' '));
     };
-
-    if (window.FLUX.isNW) {
-        requirejs(['helpers/nwjs/nw-events']);
-    }
 
     //Process Visual C++ Redistributable Check
     window.FLUX.processPythonException = function(exception_str){

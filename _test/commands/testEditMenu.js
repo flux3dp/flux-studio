@@ -1,6 +1,8 @@
 module.exports.command = function(callback) {
 
-    this.switchEngine('cura')
+    this.selectFromMenu('clear')
+        .loadStlFile()
+        .switchEngine('cura')
         .testChangeSize()
         .testRotate()
         .testUndo()

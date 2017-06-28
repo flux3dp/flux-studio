@@ -47,7 +47,7 @@ define([
                     },
                     content = (
                         <div className="home text-center">
-                            <img className="brand-image" src="/img/menu/main_logo.svg"/>
+                            <img className="brand-image" src="img/menu/main_logo.svg"/>
                             <div>
                                 <h1 className="headline">{lang.initialize.select_language}</h1>
                                 <div className="language">

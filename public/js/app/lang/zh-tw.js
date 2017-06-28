@@ -10,7 +10,7 @@ define(function() {
         },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
-            no_vcredist: 'Please install Visual C++ Redistributable 2015',
+            no_vcredist: '請安裝 Visual C++ Redistributable 2015<br/>可以在flux3dp.com找到',
             osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         generic_error: {
@@ -98,7 +98,7 @@ define(function() {
             },
             device: {
                 label: '機器',
-                new: '新增機器',
+                new: '新增或設定機器',
                 device_monitor: '儀表板',
                 device_info: '機器資訊',
                 head_info: '工具頭資訊',
@@ -164,7 +164,7 @@ define(function() {
             connect: '連接',
             back: '返回',
             retry: '重試',
-            no_machine : '目前沒有機器，跳過此步驟',
+            no_machine : '目前沒有機器或已設定過連線，跳過此步驟',
 
             // specific caption/content
             invalid_device_name: '機器名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
@@ -231,12 +231,13 @@ define(function() {
             // errors
             errors: {
                 error: '錯誤',
+                close: '關閉',
                 not_found: '無法找到 FLUX Delta',
-                not_support: '請更新 Delta 韌體到 v1.1 以上',
+                not_support: '請透過隨身碟更新 Delta 韌體到 v1.6 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認電源已被開啟及使用 USB 連接（或重新接上）機器，並正確安裝驅動程式。無法安裝驅動程式，請查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>'
+                    content: '別擔心！請確認 1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮 2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a> 3. 重新插拔線並稍等 10 秒鐘'
                 },
 
                 wifi_connection: {
@@ -409,8 +410,9 @@ define(function() {
                 sign_out: '登出',
                 not_supported_firmware: '支援 FLUX cloud 需要機器韌體 v1.5＋',
                 unbind_device: '確認要不再綁定此機器?',
-                CLOUD_SESSION_CONNECTION_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (Session)',
                 CLOUD_UNKNOWN_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (General)',
+                CLOUD_SESSION_CONNECTION_ERROR: '機器無法連接到雲端伺服器. 請重新啟動機器. (Session)',
+                SERVER_INTERNAL_ERROR: '伺服器發生錯誤，請稍後再試.',
             }
         },
         print: {
@@ -705,7 +707,7 @@ define(function() {
             get_fcode: '儲存<br/>工作',
             name: '名稱',
             go: 'GO',
-            showOutline: '顯示\n輪廓',
+            showOutline: '顯示<br/>輪廓',
             do_calibrate: '看起來您似乎第一次使用鐳射雕刻功能，可以透過包裝裡附的牛皮卡找到最佳的焦距，是否要載入焦距校正圖片？（稍後亦可以於進階面板中載入）',
             process_caption: '輸出中',
             laser_accepted_images: '雕刻支援格式：BMP/GIF/JPG/PNG/SVG',
@@ -840,6 +842,7 @@ define(function() {
                 load_preset_title: '載入',
                 background: '自訂背景',
                 removeBackground: '移除背景',
+                removePreset: '設定值將會移除',
                 load_calibrate_image: '載入校正圖片',
                 apply: '套用',
                 cancel: '取消',
@@ -984,6 +987,7 @@ define(function() {
             completed: '已完成',
             calibrating: '校正中',
             showOutline: '繪製輪廓中',
+            aborting: '取消工作中',
             starting: '啟動中',
             resuming: '恢復中',
             scanning: '掃描',
@@ -1267,9 +1271,11 @@ define(function() {
             loaded: '進料完成',
             unloaded: '退料完成',
             ok: '確定',
+            kicked: '進料程序被中斷',
             auto_emerging: '請插入線料',
             loading_filament: '進料中',
             maintain_head_type_error: '列印工具頭未正確安裝',
+            disconnected: '連線不穩，請確認機器連線狀況並稍後再試一次',
             maintain_zombie: '請重新啟動機器',
             toolhead_no_response: '#117 列印工具頭沒有回應 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218347477">暸解更多</a>'
         },

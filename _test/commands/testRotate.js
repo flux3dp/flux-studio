@@ -5,7 +5,7 @@ module.exports.command = function(callback) {
         .setValue('[id=y]', 45)
         .toggleSupport('on')
         .waitUntilSliceFinished()
-        .previewTimeShouldBe('20m21s')
+        .previewTimeShouldBe('20m22s')
         .toggleSupport('off');
 
     if (typeof callback === 'function') {

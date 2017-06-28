@@ -1,3 +1,8 @@
+
+if(window.require) {
+    window.$ = window.jQuery = require("jquery");
+}
+
 requirejs.config({
     urlArgs: 'v=' + (Boolean(localStorage.dev) ? '' : window.FLUX.timestamp),
     baseUrl: 'js/',

@@ -72,6 +72,18 @@ define([
                             lang.initialize.errors.wifi_connection.caption
                         );
                     },
+                    genericPerviousSSIDError = () => {
+                      AlertActions.showPopupCustom(
+                        'wifi-authenticate-fail',
+                        lang.initialize.errors.wifi_connection.connecting_fail,
+                        lang.initialize.errors.close,
+                        lang.initialize.errors.wifi_connection.caption,
+                        '',
+                        () => {}
+                      );
+
+                    },
+
                     checkNetworkStatus = () => {
                         var tryAgain = (response) => {
                             if (true === checkCountdown(response)) {
@@ -92,9 +104,14 @@ define([
                             .fail(tryAgain)
                             .progress(tryAgain)
                             .done((response) => {
-                                config().write('poke-ip-addr', response.ipaddr[0]);
-                                location.hash = '#initialize/wifi/setup-complete';
-                                usb.close();
+                                if (response.action === 'GOOD') {
+                                  config().write('poke-ip-addr', response.ipaddr[0]);
+                                  location.hash = '#initialize/wifi/setup-complete';
+                                  usb.close();
+                                } else if (response.action === 'PREVIOUS_SSID') {
+                                  genericPerviousSSIDError();
+                                  location.hash = '#initialize/wifi/select';
+                                };
                             });
                         }, 2000);
                     };

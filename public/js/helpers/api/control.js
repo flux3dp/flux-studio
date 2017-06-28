@@ -237,6 +237,7 @@ define([
                         }
                         else {
                             counter++;
+                            console.log('retry report');
                             ws.send('play report');
                         }
                     }
@@ -245,6 +246,7 @@ define([
                 events.onError = (response) => { d.reject(response); };
                 events.onFatal = (response) => { d.reject(response); };
 
+                setTimeout(function() { d.reject( {status: "Timeout"} )}, 3000);
                 ws.send('play report');
                 return d.promise();
             },
@@ -684,13 +686,25 @@ define([
              * @return {Promise}
              */
             changeFilament: (type) => {
-                let d = $.Deferred();
+                let d = $.Deferred(),
+                    timeout;
 
                 const getType = (t) => {
                     return t === DeviceConstants.LOAD_FILAMENT ? 'load_filament' : 'unload_filament';
                 };
 
                 events.onMessage = (response) => {
+
+                    clearTimeout(timeout);
+                    timeout = setTimeout( () => {
+                        response = {
+                          stage  : ["DISCONNECTED", "DISCONNECTED"],
+                          status : "error",
+                          error  : ["DISCONNECTED", ""]
+                        }
+                        d.notify(response);
+                    }, 10 * 500);
+
                     response.status !== 'ok' ? d.notify(response) : d.resolve(response);
                 };
 

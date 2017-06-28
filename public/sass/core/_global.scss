@@ -222,7 +222,7 @@ img {
 // controls
 select {
     background-color: transparent;
-    background-image: url('/img/icon-3d-arrow-down.png');
+    background-image: url('img/icon-3d-arrow-down.png');
     background-position: calc(100% - 4px) center;
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -328,22 +328,22 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     }
 
     .print-speed {
-        background-image: url('/img/icon-speed.png');
+        background-image: url('img/icon-speed.png');
         background-repeat: no-repeat;
     }
 
     .material {
-        background-image: url('/img/icon-material.png');
+        background-image: url('img/icon-material.png');
         background-repeat: no-repeat;
     }
 
     .platform {
-        background-image: url('/img/icon-platform.png');
+        background-image: url('img/icon-platform.png');
         background-repeat: no-repeat;
     }
 
     .support {
-        background-image: url('/img/icon-support.png');
+        background-image: url('img/icon-support.png');
         background-repeat: no-repeat;
     }
 
