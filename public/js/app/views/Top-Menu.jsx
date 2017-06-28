@@ -668,7 +668,6 @@ define([
                 AlertStore.onRetry(this._waitForPrinters);
                 GlobalStore.onMonitorClosed(this._toggleDeviceListBind);
 
-                DeviceMaster.startMonitoringUsb();
             },
 
             componentWillUnmount: function() {

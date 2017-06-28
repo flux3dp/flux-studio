@@ -7,6 +7,7 @@ define([
     'helpers/nwjs/menu-factory',
     'helpers/logger',
     'helpers/force-reload',
+    'helpers/device-master',
     'app/actions/alert-actions',
     'app/stores/alert-store'
 ], function(
@@ -18,6 +19,7 @@ define([
     menuFactory,
     Logger,
     forceReload,
+    DeviceMaster,
     AlertActions,
     AlertStore
 ) {
@@ -144,6 +146,8 @@ define([
             lang.support.osx_10_9
         );
     };
+
+    DeviceMaster.startMonitoringUsb();
 
     return function(callback) {
         var $body = $('body'),
