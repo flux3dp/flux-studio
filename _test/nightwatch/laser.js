@@ -1,6 +1,7 @@
 module.exports = {
-	'Holder Test' : function (browser) {
-		const svgFile = require('path').resolve(__dirname + '/../example_files/6-pointed-star.svg');
+	'Laser Test' : function (browser) {
+		const pngFile = require('path').resolve(__dirname + '/../example_files/star.png');
+		const svgFile = require('path').resolve(__dirname + '/../example_files/star.svg');
 		browser
 			// required for passing all the setup
 			.waitForElementVisible('body', 6000)
@@ -20,15 +21,16 @@ module.exports = {
 			// test code start -----------
 
 			// navigate to laser
-			.execute(function() {window.location = '#studio/draw'; })
-			.pause(1000)
+			.execute(function() {window.location = '#studio/laser'; })
 
 			// load (calibration) test image
-			.setValue('input[type=file]', svgFile) // Load PNG
+			.waitForElementVisible('button[data-ga-event=yes]', 8000)
+			.click('[data-test-key="no"]')
+			.setValue('input[type=file]', pngFile) // Load PNG
 
 			// send to nightwatch-laser
-			.click('.btn-go')
-			.waitForElementVisible('#nightwatch-laser', 20000)
+			.click('[data-ga-event="laser-goto-monitor"]')
+			.waitForElementVisible('#nightwatch-laser', 5000)
 			.click('#nightwatch-laser')
 			.waitForElementVisible('div.modal-alert', 5000, false, function(result){
 					// Input password if needed
@@ -45,11 +47,45 @@ module.exports = {
 			.waitForElementVisible('div.flux-monitor', 30000)
 
 			// check for shading time
-			.assert.containsText('.status-info-duration', '16 s')
+			.assert.containsText('.status-info-duration', '46 m 2 s')
+			.click('.close')
+
+			// turn off shading
+			.click('.shading')
+
+			// send to nightwatch-laser
+			.click('[data-ga-event="laser-goto-monitor"]')
+			.waitForElementVisible('#nightwatch-laser', 5000)
+			.click('#nightwatch-laser')
+
+			// wait for dashboard ready
+			.waitForElementVisible('div.flux-monitor', 30000)
+
+			// check for shading time
+			.assert.containsText('.status-info-duration', '46 m 2 s')
+			.click('.close')
+
+			// delete image
+			.click('.ft-controls')
+			.keys(browser.Keys.BACK_SPACE)
+
+			// load SVG file
+			.setValue('input[type=file]', svgFile) // Load PNG
+
+			// send to nightwatch-laser
+			.click('[data-ga-event="laser-goto-monitor"]')
+			.waitForElementVisible('#nightwatch-laser', 5000)
+			.click('#nightwatch-laser')
+
+			// wait for dashboard ready
+			.waitForElementVisible('div.flux-monitor', 30000)
+
+			// check for svg time
+			.assert.containsText('.status-info-duration', '13 s')
 			.click('.close')
 
 			// test code end -----------
-			// clean up
+
 			.keys(browser.Keys.CONTROL)
 			.keys('q')
 			.end();
