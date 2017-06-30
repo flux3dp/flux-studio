@@ -37,7 +37,7 @@ define([
 
             _handleDone: function() {
                 location.hash = 'studio/print';
-                forceReload();
+                location.reload();
             },
 
             _onLangChange: function() {
