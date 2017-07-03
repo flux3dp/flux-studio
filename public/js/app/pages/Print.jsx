@@ -180,7 +180,7 @@ define([
                 },
 
                 componentWillMount: function() {
-                    if(electron) {
+                    if(window["electron"]) {
                         let { ipc, events } = window.electron;
                         CloudApi.getMe().then(response => {
                             if(response.ok) {

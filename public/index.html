@@ -45,6 +45,8 @@
         };
 
         if(window["electron"]) {
+            window.$ = window.jQuery = require("jquery");
+
             let ipc = electron.ipc,
                 events = electron.events;
 
@@ -70,12 +72,8 @@
             ipc.send(events.NOTIFY_LANGUAGE, localStorage.getItem('active-lang'));
 
         } else {
-            let jq = document.createElement('script');
-            jq.setAttribute('src', 'js/lib/jquery-1.11.0.min.js');
-            jq.onload = () => {
-                getStarted();
-            }
-            body.append(jq);
+            window.process = {}
+            getStarted();
         }
 
         cssLink.setAttribute('rel', 'stylesheet');

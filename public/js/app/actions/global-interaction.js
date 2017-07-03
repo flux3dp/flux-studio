@@ -5,7 +5,8 @@ define([
                       "TUTORIAL"]
 
     var ipc, events, defaultAction, currentHandler;
-    if(electron) {
+
+    if(window["electron"]) {
         ipc = electron.ipc;
         events = electron.events;
 

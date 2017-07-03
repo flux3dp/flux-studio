@@ -57,7 +57,13 @@ define([
 ) {
     'use strict';
 
-    let { ipc, events } = window.electron;
+    if (window["electron"]) {
+        var { ipc, events } = window.electron;
+    } else {
+        const EM = require('events');
+        var ipc = new EM();
+        var events = {};
+    }
 
     return function(args) {
         args = args || {};
