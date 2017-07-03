@@ -35,7 +35,7 @@
         // set global definition
         window.FLUX = {
             debug: location.search.indexOf('debug') !== -1 || dev,
-            version: electron ? electron.version : "web-dev",
+            version: window["electron"] ? electron.version : "web-dev",
             timestamp: (new Date()).getTime(),
             onLine: navigator.onLine,
             os: ('undefined' === typeof nw ? undefined : os),
@@ -44,7 +44,7 @@
             dev: dev
         };
 
-        if(electron) {
+        if(window["electron"]) {
             let ipc = electron.ipc,
                 events = electron.events;
 
@@ -70,7 +70,12 @@
             ipc.send(events.NOTIFY_LANGUAGE, localStorage.getItem('active-lang'));
 
         } else {
-            getStarted();
+            let jq = document.createElement('script');
+            jq.setAttribute('src', 'js/lib/jquery-1.11.0.min.js');
+            jq.onload = () => {
+                getStarted();
+            }
+            body.append(jq);
         }
 
         cssLink.setAttribute('rel', 'stylesheet');
