@@ -9,6 +9,7 @@
 
 <body>
     <script src='js/lib/three/three.min.js'></script>
+    <script src='js/lib/jquery-1.11.0.min.js'></script>
     <div class='wrapper'>
         <section class='top-menu'></section>
         <section class='tour-overlay'></section>
@@ -45,8 +46,6 @@
         };
 
         if(window["electron"]) {
-            window.$ = window.jQuery = require("jquery");
-
             let ipc = electron.ipc,
                 events = electron.events;
 
@@ -85,7 +84,6 @@
             localStorage.setItem('poke-ip-addr', '192.168.1.1')
         }
     }
-
     launch();
 </script>
 

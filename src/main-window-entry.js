@@ -15,5 +15,5 @@
                     `document.querySelector("[data-file-input=${inputId}]").click()`, true);
             }
         }
-    }    
+    }
 })(global)
