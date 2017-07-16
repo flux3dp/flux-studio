@@ -704,6 +704,7 @@ define([
             },
 
             _handleNavigation: function(address) {
+
                 if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
                     AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
                 }

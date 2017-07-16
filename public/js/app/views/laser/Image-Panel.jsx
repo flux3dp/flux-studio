@@ -149,8 +149,8 @@ define([
                                 <div className="control">
                                     <span className="text-center header">X</span>
                                     <UnitInput
-                                        min={-85}
-                                        max={85}
+                                        min={0}
+                                        max={300}
                                         dataAttrs={{ type: 'x' }}
                                         ref="objectPosX"
                                         defaultValue={props.position.x}
@@ -160,8 +160,8 @@ define([
                                 <div className="control">
                                     <span className="text-center header">Y</span>
                                     <UnitInput
-                                        min={-85}
-                                        max={85}
+                                        min={0}
+                                        max={200}
                                         dataAttrs={{ type: 'y' }}
                                         ref="objectPosY"
                                         defaultValue={props.position.y}
@@ -181,7 +181,7 @@ define([
                                     <span className="text-center header">{lang.laser.object_params.size.unit.width}</span>
                                     <UnitInput
                                         min={1}
-                                        max={170}
+                                        max={300}
                                         dataAttrs={{ type: 'width' }}
                                         ref="objectSizeW"
                                         defaultValue={state.size.width}
@@ -192,7 +192,7 @@ define([
                                     <span className="text-center header">{lang.laser.object_params.size.unit.height}</span>
                                     <UnitInput
                                         min={1}
-                                        max={170}
+                                        max={200}
                                         dataAttrs={{ type: 'height' }}
                                         ref="objectSizeH"
                                         defaultValue={state.size.height}

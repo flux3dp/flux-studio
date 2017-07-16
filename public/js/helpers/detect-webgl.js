@@ -9,6 +9,7 @@ define(function() {
                  names = ["webgl", "experimental-webgl", "moz-webgl", "webkit-3d"],
                context = false;
 
+            window.cann = canvas;
             for(var i=0;i<4;i++) {
                 try {
                     context = canvas.getContext(names[i]);

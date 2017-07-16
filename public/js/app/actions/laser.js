@@ -55,7 +55,7 @@ define([
 
         var self = this,    // react component
             IMAGE_REAL_RATIO = 4.7244094488, // 1mm = 4.72px
-            DIAMETER = 170,    // 170mm
+            DIAMETER = 300,    // 170mm
             ACCEPTABLE_MIN_SIZE = 1, // width * height > 1
             bitmapWebSocket,
             svgWebSocket,
@@ -84,6 +84,7 @@ define([
                         file.imgSize.width = file.imgSize.width * ratio;
                         file.imgSize.height = file.imgSize.height * ratio;
                     }
+                    console.log('platformDiameter', platformDiameter);
 
                     if ('good' === file.status &&
                         ACCEPTABLE_MIN_SIZE > file.imgSize.width * file.imgSize.height
@@ -294,22 +295,16 @@ define([
                 axis = axis || '';
 
                 var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
-                    r = PLATFORM_DIAMETER_PIXEL / 2 * ratio,
-                    mm = ratio * px - r;
-
-                if ('y' === axis.toLowerCase()) {
-                    mm = mm * -1;
-                }
+                    mm = ratio * px;
 
                 return round(mm, -2);
             },
             convertToHtmlCoordinate = function(n, axis) {
                 var ratio = PLATFORM_DIAMETER_PIXEL / DIAMETER, // 1(px) : N(mm)
-                    r = DIAMETER / 2,
                     freetrans = $target_image.data('freetrans'),
                     px;
 
-                n = parseFloat(n, 10) + r;
+                n = parseFloat(n, 10);
                 px = n * ratio;
 
                 if ('x' === axis) {
