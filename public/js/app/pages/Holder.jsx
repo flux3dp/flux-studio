@@ -84,6 +84,7 @@ define([
                 },
 
                 getInitialState: function() {
+                    console.log('this.props', this.props);
                     return {
                         mode: 'engrave',
                         hasImage: false,

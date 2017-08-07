@@ -107,7 +107,7 @@ class BackendManager extends EventEmitter {
                         if (devInfo.status === 'pong') {
                             return
                         }
-                        
+
                     } catch(err) {
                         console.error('Can not parse backend stout: %s', err);
                     }
@@ -133,7 +133,8 @@ class BackendManager extends EventEmitter {
                 this._setRecover();
             }
         });
-        this._ws.connect(`ws://localhost:${this._port}/ws/discover`);
+        //this._ws.connect(`ws://localhost:${this._port}/ws/discover`);
+        this._ws.connect(`ws://127.0.0.1:${this._port}/ws/discover`);
     }
 
     _spawn() {

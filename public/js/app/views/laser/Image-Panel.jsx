@@ -66,6 +66,8 @@ define([
                 },
                 ratio;
 
+            console.log('refs', this.refs);
+            console.log('newParams', newParams);
             if ('undefined' !== typeof this.refs.threshold) {
                 newParams['threshold'] = parseInt(this.refs.threshold.getDOMNode().value, 10);
             }
@@ -83,6 +85,7 @@ define([
                 }
             }
 
+            console.log('imagePanel', this.props);
             this.props.onTransform(e, newParams);
         },
 

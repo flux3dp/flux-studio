@@ -297,6 +297,11 @@ define([
                 var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
                     mm = ratio * px;
 
+                if (axis.toLowerCase() === 'x') {
+                    mm = DIAMETER - mm;
+                }
+
+                console.log('axis', axis, mm);
                 return round(mm, -2);
             },
             convertToHtmlCoordinate = function(n, axis) {
@@ -307,15 +312,20 @@ define([
                 n = parseFloat(n, 10);
                 px = n * ratio;
 
+                console.log('234234', freetrans, PLATFORM_DIAMETER_PIXEL, DIAMETER, n, px);
+                console.log('$target_image.width', $target_image.width())
+
                 if ('x' === axis) {
                     px -= ($target_image.width() * freetrans.scalex / 2);
                     px -= ($target_image.width() * (1 - freetrans.scalex));
+                    //px = PLATFORM_DIAMETER_PIXEL - px;
                 }
                 else {
                     px -= ($target_image.height() * freetrans.scaley  / 2);
                     px -= ($target_image.height() * (1 - freetrans.scaley));
                 }
 
+                console.log('px', px);
                 return round(px, -2);
             },
             outOfRange = function(point) {
@@ -968,6 +978,7 @@ define([
                         maintainAspectRatio: params.sizeLock
                     };
 
+                console.log('$el, $target_image', $el, $target_image);
                 $target_image.data('sizeLock', params.sizeLock);
                 val = parseFloat(val, 10);
 
@@ -1002,6 +1013,7 @@ define([
             menuFactory: menuFactory,
             setPlatform: function(el) {
                 $laser_platform = $(el);
+                console.log('laser_platform', $laser_platform);
                 PLATFORM_DIAMETER_PIXEL = $laser_platform.width();
             },
             refreshImage: refreshImage,

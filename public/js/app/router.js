@@ -5,12 +5,13 @@ define([
     'helpers/display',
     'helpers/api/config',
     'app/app-settings',
-    'helpers/detect-webgl'
+    'helpers/detect-webgl',
 ],
 function(React, $, Backbone, display, config, appSettings, detectWebgl) {
     'use strict';
 
     var _display = function(view, args, el) {
+        console.log('_display', args)
         args = args || {};
         el = el || $('.content')[0];
 
@@ -35,7 +36,7 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|laser|scan|usb|settings|draw|cut|mill|cloud)\/?(.*)?/,
+                        /^studio\/?(print|beambox|svg-edit|laser|scan|usb|settings|draw|cut|mill|cloud)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -120,6 +121,8 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                 needWebGL = appSettings.needWebGL,
                 map = {
                     'print': this.print,
+                    'beambox': this.beambox,
+                    'svg-edit': this.svgEdit,
                     'settings': this.settings,
                     'laser': this.holder.bind(null, page),
                     'draw': this.holder.bind(null, page),
@@ -157,6 +160,18 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
 
         print: function() {
             requirejs(['jsx!pages/Print'], function(view) {
+                _display(view);
+            });
+        },
+
+        beambox: function() {
+            requirejs(['jsx!pages/Beambox'], function(view) {
+                _display(view);
+            });
+        },
+
+        svgEdit: function() {
+            requirejs(['jsx!pages/svg-editor_2'], function(view) {
                 _display(view);
             });
         },

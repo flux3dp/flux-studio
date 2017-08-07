@@ -263,6 +263,13 @@ define([
                 label: lang.menu.mill,
                 imgSrc: 'img/menu/icon-draw.svg'
             });
+            options.push({
+                name: 'beambox',
+                displayName: 'BeamBox',
+                className: genericClassName,
+                label: 'Beambox',
+                imgSrc: 'img/menu/icon-draw.svg'
+            });
         }
 
         const registerAllDeviceMenuClickEvents = () => {
