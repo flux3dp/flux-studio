@@ -25,6 +25,7 @@ define(['jquery', 'threejs'], function($) {
                 fileSystem.writeFileSync(path, ''); //replace old data;
                 const wstream = fileSystem.createWriteStream(path);
                 wstream.on('finish', ()=>{
+                    console.log('export finish');
                     d.resolve();
                 })
 

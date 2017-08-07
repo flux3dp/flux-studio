@@ -299,7 +299,7 @@ define([
             const path = `tmp/${name}.stl`;
             const exporter = new STLExporter();
             const doExport = exporter.exportTo(geometry, window.fs, path);            
-            uploadCaller = doExport.then(sliceMaster.addTask('upload_via_path', name, '', 'stl', path));
+            uploadCaller = doExport.then(()=>{return sliceMaster.addTask('upload_via_path', name, '', 'stl', path);});
         } else {
             uploadCaller = file.path ?
                 sliceMaster.addTask('upload_via_path', name, file, ext, file.path)
@@ -2371,8 +2371,11 @@ define([
                 const R = imgData.data[j+0],
                       G = imgData.data[j+1],
                       B = imgData.data[j+2],
-                      A = imgData.data[j+3],
-                      gray = 255 - ((R*38 + G*75 + B*15) >> 7); //referrence: http://atlaboratary.blogspot.tw/2013/08/rgb-g-rey-l-gray-r0.html
+                      A = imgData.data[j+3];
+                let gray = 255 - ((R*38 + G*75 + B*15) >> 7); //referrence: http://atlaboratary.blogspot.tw/2013/08/rgb-g-rey-l-gray-r0.html
+
+                const precision = 1;
+                gray = Math.floor(gray/precision)*precision;
 
                 this.opacityData[i] = A;
                 if (A===0) this.grayscaleData[i] = 0;
@@ -2966,20 +2969,22 @@ define([
         const exporter = new STLExporter();
 
         exporter.exportTo(mesh.geometry, window.fs, path)
-        .then(sliceMaster.addTask('delete', name))
-        .then(sliceMaster.addTask('upload_via_path', name, '', 'stl', path))
-        .then(sliceMaster.addTask('set',
-            mesh.uuid,
-            mesh.position.x,
-            mesh.position.y,
-            mesh.position.z,
-            mesh.rotation.x,
-            mesh.rotation.y,
-            mesh.rotation.z,
-            mesh.scale.x,
-            mesh.scale.y,
-            mesh.scale.z
-         ))
+        .then(()=>{
+            sliceMaster.addTask('delete', name);
+            sliceMaster.addTask('upload_via_path', name, '', 'stl', path);
+            return sliceMaster.addTask('set',
+                mesh.uuid,
+                mesh.position.x,
+                mesh.position.y,
+                mesh.position.z,
+                mesh.rotation.x,
+                mesh.rotation.y,
+                mesh.rotation.z,
+                mesh.scale.x,
+                mesh.scale.y,
+                mesh.scale.z
+            );
+        })
         .then(()=>{
             doSlicing();
         })

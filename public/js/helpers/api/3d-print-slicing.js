@@ -114,7 +114,7 @@ define([
             },
 
             upload_via_path: (name, file, ext, fileUrl) => {
-
+                console.log('upload_via_path');
                 let d = $.Deferred();
 
                 events.onMessage = (result) => {
