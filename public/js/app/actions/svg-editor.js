@@ -54,7 +54,7 @@ TODOS
 				lang: '', // Default to "en" if locale.js detection does not detect another language
 				iconsize: '', // Will default to 's' if the window height is smaller than the minimum height and 'm' otherwise
 				bkgd_color: '#FFF',
-				bkgd_url: '',
+				bkgd_url: 'img/laser-platform2.png',
 				// DOCUMENT PROPERTIES (DIALOG)
 				img_save: 'embed',
 				// ALERT NOTICES
@@ -133,7 +133,7 @@ TODOS
 				jGraduatePath: 'js/lib/svgeditor/jgraduate/images/',
 				// DOCUMENT PROPERTIES
 				// Change the following to a preference (already in the Document Properties dialog)?
-				dimensions: [640, 480],
+				dimensions: [3000, 2000],
 				// EDITOR OPTIONS
 				// Change the following to preferences (already in the Editor Options dialog)?
 				gridSnapping: false,

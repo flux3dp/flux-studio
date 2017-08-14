@@ -1,6 +1,6 @@
 requirejs.config({
   paths: {
-      svgEditor:          'app/actions/beambox',    
+      svgEditor:          'app/actions/svg-editor',    
 
       svgedit:            'lib/svgeditor/svgedit',
       jquerySvg:          'lib/svgeditor/jquery-svg',
