@@ -101,10 +101,8 @@ requirejs([
 ], function($, Backbone, Router, globalEvents, Raven) {
     'use strict';
 
-    if (true === window.FLUX.isNW) {
-        window.$ = window.jQuery = $;
-        console.log(`Flux-Studio: ${window.FLUX.version}`);
-    }
+    window.$ = window.jQuery = $;
+    console.log(`Flux-Studio: ${window.FLUX.version}`);
 
     if(window.FLUX.allowTracking) {
         // google analytics

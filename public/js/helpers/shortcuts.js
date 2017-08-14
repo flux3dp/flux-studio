@@ -4,7 +4,6 @@
 define([
     'jquery',
     'app/constants/keycode-constants',
-    'helpers/array-unique',
     'helpers/array-findindex'
 ], function($, keyCodeConstants) {
     'use strict';
@@ -61,7 +60,7 @@ define([
                 keyCodeStatus.push(special_key_map.CMD);
             }
 
-            keyCodeStatus = keyCodeStatus.unique().sort();
+            keyCodeStatus = _unique(keyCodeStatus).sort();
 
             matches = matchedEvents(keyCodeStatus);
 
@@ -120,6 +119,23 @@ define([
         },
         unsubscribe = function() {
             events = events.filter(e => e !== this);
+        },
+        _unique = function(arr) {
+            //this is array-unique.js
+            var unique_array = [],
+                some = function(compare) {
+                    return function(el) {
+                        return compare === el;
+                    };
+                };
+
+            arr.forEach(function(el, key) {
+                if (false === unique_array.some(some(el))) {
+                    unique_array.push(el);
+                }
+            });
+
+            return unique_array;
         };
 
     return {

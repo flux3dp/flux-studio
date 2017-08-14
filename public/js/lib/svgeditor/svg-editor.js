@@ -39,7 +39,6 @@ TODOS
 		editor.showSaveWarning = false;
 		editor.storagePromptClosed = false; // For use with ext-storage.js
 
-		console.log('svgedit', svgedit);
 		var svgCanvas, urldata,
 			Utils = svgedit.utilities,
 			isReady = false,
@@ -95,8 +94,8 @@ TODOS
 				'ext-shapes.js',
 				'ext-imagelib.js',
 				'ext-grid.js',
-				//'ext-polygon.js',
-				//'ext-star.js',
+				'ext-polygon.js',
+				'ext-star.js',
 				'ext-panning.js',
 				'ext-storage.js'
 			],
@@ -128,10 +127,10 @@ TODOS
 				no_save_warning: false,
 				// PATH CONFIGURATION
 				// The following path configuration items are disallowed in the URL (as should any future path configurations)
-				imgPath: 'js/lib/svgeditor/images/',
-				langPath: 'js/lib/svgeditor/locale/',
-				extPath: 'js/lib/svgeditor/extensions/',
-				jGraduatePath: 'js/lib/svgeditor/jgraduate/images/',
+				imgPath: 'images/',
+				langPath: 'locale/',
+				extPath: 'extensions/',
+				jGraduatePath: 'jgraduate/images/',
 				// DOCUMENT PROPERTIES
 				// Change the following to a preference (already in the Document Properties dialog)?
 				dimensions: [640, 480],
@@ -209,11 +208,11 @@ TODOS
 				});
 			}
 		}
-
+		
 		/**
 		* EXPORTS
 		*/
-
+		
 		/**
 		* Store and retrieve preferences
 		* @param {string} key The preference name to be retrieved or set
@@ -234,7 +233,7 @@ TODOS
 			}
 			return (key in curPrefs) ? curPrefs[key] : defaultPrefs[key];
 		};
-
+		
 		/**
 		* EDITOR PUBLIC METHODS
 		* locale.js also adds "putLang" and "readLang" as editor methods
@@ -269,7 +268,7 @@ TODOS
 					editor.loadFromString(cached);
 				}
 			}
-
+			
 			// LOAD PREFS
 			var key;
 			for (key in defaultPrefs) {
@@ -451,7 +450,7 @@ TODOS
 			}
 			function setupCurConfig () {
 				curConfig = $.extend(true, {}, defaultConfig, curConfig); // Now safe to merge with priority for curConfig in the event any are already set
-
+				
 				// Now deal with extensions and other array config
 				if (!curConfig.noDefaultExtensions) {
 					curConfig.extensions = curConfig.extensions.concat(defaultExtensions);
@@ -477,7 +476,7 @@ TODOS
 					if (urldata.bkgd_color) {
 						urldata.bkgd_color = '#' + urldata.bkgd_color;
 					}
-
+			
 					if (urldata.extensions) {
 						// For security reasons, disallow cross-domain or cross-folder extensions via URL
 						urldata.extensions = urldata.extensions.match(/[:\/\\]/) ? '' : urldata.extensions.split(',');
@@ -500,7 +499,7 @@ TODOS
 					);
 
 					editor.setConfig(urldata, {overwrite: false}); // Note: source and url (as with storagePrompt later) are not set on config but are used below
-
+					
 					setupCurConfig();
 
 					if (!curConfig.preventURLContentLoading) {
@@ -535,7 +534,7 @@ TODOS
 					setupCurPrefs();
 				}
 			}());
-
+			
 			var setIcon = editor.setIcon = function(elem, icon_id, forcedSize) {
 				var icon = (typeof icon_id === 'string') ? $.getSvgIcon(icon_id, true) : icon_id.clone();
 				if (!icon) {
@@ -559,13 +558,12 @@ TODOS
 							document.querySelector('head').appendChild(s);
 						}
 					}).fail(function(jqxhr, settings, exception){
-						console.log('excrption', exception);
+						console.log(exception);
 					});
 				});
 
 				// var lang = ('lang' in curPrefs) ? curPrefs.lang : null;
-				console.log('editor', editor);
-				//editor.putLocale(null, good_langs);
+				editor.putLocale(null, good_langs);
 			};
 
 			// Load extensions
@@ -578,8 +576,7 @@ TODOS
 			$.svgIcons(curConfig.imgPath + 'svg_edit_icons.svg', {
 				w:24, h:24,
 				id_match: false,
-				//no_img: !svgedit.browser.isWebkit(), // Opera & Firefox 4 gives odd behavior w/images
-				no_img: false,
+				no_img: !svgedit.browser.isWebkit(), // Opera & Firefox 4 gives odd behavior w/images
 				fallback_path: curConfig.imgPath,
 				fallback: {
 					'new_image': 'clear.png',
@@ -743,7 +740,7 @@ TODOS
 					if (tleft.length !== 0) {
 						min_height = tleft.offset().top + tleft.outerHeight();
 					}
-
+					
 					var size = $.pref('iconsize');
 					editor.setIconSize(size || ($(window).height() < min_height ? 's': 'm'));
 
@@ -813,7 +810,7 @@ TODOS
 					catch(e) {}
 				}
 			}());
-
+			
 			// This sets up alternative dialog boxes. They mostly work the same way as
 			// their UI counterparts, expect instead of returning the result, a callback
 			// needs to be included that returns the result as its first parameter.
@@ -1086,7 +1083,7 @@ TODOS
 				if (exportWindowName) {
 					exportWindow = window.open('', exportWindowName); // A hack to get the window via JSON-able name without opening a new one
 				}
-
+				
 				exportWindow.location.href = data.datauri;
 				var done = $.pref('export_notice_done');
 				if (done !== 'all') {
@@ -1236,7 +1233,7 @@ TODOS
 
 					// Remove any existing canvasses
 					$hcanv.siblings().remove();
-
+					
 					// Create multiple canvases when necessary (due to browser limits)
 					if (ruler_len >= limit) {
 						ctx_arr_num = parseInt(ruler_len / limit, 10) + 1;
@@ -1431,7 +1428,6 @@ TODOS
 				var buttonsNeedingFillAndStroke = [ '#tools_rect .tool_button', '#tools_ellipse .tool_button', '#tool_text', '#tool_path'];
 				if (bNoStroke) {
 					for (index in buttonsNeedingStroke) {
-						console.log('index', index);
 						button = buttonsNeedingStroke[index];
 						if ($(button).hasClass('tool_button_current')) {
 							clickSelect();
@@ -1439,8 +1435,7 @@ TODOS
 						$(button).addClass('disabled');
 					}
 				} else {
-					for (var index = 0; index < buttonsNeedingStroke.length; index++) {
-						console.log('index', index);
+					for (index in buttonsNeedingStroke) {
 						button = buttonsNeedingStroke[index];
 						$(button).removeClass('disabled');
 					}
@@ -1455,7 +1450,7 @@ TODOS
 						$(button).addClass('disabled');
 					}
 				} else {
-					for (var index = 0; index < buttonsNeedingStroke.length; index++) {
+					for (index in buttonsNeedingFillAndStroke) {
 						button = buttonsNeedingFillAndStroke[index];
 						$(button).removeClass('disabled');
 					}
@@ -1737,9 +1732,10 @@ TODOS
 					menu_items[((el_name === 'g' || !multiselected) ? 'dis' : 'en') + 'ableContextMenuItems']('#group');
 				} // if (elem != null)
 				else if (multiselected) {
-					console.log('menu_items', menu_items.enableContextMenuItems);
 					$('#multiselected_panel').show();
-					menu_items.enableContextMenuItems('#group').disableContextMenuItems('#ungroup');
+					menu_items
+						.enableContextMenuItems('#group')
+						.disableContextMenuItems('#ungroup');
 				} else {
 					menu_items.disableContextMenuItems('#delete,#cut,#copy,#group,#ungroup,#move_front,#move_up,#move_down,#move_back');
 				}
@@ -2465,7 +2461,7 @@ TODOS
 				var cb_called = false;
 				var resize_done = false;
 				var cb_ready = true; // Set to false to delay callback (e.g. wait for $.svgIcons)
-
+				
 				if (ext.langReady) {
 					if (editor.langChanged) { // We check for this since the "lang" pref could have been set by storage
 						var lang = $.pref('lang');
@@ -2918,7 +2914,7 @@ TODOS
 				svgCanvas.setRotationAngle(ctl.value);
 				$('#tool_reorient').toggleClass('disabled', parseInt(ctl.value, 10) === 0);
 			};
-
+			
 			var changeOpacity = function(ctl, val) {
 				if (val == null) {val = ctl.value;}
 				$('#group_opacity').val(val);
@@ -4179,7 +4175,7 @@ TODOS
 
 			// Test for embedImage support (use timeout to not interfere with page load)
 			setTimeout(function() {
-				svgCanvas.embedImage('js/lib/svgeditor/images/logo.png', function(datauri) {
+				svgCanvas.embedImage('images/logo.png', function(datauri) {
 					if (!datauri) {
 						// Disable option
 						$('#image_save_opts [value=embed]').attr('disabled', 'disabled');
@@ -4330,14 +4326,10 @@ TODOS
 
 			var changeSidePanelWidth = function(delta) {
 				var rulerX = $('#ruler_x');
-				var w = document.getElementById("sidepanels").offsetWidth + delta;
-
-				document.getElementById("sidepanels").style.width = w.toString() + 'px';
+				$('#sidepanels').width('+=' + delta);
 				$('#layerpanel').width('+=' + delta);
-
 				rulerX.css('right', parseInt(rulerX.css('right'), 10) + delta);
 				workarea.css('right', parseInt(workarea.css('right'), 10) + delta);
-
 				svgCanvas.runExtensions('workareaResized');
 			};
 
@@ -4364,7 +4356,6 @@ TODOS
 			var toggleSidePanel = function(close) {
 				var w = $('#sidepanels').width();
 				var deltaX = (w > 2 || close ? 2 : SIDEPANEL_OPENWIDTH) - w;
-
 				changeSidePanelWidth(deltaX);
 			};
 
@@ -4925,7 +4916,7 @@ TODOS
 						return;
 					}
 					/* if (file.type === 'application/pdf') { // Todo: Handle PDF imports
-
+						
 					}
 					else */
 					if (file.type.indexOf('image') != -1) {
@@ -5175,6 +5166,6 @@ TODOS
 	}(jQuery));
 
 	// Run init once DOM is loaded
-	//$(svgEditor.init);
+	$(svgEditor.init);
 
 }());

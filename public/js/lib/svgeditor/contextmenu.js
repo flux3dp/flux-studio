@@ -2,9 +2,9 @@
 /*jslint vars: true, eqeq: true*/
 /**
  * Package: svgedit.contextmenu
- *
+ * 
  * Licensed under the Apache License, Version 2
- *
+ * 
  * Author: Adam Bender
  */
 // Dependencies:
@@ -53,7 +53,6 @@ var svgedit = svgedit || {};
 	};
 	// Defer injection to wait out initial menu processing. This probably goes away once all context
 	// menu behavior is brought here.
-	console.log('svgEditor',svgEditor);
 	svgEditor.ready(function() {
 		var menuItem;
 		for (menuItem in contextMenuExtensions) {

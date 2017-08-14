@@ -1,45 +1,10 @@
 define([
-    'jquery',
     'react',
-    'jsx!views/laser/Setup-Panel',
     'jsx!pages/svg-editor',
     'helpers/api/config',
     'helpers/i18n',
-
-    'lib/pathseg',
-
-    //'svgeditor/js-hotkeys/jquery.hotkeys.min',
-    //'svgeditor/jquerybbq/jquery.bbq.min',
-    //'svgeditor/svgicons/jquery.svgicons',
-    //'svgeditor/jgraduate/jquery.jgraduate.min',
-    //'svgeditor/spinbtn/JQuerySpinBtn.min',
-    //'svgeditor/touch',
-
-    //'svgeditor/svgedit',
-    //'svgeditor/jquery-svg',
-    //'svgeditor/contextmenu/jquery.contextMenu',
-    //'svgeditor/pathseg',
-    //'svgeditor/browser',
-    //'svgeditor/svgtransformlist',
-    //'svgeditor/math',
-    //'svgeditor/units',
-    //'svgeditor/svgutils',
-    //'svgeditor/sanitize',
-    //'svgeditor/history',
-    //'svgeditor/historyrecording',
-    //'svgeditor/coords',
-    //'svgeditor/recalculate',
-    //'svgeditor/select',
-    //'svgeditor/draw',
-    //'svgeditor/layer',
-    //'svgeditor/path',
-    //'svgeditor/svgcanvas',
-    //'svgeditor/locale/locale',
-    //'svgeditor/contextmenu',
 ], function(
-    $,
     React,
-    LaserSetupPanel,
     SvgGenerator,
     ConfigHelper,
     i18n
@@ -48,7 +13,7 @@ define([
     let Config = ConfigHelper(),
         lang = i18n.lang;
 
-    'use strict';
+        'use strict';
 
     return function(args = {}) {
         let Svg = SvgGenerator(args);

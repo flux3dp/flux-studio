@@ -46,12 +46,12 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 		var windowHeight=parseFloat($("#svgcanvas").css("height"));
 		var overviewWidth=$("#overviewMiniView").attr("width");
 		var overviewHeight=$("#overviewMiniView").attr("height");
-
+		
 		var viewBoxX=portX/windowWidth*overviewWidth;
 		var viewBoxY=portY/windowHeight*overviewHeight;
 		var viewBoxWidth=portWidth/windowWidth*overviewWidth;
 		var viewBoxHeight=portHeight/windowHeight*overviewHeight;
-
+		
 		$("#overview_window_view_box").css("min-width",viewBoxWidth+"px");
 		$("#overview_window_view_box").css("min-height",viewBoxHeight+"px");
 		$("#overview_window_view_box").css("top",viewBoxY+"px");
@@ -64,26 +64,26 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 	});
 	$("#workarea").resize(updateViewBox);
 	updateViewBox();
-
+	
 	// Compensate for changes in zoom and canvas size.
 	var updateViewDimensions= function(){
 		var viewWidth=$("#svgroot").attr("width");
 		var viewHeight=$("#svgroot").attr("height");
 		var viewX=640;
 		var viewY=480;
-
+		
 		if(svgedit.browser.isIE())
 		{
 			// This has only been tested with Firefox 10 and IE 9 (without chrome frame).
 			// I am not sure if if is Firefox or IE that is being non compliant here.
 			// Either way the one that is noncompliant may become more compliant later.
-			//TAG:HACK
+			//TAG:HACK  
 			//TAG:VERSION_DEPENDENT
 			//TAG:BROWSER_SNIFFING
 			viewX=0;
 			viewY=0;
 		}
-
+		
 		var svgWidth_old=$("#overviewMiniView").attr("width");
 		var svgHeight_new=viewHeight/viewWidth*svgWidth_old;
 		$("#overviewMiniView").attr("viewBox",viewX+" "+viewY+" "+viewWidth+" "+viewHeight);
@@ -91,31 +91,29 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 		updateViewBox();
 	};
 	updateViewDimensions();
-
+	
 	// Set up the overview window as a controller for the view port.
 	overviewWindowGlobals.viewBoxDragging=false;
 	var updateViewPortFromViewBox = function(){
-
+	
 		var windowWidth =parseFloat($("#svgcanvas").css("width" ));
 		var windowHeight=parseFloat($("#svgcanvas").css("height"));
 		var overviewWidth =$("#overviewMiniView").attr("width" );
 		var overviewHeight=$("#overviewMiniView").attr("height");
 		var viewBoxX=parseFloat($("#overview_window_view_box").css("left"));
 		var viewBoxY=parseFloat($("#overview_window_view_box").css("top" ));
-
+		
 		var portX=viewBoxX/overviewWidth *windowWidth;
 		var portY=viewBoxY/overviewHeight*windowHeight;
 
 		$("#workarea").scrollLeft(portX);
 		$("#workarea").scrollTop(portY);
 	};
-
-	//$( "#overview_window_view_box" ).draggable({  containment: "parent"
-		//,drag: updateViewPortFromViewBox
-		//,start:function(){overviewWindowGlobals.viewBoxDragging=true; }
-		//,stop :function(){overviewWindowGlobals.viewBoxDragging=false;}
-	//});
-
+	$( "#overview_window_view_box" ).draggable({  containment: "parent"
+		,drag: updateViewPortFromViewBox
+		,start:function(){overviewWindowGlobals.viewBoxDragging=true; }
+		,stop :function(){overviewWindowGlobals.viewBoxDragging=false;}
+	});  
 	$("#overviewMiniView").click(function(evt){
 		// Firefox doesn't support evt.offsetX and evt.offsetY.
 		var mouseX=(evt.offsetX || evt.originalEvent.layerX);
@@ -124,7 +122,7 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 		var overviewHeight=$("#overviewMiniView").attr("height");
 		var viewBoxWidth =parseFloat($("#overview_window_view_box").css("min-width" ));
 		var viewBoxHeight=parseFloat($("#overview_window_view_box").css("min-height"));
-
+ 
 		var viewBoxX=mouseX - 0.5 * viewBoxWidth;
 		var viewBoxY=mouseY- 0.5 * viewBoxHeight;
 		//deal with constraints
@@ -140,12 +138,12 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 		if(viewBoxY+viewBoxHeight>overviewHeight){
 			viewBoxY=overviewHeight-viewBoxHeight;
 		}
-
+		
 		$("#overview_window_view_box").css("top",viewBoxY+"px");
 		$("#overview_window_view_box").css("left",viewBoxX+"px");
 		updateViewPortFromViewBox();
 	});
-
+	
 	return {
 		name: "overview window",
 		canvasUpdated: updateViewDimensions,

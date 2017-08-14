@@ -18,19 +18,19 @@
 var svgEditor = (function($, editor) {'use strict';
 
 	var lang_param;
-
+	
 	function setStrings(type, obj, ids) {
 		// Root element to look for element from
 		var i, sel, val, $elem, elem, node, parent = $('#svg_editor').parent();
 		for (sel in obj) {
 			val = obj[sel];
 			if (!val) {console.log(sel);}
-
+			
 			if (ids) {sel = '#' + sel;}
 			$elem = parent.find(sel);
 			if ($elem.length) {
 				elem = parent.find(sel)[0];
-
+				
 				switch ( type ) {
 					case 'content':
 						for (i = 0; i < elem.childNodes.length; i++) {
@@ -41,20 +41,19 @@ var svgEditor = (function($, editor) {'use strict';
 							}
 						}
 						break;
-
+					
 					case 'title':
 						elem.title = val;
 						break;
 				}
-
-
+				
+				
 			} else {
 				console.log('Missing: ' + sel);
 			}
 		}
 	}
 
-	console.log('editor.readLang', editor);
 	editor.readLang = function(langData) {
 		var more = editor.canvas.runExtensions('addlangData', lang_param, true);
 		$.each(more, function(i, m) {
@@ -62,7 +61,7 @@ var svgEditor = (function($, editor) {'use strict';
 				langData = $.merge(langData, m.data);
 			}
 		});
-
+		
 		// Old locale file, do nothing for now.
 		if (!langData.tools) {return;}
 
@@ -73,7 +72,7 @@ var svgEditor = (function($, editor) {'use strict';
 			layers = langData.layers,
 			common = langData.common,
 			ui = langData.ui;
-
+		
 		setStrings('content', {
 			// copyrightLabel: misc.powered_by, // Currently commented out in svg-editor.html
 			curve_segments: properties.curve_segments,
@@ -82,7 +81,7 @@ var svgEditor = (function($, editor) {'use strict';
 			fit_to_canvas: tools.fit_to_canvas,
 			fit_to_layer_content: tools.fit_to_layer_content,
 			fit_to_sel: tools.fit_to_sel,
-
+			
 			icon_large: config.icon_large,
 			icon_medium: config.icon_medium,
 			icon_small: config.icon_small,
@@ -90,19 +89,19 @@ var svgEditor = (function($, editor) {'use strict';
 			image_opt_embed: config.image_opt_embed,
 			image_opt_ref: config.image_opt_ref,
 			includedImages: config.included_images,
-
+			
 			largest_object: tools.largest_object,
-
+			
 			layersLabel: layers.layers,
 			page: tools.page,
 			relativeToLabel: tools.relativeTo,
 			selLayerLabel: layers.move_elems_to,
 			selectedPredefined: config.select_predefined,
-
+			
 			selected_objects: tools.selected_objects,
 			smallest_object: tools.smallest_object,
 			straight_segments: properties.straight_segments,
-
+			
 			svginfo_bg_url: config.editor_img_url + ":",
 			svginfo_bg_note: config.editor_bg_note,
 			svginfo_change_background: config.background,
@@ -114,13 +113,13 @@ var svgEditor = (function($, editor) {'use strict';
 			svginfo_lang: config.language,
 			svginfo_title: config.doc_title,
 			svginfo_width: common.width,
-
+			
 			tool_docprops_cancel: common.cancel,
 			tool_docprops_save: common.ok,
 
 			tool_source_cancel: common.cancel,
 			tool_source_save: common.ok,
-
+			
 			tool_prefs_cancel: common.cancel,
 			tool_prefs_save: common.ok,
 
@@ -133,28 +132,28 @@ var svgEditor = (function($, editor) {'use strict';
 			tool_imagelib: tools.imagelib,
 			tool_open: tools.open_doc,
 			tool_save: tools.save_doc,
-
+			
 			svginfo_units_rulers: config.units_and_rulers,
 			svginfo_rulers_onoff: config.show_rulers,
 			svginfo_unit: config.base_unit,
-
+			
 			svginfo_grid_settings: config.grid,
 			svginfo_snap_onoff: config.snapping_onoff,
 			svginfo_snap_step: config.snapping_stepsize,
 			svginfo_grid_color: config.grid_color
 		}, true);
-
+		
 		// Shape categories
 		var o, cats = {};
 		for (o in langData.shape_cats) {
 			cats['#shape_cats [data-cat="' + o + '"]'] = langData.shape_cats[o];
 		}
-
+		
 		// TODO: Find way to make this run after shapelib ext has loaded
 		setTimeout(function() {
 			setStrings('content', cats);
 		}, 2000);
-
+		
 		// Context menus
 		var opts = {};
 		$.each(['cut','copy','paste', 'paste_in_place', 'delete', 'group', 'ungroup', 'move_front', 'move_up', 'move_down', 'move_back'], function() {
@@ -166,9 +165,9 @@ var svgEditor = (function($, editor) {'use strict';
 		});
 
 		opts['#cmenu_layers a[href="#delete"]'] = layers.del;
-
+		
 		setStrings('content', opts);
-
+		
 		setStrings('title', {
 			align_relative_to: tools.align_relative_to,
 			circle_cx: properties.circle_cx,
@@ -272,19 +271,17 @@ var svgEditor = (function($, editor) {'use strict';
 			url_notice: tools.no_embed
 
 		}, true);
-
+		
 		editor.setLang(lang_param, langData);
 	};
 
 	editor.putLocale = function (given_param, good_langs) {
-		console.log('editor.putLocale', given_param, good_langs);
-
+	
 		if (given_param) {
 			lang_param = given_param;
 		}
 		else {
-			//lang_param = $.pref('lang');
-			lang_param = 'en';
+			lang_param = $.pref('lang');
 			if (!lang_param) {
 				if (navigator.userLanguage) { // Explorer
 					lang_param = navigator.userLanguage;
@@ -296,26 +293,26 @@ var svgEditor = (function($, editor) {'use strict';
 					return;
 				}
 			}
-
+			
 			console.log('Lang: ' + lang_param);
-
+			
 			// Set to English if language is not in list of good langs
 			if ($.inArray(lang_param, good_langs) === -1 && lang_param !== 'test') {
 				lang_param = "en";
 			}
-
-			// don't bother on first run if language is English
+	
+			// don't bother on first run if language is English		
 			// The following line prevents setLang from running
 			//    extensions which depend on updated uiStrings,
 			//    so commenting it out.
 			// if (lang_param.indexOf("en") === 0) {return;}
 
 		}
-
+		
 		var conf = editor.curConfig;
-
+		
 		var url = conf.langPath + "lang." + lang_param + ".js";
-
+		
 		$.getScript(url, function(d) {
 			// Fails locally in Chrome 5+
 			if (!d) {
@@ -324,8 +321,8 @@ var svgEditor = (function($, editor) {'use strict';
 				document.querySelector('head').appendChild(s);
 			}
 		});
-
+		
 	};
-
+	
 	return editor;
 }(jQuery, svgEditor));

@@ -18,7 +18,7 @@ if(jQuery)( function() {
 	var doc = $(document);
 
 	$.extend($.fn, {
-
+		
 		contextMenu: function(o, callback) {
 			// Defaults
 			if( o.menu == undefined ) return false;
@@ -31,7 +31,7 @@ if(jQuery)( function() {
 			$(this).each( function() {
 				var el = $(this);
 				var offset = $(el).offset();
-
+			
 				var menu = $('#' + o.menu);
 
 				// Add contextMenu class
@@ -47,18 +47,18 @@ if(jQuery)( function() {
 							// Hide context menus that may be showing
 							$(".contextMenu").hide();
 							// Get this context menu
-
+						
 							if( el.hasClass('disabled') ) return false;
-
+							
 							// Detect mouse position
 							var d = {}, x = e.pageX, y = e.pageY;
-
-							var x_off = win.width() - menu.width(),
+							
+							var x_off = win.width() - menu.width(), 
 								y_off = win.height() - menu.height();
 
 							if(x > x_off - 15) x = x_off-15;
 							if(y > y_off - 30) y = y_off-30; // 30 is needed to prevent scrollbars in FF
-
+							
 							// Show the menu
 							doc.unbind('click');
 							menu.css({ top: y, left: x }).fadeIn(o.inSpeed);
@@ -69,7 +69,7 @@ if(jQuery)( function() {
 							}).mouseout( function() {
 								menu.find('LI.hover').removeClass('hover');
 							});
-
+							
 							// Keyboard
 							doc.keypress( function(e) {
 								switch( e.keyCode ) {
@@ -97,7 +97,7 @@ if(jQuery)( function() {
 									break
 								}
 							});
-
+							
 							// When items are selected
 							menu.find('A').unbind('mouseup');
 							menu.find('LI:not(.disabled) A').mouseup( function() {
@@ -107,7 +107,7 @@ if(jQuery)( function() {
 								if( callback ) callback( $(this).attr('href').substr(1), $(srcElement), {x: x - offset.left, y: y - offset.top, docX: x, docY: y} );
 								return false;
 							});
-
+							
 							// Hide bindings
 							setTimeout( function() { // Delay for Mozilla
 								doc.click( function() {
@@ -119,23 +119,22 @@ if(jQuery)( function() {
 						}
 					});
 				});
-
+				
 				// Disable text selection
-				//if( $.browser.mozilla ) {
-					//$('#' + o.menu).each( function() { $(this).css({ 'MozUserSelect' : 'none' }); });
-				//} else if( $.browser.msie ) {
-					//$('#' + o.menu).each( function() { $(this).bind('selectstart.disableTextSelect', function() { return false; }); });
-				//} else {
-					//$('#' + o.menu).each(function() { $(this).bind('mousedown.disableTextSelect', function() { return false; }); });
-				//}
+				if( $.browser.mozilla ) {
+					$('#' + o.menu).each( function() { $(this).css({ 'MozUserSelect' : 'none' }); });
+				} else if( $.browser.msie ) {
+					$('#' + o.menu).each( function() { $(this).bind('selectstart.disableTextSelect', function() { return false; }); });
+				} else {
 					$('#' + o.menu).each(function() { $(this).bind('mousedown.disableTextSelect', function() { return false; }); });
+				}
 				// Disable browser context menu (requires both selectors to work in IE/Safari + FF/Chrome)
 				$(el).add($('UL.contextMenu')).bind('contextmenu', function() { return false; });
-
+				
 			});
 			return $(this);
 		},
-
+		
 		// Disable context menu items on the fly
 		disableContextMenuItems: function(o) {
 			if( o == undefined ) {
@@ -148,13 +147,13 @@ if(jQuery)( function() {
 					var d = o.split(',');
 					for( var i = 0; i < d.length; i++ ) {
 						$(this).find('A[href="' + d[i] + '"]').parent().addClass('disabled');
-
+						
 					}
 				}
 			});
 			return( $(this) );
 		},
-
+		
 		// Enable context menu items on the fly
 		enableContextMenuItems: function(o) {
 			if( o == undefined ) {
@@ -167,13 +166,13 @@ if(jQuery)( function() {
 					var d = o.split(',');
 					for( var i = 0; i < d.length; i++ ) {
 						$(this).find('A[href="' + d[i] + '"]').parent().removeClass('disabled');
-
+						
 					}
 				}
 			});
 			return( $(this) );
 		},
-
+		
 		// Disable context menu(s)
 		disableContextMenu: function() {
 			$(this).each( function() {
@@ -181,7 +180,7 @@ if(jQuery)( function() {
 			});
 			return( $(this) );
 		},
-
+		
 		// Enable context menu(s)
 		enableContextMenu: function() {
 			$(this).each( function() {
@@ -189,7 +188,7 @@ if(jQuery)( function() {
 			});
 			return( $(this) );
 		},
-
+		
 		// Destroy context menu(s)
 		destroyContextMenu: function() {
 			// Destroy specified context menus
@@ -199,6 +198,6 @@ if(jQuery)( function() {
 			});
 			return( $(this) );
 		}
-
+		
 	});
 })(jQuery);

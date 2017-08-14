@@ -170,12 +170,6 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
             });
         },
 
-        svgEdit: function() {
-            requirejs(['jsx!pages/svg-editor_2'], function(view) {
-                _display(view);
-            });
-        },
-
         usb: function() {
             requirejs(['jsx!pages/usb'], function(view) {
                 _display(view);

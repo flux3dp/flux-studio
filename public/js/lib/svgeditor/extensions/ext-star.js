@@ -33,21 +33,6 @@ svgEditor.addExtension('star', function(S){'use strict';
 		$('#star_panel').toggle(on);
 	}
 
-	function setAttrs(element, attrs) {
-		var obj = {};
-		attrs.forEach(function(el) {
-			obj[el] = $(element).attr(el);
-		});
-		return obj
-	};
-
-	function getAttrs(element, attrs) {
-		var obj = {};
-		attrs.forEach(function(el) {
-				obj[el] = el;
-			});
-			return obj
-		};
 	/*
 	function toggleSourceButtons(on){
 		$('#star_save, #star_cancel').toggle(on);
@@ -163,9 +148,7 @@ svgEditor.addExtension('star', function(S){'use strict';
 			if (svgCanvas.getMode() == 'star') {
 				var x = opts.mouse_x;
 				var y = opts.mouse_y;
-				console.log('star', x, y);
-				//var c = $(newFO).attr(['cx', 'cy', 'point', 'orient', 'fill', 'strokecolor', 'strokeWidth', 'radialshift']);
-				var c = setAttrs(newFO, ['cx', 'cy', 'point', 'orient', 'fill', 'strokecolor', 'strokeWidth', 'radialshift']);
+				var c = $(newFO).attr(['cx', 'cy', 'point', 'orient', 'fill', 'strokecolor', 'strokeWidth', 'radialshift']);
 
 				var cx = c.cx, cy = c.cy, fill = c.fill, strokecolor = c.strokecolor, strokewidth = c.strokeWidth, radialShift = c.radialshift, point = c.point, orient = c.orient, circumradius = (Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy))) / 1.5, inradius = circumradius / document.getElementById('starRadiusMulitplier').value;
 				newFO.setAttributeNS(null, 'r', circumradius);
@@ -184,10 +167,7 @@ svgEditor.addExtension('star', function(S){'use strict';
 					x = (circumradius * Math.cos(angle)) + cx;
 					y = (circumradius * Math.sin(angle)) + cy;
 
-					x = Math.round(x * 10000)/10000
-					y = Math.round(y * 10000)/10000
-
-					polyPoints += x.toString() + ',' + y.toString() + ' ';
+					polyPoints += x + ',' + y + ' ';
 
 					if (null != inradius) {
 						angle = (2.0 * Math.PI * (s / point)) + (Math.PI / point);
@@ -201,13 +181,9 @@ svgEditor.addExtension('star', function(S){'use strict';
 						x = (inradius * Math.cos(angle)) + cx;
 						y = (inradius * Math.sin(angle)) + cy;
 
-					x = Math.round(x * 10000)/10000
-					y = Math.round(y * 10000)/10000
-
-					polyPoints += x.toString() + ',' + y.toString() + ' ';
+						polyPoints += x + ',' + y + ' ';
 					}
 				}
-				console.log('newFO', newFO);
 				newFO.setAttributeNS(null, 'points', polyPoints);
 				newFO.setAttributeNS(null, 'fill', fill);
 				newFO.setAttributeNS(null, 'stroke', strokecolor);
@@ -222,8 +198,7 @@ svgEditor.addExtension('star', function(S){'use strict';
 		},
 		mouseUp: function(){
 			if (svgCanvas.getMode() == 'star') {
-				//var attrs = $(newFO).attr(['r']);
-				var attrs = getAttrs(newFO, ['r']);
+				var attrs = $(newFO).attr(['r']);
 				// svgCanvas.addToSelection([newFO], true);
 				return {
 					keep: (attrs.r != 0),

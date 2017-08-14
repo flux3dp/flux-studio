@@ -1,55 +1,145 @@
+requirejs.config({
+  paths: {
+      svgEditor:          'app/actions/beambox',    
+
+      svgedit:            'lib/svgeditor/svgedit',
+      jquerySvg:          'lib/svgeditor/jquery-svg',
+      jqueryContextMenu:  'lib/svgeditor/contextmenu/jquery.contextMenu',
+      pathseg:            'lib/svgeditor/pathseg',
+      browser:            'lib/svgeditor/browser',
+      svgtransformlist:   'lib/svgeditor/svgtransformlist',
+      math:               'lib/svgeditor/math',
+      units:              'lib/svgeditor/units',
+      svgutils:           'lib/svgeditor/svgutils',
+      sanitize:           'lib/svgeditor/sanitize',
+      history:            'lib/svgeditor/history',
+      historyrecording:   'lib/svgeditor/historyrecording',
+      coords:             'lib/svgeditor/coords',
+      recalculate:        'lib/svgeditor/recalculate',
+      select:             'lib/svgeditor/select',
+      draw:               'lib/svgeditor/draw',
+      layer:              'lib/svgeditor/layer',
+      path:               'lib/svgeditor/path',
+      svgcanvas:          'lib/svgeditor/svgcanvas',
+      locale:             'lib/svgeditor/locale/locale',
+      contextmenu:        'lib/svgeditor/contextmenu',
+  },
+  shim: {
+    //load in the same order with js/lib/svgeditor/svg-editor.html
+    svgedit: {
+      deps: [ 'jquery' ]
+    },
+    jquerySvg: {
+      deps: [ 'svgedit' ]
+    },
+    jqueryContextMenu: {
+      deps: [ 'jquerySvg' ]
+    },
+    pathseg: {
+      deps: [ 'jqueryContextMenu' ]
+    },
+    browser: {
+      deps: [ 'pathseg' ]
+    },
+    svgtransformlist: {
+      deps: [ 'browser' ]
+    },
+    math: {
+      deps: [ 'svgtransformlist' ]
+    },
+    units: {
+      deps: [ 'math' ]
+    },
+    svgutils: {
+      deps: [ 'units' ]
+    },
+    sanitize: {
+      deps: [ 'svgutils' ]
+    },
+    history: {
+      deps: [ 'sanitize' ]
+    },
+    historyrecording: {
+      deps: [ 'history' ]
+    },
+    coords: {
+      deps: [ 'historyrecording' ]
+    },
+    recalculate: {
+      deps: [ 'coords' ]
+    },
+    select: {
+      deps: [ 'recalculate' ]
+    },
+    draw: {
+      deps: [ 'select' ]
+    },
+    layer: {
+      deps: [ 'draw' ]
+    },
+    path: {
+      deps: [ 'layer' ]
+    },
+    svgcanvas: {
+      deps: [ 'path' ]
+    },
+    svgEditor: {
+      deps: [ 'svgcanvas' ]
+    },
+    locale: {
+      deps: [ 'svgEditor' ]
+    },
+    contextmenu: {
+      deps: [ 'locale' ]
+    },
+    
+  }
+});
 define([
-    'jquery',
     'react',
     'helpers/api/config',
     'helpers/i18n',
 
-//    'lib/pathseg',
+   'svgeditor/js-hotkeys/jquery.hotkeys.min',
+   'svgeditor/jquerybbq/jquery.bbq.min',
+   'svgeditor/svgicons/jquery.svgicons',
+   'svgeditor/jgraduate/jquery.jgraduate.min',
+   'svgeditor/spinbtn/JQuerySpinBtn.min',
+   'svgeditor/touch',
 
+   'svgedit',
+   'jquerySvg',
+   'jqueryContextMenu',
+   'pathseg',
+   'browser',
+   'svgtransformlist',
+   'math',
+   'units',
+   'svgutils',
+   'sanitize',
+   'history',
+   'historyrecording',
+   'coords',
+   'recalculate',
+   'select',
+   'draw',
+   'layer',
+   'path',
+   'svgcanvas',
+   'svgEditor',
+   'locale',
+   'contextmenu',
 
-  //  'svgeditor/js-hotkeys/jquery.hotkeys.min',
-  //  'svgeditor/jquerybbq/jquery.bbq.min',
-  //  'svgeditor/svgicons/jquery.svgicons',
-  //  'svgeditor/jgraduate/jquery.jgraduate.min',
-  //  'svgeditor/spinbtn/JQuerySpinBtn.min',
-  //  'svgeditor/touch',
-
-//    'svgeditor/svgedit',
-//    'svgeditor/jquery-svg',
-//    'svgeditor/contextmenu/jquery.contextMenu',
-//    'svgeditor/pathseg',
-//    'svgeditor/browser',
-//    'svgeditor/svgtransformlist',
-//    'svgeditor/math',
-//    'svgeditor/units',
-//    'svgeditor/svgutils',
-//    'svgeditor/sanitize',
-//    'svgeditor/history',
-//    'svgeditor/historyrecording',
-//    'svgeditor/coords',
-//    'svgeditor/recalculate',
-//    'svgeditor/select',
-//    'svgeditor/draw',
-//    'svgeditor/layer',
-//    'svgeditor/path',
-//    'svgeditor/svgcanvas',
-    'svgeditor/svg-editor',
-//    'svgeditor/locale/locale',
-//    'svgeditor/contextmenu',
-//
-//    'svgeditor/jquery-ui/jquery-ui-1.8.17.custom.min',
-//    'svgeditor/jgraduate/jpicker',
-
-    //'svgeditor/config',
+   'svgeditor/jquery-ui/jquery-ui-1.8.17.custom.min',
+   'svgeditor/jgraduate/jpicker',
 
     'css!svgeditor/svg-editor',
-    'css!svgeditor/jgraduate/css/jPicker.css',
-    'css!svgeditor/jgraduate/css/jgraduate.css',
-    'css!svgeditor/spinbtn/JQuerySpinBtn.css',
+    'css!svgeditor/jgraduate/css/jPicker',
+    'css!svgeditor/jgraduate/css/jgraduate',
+    'css!svgeditor/spinbtn/JQuerySpinBtn',
     //'css!svgeditor/custom.css'
 
 ], function(
-    $,
     React,
     ConfigHelper,
     i18n
