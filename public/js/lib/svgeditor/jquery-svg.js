@@ -25,9 +25,10 @@
   var proxied = jQuery.fn.attr,
     // TODO use NS.SVG instead
     svgns = "http://www.w3.org/2000/svg";
+    console.log('svgns', svgns);
   jQuery.fn.attr = function(key, value) {
     var i, attr;
-	var len = this.length;
+	  var len = this.length;
     if (!len) {return proxied.apply(this, arguments);}
     for (i = 0; i < len; ++i) {
       var elem = this[i];

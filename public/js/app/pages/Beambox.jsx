@@ -1,11 +1,22 @@
 define([
     'react',
+    'app/actions/beambox',
+    //'app/actions/laser',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
+    'jsx!views/laser/Setup-Panel',
     'jsx!pages/svg-editor',
+    'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/i18n',
 ], function(
     React,
+    laserEvents,
+    ProgressActions,
+    ProgressConstants,
+    LaserSetupPanel,
     SvgGenerator,
+    ButtonGroup,
     ConfigHelper,
     i18n
 ) {
@@ -17,25 +28,23 @@ define([
 
     return function(args = {}) {
         let Svg = SvgGenerator(args);
+            self = this;
 
         class view extends React.Component {
-          constructor(props){
-            super(props);
-            this.state = {
-              options: {
-                  material: lang.laser.advanced.form.object_options.options[0],
-                  objectHeight: 0,
-                  heightOffset: 0,
-                  isShading: false
-              }
-            }
-          }
-
-          //static get defaultProps() {
-          //    return {
-          //        page: React.PropTypes.string
+          constructor(){
+            super();
+            this.laserEvents = laserEvents();
+          //  this.state = {
+          //    options: {
+          //        material: lang.laser.advanced.form.object_options.options[0],
+          //        laserEvents: laserEvents.call(this, args),
+          //        test: 0,
+          //        objectHeight: 0,
+          //        heightOffset: 0,
+          //        isShading: false
           //    }
-          //}
+          //  }
+          }
 
           componentDidMount() {
             let options = Config.read('laser-defaults') || {};
@@ -50,48 +59,92 @@ define([
                 Config.write('laser-defaults', options);
             }
             this.setState({options});
-
           }
 
-        //  _fetchFormalSettings(hilder) {
-        //      let options = Config.read('laser-defaults') || {},
-        //          max = lang.laser.advanced.form.power.ma
-        //      return {
-        //          object_height: options.objectHeight,
-        //          height_offset: options.heightOffset || 0,
-        //          laser_speed: options.material.data.laser_speed,
-        //          calibration: holder.state.debug || 0,
-        //          power: options.material.data.power / max,
-        //          shading: (true === holder.refs.setupPanel.isShading() ? 1 : 0)
-        //      };
-        //  }
-//
-        //  _renderSetupPanel(holder) {
-        //      return <LaserSetupPanel
-        //          page={holder.props.page}
-        //          className="operating-panel"
-        //          imageFormat={holder.state.fileFormat}
-        //          defaults={holder.state.panelOptions}
-        //          onLoadCalibrationImage = { holder._onLoadCalibrationImage }
-        //          ref="setupPanel"
-        //          onShadingChanged={holder._onShadingChanged}
-        //      />;
-      //  }
-          getIframelyHtml() {
-            return {
-              __html: '<div><iframe src="http://127.0.0.1:8111/js/lib/svgeditor/svg-editor.html" \
-                        width=1000 height=600" \
-                        style=" position: absolute; \
-                                left: 50%; \
-                                top: 100px; \
-                                transform: translate(-50%);">\
-                      </iframe></div>'
-            };
+          _fetchFormalSettings(holder) {
+              let options = Config.read('laser-defaults') || {},
+                  max = lang.laser.advanced.form.power.max;
+              return {
+                  object_height: options.objectHeight,
+                  height_offset: options.heightOffset || 0,
+                  laser_speed: options.material.data.laser_speed,
+                  //calibration: holder.state.debug || 0,
+                  calibration: 0,
+                  power: options.material.data.power / max,
+                  //shading: (true === holder.refs.setupPanel.isShading() ? 1 : 0)
+                  shading: true
+              };
+          }
+
+          _handleExportClick(filemode) {
+              this.laserEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
+          }
+
+          _renderActionButtons() {
+              console.log('randerActionButtons', this);
+              //globalInteraction.onImageChanged(this.state.hasImage);
+
+              var cx = React.addons.classSet,
+                  buttons = [{
+                      label: lang.laser.get_fcode,
+                      className: cx({
+                          //'btn-disabled': !this.state.hasImage,
+                          'btn-disabled': false,
+                          'btn-default': true,
+                          'btn-hexagon': true,
+                          'btn-get-fcode': true
+                      }),
+                      dataAttrs: {
+                          'ga-event': 'get-laser-fcode'
+                      },
+                      onClick: this._handleExportClick.bind(this, '-f')
+                  }, {
+                      label: lang.monitor.start,
+                      className: cx({
+                          //'btn-disabled': !this.state.hasImage,
+                          'btn-disabled': false,
+                          'btn-default': true,
+                          'btn-hexagon': true,
+                          'btn-go': true
+                      }),
+                      dataAttrs: {
+                          'ga-event': 'laser-goto-monitor'
+                      },
+                      //onClick: this._handleStartClick
+                  }];
+
+              if (this.props.page === 'laser') {
+                  buttons = [{
+                      label: lang.laser.showOutline,
+                      className: cx({
+                          //'btn-disabled': !this.state.hasImage,
+                          'btn-disabled': false,
+                          'btn-default': true,
+                          'btn-hexagon': true,
+                          'btn-go': true
+                      }),
+                      dataAttrs: {
+                          'ga-event': 'holder-outline'
+                      },
+                      //onClick: this._handleShowOutlineClick
+                  }].concat(buttons);
+              }
+
+              return (
+                  <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
+              );
           }
 
           render() {
-            //return <div dangerouslySetInnerHTML={this.getIframelyHtml()} />
-            return <Svg />
+            var actionButtons = this._renderActionButtons();
+            return (
+                    <div className="studio-container laser-studio">
+                      <div className="stage">
+                        <Svg />
+                          {actionButtons}
+                      </div>
+                    </div>
+            );
           }
         }
 

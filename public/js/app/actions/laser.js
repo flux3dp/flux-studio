@@ -301,7 +301,6 @@ define([
                     mm = DIAMETER - mm;
                 }
 
-                console.log('axis', axis, mm);
                 return round(mm, -2);
             },
             convertToHtmlCoordinate = function(n, axis) {
@@ -312,13 +311,13 @@ define([
                 n = parseFloat(n, 10);
                 px = n * ratio;
 
-                console.log('234234', freetrans, PLATFORM_DIAMETER_PIXEL, DIAMETER, n, px);
-                console.log('$target_image.width', $target_image.width())
-
                 if ('x' === axis) {
                     px -= ($target_image.width() * freetrans.scalex / 2);
                     px -= ($target_image.width() * (1 - freetrans.scalex));
-                    //px = PLATFORM_DIAMETER_PIXEL - px;
+
+                    //Horizontal mirror xaxis
+                    px = PLATFORM_DIAMETER_PIXEL - px - $target_image.width();
+                    px -= ($target_image.width() * (1 - freetrans.scalex));
                 }
                 else {
                     px -= ($target_image.height() * freetrans.scaley  / 2);
@@ -525,6 +524,7 @@ define([
                                         if (args.length === $ft_controls.length) {
                                             // sending data
                                             if (fileFormat === 'svg') {
+                                               console.log('imageData', args, settings, _callback, fileMode);
                                                 sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {
@@ -926,6 +926,7 @@ define([
                 fileFormat = extension;
                 ProgressActions.open(ProgressConstants.NONSTOP);
 
+                console.log('currentFileFormat', currentFileFormat);
                 if ('string' !== typeof currentFileFormat) {
                     currentFileFormat = ('svg' === extension.toLowerCase() ? 'svg' : 'bitmap');
                     // in draw mode. only svg files are acceptable.
@@ -934,6 +935,7 @@ define([
                         fileFormat: currentFileFormat
                     });
                 }
+                console.log('currentFileFormat', currentFileFormat);
                 if (extension === 'svg') {
                     svgWebSocket = svgWebSocket || svgLaserParser({
                         type: self.props.page
@@ -944,6 +946,8 @@ define([
                 }
             },
             onFileReadEnd: function(e, files) {
+
+                console.log('before onFileReadEnd', e, files);
                 var parserSocket;
 
                 // go svg process
@@ -960,6 +964,7 @@ define([
                     file.uploadName = file.url.split('/').pop();
                 });
 
+                console.log('after onFileReadEnd', e, files);
                 parserSocket.upload(files).always(_onUploadResponse).done(_onUploaded);
             },
             thresholdChanged: function(threshold) {

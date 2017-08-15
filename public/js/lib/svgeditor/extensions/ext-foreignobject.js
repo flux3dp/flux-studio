@@ -5,8 +5,8 @@
  *
  * Licensed under the Apache License, Version 2
  *
- * Copyright(c) 2010 Jacques Distler 
- * Copyright(c) 2010 Alexis Deveria 
+ * Copyright(c) 2010 Jacques Distler
+ * Copyright(c) 2010 Alexis Deveria
  *
  */
 
@@ -177,7 +177,7 @@ svgEditor.addExtension("foreignObject", function(S) {
 						} else {
 							endChanges();
 						}
-						// setSelectMode();	
+						// setSelectMode();
 					});
 
 				var cancel = $('#tool_source_cancel').clone()
