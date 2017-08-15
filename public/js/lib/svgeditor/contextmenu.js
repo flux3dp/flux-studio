@@ -47,7 +47,7 @@ var svgedit = svgedit || {};
 			$("#cmenu_canvas").append("<li class='separator'>");
 		}
 		var shortcut = menuItem.shortcut || "";
-		$("#cmenu_canvas").append("<li class='disabled'><a href='#" + menuItem.id + "'>"
+		$("#cmenu_canvas").append("<li class='disabled'><a href='#" + menuItem.id + "' onclick='return false;'>"
 									+ menuItem.label + "<span class='shortcut'>"
 									+ shortcut + "</span></a></li>");
 	};

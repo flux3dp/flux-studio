@@ -101,7 +101,6 @@ requirejs([
 ], function($, Backbone, Router, globalEvents, Raven) {
     'use strict';
 
-    window.$ = window.jQuery = $;
     console.log(`Flux-Studio: ${window.FLUX.version}`);
 
     if(window.FLUX.allowTracking) {

@@ -54,7 +54,7 @@ TODOS
 				lang: '', // Default to "en" if locale.js detection does not detect another language
 				iconsize: '', // Will default to 's' if the window height is smaller than the minimum height and 'm' otherwise
 				bkgd_color: '#FFF',
-				bkgd_url: 'img/laser-platform2.png',
+				bkgd_url: '',
 				// DOCUMENT PROPERTIES (DIALOG)
 				img_save: 'embed',
 				// ALERT NOTICES
@@ -122,7 +122,7 @@ TODOS
 				colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
 				initTool: 'select',
 				exportWindowType: 'new', // 'same' (todo: also support 'download')
-				wireframe: false,
+				wireframe: true,
 				showlayers: false,
 				no_save_warning: false,
 				// PATH CONFIGURATION
@@ -148,7 +148,7 @@ TODOS
 				lockExtensions: false, // Disallowed in URL setting
 				noDefaultExtensions: false, // noDefaultExtensions can only be meaningfully used in config.js or in the URL
 				// EXTENSION-RELATED (GRID)
-				showGrid: false, // Set by ext-grid.js
+				showGrid: true, // Set by ext-grid.js
 				// EXTENSION-RELATED (STORAGE)
 				noStorageOnLoad: false, // Some interaction with ext-storage.js; prevent even the loading of previously saved local storage
 				forceStorage: false, // Some interaction with ext-storage.js; strongly discouraged from modification as it bypasses user privacy by preventing them from choosing whether to keep local storage or not
@@ -4335,6 +4335,13 @@ TODOS
 				workarea.css('right', parseInt(workarea.css('right'), 10) + delta);
 
 				svgCanvas.runExtensions('workareaResized');
+
+				// var rulerX = $('#ruler_x');
+				// $('#sidepanels').width('+=' + delta);
+				// $('#layerpanel').width('+=' + delta);
+				// rulerX.css('right', parseInt(rulerX.css('right'), 10) + delta);
+				// workarea.css('right', parseInt(workarea.css('right'), 10) + delta);
+				// svgCanvas.runExtensions('workareaResized');
 			};
 
 			var resizeSidePanel = function(evt) {

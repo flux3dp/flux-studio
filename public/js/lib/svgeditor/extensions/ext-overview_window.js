@@ -69,8 +69,8 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 	var updateViewDimensions= function(){
 		var viewWidth=$("#svgroot").attr("width");
 		var viewHeight=$("#svgroot").attr("height");
-		var viewX=640;
-		var viewY=480;
+		var viewX=svgEditor.curConfig.dimensions[0];
+		var viewY=svgEditor.curConfig.dimensions[1];
 		
 		if(svgedit.browser.isIE())
 		{

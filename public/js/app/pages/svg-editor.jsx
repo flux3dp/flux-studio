@@ -2,6 +2,13 @@ requirejs.config({
   paths: {
       svgEditor:          'app/actions/svg-editor',    
 
+      jsHotkeys:          'lib/svgeditor/js-hotkeys/jquery.hotkeys.min',
+      jquerybbq:          'lib/svgeditor/jquerybbq/jquery.bbq.min',
+      svgicons:           'lib/svgeditor/svgicons/jquery.svgicons',
+      jgraduate:          'lib/svgeditor/jgraduate/jquery.jgraduate.min',
+      spinbtn:            'lib/svgeditor/spinbtn/JQuerySpinBtn.min',
+      touch:              'lib/svgeditor/touch',
+
       svgedit:            'lib/svgeditor/svgedit',
       jquerySvg:          'lib/svgeditor/jquery-svg',
       jqueryContextMenu:  'lib/svgeditor/contextmenu/jquery.contextMenu',
@@ -23,11 +30,34 @@ requirejs.config({
       svgcanvas:          'lib/svgeditor/svgcanvas',
       locale:             'lib/svgeditor/locale/locale',
       contextmenu:        'lib/svgeditor/contextmenu',
+
+      jqueryUi:           'lib/svgeditor/jquery-ui/jquery-ui-1.8.17.custom.min',
+      jpicker:            'lib/svgeditor/jgraduate/jpicker',
   },
   shim: {
     //load in the same order with js/lib/svgeditor/svg-editor.html
-    svgedit: {
+    jsHotkeys: {
       deps: [ 'jquery' ]
+    },
+    jquerybbq: {
+      deps: [ 'jsHotkeys' ]
+    },
+    svgicons: {
+      deps: [ 'jquerybbq' ]
+    },
+    jgraduate: {
+      deps: [ 'svgicons' ]
+    },
+    spinbtn: {
+      deps: [ 'jgraduate' ]
+    },
+    touch: {
+      deps: [ 'spinbtn' ]
+    },
+
+
+    svgedit: {
+      deps: [ 'touch' ]
     },
     jquerySvg: {
       deps: [ 'svgedit' ]
@@ -92,6 +122,12 @@ requirejs.config({
     contextmenu: {
       deps: [ 'locale' ]
     },
+    jqueryUi: {
+      deps: [ 'contextmenu' ]
+    },
+    jpicker: {
+      deps: [ 'jqueryUi' ]
+    },
     
   }
 });
@@ -100,12 +136,12 @@ define([
     'helpers/api/config',
     'helpers/i18n',
 
-   'svgeditor/js-hotkeys/jquery.hotkeys.min',
-   'svgeditor/jquerybbq/jquery.bbq.min',
-   'svgeditor/svgicons/jquery.svgicons',
-   'svgeditor/jgraduate/jquery.jgraduate.min',
-   'svgeditor/spinbtn/JQuerySpinBtn.min',
-   'svgeditor/touch',
+   'jsHotkeys',
+   'jquerybbq',
+   'svgicons',
+   'jgraduate',
+   'spinbtn',
+   'touch',
 
    'svgedit',
    'jquerySvg',
@@ -130,8 +166,8 @@ define([
    'locale',
    'contextmenu',
 
-   'svgeditor/jquery-ui/jquery-ui-1.8.17.custom.min',
-   'svgeditor/jgraduate/jpicker',
+   'jqueryUi',
+   'jpicker',
 
     'css!svgeditor/svg-editor',
     'css!svgeditor/jgraduate/css/jPicker',
@@ -151,12 +187,16 @@ define([
 
     return function(args = {}) {
 
-        class view extends React.Component {
+      class view extends React.Component {
           componentDidMount(node) {
               $(svgEditor.init);
               setTimeout(() => {
                 $('#svg_editor').show();
               }, 500);
+          }
+
+          _handleDisableHref() {
+              return false;
           }
 
           render() {
@@ -1409,63 +1449,63 @@ define([
                                       </div>
                                       <ul id="cmenu_canvas" className="contextMenu">
                                         <li>
-                                          <a href="#cut">Cut</a>
+                                          <a href="#cut" onClick={this._handleDisableHref}>Cut</a>
                                         </li>
                                         <li>
-                                          <a href="#copy">Copy</a>
+                                          <a href="#copy" onClick={this._handleDisableHref}>Copy</a>
                                         </li>
                                         <li>
-                                          <a href="#paste">Paste</a>
+                                          <a href="#paste" onClick={this._handleDisableHref}>Paste</a>
                                         </li>
                                         <li>
-                                          <a href="#paste_in_place">Paste in Place</a>
+                                          <a href="#paste_in_place" onClick={this._handleDisableHref}>Paste in Place</a>
                                         </li>
                                         <li className="separator">
-                                          <a href="#delete">Delete</a>
+                                          <a href="#delete" onClick={this._handleDisableHref}>Delete</a>
                                         </li>
                                         <li className="separator">
-                                          <a href="#group">
+                                          <a href="#group" onClick={this._handleDisableHref}>
                                             Group<span className="shortcut">G</span>
                                         </a>
                                       </li>
                                       <li>
-                                        <a href="#ungroup">
+                                        <a href="#ungroup" onClick={this._handleDisableHref}>
                                           Ungroup<span className="shortcut">G</span>
                                       </a>
                                     </li>
                                     <li className="separator">
-                                      <a href="#move_front">
+                                      <a href="#move_front" onClick={this._handleDisableHref}>
                                         Bring to Front<span className="shortcut">SHFT+CTRL+]</span>
                                     </a>
                                   </li>
                                   <li>
-                                    <a href="#move_up">
+                                    <a href="#move_up" onClick={this._handleDisableHref}>
                                       Bring Forward<span className="shortcut">CTRL+]</span>
                                   </a>
                                 </li>
                                 <li>
-                                  <a href="#move_down">
+                                  <a href="#move_down" onClick={this._handleDisableHref}>
                                     Send Backward<span className="shortcut">CTRL+[</span>
                                   </a>
                                 </li>
                                 <li>
-                                  <a href="#move_back">
+                                  <a href="#move_back" onClick={this._handleDisableHref}>
                                     Send to Back<span className="shortcut">SHFT+CTRL+[</span>
                                   </a>
                                 </li>
                               </ul>
                               <ul id="cmenu_layers" className="contextMenu">
                                 <li>
-                                  <a href="#dupe">Duplicate Layer...</a>
+                                  <a href="#dupe" onClick={this._handleDisableHref}>Duplicate Layer...</a>
                                 </li>
                                 <li>
-                                  <a href="#delete">Delete Layer</a>
+                                  <a href="#delete" onClick={this._handleDisableHref}>Delete Layer</a>
                                 </li>
                                 <li>
-                                  <a href="#merge_down">Merge Down</a>
+                                  <a href="#merge_down" onClick={this._handleDisableHref}>Merge Down</a>
                                 </li>
                                 <li>
-                                  <a href="#merge_all">Merge All</a>
+                                  <a href="#merge_all" onClick={this._handleDisableHref}>Merge All</a>
                                 </li>
                               </ul>
                             </div>
