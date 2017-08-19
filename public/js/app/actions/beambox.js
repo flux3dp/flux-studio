@@ -38,6 +38,11 @@ define([
         return uploadFiles
     };
 
+    var ExportGCodeProgressing = function(data) {
+            ProgressActions.open(ProgressConstants.STEPPING);
+            ProgressActions.updating(data.message, data.percentage * 100);
+        };
+
     var sendToSVGAPI = function(args, settings, callback, fileMode) {
             console.log('sendToSVGAPI', args, settings, callback, fileMode);
             callback = callback || function() {};
@@ -47,6 +52,7 @@ define([
                     laserParser.uploadToSvgeditorAPI(args).done(onComputeFinished);
                 },
                 onComputeFinished = function() {
+                    console.log('onComputeFinished')
                     var names = [],
                         all_svg = laserParser.History.get();
 
@@ -91,7 +97,8 @@ define([
                     console.log('Bang!');
 
                     var uploadFiles = [];
-                    $.get("js/lib/svgeditor/test.svg", (res) => {
+                    //============for testing ===============================
+                    $.get("js/lib/svgeditor/test2.svg", (res) => {
                       var data = new XMLSerializer().serializeToString(res);
                       var blob = new Blob([data], {type: 'image/svg+xml'});
                       var reader = new FileReader();
@@ -110,6 +117,7 @@ define([
                           index: 0,
                           totalFiles: 1
                         });
+                    //============for testing end============================
 
                         uploadFiles.forEach(function(file) {
                           file.uploadName = file.url.split('/').pop();
@@ -129,21 +137,22 @@ define([
           };
       return {
           exportTaskCode: function(settings, fileMode) {
-            console.log('exportTaskCode', settings, fileMode);
             var getToolpathCallback = (blob, fileMode) => {
                 var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
                     // split by . and get unless the last then join as string
-                    fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
+                    //fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
+                    fileName = 'test',
                     fullName = fileName + '.' + extension
                     ProgressActions.close();
+                    console.log('blob', blob);
                 saveAs(blob, fullName)
-            }
-              getToolpath(
-                  settings,
-                  getToolpathCallback,
-                  ProgressConstants.STEPPING,
-                  fileMode || '-f'
-              );
+            };
+            getToolpath(
+                settings,
+                getToolpathCallback,
+                ProgressConstants.STEPPING,
+                fileMode || '-f'
+            );
           },
       };
     };

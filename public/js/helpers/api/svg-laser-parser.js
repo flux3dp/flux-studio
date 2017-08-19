@@ -355,6 +355,7 @@ define([
                                 break;
                             case 'ok':
                                 console.log('done!');
+                                $deferred.resolve();
                                 break;
                                 //self.get(file).done(function(response) {
                                     //file.blob = response.blob;
@@ -405,6 +406,7 @@ define([
                         else if (file.extension && 'svg' === file.extension.toLowerCase()) {
                             sendFile(file);
                             currIndex += 1;
+                            console.log('currIndex', currIndex)
                         }
                         else {
                             setMessages(file, true, ['NOT_SUPPORT']);

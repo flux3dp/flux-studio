@@ -297,9 +297,9 @@ define([
                 var ratio = DIAMETER / PLATFORM_DIAMETER_PIXEL, // 1(px) : N(mm)
                     mm = ratio * px;
 
-                if (axis.toLowerCase() === 'x') {
-                    mm = DIAMETER - mm;
-                }
+                // if (axis.toLowerCase() === 'x') {
+                //     mm = DIAMETER - mm;
+                // }
 
                 return round(mm, -2);
             },
@@ -316,8 +316,8 @@ define([
                     px -= ($target_image.width() * (1 - freetrans.scalex));
 
                     //Horizontal mirror xaxis
-                    px = PLATFORM_DIAMETER_PIXEL - px - $target_image.width();
-                    px -= ($target_image.width() * (1 - freetrans.scalex));
+                    //    px = PLATFORM_DIAMETER_PIXEL - px - $target_image.width();
+                    //    px -= ($target_image.width() * (1 - freetrans.scalex));
                 }
                 else {
                     px -= ($target_image.height() * freetrans.scaley  / 2);
