@@ -276,6 +276,32 @@ define([
                             </tr>
                           </tbody>
                         </table>
+                        
+                        <h4>Laser Config</h4>
+                        <div id="layerLaserConfigs">
+                          <table>
+                            <caption className="layername" hidden>Layer 1</caption>
+                            <tbody>
+                              <tr>
+                                <td>Strength</td>
+                                <td>
+                                  <input type="number" name="layserStrength" defaultValue="50" min="1" max="100"/>
+                                </td>
+                                </tr>
+                              <tr>
+                                <td>Speed</td>
+                                <td>
+                                  <input type="number" name="layserSpeed" defaultValue="150" min="3" max="300"/>
+                                </td>
+                              </tr>
+                              <tr>
+                                <td>Shadow</td>
+                                <td><input type="checkbox" name="layserShading" /></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <hr/>
                         <span id="selLayerLabel">Move elements to:</span>
                         <select
                           id="selLayerNames"
@@ -1289,62 +1315,8 @@ define([
                                         <span id="svginfo_lang">Language:</span>
                                         {}
                                         <select id="lang_select">
-                                          <option id="lang_ar" value="ar">
-                                            العربية
-                                          </option>
-                                          <option id="lang_cs" value="cs">
-                                            Čeština
-                                          </option>
-                                          <option id="lang_de" value="de">
-                                            Deutsch
-                                          </option>
                                           <option id="lang_en" value="en" selected="selected">
                                             English
-                                          </option>
-                                          <option id="lang_es" value="es">
-                                            Español
-                                          </option>
-                                          <option id="lang_fa" value="fa">
-                                            فارسی
-                                          </option>
-                                          <option id="lang_fr" value="fr">
-                                            Français
-                                          </option>
-                                          <option id="lang_fy" value="fy">
-                                            Frysk
-                                          </option>
-                                          <option id="lang_hi" value="hi">
-                                            हिन्दी, हिंदी
-                                          </option>
-                                          <option id="lang_it" value="it">
-                                            Italiano
-                                          </option>
-                                          <option id="lang_ja" value="ja">
-                                            日本語
-                                          </option>
-                                          <option id="lang_nl" value="nl">
-                                            Nederlands
-                                          </option>
-                                          <option id="lang_pl" value="pl">
-                                            Polski
-                                          </option>
-                                          <option id="lang_pt-BR" value="pt-BR">
-                                            Português (BR)
-                                          </option>
-                                          <option id="lang_ro" value="ro">
-                                            Română
-                                          </option>
-                                          <option id="lang_ru" value="ru">
-                                            Русский
-                                          </option>
-                                          <option id="lang_sk" value="sk">
-                                            Slovenčina
-                                          </option>
-                                          <option id="lang_sl" value="sl">
-                                            Slovenščina
-                                          </option>
-                                          <option id="lang_zh-CN" value="zh-CN">
-                                            简体中文
                                           </option>
                                           <option id="lang_zh-TW" value="zh-TW">
                                             繁體中文

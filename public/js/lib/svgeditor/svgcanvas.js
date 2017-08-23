@@ -110,9 +110,6 @@ var clearSvgContentElement = canvas.clearSvgContentElement = function() {
 		'xmlns:xlink': NS.XLINK
 	}).appendTo(svgroot);
 
-	// TODO: make this string optional and set by the client
-	var comment = svgdoc.createComment(" Created with SVG-edit - https://github.com/SVG-Edit/svgedit");
-	svgcontent.appendChild(comment);
 };
 clearSvgContentElement();
 
@@ -2317,7 +2314,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 		if (!delta) {return;}
 
-		bbox.factor = Math.max(3/4, Math.min(4/3, (delta)));
+		bbox.factor = Math.max(95/100, Math.min(100/95, (delta)));
 	
 		call('zoomed', bbox);
 	});

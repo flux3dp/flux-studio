@@ -90,14 +90,16 @@ TODOS
 				'ext-overview_window.js',
 				'ext-markers.js',
 				'ext-connector.js',
-				'ext-eyedropper.js',
+				// 'ext-eyedropper.js',
 				'ext-shapes.js',
 				'ext-imagelib.js',
 				'ext-grid.js',
 				'ext-polygon.js',
 				'ext-star.js',
 				'ext-panning.js',
-				'ext-storage.js'
+				// 'ext-storage.js',
+
+				'ext-closepath.js',
 			],
 			defaultConfig = {
 				// Todo: svgcanvas.js also sets and checks: show_outside_canvas, selectNew; add here?
@@ -116,15 +118,15 @@ TODOS
 				text: {
 					stroke_width: 0,
 					font_size: 24,
-					font_family: 'serif'
+					font_family: 'monospace'
 				},
 				initOpacity: 1,
 				colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
 				initTool: 'select',
 				exportWindowType: 'new', // 'same' (todo: also support 'download')
 				wireframe: true,
-				showlayers: false,
-				no_save_warning: false,
+				showlayers: true,
+				no_save_warning: true,
 				// PATH CONFIGURATION
 				// The following path configuration items are disallowed in the URL (as should any future path configurations)
 				imgPath: 'js/lib/svgeditor/images/',
@@ -142,8 +144,8 @@ TODOS
 				snappingStep: 10,
 				showRulers: true,
 				// URL BEHAVIOR CONFIGURATION
-				preventAllURLConfig: false,
-				preventURLContentLoading: false,
+				preventAllURLConfig: true,
+				preventURLContentLoading: true,
 				// EXTENSION CONFIGURATION (see also preventAllURLConfig)
 				lockExtensions: false, // Disallowed in URL setting
 				noDefaultExtensions: false, // noDefaultExtensions can only be meaningfully used in config.js or in the URL
@@ -952,6 +954,42 @@ TODOS
 				}
 			};
 
+			var insertLayerLaserConfigs = function() {
+				const layerLaserConfigs = $('#layerLaserConfigs');
+				const layers = $('#svgcontent').find('g.layer');
+				
+
+				layers.each(function(){
+					layername = $(this).find('title').text();
+					const theConfig = layerLaserConfigs.find('table').filter(function(){
+						return $(this).find('.layername').text() === layername;
+					});
+					$(this).attr('data-strength', theConfig.find('[name="layserStrength"]').val());
+					$(this).attr('data-speed', theConfig.find('[name="layserSpeed"]').val());
+					$(this).attr('data-shading', theConfig.find('[name="layserShading"]').is(':checked'));
+				});				
+			}
+
+			var populateLayerLaserConfigs = function() {
+				var layerLaserConfigs = $('#layerLaserConfigs');
+				var drawing = svgCanvas.getCurrentDrawing();
+				var currentLayerName = drawing.getCurrentLayerName();
+				
+				layerLaserConfigs.find('table').each(function() {
+					$(this).hide();
+					if($(this).find('.layername').text() === currentLayerName) {
+						$(this).show();
+					}
+				});
+
+				insertLayerLaserConfigs();
+				layerLaserConfigs.find('input').change(function(){
+					insertLayerLaserConfigs();
+				});
+			}
+
+			
+
 			var populateLayers = function() {
 				svgCanvas.clearSelection();
 				var layerlist = $('#layerlist tbody').empty();
@@ -974,12 +1012,16 @@ TODOS
 					$('td.layervis', layerlist).append(copy);
 					$.resizeSvgIcons({'td.layervis .svg_icon': 14});
 				}
+
+				populateLayerLaserConfigs();
+				
 				// handle selection of layer
 				$('#layerlist td.layername')
 					.mouseup(function(evt) {
 						$('#layerlist tr.layer').removeClass('layersel');
 						$(this.parentNode).addClass('layersel');
 						svgCanvas.setCurrentLayer(this.textContent);
+						populateLayerLaserConfigs();				
 						evt.preventDefault();
 					})
 					.mouseover(function() {
@@ -1003,6 +1045,34 @@ TODOS
 					layerlist.append('<tr><td style="color:white">_</td><td/></tr>');
 				}
 			};
+
+			var addLayerLaserConfig = function(layername) {
+				$('#layerLaserConfigs').append(
+					'<table><caption class="layername" hidden>'+ layername +'</caption>\
+					<tbody>\
+						<tr>\
+							<td>Strength</td>\
+							<td><input type="number" name="layserStrength" value="50" min="1" max="100"/></td>\
+						</tr>\
+						<tr>\
+							<td>Speed</td>\
+							<td><input type="number" name="layserSpeed" value="150" min="3" max="300"/></td>\
+						</tr>\
+						<tr>\
+							<td>Shadow</td>\
+							<td><input type="checkbox" name="layserShading" /></td>\
+						</tr>\
+					</tbody>\
+				  </table>'
+				);
+			}
+
+			var cloneLayerLaserConfig = function(oldName, newName) {
+				const oldConfig = $('#layerLaserConfigs > table').filter(function(){return $(this).find('.layername').text() === oldName;});
+				const newConfig = oldConfig.clone();
+				newConfig.find('.layername').text(newName);
+				$('#layerLaserConfigs').append(newConfig);
+			}
 
 			var showSourceEditor = function(e, forSaving) {
 				if (editingsource) {return;}
@@ -4245,6 +4315,7 @@ TODOS
 					}
 					svgCanvas.createLayer(newName);
 					updateContextPanel();
+					addLayerLaserConfig(newName);
 					populateLayers();
 				});
 			});
@@ -4262,7 +4333,8 @@ TODOS
 			}
 
 			function cloneLayer() {
-				var name = svgCanvas.getCurrentDrawing().getCurrentLayerName() + ' copy';
+				const oldName = svgCanvas.getCurrentDrawing().getCurrentLayerName();
+				var name = oldName + ' copy';
 
 				$.prompt(uiStrings.notification.enterUniqueLayerName, name, function(newName) {
 					if (!newName) {return;}
@@ -4272,6 +4344,7 @@ TODOS
 					}
 					svgCanvas.cloneLayer(newName);
 					updateContextPanel();
+					cloneLayerLaserConfig(oldName, newName);
 					populateLayers();
 				});
 			}
@@ -4316,6 +4389,7 @@ TODOS
 					}
 
 					svgCanvas.renameCurrentLayer(newName);
+					cloneLayerLaserConfig(oldName, newName);					
 					populateLayers();
 				});
 			});
@@ -4945,6 +5019,7 @@ TODOS
 								svgCanvas.alignSelectedElements('c', 'page');
 								// highlight imported element, otherwise we get strange empty selectbox
 								svgCanvas.selectOnly([newElement]);
+								svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
 								$('#dialog_box').hide();
 							};
 							reader.readAsText(file);
@@ -4963,7 +5038,8 @@ TODOS
 											width: width,
 											height: height,
 											id: svgCanvas.getNextId(),
-											style: 'pointer-events:inherit'
+											style: 'pointer-events:inherit',
+											preserveAspectRatio: 'none',
 										}
 									});
 									svgCanvas.setHref(newImage, e.target.result);
@@ -4980,8 +5056,8 @@ TODOS
 								img.src = e.target.result;
 								img.style.opacity = 0;
 								img.onload = function() {
-									imgWidth = img.offsetWidth;
-									imgHeight = img.offsetHeight;
+									imgWidth = img.width;
+									imgHeight = img.height;
 									insertNewImage(imgWidth, imgHeight);
 								};
 							};

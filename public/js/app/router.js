@@ -122,7 +122,6 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                 map = {
                     'print': this.print,
                     'beambox': this.beambox,
-                    'svg-edit': this.svgEdit,
                     'settings': this.settings,
                     'laser': this.holder.bind(null, page),
                     'draw': this.holder.bind(null, page),
