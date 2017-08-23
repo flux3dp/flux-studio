@@ -98,6 +98,12 @@ define([
                 this.disableMenuItems(["UNDO"]);
             }
         }
+        onSceneImport() {
+            this.enableMenuItems(["CLEAR_SCENE"]);
+        }
+        onSceneClear() {
+            this.disableMenuItems(["CLEAR_SCENE"]);
+        }
     }
 
     let THREE = window.THREE || {},
@@ -2702,6 +2708,11 @@ define([
             previewModeOnly: false,
             leftPanelReady: true
         });
+        if (objects.length === 0) {
+            globalInteraction.onSceneClear();
+        } else {
+            globalInteraction.onSceneImport();
+        }
         _clearPath();
         render();
     }
