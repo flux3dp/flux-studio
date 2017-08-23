@@ -339,7 +339,7 @@ support_interface_line_width = 0.4
 support_interface_pattern = concentric
 support_interface_skip_height = 0.3
 support_join_distance = 2
-support_line_distance = 2.66
+support_line_distance = 2.0
 support_line_width = 0.35
 support_mesh = false
 support_minimal_diameter = 3
@@ -418,7 +418,7 @@ z_offset = 0.1`,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
-            "support_material_spacing": 0.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.15
         },
         med: {
@@ -433,7 +433,7 @@ z_offset = 0.1`,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
-            "support_material_spacing": 0.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.15
         },
         low: {
@@ -448,7 +448,7 @@ z_offset = 0.1`,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
-            "support_material_spacing": 0.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.15
         }
     },
@@ -465,7 +465,7 @@ z_offset = 0.1`,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
-            "support_material_spacing": 1.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.3
         },
         med: {
@@ -480,7 +480,7 @@ z_offset = 0.1`,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
-            "support_material_spacing": 1.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.3
         },
         low: {
@@ -495,7 +495,7 @@ z_offset = 0.1`,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
-            "support_material_spacing": 1.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.3
         }
     }

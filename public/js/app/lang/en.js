@@ -458,7 +458,7 @@ define(function() {
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
                 generalSupport: 'General Support',
-                spacing: 'Spacing',
+                spacing: 'Line Distance',
                 overhang: 'Overhang',
                 zDistance: 'Z Distance',
                 raft: 'Raft',

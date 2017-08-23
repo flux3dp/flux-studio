@@ -18,7 +18,7 @@ define([
                                                                             return (['automatic','grid','lines','concentric','concentric_3d','cubic','cubicsubdiv','tetrahedral','triangles','zigzag',].indexOf(v) >= 0 ? v : 'zigzag').toLowerCase();
                                                                        } },
         support_material                    : { key: 'support_enable', fn: (v) => { return !!parseInt(v); } },
-        support_material_spacing            : { key: 'support_xy_distance' },
+        support_material_spacing            : { key: 'support_line_distance' },
         support_material_threshold          : { key: 'support_angle', fn: (v) => { return 90.0 - parseFloat(v); } },
         support_material_pattern            : { key: 'support_pattern', fn: (v) => {
                                                                             v = v.toLowerCase();
