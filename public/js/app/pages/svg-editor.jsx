@@ -1,6 +1,6 @@
 requirejs.config({
   paths: {
-      svgEditor:          'app/actions/svg-editor',    
+      svgEditor:          'app/actions/svg-editor',
 
       jsHotkeys:          'lib/svgeditor/js-hotkeys/jquery.hotkeys.min',
       jquerybbq:          'lib/svgeditor/jquerybbq/jquery.bbq.min',
@@ -128,13 +128,14 @@ requirejs.config({
     jpicker: {
       deps: [ 'jqueryUi' ]
     },
-    
+
   }
 });
 define([
     'react',
     'helpers/api/config',
     'helpers/i18n',
+    'helpers/api/svg-laser-parser',
 
    'jsHotkeys',
    'jquerybbq',
@@ -178,7 +179,8 @@ define([
 ], function(
     React,
     ConfigHelper,
-    i18n
+    i18n,
+    svgLaserParser
 ) {
     let Config = ConfigHelper(),
         lang = i18n.lang;
@@ -190,9 +192,6 @@ define([
       class view extends React.Component {
           componentDidMount(node) {
               $(svgEditor.init);
-              setTimeout(() => {
-                $('#svg_editor').show();
-              }, 500);
           }
 
           _handleDisableHref() {

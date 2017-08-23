@@ -92,7 +92,7 @@ TODOS
 				'ext-connector.js',
 				'ext-eyedropper.js',
 				'ext-shapes.js',
-				'ext-imagelib.js',
+				//'ext-imagelib.js',
 				'ext-grid.js',
 				'ext-polygon.js',
 				'ext-star.js',
@@ -1009,6 +1009,7 @@ TODOS
 
 				editingsource = true;
 				origSource = svgCanvas.getSvgString();
+				console.log('SVG origSource', origSource);
 				$('#save_output_btns').toggle(!!forSaving);
 				$('#tool_source_back').toggle(!forSaving);
 				$('#svg_source_textarea').val(origSource);

@@ -215,10 +215,10 @@ svgedit.utilities.text2xml = function(sXML) {
 
 // Function: svgedit.utilities.bboxToObj
 // Converts a SVGRect into an object.
-// 
+//
 // Parameters:
 // bbox - a SVGRect
-// 
+//
 // Returns:
 // An object with properties names x, y, width, height.
 svgedit.utilities.bboxToObj = function(bbox) {
@@ -544,6 +544,7 @@ svgedit.utilities.getPathDFromSegments = function(pathSegments) {
 	$.each(pathSegments, function(j, seg) {
 		var i;
 		var pts = seg[1];
+		//var pts = parseFloat(seg[1]);
 		d += seg[0];
 		for (i = 0; i < pts.length; i+=2) {
 			d += (pts[i] +','+pts[i+1]) + ' ';
@@ -577,6 +578,7 @@ svgedit.utilities.getPathDFromElement = function(elem) {
 				rx = ry = $(elem).attr('r');
 			}
 
+			console.log('1324', a)
 			d = svgedit.utilities.getPathDFromSegments([
 				['M',[(cx-rx),(cy)]],
 				['C',[(cx-rx),(cy-ry/num), (cx-rx/num),(cy-ry), (cx),(cy-ry)]],
@@ -1025,7 +1027,7 @@ if (svgedit.browser.supportsSelectors()) {
 // Function: assignAttributes
 // Assigns multiple attributes to an element.
 //
-// Parameters: 
+// Parameters:
 // node - DOM element to apply new attribute values to
 // attrs - Object with attribute keys/values
 // suspendLength - Optional integer of milliseconds to suspend redraw
