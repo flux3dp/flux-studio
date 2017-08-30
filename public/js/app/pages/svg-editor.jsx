@@ -199,6 +199,7 @@ define([
           }
 
           render() {
+            // HIDE ALMOST ALL TOOLS USING CSS
               return (
                 <div>
                   <div id="svg_editor">
@@ -240,32 +241,44 @@ define([
                             id="layer_new"
                             className="layer_button"
                             title="New Layer"
-                            />
+                          >
+                            <i className="fa fa-plus"></i>
+                          </div>
                           <div
                             id="layer_delete"
                             className="layer_button"
                             title="Delete Layer"
-                            />
+                            >
+                            <i className="fa fa-trash-o"></i>
+                          </div>
                           <div
                             id="layer_rename"
                             className="layer_button"
                             title="Rename Layer"
-                            />
+                            >
+                            <i className="fa fa-font"></i>
+                          </div>
                           <div
                             id="layer_up"
                             className="layer_button"
                             title="Move Layer Up"
-                            />
+                            >
+                            <i className="fa fa-arrow-up"></i>
+                          </div>
                           <div
                             id="layer_down"
                             className="layer_button"
                             title="Move Layer Down"
-                            />
+                            >
+                            <i className="fa fa-arrow-down"></i>
+                          </div>
                           <div
                             id="layer_moreopts"
                             className="layer_button"
                             title="More Options"
-                            />
+                            >
+                            <i className="fa fa-bars"></i>
+                          </div>
                         </fieldset>
                         <table id="layerlist">
                           <tbody>
@@ -294,7 +307,7 @@ define([
                                 </td>
                               </tr>
                               <tr>
-                                <td>Shadow</td>
+                                <td>Shading</td>
                                 <td><input type="checkbox" name="layserShading" /></td>
                               </tr>
                             </tbody>

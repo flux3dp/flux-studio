@@ -962,6 +962,12 @@ define(function() {
                 }
             }
         },
+        beambox: {
+            maxStrength: 'Max Laser Strength',
+            units: {
+                w: 'W'
+            }
+        },
         select_printer: {
             choose_printer: 'Choose a machine',
             notification: '"%s" requires a password',

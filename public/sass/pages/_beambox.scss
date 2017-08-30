@@ -1,0 +1,74 @@
+.beambox-studio {
+    padding: 5px;
+
+    .left-panel {
+        margin: 0 0 0 30px;
+        z-index: 1;
+        position: relative;
+        top: calc(50% - 150px);
+        display: table;
+        // max-width: 300px;
+        .ui-dialog-menu-item {
+            .max-strength {
+                width: 300px;
+            }
+            .slider {
+                width: 110px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+        
+    }
+
+    #svg_editor {
+        color: #000;
+
+        #workarea {
+            border: none;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            #svgcanvas {
+                background: $backgroundColor;
+            }
+        }
+
+        #sidepanels {
+            border: none;
+            width: 180px;
+            bottom: initial;
+            padding-top: 35px;
+            background-color: $backgroundColor;
+            opacity: 0.8;
+            &:hover {
+                opacity: 1;
+            }
+            #layerpanel {
+                overflow: initial;
+
+                #layerbuttons {
+                    padding: 0;
+                    width: 129px;
+                    .layer_button{
+                        padding: 0 3px;
+                        width: initial;
+                        height: initial;
+                    }
+                }
+            }
+            
+            #sidepanel_handle {
+                @include force-hide();
+            }
+        }
+
+        #main_button, #tools_top, #tools_left {
+            @include force-hide();
+        }
+    }
+
+    #svg_source_editor, #docprops, #svg_prefs {
+        @include force-hide();
+    }
+}

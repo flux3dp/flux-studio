@@ -958,6 +958,12 @@ define(function() {
                 }
             }
         },
+        beambox: {
+            maxStrength: '最大雷射強度',
+            units: {
+                w: '瓦'
+            }
+        },
         select_printer: {
             choose_printer: '請選擇要設定的機器',
             notification: '"%s" 需要密碼',
