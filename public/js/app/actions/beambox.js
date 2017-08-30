@@ -98,7 +98,7 @@ define([
 
                     var uploadFiles = [];
                     //============for testing ===============================
-                    $.get("js/lib/svgeditor/test2.svg", (res) => {
+                    $.get("js/lib/svgeditor/test3.svg", (res) => {
                       var data = new XMLSerializer().serializeToString(res);
                       var blob = new Blob([data], {type: 'image/svg+xml'});
                       var reader = new FileReader();
@@ -108,7 +108,7 @@ define([
 
                         uploadFiles.push({
                           data: reader.result,
-                          blob: blob,
+                          //blob: blob,
                           url: window.URL.createObjectURL(blob),
                           name: 'svgeditor.svg',
                           extension: 'svg',
@@ -119,6 +119,7 @@ define([
                         });
                     //============for testing end============================
 
+                        console.log('uploadFiles', uploadFiles);
                         uploadFiles.forEach(function(file) {
                           file.uploadName = file.url.split('/').pop();
                         });

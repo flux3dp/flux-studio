@@ -957,7 +957,7 @@ TODOS
 			var insertLayerLaserConfigs = function() {
 				const layerLaserConfigs = $('#layerLaserConfigs');
 				const layers = $('#svgcontent').find('g.layer');
-				
+
 
 				layers.each(function(){
 					layername = $(this).find('title').text();
@@ -967,14 +967,14 @@ TODOS
 					$(this).attr('data-strength', theConfig.find('[name="layserStrength"]').val());
 					$(this).attr('data-speed', theConfig.find('[name="layserSpeed"]').val());
 					$(this).attr('data-shading', theConfig.find('[name="layserShading"]').is(':checked'));
-				});				
+				});
 			}
 
 			var populateLayerLaserConfigs = function() {
 				var layerLaserConfigs = $('#layerLaserConfigs');
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
-				
+
 				layerLaserConfigs.find('table').each(function() {
 					$(this).hide();
 					if($(this).find('.layername').text() === currentLayerName) {
@@ -988,7 +988,7 @@ TODOS
 				});
 			}
 
-			
+
 
 			var populateLayers = function() {
 				svgCanvas.clearSelection();
@@ -1014,14 +1014,14 @@ TODOS
 				}
 
 				populateLayerLaserConfigs();
-				
+
 				// handle selection of layer
 				$('#layerlist td.layername')
 					.mouseup(function(evt) {
 						$('#layerlist tr.layer').removeClass('layersel');
 						$(this.parentNode).addClass('layersel');
 						svgCanvas.setCurrentLayer(this.textContent);
-						populateLayerLaserConfigs();				
+						populateLayerLaserConfigs();
 						evt.preventDefault();
 					})
 					.mouseover(function() {
@@ -4389,7 +4389,7 @@ TODOS
 					}
 
 					svgCanvas.renameCurrentLayer(newName);
-					cloneLayerLaserConfig(oldName, newName);					
+					cloneLayerLaserConfig(oldName, newName);
 					populateLayers();
 				});
 			});
