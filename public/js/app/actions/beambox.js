@@ -35,7 +35,7 @@ define([
             file.image_data = [255,255,255,255];
         });
 
-        return uploadFiles
+        return uploadFiles;
     };
 
     var ExportGCodeProgressing = function(data) {
@@ -98,14 +98,14 @@ define([
 
                     var uploadFiles = [];
                     //============for testing ===============================
-                    $.get("js/lib/svgeditor/test3.svg", (res) => {
-                      var data = new XMLSerializer().serializeToString(res);
+                      //$.get("js/lib/svgeditor/test3.svg", (res) => {
+                      //$.var data = new XMLSerializer().serializeToString(res);
+                      var data = svgCanvas.getSvgString();
                       var blob = new Blob([data], {type: 'image/svg+xml'});
                       var reader = new FileReader();
 
                       reader.readAsArrayBuffer(blob);
                       reader.onload = function(e) {
-
                         uploadFiles.push({
                           data: reader.result,
                           //blob: blob,
@@ -129,7 +129,6 @@ define([
                         sendToSVGAPI(convertedFiles, settings, callback, fileMode);
 
                       };
-                    });
                   };
 
               ProgressActions.open(progressType, lang.laser.process_caption, 'Processing...', false);

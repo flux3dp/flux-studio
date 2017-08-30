@@ -14,7 +14,7 @@ function(
 
     return React.createClass({
         propTypes: {
-            Direction: React.PropTypes.oneOf(['LEFT', 'RIGHT', 'UP', 'BOTTOM']),
+            arrowDirection: React.PropTypes.oneOf(['LEFT', 'RIGHT', 'UP', 'BOTTOM']),
             className: React.PropTypes.object,
             items: React.PropTypes.array
         },

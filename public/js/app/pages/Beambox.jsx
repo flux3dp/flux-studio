@@ -1,10 +1,7 @@
 define([
     'react',
     'app/actions/beambox',
-    //'app/actions/laser',
-    'app/actions/progress-actions',
-    'app/constants/progress-constants',
-    'jsx!views/laser/Setup-Panel',
+    'jsx!views/beambox/Left-Panel',
     'jsx!pages/svg-editor',
     'jsx!widgets/Button-Group',
     'helpers/api/config',
@@ -12,9 +9,7 @@ define([
 ], function(
     React,
     laserEvents,
-    ProgressActions,
-    ProgressConstants,
-    LaserSetupPanel,
+    LeftPanel,
     SvgGenerator,
     ButtonGroup,
     ConfigHelper,
@@ -135,14 +130,18 @@ define([
               );
           }
 
+          _renderLeftPanel() {
+          return (<LeftPanel/>);
+          }
+
           render() {
             var actionButtons = this._renderActionButtons();
+            var leftPanel = this._renderLeftPanel();
             return (
-                    <div className="studio-container laser-studio">
-                      <div className="stage">
+                    <div className="studio-container beambox-studio">
+                        {leftPanel}
                         <Svg />
-                          {actionButtons}
-                      </div>
+                        {actionButtons}
                     </div>
             );
           }

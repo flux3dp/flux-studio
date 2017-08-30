@@ -11,20 +11,11 @@
 
 var overviewWindowGlobals = {};
 svgEditor.addExtension("overview_window", function() {	'use strict';
-	// Disabled in Chrome 48-, see https://github.com/SVG-Edit/svgedit/issues/26 and
-	// https://code.google.com/p/chromium/issues/detail?id=565120.
-	if (svgedit.browser.isChrome()) {
-		var verIndex = navigator.userAgent.indexOf("Chrome/") + 7;
-		var chromeVersion = parseInt(navigator.userAgent.substring(verIndex), 10);
-		if (chromeVersion < 49) {
-			return;
-		}
-	}
 
 	// Define and insert the base html element.
 	var propsWindowHtml= "\
 		<div id=\"overview_window_content_pane\" style=\" width:100%; word-wrap:break-word;  display:inline-block; margin-top:20px;\">\
-			<div id=\"overview_window_content\" style=\"position:relative; left:12px; top:0px;\">\
+			<div id=\"overview_window_content\" style=\"position:relative; left:5px; top:0px;\">\
 				<div style=\"background-color:#A0A0A0; display:inline-block; overflow:visible;\">\
 					<svg id=\"overviewMiniView\" width=\"150\" height=\"100\" x=\"0\" y=\"0\" viewBox=\"0 0 4800 3600\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\
 						<use x=\"0\" y=\"0\" xlink:href=\"#svgroot\"> </use>\
@@ -71,18 +62,6 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 		var viewHeight=$("#svgroot").attr("height");
 		var viewX=svgEditor.curConfig.dimensions[0];
 		var viewY=svgEditor.curConfig.dimensions[1];
-		
-		if(svgedit.browser.isIE())
-		{
-			// This has only been tested with Firefox 10 and IE 9 (without chrome frame).
-			// I am not sure if if is Firefox or IE that is being non compliant here.
-			// Either way the one that is noncompliant may become more compliant later.
-			//TAG:HACK  
-			//TAG:VERSION_DEPENDENT
-			//TAG:BROWSER_SNIFFING
-			viewX=0;
-			viewY=0;
-		}
 		
 		var svgWidth_old=$("#overviewMiniView").attr("width");
 		var svgHeight_new=viewHeight/viewWidth*svgWidth_old;

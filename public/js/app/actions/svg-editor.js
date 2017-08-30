@@ -142,7 +142,7 @@ TODOS
 				gridColor: '#000',
 				baseUnit: 'px',
 				snappingStep: 10,
-				showRulers: true,
+				showRulers: false,
 				// URL BEHAVIOR CONFIGURATION
 				preventAllURLConfig: true,
 				preventURLContentLoading: true,
@@ -637,7 +637,7 @@ TODOS
 				placement: {
 					'#logo': 'logo',
 
-					'#tool_clear div,#layer_new': 'new_image',
+					'#tool_clear div': 'new_image',
 					'#tool_save div': 'save',
 					'#tool_export div': 'export',
 					'#tool_open div div': 'open',
@@ -659,13 +659,13 @@ TODOS
 					'#tool_circle': 'circle',
 					'#tool_fhellipse': 'fh_ellipse',
 					'#tool_path': 'path',
-					'#tool_text,#layer_rename': 'text',
+					'#tool_text': 'text',
 					'#tool_image': 'image',
 					'#tool_zoom': 'zoom',
 
 					'#tool_clone,#tool_clone_multi': 'clone',
 					'#tool_node_clone': 'node_clone',
-					'#layer_delete,#tool_delete,#tool_delete_multi': 'delete',
+					'#tool_delete,#tool_delete_multi': 'delete',
 					'#tool_node_delete': 'node_delete',
 					'#tool_add_subpath': 'add_subpath',
 					'#tool_openclose_path': 'open_path',
@@ -696,11 +696,6 @@ TODOS
 
 					'#url_notice': 'warning',
 
-					'#layer_up': 'go_up',
-					'#layer_down': 'go_down',
-					'#layer_moreopts': 'context_menu',
-					'#layerlist td.layervis': 'eye',
-
 					'#tool_source_save,#tool_docprops_save,#tool_prefs_save': 'ok',
 					'#tool_source_cancel,#tool_docprops_cancel,#tool_prefs_cancel': 'cancel',
 
@@ -723,7 +718,7 @@ TODOS
 				resize: {
 					'#logo .svg_icon': 28,
 					'.flyout_arrow_horiz .svg_icon': 5,
-					'.layer_button .svg_icon, #layerlist td.layervis .svg_icon': 14,
+					'.layer_button .svg_icon, #layerlist .svg_icon': 14,
 					'.dropdown button .svg_icon': 7,
 					'#main_button .dropdown .svg_icon': 9,
 					'.palette_item:first .svg_icon' : 15,
@@ -997,7 +992,7 @@ TODOS
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
 				var layer = svgCanvas.getCurrentDrawing().getNumLayers();
-				var icon = $.getSvgIcon('eye');
+
 				// we get the layers in the reverse z-order (the layer rendered on top is listed first)
 				while (layer--) {
 					var name = drawing.getLayerName(layer);
@@ -1007,11 +1002,9 @@ TODOS
 					layerlist.append(layerTr.append(layerVis, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
 				}
-				if (icon !== undefined) {
-					var copy = icon.clone();
-					$('td.layervis', layerlist).append(copy);
-					$.resizeSvgIcons({'td.layervis .svg_icon': 14});
-				}
+				
+
+				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 
 				populateLayerLaserConfigs();
 
@@ -1059,7 +1052,7 @@ TODOS
 							<td><input type="number" name="layserSpeed" value="150" min="3" max="300"/></td>\
 						</tr>\
 						<tr>\
-							<td>Shadow</td>\
+							<td>Shading</td>\
 							<td><input type="checkbox" name="layserShading" /></td>\
 						</tr>\
 					</tbody>\
@@ -4394,6 +4387,7 @@ TODOS
 				});
 			});
 
+			/* keep sidepanel visible. (but there are still some related code seperate)
 			var SIDEPANEL_MAXWIDTH = 300;
 			var SIDEPANEL_OPENWIDTH = 150;
 			var sidedrag = -1, sidedragging = false, allowmove = false;
@@ -4465,6 +4459,8 @@ TODOS
 				sidedragging = false;
 				$('#svg_editor').unbind('mousemove', resizeSidePanel);
 			});
+			//end keep sidepanel visible.
+			*/
 
 			populateLayers();
 
@@ -4611,7 +4607,7 @@ TODOS
 		//			{sel: '#tools_ellipse_show', fn: clickEllipse, evt: 'click'},
 					{sel: '#tool_bold', fn: clickBold, evt: 'mousedown'},
 					{sel: '#tool_italic', fn: clickItalic, evt: 'mousedown'},
-					{sel: '#sidepanel_handle', fn: toggleSidePanel, key: ['X']},
+					// {sel: '#sidepanel_handle', fn: toggleSidePanel, key: ['X']},
 					{sel: '#copy_save_done', fn: cancelOverlays, evt: 'click'},
 
 					// Shortcuts not associated with buttons
@@ -4814,9 +4810,9 @@ TODOS
 					$('#tool_wireframe').click();
 				}
 
-				if (curConfig.showlayers) {
-					toggleSidePanel();
-				}
+				// if (curConfig.showlayers) {
+				// 	toggleSidePanel();
+				// }
 
 				$('#rulers').toggle(!!curConfig.showRulers);
 
@@ -5160,6 +5156,12 @@ TODOS
 					$('#tool_pos' + this.id.substr(10))[0].title = this.title;
 				});
 			};
+
+			
+			//initialize the view
+			zoomImage(0.4);
+			workarea[0].scrollLeft = 930;
+			workarea[0].scrollTop = 730;
 		};
 
 		editor.ready = function (cb) {
