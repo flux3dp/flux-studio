@@ -7,6 +7,9 @@ define([
     'app/constants/progress-constants',
     'helpers/image-data',
     'helpers/api/svg-laser-parser',
+    'helpers/api/fcode-reader',
+    'app/actions/alert-actions',
+    'app/actions/global-actions'
 ], function(
     $,
     DeviceMaster,
@@ -15,7 +18,10 @@ define([
     ProgressActions,
     ProgressConstants,
     imageData,
-    svgLaserParser
+    svgLaserParser,
+    fcodeReader,
+    AlertActions,
+    GlobalActions
 ) {
     'use strict';
     var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
@@ -136,6 +142,33 @@ define([
               doLaser(settings);
           };
       return {
+          uploadFcode: function(settings) {
+                getToolpath(settings, 
+                    (blob) => {
+                        var blobUrl = window.URL,
+                            fcodeReaderMethods = fcodeReader(),
+                            parseFCode = function() {
+                                fcodeReaderMethods.getThumbnail().then((data) => {
+                                    ProgressActions.close();
+                                    DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
+                                        if (status === DeviceConstants.CONNECTED) {
+                                            GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(data), 'engrave');
+                                        }
+                                        else if (status === DeviceConstants.TIMEOUT) {
+                                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                        }
+                                    });
+                                });
+                            };
+
+                        ProgressActions.updating(lang.message.uploading_fcode, 100);
+                        fcodeReaderMethods.upload(blob).then(() => {
+                            parseFCode();
+                        });
+                    },
+                    ProgressConstants.STEPPING,
+                    '-f');
+            },
           exportTaskCode: function(settings, fileMode) {
             var getToolpathCallback = (blob, fileMode) => {
                 var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
@@ -145,7 +178,7 @@ define([
                     fullName = fileName + '.' + extension
                     ProgressActions.close();
                     console.log('blob', blob);
-                saveAs(blob, fullName)
+                saveAs(blob, fullName);
             };
             getToolpath(
                 settings,

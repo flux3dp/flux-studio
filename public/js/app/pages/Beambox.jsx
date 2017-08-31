@@ -6,14 +6,18 @@ define([
     'jsx!widgets/Button-Group',
     'helpers/api/config',
     'helpers/i18n',
+    'jsx!widgets/Modal',
+    'jsx!views/Printer-Selector',
 ], function(
     React,
-    laserEvents,
+    beamboxEvents,
     LeftPanel,
     SvgGenerator,
     ButtonGroup,
     ConfigHelper,
-    i18n
+    i18n,
+    Modal,
+    PrinterSelector
 ) {
 
     let Config = ConfigHelper(),
@@ -26,22 +30,15 @@ define([
             self = this;
 
         class view extends React.Component {
-          constructor(){
+        constructor(){
             super();
-            this.laserEvents = laserEvents();
-          //  this.state = {
-          //    options: {
-          //        material: lang.laser.advanced.form.object_options.options[0],
-          //        laserEvents: laserEvents.call(this, args),
-          //        test: 0,
-          //        objectHeight: 0,
-          //        heightOffset: 0,
-          //        isShading: false
-          //    }
-          //  }
-          }
+            this.beamboxEvents = beamboxEvents.call(this);
+            this.state = {
+                openPrinterSelectorWindow: false
+            };
+        }
 
-          componentDidMount() {
+        componentDidMount() {
             let options = Config.read('laser-defaults') || {};
             if (options.material == null) {
                 options.material = lang.laser.advanced.form.object_options.options[0];
@@ -105,43 +102,69 @@ define([
                       dataAttrs: {
                           'ga-event': 'laser-goto-monitor'
                       },
-                      //onClick: this._handleStartClick
-                  }];
+                    onClick: this._handleStartClick.bind(this)
+                }];
 
-              if (this.props.page === 'laser') {
-                  buttons = [{
-                      label: lang.laser.showOutline,
-                      className: cx({
-                          //'btn-disabled': !this.state.hasImage,
-                          'btn-disabled': false,
-                          'btn-default': true,
-                          'btn-hexagon': true,
-                          'btn-go': true
-                      }),
-                      dataAttrs: {
-                          'ga-event': 'holder-outline'
-                      },
-                      //onClick: this._handleShowOutlineClick
-                  }].concat(buttons);
-              }
+            return (
+                <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
+            );
+        }
 
-              return (
-                  <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
-              );
-          }
+        _handleStartClick() {
+            this.setState({
+                openPrinterSelectorWindow: true,
+                machineCommand: 'start',
+                settings: this._fetchFormalSettings()
+            });
+        }
+
+        _renderPrinterSelectorWindow() {
+            if (!this.state.openPrinterSelectorWindow) { return ''; }
+            var self = this,
+                onGettingPrinter = function(auth_printer) {
+                    self.setState({
+                        selectedPrinter: auth_printer,
+                        openPrinterSelectorWindow: false
+                    });
+
+                    self.beamboxEvents.uploadFcode(self._fetchFormalSettings());
+                },
+                onClose = function(e) {
+                    self.setState({
+                        openPrinterSelectorWindow: false
+                    });
+                },
+                content = (
+                    <PrinterSelector
+                        uniqleId="laser"
+                        className="laser-device-selection-popup"
+                        lang={lang}
+                        onClose={onClose}
+                        onGettingPrinter={onGettingPrinter}
+                    />
+                );
+
+            return (
+                <Modal content={content} onClose={onClose}/>
+            );
+        }
+
 
           _renderLeftPanel() {
           return (<LeftPanel/>);
           }
 
           render() {
-            var actionButtons = this._renderActionButtons();
-            var leftPanel = this._renderLeftPanel();
+            var actionButtons = this._renderActionButtons(),
+                leftPanel = this._renderLeftPanel(),
+                printerSelector = this._renderPrinterSelectorWindow();
+
             return (
                     <div className="studio-container beambox-studio">
                         {leftPanel}
                         <Svg />
                         {actionButtons}
+                        {printerSelector}
                     </div>
             );
           }
