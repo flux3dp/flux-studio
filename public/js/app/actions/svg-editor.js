@@ -5036,6 +5036,7 @@ TODOS
 											id: svgCanvas.getNextId(),
 											style: 'pointer-events:inherit',
 											preserveAspectRatio: 'none',
+											"data-threshold": 50 //TODO:
 										}
 									});
 									svgCanvas.setHref(newImage, e.target.result);
