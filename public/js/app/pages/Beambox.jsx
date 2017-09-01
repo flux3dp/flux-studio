@@ -57,19 +57,16 @@ define([
               let options = Config.read('laser-defaults') || {},
                   max = lang.laser.advanced.form.power.max;
               return {
-                  object_height: options.objectHeight,
-                  height_offset: options.heightOffset || 0,
-                  laser_speed: options.material.data.laser_speed,
-                  //calibration: holder.state.debug || 0,
-                  calibration: 0,
-                  power: options.material.data.power / max,
-                  //shading: (true === holder.refs.setupPanel.isShading() ? 1 : 0)
-                  shading: true
+                  //object_height: options.objectHeight,
+                  //height_offset: options.heightOffset || 0,
+                  //laser_speed: options.material.data.laser_speed,
+                  //calibration: 0,
+                  //power: options.material.data.power / max,
               };
           }
 
           _handleExportClick(filemode) {
-              this.laserEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
+              this.beamboxEvents.exportTaskCode(this._fetchFormalSettings(), filemode);
           }
 
           _renderActionButtons() {

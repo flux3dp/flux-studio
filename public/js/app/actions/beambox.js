@@ -26,24 +26,6 @@ define([
     'use strict';
     var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
 
-    var convertToFitSVGAPI = (uploadFiles) => {
-        uploadFiles.forEach((file) => {
-            file.svg_data = file;
-            file.real_width = 300;
-            file.real_height = 200;
-            file.tl_position_x = 0;
-            file.tl_position_y = 0;
-            file.br_position_x = 300;
-            file.br_position_y = 200,
-            file.rotate = 0;
-            file.width = 300;
-            file.height = 200;
-            file.image_data = [255,255,255,255];
-        });
-
-        return uploadFiles;
-    };
-
     var ExportGCodeProgressing = function(data) {
             ProgressActions.open(ProgressConstants.STEPPING);
             ProgressActions.updating(data.message, data.percentage * 100);
@@ -91,21 +73,12 @@ define([
       var getToolpath = function(settings, callback, progressType, fileMode) {
               fileMode = fileMode || '-f';
               progressType = progressType || ProgressConstants.NONSTOP;
-
-              var //$ft_controls = $laser_platform.find('.ft-controls'),
-                  //_callback = function() {
-                  //    GlobalActions.sliceComplete({ time: arguments[2] });
-                  //    callback.apply(null, arguments);
-                  //},
-
-                  args = [],
+              var args = [],
                   doLaser = function(settings) {
                     console.log('Bang!');
 
                     var uploadFiles = [];
                     //============for testing ===============================
-                      //$.get("js/lib/svgeditor/test3.svg", (res) => {
-                      //$.var data = new XMLSerializer().serializeToString(res);
                       var data = svgCanvas.getSvgString();
                       var blob = new Blob([data], {type: 'image/svg+xml'});
                       var reader = new FileReader();
@@ -125,15 +98,11 @@ define([
                         });
                     //============for testing end============================
 
-                        console.log('uploadFiles', uploadFiles);
                         uploadFiles.forEach(function(file) {
                           file.uploadName = file.url.split('/').pop();
                         });
 
-                        var convertedFiles = convertToFitSVGAPI(uploadFiles);
-
-                        sendToSVGAPI(convertedFiles, settings, callback, fileMode);
-
+                        sendToSVGAPI(uploadFiles, settings, callback, fileMode);
                       };
                   };
 
@@ -143,7 +112,7 @@ define([
           };
       return {
           uploadFcode: function(settings) {
-                getToolpath(settings, 
+                getToolpath(settings,
                     (blob) => {
                         var blobUrl = window.URL,
                             fcodeReaderMethods = fcodeReader(),
@@ -168,7 +137,8 @@ define([
                     },
                     ProgressConstants.STEPPING,
                     '-f');
-            },
+          },
+
           exportTaskCode: function(settings, fileMode) {
             var getToolpathCallback = (blob, fileMode) => {
                 var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
@@ -177,7 +147,6 @@ define([
                     fileName = 'test',
                     fullName = fileName + '.' + extension
                     ProgressActions.close();
-                    console.log('blob', blob);
                 saveAs(blob, fullName);
             };
             getToolpath(
