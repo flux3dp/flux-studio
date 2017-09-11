@@ -341,35 +341,24 @@ define([
                         file.status = (0 < warningCollection.length ? 'bad' : 'good');
                         file.messages = warningCollection;
                         file.isBroken = isBroken;
-
                         return file;
                     },
+
                     sendFile = function(file, isEnd) {
                         var warningCollection = [];
 
                         events.onMessage = function(data) {
-
                             switch (data.status) {
                             case 'continue':
                                 ws.send(file.data);
                                 break;
                             case 'ok':
-                                console.log('done!');
                                 $deferred.resolve();
                                 break;
-                                //self.get(file).done(function(response) {
-                                    //file.blob = response.blob;
-                                    //file.imgSize = response.size;
-//
-                                    //file = setMessages(file, false, warningCollection);
-                                    //$deferred.notify('next');
-                                //});
-                                //break;
                             case 'warning':
                                 warningCollection.push(data.message);
                                 break;
                             }
-
                         };
 
                         events.onError = function(data) {
@@ -381,11 +370,6 @@ define([
                         ws.send([
                             order_name,
                             file.uploadName,
-                            file.tl_position_x,
-                            file.tl_position_y,
-                            file.br_position_x,
-                            file.br_position_y,
-                            file.rotate,
                             file.size
                         ].join(' '));
                     };
