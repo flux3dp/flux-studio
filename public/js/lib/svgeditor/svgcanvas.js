@@ -4620,8 +4620,8 @@ this.setSvgString = function(xmlString) {
 // was obtained
 // * import should happen in top-left of current zoomed viewport
 this.importSvgString = function(xmlString) {
-	//var re = /viewBox=".*?\"/;
-	//xmlString = xmlString.replace(re, '')
+	var re = /viewBox=".*?\"/;
+	xmlString = xmlString.replace(re, '')
 	var j, ts;
 	try {
 		// Get unique ID
