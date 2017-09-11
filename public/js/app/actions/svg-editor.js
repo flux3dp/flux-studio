@@ -124,7 +124,7 @@ TODOS
 				colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
 				initTool: 'select',
 				exportWindowType: 'new', // 'same' (todo: also support 'download')
-				wireframe: true,
+				wireframe: false,
 				showlayers: true,
 				no_save_warning: true,
 				// PATH CONFIGURATION
@@ -1002,7 +1002,7 @@ TODOS
 					layerlist.append(layerTr.append(layerVis, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
 				}
-				
+
 
 				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 
@@ -5015,7 +5015,7 @@ TODOS
 								svgCanvas.alignSelectedElements('c', 'page');
 								// highlight imported element, otherwise we get strange empty selectbox
 								svgCanvas.selectOnly([newElement]);
-								svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+								//svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
 								$('#dialog_box').hide();
 							};
 							reader.readAsText(file);
@@ -5158,7 +5158,7 @@ TODOS
 				});
 			};
 
-			
+
 			//initialize the view
 			zoomImage(0.4);
 			workarea[0].scrollLeft = 930;
