@@ -6,19 +6,105 @@
         z-index: 1;
         position: relative;
         top: calc(50% - 150px);
-        display: table;
-        // max-width: 300px;
+        pointer-events: none;
         .ui-dialog-menu-item {
-            .max-strength {
-                width: 300px;
+            .dialog-label {
+                min-width: auto;
+                div {
+                    pointer-events: visible;
+                }
             }
-            .slider {
-                width: 110px;
-                padding-left: 10px;
-                padding-right: 10px;
+            .dialog-window {
+                pointer-events: visible;
+                .slider {
+                    width: 110px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                }         
             }
         }
+    }
+
+    .object-panels {
+        display: absolute;
+        box-shadow: 1px 1px 5px #333;
+        margin-top: 10px;
+        margin-left: 10px;
+        .object-panel {
+            @include flexbox();
+            font-size: 20px;
+            transition: all .1s ease;
+            z-index: 1;
+            will-change: top,left,transform;
+    
+            .accordion-body {
+                overflow: visible;
+                position: relative;
+    
+                .icon-locker {
+                    bottom: 0;
+                    cursor: pointer;
+                    height: 20px;
+                    left: 100%;
+                    margin: auto;
+                    position: absolute;
+                    top: 0;
+                    width: 20px;
+                }
+                .ui.ui-control-unit-input-v2 {
+                    .unit {
+                        font-size: 10px;
+                        margin-left: -30px;
+                    }
+                }
+            }
+    
+            .caption {
+                margin: 0;
+            }
+    
+            .controls {
+                background: #FFFFFF;
+                display: block;
+                margin: 0;
+                padding: 0 20px;
+                width: 240px;
+                border: 1px #ddd solid;                
+                .control {
+                    font-size: 20px;
+                    margin: 0 0 10px 0;
         
+                    .input-fullsize {
+                        margin: 0;
+                        width: 100%;
+                    }
+
+                    .input-halfsize {
+                        display: inline-block;                        
+                        width: 45%;
+                        input {
+                            width: 80%;
+                        }
+                    }
+                    > div {
+                        margin-right: unset;
+                    }
+
+                    input[type='range'] {
+                        border: unset;
+                    }
+    
+                }
+            }
+    
+            .caption {
+                @include flexbox();
+                color: $primaryColor;
+                font-size: 12px;
+                line-height: 30px;
+                justify-content: space-between;
+            }
+        }
     }
 
     #svg_editor {
@@ -63,7 +149,7 @@
             }
         }
 
-        #main_button, #tools_top, #tools_left {
+        #main_button, #tools_top, #tools_left, #tools_bottom {
             @include force-hide();
         }
     }

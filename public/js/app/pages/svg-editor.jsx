@@ -306,10 +306,6 @@ define([
                                   <input type="number" name="layserSpeed" defaultValue="150" min="3" max="300"/>
                                 </td>
                               </tr>
-                              <tr>
-                                <td>Shading</td>
-                                <td><input type="checkbox" name="layserShading" /></td>
-                              </tr>
                             </tbody>
                           </table>
                         </div>
