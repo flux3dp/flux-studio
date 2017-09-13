@@ -142,7 +142,7 @@ TODOS
 				gridColor: '#000',
 				baseUnit: 'px',
 				snappingStep: 10,
-				showRulers: false,
+				showRulers: true,
 				// URL BEHAVIOR CONFIGURATION
 				preventAllURLConfig: true,
 				preventURLContentLoading: true,
@@ -209,7 +209,7 @@ TODOS
 					callback(false);
 				});
 			}
-		}
+		};
 
 		/**
 		* EXPORTS
