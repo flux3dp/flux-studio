@@ -22,8 +22,12 @@
 TODOS
 1. JSDoc
 */
-(function() {
-
+define([
+	'jsx!views/beambox/Object-Panels-Controller'
+],function(
+	ObjectPanelsController
+){
+	
 	if (window.svgEditor) {
 		return;
 	}
@@ -107,8 +111,8 @@ TODOS
 				canvasName: 'default',
 				canvas_expansion: 3,
 				initFill: {
-					color: 'FF0000', // solid red
-					opacity: 1
+					color: 'FFFFFF',
+					opacity: 0
 				},
 				initStroke: {
 					width: 5,
@@ -135,7 +139,7 @@ TODOS
 				jGraduatePath: 'js/lib/svgeditor/jgraduate/images/',
 				// DOCUMENT PROPERTIES
 				// Change the following to a preference (already in the Document Properties dialog)?
-				dimensions: [3000, 2000],
+				dimensions: [4000, 4000],
 				// EDITOR OPTIONS
 				// Change the following to preferences (already in the Editor Options dialog)?
 				gridSnapping: false,
@@ -430,6 +434,10 @@ TODOS
 		};
 
 		editor.init = function () {
+
+			const objectPanelsController = new ObjectPanelsController(document.getElementById("object-panels-placeholder"));
+			window.objectPanelsController = objectPanelsController; //we should use Singleton Pattern to avoid global variable.
+			
 			// var host = location.hostname,
 			//	onWeb = host && host.indexOf('.') >= 0;
 			// Some FF versions throw security errors here when directly accessing
@@ -949,7 +957,7 @@ TODOS
 				}
 			};
 
-			var insertLayerLaserConfigs = function() {
+			var writeLayerLaserConfigs = function() {
 				const layerLaserConfigs = $('#layerLaserConfigs');
 				const layers = $('#svgcontent').find('g.layer');
 
@@ -961,7 +969,6 @@ TODOS
 					});
 					$(this).attr('data-strength', theConfig.find('[name="layserStrength"]').val());
 					$(this).attr('data-speed', theConfig.find('[name="layserSpeed"]').val());
-					$(this).attr('data-shading', theConfig.find('[name="layserShading"]').is(':checked'));
 				});
 			}
 
@@ -977,9 +984,9 @@ TODOS
 					}
 				});
 
-				insertLayerLaserConfigs();
+				writeLayerLaserConfigs();
 				layerLaserConfigs.find('input').change(function(){
-					insertLayerLaserConfigs();
+					writeLayerLaserConfigs();
 				});
 			}
 
@@ -1002,7 +1009,7 @@ TODOS
 					layerlist.append(layerTr.append(layerVis, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
 				}
-
+				
 
 				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 
@@ -1050,10 +1057,6 @@ TODOS
 						<tr>\
 							<td>Speed</td>\
 							<td><input type="number" name="layserSpeed" value="150" min="3" max="300"/></td>\
-						</tr>\
-						<tr>\
-							<td>Shading</td>\
-							<td><input type="checkbox" name="layserShading" /></td>\
 						</tr>\
 					</tbody>\
 				  </table>'
@@ -1165,14 +1168,6 @@ TODOS
 				}
 			};
 
-			var operaRepaint = function() {
-				// Repaints canvas in Opera. Needed for stroke-dasharray change as well as fill change
-				if (!window.opera) {
-					return;
-				}
-				$('<p/>').hide().appendTo('body').remove();
-			};
-
 			function setStrokeOpt(opt, changeElem) {
 				var id = opt.id;
 				var bits = id.split('_');
@@ -1182,7 +1177,6 @@ TODOS
 				if (changeElem) {
 					svgCanvas.setStrokeAttr('stroke-' + pre, val);
 				}
-				operaRepaint();
 				setIcon('#cur_' + pre, id, 20);
 				$(opt).addClass('current').siblings().removeClass('current');
 			}
@@ -1536,7 +1530,6 @@ TODOS
 					shower.toggleClass('disabled', !has_enabled);
 				});
 
-				operaRepaint();
 			};
 
 			// Updates the toolbar (colors, opacity, etc) based on the selected element
@@ -1606,6 +1599,7 @@ TODOS
 			// updates the context panel tools based on the selected element
 			var updateContextPanel = function() {
 				var elem = selectedElement;
+				objectPanelsController.setMe($(elem));
 				// If element has just been deleted, consider it null
 				if (elem != null && !elem.parentNode) {elem = null;}
 				var currentLayerName = svgCanvas.getCurrentDrawing().getCurrentLayerName();
@@ -1619,6 +1613,7 @@ TODOS
 					' #use_panel, #a_panel').hide();
 				if (elem != null) {
 					var elname = elem.nodeName;
+					objectPanelsController.setType(elname);
 					// If this is a link with no transform and one child, pretend
 					// its child is selected
 //					if (elname === 'a') { // && !$(elem).attr('transform')) {
@@ -1627,6 +1622,7 @@ TODOS
 
 					var angle = svgCanvas.getRotationAngle(elem);
 					$('#angle').val(angle);
+					objectPanelsController.setRotation(angle);
 
 					var blurval = svgCanvas.getBlur(elem);
 					$('#blur').val(blurval);
@@ -1671,6 +1667,7 @@ TODOS
 							$('#selected_x').val(x || 0);
 							$('#selected_y').val(y || 0);
 							$('#xy_panel').show();
+							objectPanelsController.setPosition(x||0, y||0);
 						}
 
 						// Elements in this array cannot be converted to a path
@@ -1707,7 +1704,7 @@ TODOS
 					var panels = {
 						g: [],
 						a: [],
-						rect: ['rx', 'width', 'height'],
+						rect: ['width', 'height'],
 						image: ['width', 'height'],
 						circle: ['cx', 'cy', 'r'],
 						ellipse: ['cx', 'cy', 'rx', 'ry'],
@@ -1715,6 +1712,18 @@ TODOS
 						text: [],
 						use: []
 					};
+					const objectPanelsControllerSetter = {
+						width: 	objectPanelsController.setWidth,
+						height: objectPanelsController.setHeight,
+						cx:		objectPanelsController.setEllipsePositionX,
+						cy: 	objectPanelsController.setEllipsePositionY,
+						rx:		objectPanelsController.setEllipseRadiusX,
+						ry:		objectPanelsController.setEllipseRadiusY,
+						x1:		objectPanelsController.setLineX1,
+						y1:		objectPanelsController.setLineY1,
+						x2:		objectPanelsController.setLineX2,
+						y2:		objectPanelsController.setLineY2,
+					}
 
 					var el_name = elem.tagName;
 
@@ -1754,6 +1763,7 @@ TODOS
 								attrVal = svgedit.units.convertUnit(bv);
 							}
 							$('#' + el_name + '_' + item).val(attrVal || 0);
+							objectPanelsControllerSetter[item](attrVal);
 						});
 
 						if (el_name == 'text') {
@@ -1779,8 +1789,15 @@ TODOS
 								}, 100);
 							}
 						} // text
-						else if (el_name == 'image' && svgCanvas.getMode() == 'image') {
-							setImageURL(svgCanvas.getHref(elem));
+						else if(el_name == 'image') {
+							if ( svgCanvas.getMode() == 'image') {
+								setImageURL(svgCanvas.getHref(elem));
+							}
+
+							const threshold = $(elem).data('threshold');
+							const shading = $(elem).data('shading');
+							objectPanelsController.setImageShading(shading);
+							objectPanelsController.setImageThreshold(threshold);
 						} // image
 						else if (el_name === 'g' || el_name === 'use') {
 							$('#container_panel').show();
@@ -1793,6 +1810,8 @@ TODOS
 					}
 					menu_items[(el_name === 'g' ? 'en' : 'dis') + 'ableContextMenuItems']('#ungroup');
 					menu_items[((el_name === 'g' || !multiselected) ? 'dis' : 'en') + 'ableContextMenuItems']('#group');
+					
+					objectPanelsController.render();
 				} // if (elem != null)
 				else if (multiselected) {
 					$('#multiselected_panel').show();
@@ -3004,12 +3023,10 @@ TODOS
 
 			$('#stroke_style').change(function() {
 				svgCanvas.setStrokeAttr('stroke-dasharray', $(this).val());
-				operaRepaint();
 			});
 
 			$('#stroke_linejoin').change(function() {
 				svgCanvas.setStrokeAttr('stroke-linejoin', $(this).val());
-				operaRepaint();
 			});
 
 			// Lose focus for select elements when changed (Allows keyboard shortcuts to work better)
@@ -3716,7 +3733,7 @@ TODOS
 				svgCanvas.open();
 			};
 
-			var clickImport = function() {
+			var clickImport = function() {		
 			};
 
 			var clickUndo = function() {
@@ -3955,39 +3972,6 @@ TODOS
 			};
 
 			var win_wh = {width:$(window).width(), height:$(window).height()};
-
-			// Fix for Issue 781: Drawing area jumps to top-left corner on window resize (IE9)
-			if (svgedit.browser.isIE()) {
-				(function() {
-					resetScrollPos = function() {
-						if (workarea[0].scrollLeft === 0 && workarea[0].scrollTop === 0) {
-							workarea[0].scrollLeft = curScrollPos.left;
-							workarea[0].scrollTop = curScrollPos.top;
-						}
-					};
-
-					curScrollPos = {
-						left: workarea[0].scrollLeft,
-						top: workarea[0].scrollTop
-					};
-
-					$(window).resize(resetScrollPos);
-					editor.ready(function() {
-						// TODO: Find better way to detect when to do this to minimize
-						// flickering effect
-						setTimeout(function() {
-							resetScrollPos();
-						}, 500);
-					});
-
-					workarea.scroll(function() {
-						curScrollPos = {
-							left: workarea[0].scrollLeft,
-							top: workarea[0].scrollTop
-						};
-					});
-				}());
-			}
 
 			$(window).resize(function(evt) {
 				$.each(win_wh, function(type, val) {
@@ -5015,7 +4999,7 @@ TODOS
 								svgCanvas.alignSelectedElements('c', 'page');
 								// highlight imported element, otherwise we get strange empty selectbox
 								svgCanvas.selectOnly([newElement]);
-								//svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+								// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
 								$('#dialog_box').hide();
 							};
 							reader.readAsText(file);
@@ -5036,7 +5020,8 @@ TODOS
 											id: svgCanvas.getNextId(),
 											style: 'pointer-events:inherit',
 											preserveAspectRatio: 'none',
-											"data-threshold": 50 //TODO:
+											"data-threshold": 100,
+											"data-shading": false
 										}
 									});
 									svgCanvas.setHref(newImage, e.target.result);
@@ -5158,11 +5143,12 @@ TODOS
 				});
 			};
 
-
+			
 			//initialize the view
-			zoomImage(0.4);
-			workarea[0].scrollLeft = 930;
-			workarea[0].scrollTop = 730;
+			zoomImage(0.2);
+			workarea[0].scrollLeft = 300;
+			workarea[0].scrollTop = 750;
+			
 		};
 
 		editor.ready = function (cb) {
@@ -5259,4 +5245,4 @@ TODOS
 	// $(svgEditor.init);
 	//replaced by componentDidMount()
 
-}());
+});

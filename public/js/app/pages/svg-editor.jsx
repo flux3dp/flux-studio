@@ -176,6 +176,9 @@ define([
     'css!svgeditor/spinbtn/JQuerySpinBtn',
     //'css!svgeditor/custom.css'
 
+    'lib/svgeditor/canvg/canvg',
+    'lib/svgeditor/canvg/rgbcolor',
+
 ], function(
     React,
     ConfigHelper,
@@ -305,10 +308,6 @@ define([
                                 <td>
                                   <input type="number" name="layserSpeed" defaultValue="150" min="3" max="300"/>
                                 </td>
-                              </tr>
-                              <tr>
-                                <td>Shading</td>
-                                <td><input type="checkbox" name="layserShading" /></td>
                               </tr>
                             </tbody>
                           </table>

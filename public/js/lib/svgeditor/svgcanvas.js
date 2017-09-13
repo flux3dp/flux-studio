@@ -2108,6 +2108,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			case 'foreignObject':
 			case 'square':
 			case 'rect':
+				current_mode = 'select';
 			case 'image':
 				attrs = $(element).attr(['width', 'height']);
 				// Image should be kept regardless of size (use inherit dimensions later)
@@ -2119,6 +2120,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			case 'ellipse':
 				attrs = $(element).attr(['rx', 'ry']);
 				keep = (attrs.rx != null || attrs.ry != null);
+				current_mode = 'select';
 				break;
 			case 'fhellipse':
 				if ((freehand.maxx - freehand.minx) > 0 &&

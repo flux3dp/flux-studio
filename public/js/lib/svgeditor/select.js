@@ -134,6 +134,9 @@ svgedit.select.Selector.prototype.showGrips = function(show) {
 		this.selectorGroup.appendChild(selectorManager_.selectorGripsGroup);
 		this.updateGripCursors(svgedit.utilities.getRotationAngle(elem));
 	}
+
+	window.objectPanelsController.setVisibility(show);
+	window.objectPanelsController.render();
 };
 
 // Function: svgedit.select.Selector.resize
@@ -474,6 +477,8 @@ svgedit.select.SelectorManager.prototype.releaseSelector = function(elem) {
 			break;
 		}
 	}
+	
+	window.objectPanelsController.unmount();
 };
 
 // Function: svgedit.select.SelectorManager.getRubberBandBox

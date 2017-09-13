@@ -7,7 +7,7 @@ requirejs.config({
         jquery: 'lib/svgeditor/jquery',
         backbone: 'lib/backbone',
         underscore: 'lib/underscore',
-        react: 'lib/react/react-with-addons.min',
+        react: (Boolean(localStorage.dev) ? 'lib/react/react-with-addons' : 'lib/react/react-with-addons.min'),
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',

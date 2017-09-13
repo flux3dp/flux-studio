@@ -70,7 +70,6 @@ define([
           }
 
           _renderActionButtons() {
-              console.log('randerActionButtons', this);
               //globalInteraction.onImageChanged(this.state.hasImage);
 
               var cx = React.addons.classSet,
@@ -162,6 +161,7 @@ define([
                         <Svg />
                         {actionButtons}
                         {printerSelector}
+                        <div id="object-panels-placeholder"></div>
                     </div>
             );
           }

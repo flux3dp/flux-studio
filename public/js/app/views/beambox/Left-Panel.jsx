@@ -38,7 +38,7 @@ define([
         _renderMaxStrength: function() {
             return {
                 label: (
-                    <div onClick={FnWrapper.useSelectTool} className="max-strength">
+                    <div onClick={FnWrapper.useSelectTool}>
                         <span>{lang.beambox.maxStrength}</span>
                         <span> : {parseFloat(Math.round(this.state.maxStrength * 10) / 10).toFixed(1)} {lang.beambox.units.w}</span>
                     </div>
