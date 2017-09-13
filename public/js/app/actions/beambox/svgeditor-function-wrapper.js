@@ -11,7 +11,7 @@ define([
     let _setCrosshairCursor = function() {
         $('#workarea').css('cursor', 'crosshair');
     };
-    
+
     return {
         //main panel
         importImage: function() {
@@ -89,7 +89,7 @@ define([
             elem.attr('data-shading', val);
         },
         write_image_data_threshold: function(elem, val) {
-            elem.attr('data-threshold', val);            
+            elem.attr('data-threshold', val);
         },
 
         getThumbnailDataurl: function() {
@@ -102,14 +102,14 @@ define([
             const c = $('#export_canvas')[0];
             c.width = svgCanvas.contentW;
             c.height = svgCanvas.contentH;
-    
+
             canvg(c, str); //canvg.js
-            
-            dataurl = c.toDataURL();
-            
+
+            var dataurl = c.toDataURL();
+
             return dataurl;
         }
-        
-        
+
+
     };
 });

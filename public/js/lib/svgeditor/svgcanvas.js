@@ -4656,9 +4656,10 @@ this.setSvgString = function(xmlString) {
 // was obtained
 // * import should happen in top-left of current zoomed viewport
 this.importSvgString = function(xmlString) {
-	//var re = /viewBox=".*?\"/;
-	//xmlString = xmlString.replace(re, '')
 	var j, ts;
+	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
+	var dpi = 72;
+
 	try {
 		// Get unique ID
 		var uid = svgedit.utilities.encode64(xmlString.length + xmlString).substr(0,32);
@@ -4711,21 +4712,6 @@ this.importSvgString = function(xmlString) {
 				canvash = +svgcontent.getAttribute('height');
 			// imported content should be 1/3 of the canvas on its largest dimension
 
-			//72 dpi: 1mm = 2.83464567px  ; 72 / 2.54
-
-			var sc = 1;
-	//		if (innerh > innerw) {
-	//			sc = (canvash/3)/vb[3];
-	//			ts = 'scale(' + sc + ')';
-	//		} else {
-	//			sc = (canvash/3)/vb[2];
-	//			ts = 'scale(' + sc + ')';
-	//		}
-
-			ts = 'scale(1)';
-
-			// Hack to make recalculateDimensions understand how to scale
-			ts = 'translate(0) ' + ts + ' translate(0)';
 
 			symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
 			var defs = svgedit.utilities.findDefs();
@@ -4767,10 +4753,18 @@ this.importSvgString = function(xmlString) {
 		batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 		clearSelection();
 
-		var bb = svgedit.utilities.getBBox(use_el);
+		var bb = svgedit.utilities.getBBox(use_el),
+				ratio = 25.4 / dpi * 10;
 
-		//use_el.setAttribute('transform', ts);
-		use_el.setAttribute('transform', 'matrix(3.5,0,0,3.5,0,0)');
+		ts = 'scale(' + ratio + ')';
+
+		// Hack to make recalculateDimensions understand how to scale
+		ts = 'translate(0) ' + ts + ' translate(0)';
+
+
+
+
+		use_el.setAttribute('transform', ts);
 
 		svgedit.recalculate.recalculateDimensions(use_el);
 
@@ -4785,7 +4779,6 @@ this.importSvgString = function(xmlString) {
 
 		var dataXform = "";
 		$.each(bb, function(key, value) {
-			value = value / sc;
 			dataXform += key + '=' + value + ' ';
 		});
 		use_el.setAttribute('data-xform', dataXform);

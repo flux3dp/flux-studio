@@ -12,7 +12,7 @@ define(['helpers/is-json'], function(isJson) {
 
 
     // options:
-    //      hostname      - host name (Default: localhost)
+    //      hostname      - host name (Default: 127.0.0.1)
     //      port          - what protocol uses (Default: 8000)
     //      method        - method be called
     //      autoReconnect - auto reconnect on close

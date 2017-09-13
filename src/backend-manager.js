@@ -133,7 +133,6 @@ class BackendManager extends EventEmitter {
                 this._setRecover();
             }
         });
-        //this._ws.connect(`ws://localhost:${this._port}/ws/discover`);
         this._ws.connect(`ws://127.0.0.1:${this._port}/ws/discover`);
     }
 

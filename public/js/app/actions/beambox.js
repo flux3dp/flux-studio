@@ -9,7 +9,9 @@ define([
     'helpers/api/svg-laser-parser',
     'helpers/api/fcode-reader',
     'app/actions/alert-actions',
-    'app/actions/global-actions'
+    'app/actions/global-actions',
+    'app/actions/beambox/svgeditor-function-wrapper'
+
 ], function(
     $,
     DeviceMaster,
@@ -21,7 +23,8 @@ define([
     svgLaserParser,
     fcodeReader,
     AlertActions,
-    GlobalActions
+    GlobalActions,
+    test
 ) {
     'use strict';
     var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
@@ -32,6 +35,7 @@ define([
         };
 
     var sendToSVGAPI = function(args, settings, callback, fileMode) {
+            console.log('test',test.getThumbnailDataurl());
             console.log('sendToSVGAPI', args, settings, callback, fileMode);
             callback = callback || function() {};
 
