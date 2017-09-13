@@ -176,6 +176,9 @@ define([
     'css!svgeditor/spinbtn/JQuerySpinBtn',
     //'css!svgeditor/custom.css'
 
+    'lib/svgeditor/canvg/canvg',
+    'lib/svgeditor/canvg/rgbcolor',
+
 ], function(
     React,
     ConfigHelper,

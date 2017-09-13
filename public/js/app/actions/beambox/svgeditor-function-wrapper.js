@@ -90,6 +90,24 @@ define([
         },
         write_image_data_threshold: function(elem, val) {
             elem.attr('data-threshold', val);            
+        },
+
+        getThumbnailDataurl: function() {
+            const svgCanvas = window.svgCanvas;
+
+            const str = svgCanvas.getSvgString();
+            if (!$('#export_canvas').length) {
+                $('<canvas>', {id: 'export_canvas'}).appendTo('body');
+            }
+            const c = $('#export_canvas')[0];
+            c.width = svgCanvas.contentW;
+            c.height = svgCanvas.contentH;
+    
+            canvg(c, str); //canvg.js
+            
+            dataurl = c.toDataURL();
+            
+            return dataurl;
         }
         
         
