@@ -20,7 +20,7 @@ define([
     'use strict';
 
     let Config = ConfigHelper(),
-        lang = i18n.lang;
+        LANG = i18n.lang.beambox.left_panel;
 
     return React.createClass({
 
@@ -30,17 +30,25 @@ define([
         },
 
         getInitialState: function() {
+            const options = Config.read('beambox-defaults');
             return {
-                maxStrength: 10
+                maxStrength: options['max-strength']
             };
+        },
+
+        _handleMaxStrengthChange: function(newValue) {
+            const options = Config.read('beambox-defaults');
+            options['max-strength'] = newValue;
+            Config.write('beambox-defaults', options);
+            this.setState({maxStrength: newValue});
         },
 
         _renderMaxStrength: function() {
             return {
                 label: (
                     <div onClick={FnWrapper.useSelectTool}>
-                        <span>{lang.beambox.maxStrength}</span>
-                        <span> : {parseFloat(Math.round(this.state.maxStrength * 10) / 10).toFixed(1)} {lang.beambox.units.w}</span>
+                        <span>{LANG.max_strength}</span>
+                        <span> : {parseFloat(Math.round(this.state.maxStrength * 10) / 10).toFixed(1)} {i18n.lang.beambox.units.walt}</span>
                     </div>
                 ),
                 content: (
@@ -51,7 +59,7 @@ define([
                         max={40}
                         step={0.1}
                         default={this.state.maxStrength}
-                        onChange={(id, newValue)=>{this.setState({maxStrength: newValue});}} />
+                        onChange={(id, newValue)=>{this._handleMaxStrengthChange(newValue)}}/>
                     </div>
                 ),
                 disable: false
@@ -62,7 +70,7 @@ define([
             return {
                 label: (
                     <div onClick={FnWrapper.useSelectTool}>
-                        <span>Insert Object</span>
+                        <span>{LANG.insert_object}</span>
                     </div>
                 ),
                 content: (
@@ -76,7 +84,7 @@ define([
             return {
                 label: (
                     <div onClick={FnWrapper.useSelectTool}>
-                        <span>Preview</span>
+                        <span>{LANG.preview}</span>
                     </div>
                 ),
                 disable: false

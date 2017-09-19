@@ -7,8 +7,8 @@ define([
 ], function($, React, FnWrapper, UnitInput, i18n) {
     'use strict';
 
-    const lang = i18n.lang;
-
+    const LANG = i18n.lang.beambox.object_panels;
+    
     return React.createClass({
         propTypes: {
             angle: React.PropTypes.number.isRequired
@@ -36,7 +36,7 @@ define([
                     <label className="controls accordion">
                         <input type="checkbox" className="accordion-switcher"/>
                         <p className="caption">
-                            {lang.laser.object_params.rotate.text}
+                            {LANG.rotation}
                             <span className="value">{this.state.angle}°</span>
                         </p>
                         <label className="accordion-body">

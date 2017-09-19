@@ -7,7 +7,7 @@ define([
 ], function($, React, FnWrapper, UnitInput, i18n) {
     'use strict';
 
-    const lang = i18n.lang;
+    const LANG = i18n.lang.beambox.object_panels;
 
     return React.createClass({
         propTypes: {
@@ -55,16 +55,16 @@ define([
                     <label className="controls accordion">
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
-                        雷雕設定
-                        <span className="value">漸層 {this.state.shading ? 'On' : 'Off'} , {this.state.threshold}%</span>
+                        {LANG.laser_config}
+                        <span className="value">{LANG.shading} {this.state.shading ? 'On' : 'Off'} , {this.state.threshold}%</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
-                            <span className="text-center header">漸層</span>
+                            <span className="text-center header">{LANG.shading}</span>
                             <input type="checkbox" checked={this.state.shading} onChange={this._handleShadingChange}/>
                         </div>
                         <div className="control">
-                            <span className="text-center header">曝光閾值</span>
+                            <span className="text-center header">{LANG.threshold}</span>
                             <input type="range" min={0} max={100} value={this.state.threshold} onChange={this._handleThresholdChange} />
                         </div>
                     </label>

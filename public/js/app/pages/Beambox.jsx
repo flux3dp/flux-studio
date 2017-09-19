@@ -5,6 +5,7 @@ define([
     'jsx!pages/svg-editor',
     'jsx!widgets/Button-Group',
     'helpers/api/config',
+    'app/actions/beambox/default-config',
     'helpers/i18n',
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
@@ -15,15 +16,20 @@ define([
     SvgGenerator,
     ButtonGroup,
     ConfigHelper,
+    DefaultConfig,
     i18n,
     Modal,
     PrinterSelector
 ) {
+    'use strict';
+    
+    const Config = ConfigHelper();
+    const lang = i18n.lang;
 
-    let Config = ConfigHelper(),
-        lang = i18n.lang;
+    if (!Config.read('beambox-defaults')) {
+        Config.write('beambox-defaults', DefaultConfig);
+    }
 
-        'use strict';
 
     return function(args = {}) {
         let Svg = SvgGenerator(args);
@@ -38,24 +44,11 @@ define([
             };
         }
 
-        componentDidMount() {
-            let options = Config.read('laser-defaults') || {};
-            if (options.material == null) {
-                options.material = lang.laser.advanced.form.object_options.options[0];
-            }
-
-            options.objectHeight = options.objectHeight || 0;
-            options.heightOffset = options.heightOffset || (Config.read('default-model') === 'fd1p' ? -2.3 : 0);
-            options.isShading = !!options.isShading;
-            if (!Config.read('laser-defaults')) {
-                Config.write('laser-defaults', options);
-            }
-            this.setState({options});
-          }
 
           _fetchFormalSettings(holder) {
-              let options = Config.read('laser-defaults') || {},
-                  max = lang.laser.advanced.form.power.max;
+              const options = Config.read('beambox-defaults');
+            //   const max = options['max-strength'];
+                //   max = lang.laser.advanced.form.power.max;
               return {
                   //object_height: options.objectHeight,
                   //height_offset: options.heightOffset || 0,

@@ -12,7 +12,7 @@ define([
         $('#workarea').css('cursor', 'crosshair');
     };
     
-    return {
+    const funcs =  {
         //main panel
         importImage: function() {
             $('#tool_import input').click();
@@ -92,7 +92,7 @@ define([
             elem.attr('data-threshold', val);            
         },
 
-        getThumbnailDataurl: function() {
+        fetchThumbnailDataurl: function() {
             const svgCanvas = window.svgCanvas;
 
             const str = svgCanvas.getSvgString();
@@ -100,16 +100,41 @@ define([
                 $('<canvas>', {id: 'export_canvas'}).appendTo('body');
             }
             const c = $('#export_canvas')[0];
-            c.width = svgCanvas.contentW;
-            c.height = svgCanvas.contentH;
-    
-            canvg(c, str); //canvg.js
+            const cw = c.width = svgCanvas.contentW;
+            const ch = c.height = svgCanvas.contentH;
             
-            dataurl = c.toDataURL();
+            function drawBoard(){
+                const context = c.getContext("2d");
+                const gridW = 50;
+                const gridH = 50;
+
+                context.globalCompositeOperation='destination-over';
+
+                for (var x = 0; x <= cw; x += gridW) {
+                    context.moveTo(x, 0);
+                    context.lineTo(x, ch);
+                }
             
-            return dataurl;
+                for (var x = 0; x <= ch; x += gridH) {
+                    context.moveTo(0, x);
+                    context.lineTo(cw, x);
+                }
+            
+                context.strokeStyle = "#E0E0DF";
+                context.lineWidth = 1;
+                context.stroke();
+            }
+
+            const d = $.Deferred();
+
+            canvg(c, str, {renderCallback: function(){
+                drawBoard();
+                d.resolve(c.toDataURL());
+                
+            }});
+            return d.promise();
         }
-        
-        
     };
+
+    return funcs;
 });

@@ -1794,8 +1794,13 @@ define([
 								setImageURL(svgCanvas.getHref(elem));
 							}
 
-							const threshold = $(elem).data('threshold');
-							const shading = $(elem).data('shading');
+							const threshold = $(elem).attr('data-threshold');
+							let shading = $(elem).attr('data-shading');
+							if(shading === 'false') {
+								shading = false;
+							} else {
+								shading = Boolean(shading);
+							}
 							objectPanelsController.setImageShading(shading);
 							objectPanelsController.setImageThreshold(threshold);
 						} // image
@@ -4672,7 +4677,7 @@ define([
 									flyouts[opts.parent].push(opts);
 								}
 							}
-
+							/*
 							// Bind function to shortcut key
 							if (opts.key) {
 								// Set shortcut based on options
@@ -4693,7 +4698,7 @@ define([
 											e.preventDefault();
 										}
 										// Prevent default on ALL keys?
-										return false;
+										// return false; //return false in jquery do both preventDefault and stopPropogation
 									});
 								});
 
@@ -4707,6 +4712,7 @@ define([
 									}
 								}
 							}
+							*/
 						});
 
 						// Setup flyouts

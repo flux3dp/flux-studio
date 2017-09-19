@@ -59,7 +59,7 @@ define([
                 value = Math.max(value, this.props.min);
             }
             
-            return Number(value).toFixed(this.decimal);
+            return Number(value).toFixed(this.props.decimal);
         },
 
         _updateValue: function(newVal) {
@@ -69,7 +69,7 @@ define([
             
             if(newValue!==this.state.savedValue) {
                 this.setState({savedValue: newValue});
-                this.props.getValue(newValue);
+                this.props.getValue(Number(newValue));
             }
         },
 

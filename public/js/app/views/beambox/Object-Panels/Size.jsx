@@ -7,8 +7,8 @@ define([
 ], function($, React, FnWrapper, UnitInput, i18n) {
     'use strict';
 
-    const lang = i18n.lang;
-
+    const LANG = i18n.lang.beambox.object_panels;
+    
     return React.createClass({
         propTypes: {
             width: React.PropTypes.number.isRequired,
@@ -52,12 +52,12 @@ define([
                     <label className="controls accordion">
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
-                        大小
-                        <span className="value">{this.state.width} , {this.state.height}mm</span>
+                        {LANG.size}
+                        <span className="value">{this.state.width} x {this.state.height}mm</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
-                            <span className="text-center header">寬</span>
+                            <span className="text-center header">{LANG.width}</span>
                             <UnitInput
                                 min={0}
                                 max={4000}
@@ -67,7 +67,7 @@ define([
                             />
                         </div>
                         <div className="control">
-                            <span className="text-center header">高</span>
+                            <span className="text-center header">{LANG.height}</span>
                             <UnitInput
                                 min={0}
                                 max={4000}

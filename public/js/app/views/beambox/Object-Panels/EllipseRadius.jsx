@@ -7,8 +7,8 @@ define([
 ], function($, React, FnWrapper, UnitInput, i18n) {
     'use strict';
 
-    const lang = i18n.lang;
-
+    const LANG = i18n.lang.beambox.object_panels;
+    
     return React.createClass({
         propTypes: {
             rx: React.PropTypes.number.isRequired,
@@ -43,12 +43,12 @@ define([
                     <label className="controls accordion">
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
-                        長短軸
+                        {LANG.ellipse_radius}
                         <span className="value">{this.state.rx} , {this.state.ry}mm</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
-                            <span className="text-center header">rx</span>
+                            <span className="text-center header">RX</span>
                             <UnitInput
                                 min={0}
                                 max={4000}
@@ -58,7 +58,7 @@ define([
                             />
                         </div>
                         <div className="control">
-                            <span className="text-center header">ry</span>
+                            <span className="text-center header">RY</span>
                             <UnitInput
                                 min={0}
                                 max={4000}

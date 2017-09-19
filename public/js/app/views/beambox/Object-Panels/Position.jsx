@@ -7,7 +7,7 @@ define([
 ], function($, React, FnWrapper, UnitInput, i18n) {
     'use strict';
 
-    const lang = i18n.lang;
+    const LANG = i18n.lang.beambox.object_panels;
 
     return React.createClass({
         propTypes: {
@@ -43,7 +43,7 @@ define([
                     <label className="controls accordion">
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
-                        {lang.laser.object_params.position.text}
+                        {LANG.position}
                         <span className="value">{this.state.x} , {this.state.y}mm</span>
                     </p>
                     <label className="accordion-body">

@@ -963,9 +963,37 @@ define(function() {
             }
         },
         beambox: {
-            maxStrength: 'Max Laser Strength',
+            left_panel: {
+                insert_object: 'Insert Object',
+                max_strength: 'Max Laser Strength',
+                preview: 'Preview',
+                rectangle: 'Rectangle',
+                ellipse: 'Ellipse',
+                line: 'Line',
+                image: 'Image',
+                text: 'Text'
+            },
+            object_panels: {
+                position: 'Position',
+                rotation: 'Rotation',
+                size: 'Size',
+                width: 'Width',
+                height: 'Height',
+                center: 'Center',
+                ellipse_radius: 'Radius',
+                points: 'Points',
+                laser_config: 'Laser Config',
+                shading: 'Shading',
+                threshold: 'Threshold'
+            },
+            layer_panel: {
+                laser_config: 'Laser Config',
+                laser_strength: 'Strength',
+                laser_speed: 'Speed'
+            },
             units: {
-                w: 'W'
+                walt: 'W',
+                mm: 'mm'
             }
         },
         select_printer: {

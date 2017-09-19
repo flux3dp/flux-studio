@@ -50,20 +50,21 @@ define([
             const data = this.props.data;
             const type = this.props.type;
             const $me = this.props.$me;
-            const reactPanels = {
-                position: <PositionPanel x={data.position.x} y={data.position.y}/>,
-                rotation: <RotationPanel angle={data.rotation.angle} />,
-                size: <SizePanel width={data.size.width} height={data.size.height} type={type}/>,
-                ellipsePosition: <EllipsePositionPanel cx={data.ellipsePosition.cx} cy={data.ellipsePosition.cy}/>,
-                ellipseRadius: <EllipseRadiusPanel rx={data.ellipseRadius.rx} ry={data.ellipseRadius.ry}/>,
-                line: <LinePanel x1={data.line.x1} y1={data.line.y1} x2={data.line.x2} y2={data.line.y2}/>,
-                threshold: <ThresholdPanel shading={data.image.shading} threshold={data.image.threshold} $me={$me}/>
-            };
 
             const validPanels = this._getValidPanels(this.props.type);
             let panelsToBeRender = [];
             validPanels.forEach(function(panelName) {
-                panelsToBeRender.push(reactPanels[panelName]);
+                let panel;
+                switch (panelName) {
+                    case 'position':        panel = <PositionPanel key={panelName} x={data.position.x} y={data.position.y}/>;       break;
+                    case 'rotation':        panel = <RotationPanel key={panelName} angle={data.rotation.angle} />;                  break;
+                    case 'size':            panel = <SizePanel key={panelName} width={data.size.width} height={data.size.height} type={type}/>;         break;
+                    case 'ellipsePosition': panel = <EllipsePositionPanel key={panelName} cx={data.ellipsePosition.cx} cy={data.ellipsePosition.cy}/>;  break;
+                    case 'ellipseRadius':   panel = <EllipseRadiusPanel key={panelName} rx={data.ellipseRadius.rx} ry={data.ellipseRadius.ry}/>;        break;
+                    case 'line':            panel = <LinePanel key={panelName} x1={data.line.x1} y1={data.line.y1} x2={data.line.x2} y2={data.line.y2}/>;       break;
+                    case 'threshold':       panel = <ThresholdPanel key={panelName} shading={data.image.shading} threshold={data.image.threshold} $me={$me}/>;  break;
+                }
+                panelsToBeRender.push(panel);
             });
             return panelsToBeRender;
         },

@@ -119,7 +119,7 @@ define([
         }
 
         _toFixed(val) {
-            return Number(val).toFixed(this._decimal);
+            return Number(Number(val).toFixed(this._decimal));
         }
 
         _render() {
