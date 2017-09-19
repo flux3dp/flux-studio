@@ -102,7 +102,7 @@ solid_infill_extrusion_width = 0.4
 solid_infill_speed = 20
 spiral_vase = 0
 standby_temperature_delta = -5
-start_gcode = G1 F6000 Z50\\nG92 Z49.9 \\nG1 F2400 E37 \\nG92 E0
+start_gcode = G1 F6000 Z50\\nG92 Z49.9 \\nG1 F2400 E32 \\nG92 E0
 support_everywhere = 0
 support_material = 0
 support_material_angle = 0
@@ -170,7 +170,6 @@ cool_lift_head = false
 cool_min_layer_time = 5
 cool_min_layer_time_fan_speed_max = 10
 cool_min_speed = 10
-cut_bottom = 0
 default_material_print_temperature = 205
 draft_shield_dist = 10
 draft_shield_enabled = false
@@ -214,7 +213,7 @@ layer_start_y = 0
 machine_disallowed_areas =
 machine_end_gcode = G91\\nG1 E-40 F2400\\nM104 S0\\nG90\\nM84\\n
 machine_min_cool_heat_time_window = 50
-machine_start_gcode = G1 F6000 Z50\\nG92 Z49.9 \\nG1 F2400 E37 \\nG92 E0
+machine_start_gcode = G1 F6000 Z50\\nG92 Z49.9 \\nG1 F2400 E32 \\nG92 E0
 magic_fuzzy_skin_enabled = false
 magic_fuzzy_skin_point_dist = 0.8
 magic_fuzzy_skin_thickness = 0.3
@@ -283,19 +282,19 @@ raft_surface_line_width = 0.4
 raft_surface_speed = 20
 raft_surface_thickness = 0.1
 retract_at_layer_change = false
-retraction_amount = 5.7
+retraction_amount = 8
 retraction_combing = noskin
-retraction_count_max = 90
+retraction_count_max = 15
 retraction_enable = true
 retraction_extra_prime_amount = 0
-retraction_extrusion_window = 5.7
+retraction_extrusion_window = 8
 retraction_hop = 0.05
 retraction_hop_after_extruder_switch = true
 retraction_hop_enabled = true
 retraction_hop_only_when_collides = true
 retraction_min_travel = 0.8
-retraction_prime_speed = 60
-retraction_retract_speed = 60
+retraction_prime_speed = 80
+retraction_retract_speed = 80
 skin_alternate_rotation = false
 skin_line_width = 0.4
 skin_no_small_gaps_heuristic = true
@@ -340,7 +339,7 @@ support_interface_line_width = 0.4
 support_interface_pattern = concentric
 support_interface_skip_height = 0.3
 support_join_distance = 2
-support_line_distance = 2.66
+support_line_distance = 2.0
 support_line_width = 0.35
 support_mesh = false
 support_minimal_diameter = 3
@@ -393,7 +392,6 @@ wireframe_top_delay = 0
 wireframe_top_jump = 0.6
 wireframe_up_half_speed = 0.3
 xy_offset = -0.07
-z_offset = 0
 z_seam_type = shortest
 z_seam_x = 85
 z_seam_y = 510
@@ -406,7 +404,7 @@ flux_calibration = 1
 geometric_error_correction_on = 1
 pause_at_layers =
 temperature = 200
-z_offset = 0`,
+z_offset = 0.1`,
     fd1p: {
         high: {
             "layer_height": 0.075,
@@ -420,7 +418,7 @@ z_offset = 0`,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
-            "support_material_spacing": 0.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.15
         },
         med: {
@@ -435,7 +433,7 @@ z_offset = 0`,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
-            "support_material_spacing": 0.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.15
         },
         low: {
@@ -450,7 +448,7 @@ z_offset = 0`,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
-            "support_material_spacing": 0.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.15
         }
     },
@@ -467,7 +465,7 @@ z_offset = 0`,
             "top_solid_layers": 8,
             "bottom_solid_layers": 6,
             "first_layer_temperature": 230,
-            "support_material_spacing": 1.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.3
         },
         med: {
@@ -482,7 +480,7 @@ z_offset = 0`,
             "top_solid_layers": 5,
             "bottom_solid_layers": 5,
             "first_layer_temperature": 230,
-            "support_material_spacing": 1.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.3
         },
         low: {
@@ -497,7 +495,7 @@ z_offset = 0`,
             "top_solid_layers": 3,
             "bottom_solid_layers": 3,
             "first_layer_temperature": 230,
-            "support_material_spacing": 1.7,
+            "support_material_spacing": 2.0,
             "support_material_contact_distance": 0.3
         }
     }

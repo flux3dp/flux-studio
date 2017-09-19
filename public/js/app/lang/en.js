@@ -458,7 +458,7 @@ define(function() {
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
                 generalSupport: 'General Support',
-                spacing: 'Spacing',
+                spacing: 'Line Distance',
                 overhang: 'Overhang',
                 zDistance: 'Z Distance',
                 raft: 'Raft',
@@ -1060,7 +1060,7 @@ define(function() {
             plus_extrusion: 'Upgrade Kits Extruder',
             postback_url: 'Status callback URL',
             movement_test: 'Movement Test Before Print',
-            machine_radius: 'Machine Radius',
+            machine_radius: 'Delta Radius',
             disable: 'Disable',
             enable: 'Enable'
         },

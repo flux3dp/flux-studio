@@ -65,7 +65,7 @@ function buildMenu(callback) {
             { 'id': 'RESET', label: r.reset || 'Reset', enabled: false, click: callback },
             { 'id': 'ALIGN_CENTER', label: r.align_center || 'Align Center', enabled: false, click: callback },
             { type: 'separator' },
-            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Sift+X` },
+            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Shift+X` },
         ]
     });
 
