@@ -1311,7 +1311,10 @@ define(function() {
             startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
             runningMovementTests: '進行運動測試',
             connectingMachine: '連接機器中',
-            movementTestFailed: { caption: '無法通過運動測試',  message: '1. 請確認工具頭連接線不會造成過大阻力<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a><br/>再試一次？' }
+            movementTestFailed: { caption: '無法通過運動測試',  message: '1. 請確認工具頭連接線不會造成過大阻力<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a><br/>再試一次？' },
+            befaultTutorialWelcome: '非常感謝您購買 FLUX Delta+！<br/><br/>以下內容能幫助您快速瞭解並使用您的 FLUX Delta+<br/>期待 FLUX Delta+ 能陪伴您度過美好的時光<br/><br/>＊請務必先觀看教學影片！請打開中文字幕',
+            openBrowser: '開啟網頁',
+            welcome: '歡迎使用'
         },
         slicer: {
             computing: '計算中',

@@ -1316,7 +1316,10 @@ define(function() {
             startPrintDeltaPlus: 'Make sure you put on the magnetic print plate.',
             runningMovementTests: 'Running movement tests',
             connectingMachine: 'Connecting to the machine',
-            movementTestFailed: { caption: 'Unable to pass movement tests',  message: '1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.<br/> Try again?' }
+            movementTestFailed: { caption: 'Unable to pass movement tests',  message: '1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.<br/> Try again?' },
+            befaultTutorialWelcome: 'Thank you for ordering FLUX Delta+!<br/><br/> This guide will help you take you through the basic settings of the machine and help you set up.<br/><br/> Let’s watch the tutorial! Please turn on the subtitles.<br/><br/>',
+            openBrowser: 'openBrowser',
+            welcome: 'WELCOME'
         },
         slicer: {
             computing: 'Computing',

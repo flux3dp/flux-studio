@@ -69,7 +69,7 @@ gulp.task('webserver', ['sass:watch'], function() {
     gulp.src('public')
         .pipe(webserver({
             livereload: true,
-            open: true,
+            open: false,
             port: 8111
         }));
 });
