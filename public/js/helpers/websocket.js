@@ -30,7 +30,7 @@ define([
         logLimit = 100;
 
     // options:
-    //      hostname      - host name (Default: localhost)
+    //      hostname      - host name (Default: 127.0.0.1)
     //      port          - what protocol uses (Default: 8000)
     //      method        - method be called
     //      autoReconnect - auto reconnect on close
@@ -47,7 +47,7 @@ define([
             customPort = localStorage.getItem('port'),
             defaultCallback = function(result) {},
             defaultOptions = {
-                hostname: customHost ? customHost : (dev ? '127.0.0.1' : 'localhost'),
+                hostname: customHost ? customHost : (dev ? '127.0.0.1' : '127.0.0.1'),
                 method: '',
                 get port() {
                     return customPort ? customPort : dev ? '8000' : window.FLUX.ghostPort;

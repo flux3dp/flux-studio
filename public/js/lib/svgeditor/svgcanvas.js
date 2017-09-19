@@ -42,6 +42,37 @@ if (window.opera) {
 
 }());
 
+function calRealLocaltion(elem) {
+		var matrix, matr, a, b, c, d, e, f;
+		var x, y, width, height;
+		var key, value;
+		var obj = new Object();
+
+	  var ts = $.attr(elem, 'transform');
+		var xform = $.attr(elem, 'data-xform');
+		var elemX = parseFloat($.attr(elem, 'x'));
+		var elemY = parseFloat($.attr(elem, 'y'));
+
+		xform.split(" ").forEach((pair) => {
+				[key, value] = pair.split("=");
+				if (value === undefined) { return };
+				obj[key] = parseFloat(value);
+		});
+		matrix = ts.match(/matrix\(.*?\)/g);
+
+		matrix.forEach((element) => {
+				matr = element.substring(7, element.length - 1);
+				[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+
+				x = a * obj.x + c * obj.y + e + a * elemX;
+				y = b * obj.x + d * obj.y + f + d * elemY;
+
+				width = obj.width * a;
+				height = obj.height * d;
+
+				console.log("x:", x,"y:", y,"width:", width, "height:", height);
+		});
+};
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions
 //
@@ -525,6 +556,8 @@ var runExtensions = this.runExtensions = function(action, vars, returnArray) {
 // Parameters:
 // name - String with the ID of the extension
 // ext_func - Function supplied by the extension with its data
+this.importIds = function() {return import_ids};
+
 this.addExtension = function(name, ext_func) {
 	var ext;
 	if (!(name in extensions)) {
@@ -2032,6 +2065,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
+				calRealLocaltion(elem);
 				return;
 			case 'zoom':
 				if (rubberBox != null) {
@@ -4622,9 +4656,10 @@ this.setSvgString = function(xmlString) {
 // was obtained
 // * import should happen in top-left of current zoomed viewport
 this.importSvgString = function(xmlString) {
-	var re = /viewBox=".*?\"/;
-	xmlString = xmlString.replace(re, '')
 	var j, ts;
+	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
+	var dpi = 72;
+
 	try {
 		// Get unique ID
 		var uid = svgedit.utilities.encode64(xmlString.length + xmlString).substr(0,32);
@@ -4665,6 +4700,9 @@ this.importSvgString = function(xmlString) {
 				innervb = svg.getAttribute('viewBox'),
 				// if no explicit viewbox, create one out of the width and height
 				vb = innervb ? innervb.split(' ') : [0, 0, innerw, innerh];
+
+			svg.removeAttribute('viewBox');
+
 			for (j = 0; j < 4; ++j) {
 				vb[j] = +(vb[j]);
 			}
@@ -4674,14 +4712,6 @@ this.importSvgString = function(xmlString) {
 				canvash = +svgcontent.getAttribute('height');
 			// imported content should be 1/3 of the canvas on its largest dimension
 
-			if (innerh > innerw) {
-				ts = 'scale(' + (canvash/3)/vb[3] + ')';
-			} else {
-				ts = 'scale(' + (canvash/3)/vb[2] + ')';
-			}
-
-			// Hack to make recalculateDimensions understand how to scale
-			ts = 'translate(0) ' + ts + ' translate(0)';
 
 			symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
 			var defs = svgedit.utilities.findDefs();
@@ -4706,10 +4736,10 @@ this.importSvgString = function(xmlString) {
 			symbol.id = getNextId();
 
 			// Store data
-			import_ids[uid] = {
-				symbol: symbol,
-				xform: ts
-			};
+	//		import_ids[uid] = {
+	//			symbol: symbol,
+	//			xform: ts
+	//		};
 
 			svgedit.utilities.findDefs().appendChild(symbol);
 			batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(symbol));
@@ -4723,8 +4753,21 @@ this.importSvgString = function(xmlString) {
 		batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 		clearSelection();
 
+		var bb = svgedit.utilities.getBBox(use_el),
+				ratio = 25.4 / dpi * 10;
+
+		ts = 'scale(' + ratio + ')';
+
+		// Hack to make recalculateDimensions understand how to scale
+		ts = 'translate(0) ' + ts + ' translate(0)';
+
+
+
+
 		use_el.setAttribute('transform', ts);
+
 		svgedit.recalculate.recalculateDimensions(use_el);
+
 		$(use_el).data('symbol', symbol).data('ref', symbol);
 		addToSelection([use_el]);
 
@@ -4734,10 +4777,17 @@ this.importSvgString = function(xmlString) {
 		addCommandToHistory(batchCmd);
 		call('changed', [svgcontent]);
 
+		var dataXform = "";
+		$.each(bb, function(key, value) {
+			dataXform += key + '=' + value + ' ';
+		});
+		use_el.setAttribute('data-xform', dataXform);
+
 	} catch(e) {
 		console.log(e);
 		return null;
 	}
+
 
 	// we want to return the element so we can automatically select it
 	return use_el;

@@ -89,7 +89,7 @@ define([
             elem.attr('data-shading', val);
         },
         write_image_data_threshold: function(elem, val) {
-            elem.attr('data-threshold', val);            
+            elem.attr('data-threshold', val);
         },
 
         fetchThumbnailDataurl: function() {
