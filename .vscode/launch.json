@@ -6,7 +6,7 @@
             "type": "chrome",
             "request": "attach",
             "port": 9222,
-            "url": "http://localhost:8111/#studio/print",
+            "url": "http://127.0.0.1:8111/#studio/print",
             "webRoot": "${workspaceRoot}/public"
         },
         {

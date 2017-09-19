@@ -1,7 +1,7 @@
 define([], function() {
 	// const ip = 'https://35.161.43.14:3000';
 	const _ip = {
-		dev: 'https://localhost:3000',
+		dev: 'https://127.0.0.1:3000',
 		prod: 'https://cloudserv1.flux3dp.com:3000'
 	};
 	const ip = window.FLUX.dev ? _ip.dev : _ip.prod;
