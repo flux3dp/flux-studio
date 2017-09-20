@@ -22,7 +22,7 @@ define([
     PrinterSelector
 ) {
     'use strict';
-    
+
     const Config = ConfigHelper();
     const lang = i18n.lang;
 
@@ -36,13 +36,13 @@ define([
             self = this;
 
         class view extends React.Component {
-        constructor(){
-            super();
-            this.beamboxEvents = beamboxEvents.call(this);
-            this.state = {
-                openPrinterSelectorWindow: false
-            };
-        }
+          constructor(){
+              super();
+              this.beamboxEvents = beamboxEvents.call(this);
+              this.state = {
+                  openPrinterSelectorWindow: false
+                };
+          }
 
 
           _fetchFormalSettings(holder) {
@@ -67,9 +67,20 @@ define([
 
               var cx = React.addons.classSet,
                   buttons = [{
+                      label: 'Move',
+                      className: cx({
+                          'btn-disabled': false,
+                          'btn-default': true,
+                          'btn-hexagon': true,
+                          'btn-get-fcode': true
+                      }),
+                      dataAttrs: {
+                          'ga-event': 'get-laser-test'
+                      },
+                      onClick: this._handleTestClick.bind(this, '-f')
+                  }, {
                       label: lang.laser.get_fcode,
                       className: cx({
-                          //'btn-disabled': !this.state.hasImage,
                           'btn-disabled': false,
                           'btn-default': true,
                           'btn-hexagon': true,
@@ -82,7 +93,6 @@ define([
                   }, {
                       label: lang.monitor.start,
                       className: cx({
-                          //'btn-disabled': !this.state.hasImage,
                           'btn-disabled': false,
                           'btn-default': true,
                           'btn-hexagon': true,
@@ -99,11 +109,19 @@ define([
             );
         }
 
+        _handleTestClick() {
+          this.setState({
+              openPrinterSelectorWindow: true,
+              printerSelectorWindowStyle: {bottom: '15.5rem'}
+          });
+        }
+
         _handleStartClick() {
             this.setState({
                 openPrinterSelectorWindow: true,
                 machineCommand: 'start',
-                settings: this._fetchFormalSettings()
+                settings: this._fetchFormalSettings(),
+                printerSelectorWindowStyle: {}
             });
         }
 
@@ -130,6 +148,7 @@ define([
                         lang={lang}
                         onClose={onClose}
                         onGettingPrinter={onGettingPrinter}
+                        WindowStyle={this.state.printerSelectorWindowStyle}
                     />
                 );
 
@@ -137,7 +156,6 @@ define([
                 <Modal content={content} onClose={onClose}/>
             );
         }
-
 
           _renderLeftPanel() {
           return (<LeftPanel/>);
