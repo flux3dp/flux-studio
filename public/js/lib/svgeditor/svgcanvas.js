@@ -27,20 +27,6 @@
 // 13) coords.js
 // 14) recalculate.js
 
-(function () {
-
-if (!window.console) {
-	window.console = {};
-	window.console.log = function(str) {};
-	window.console.dir = function(str) {};
-}
-
-if (window.opera) {
-	window.console.log = function(str) { opera.postError(str); };
-	window.console.dir = function(str) {};
-}
-
-}());
 
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions

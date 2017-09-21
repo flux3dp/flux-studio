@@ -1475,6 +1475,8 @@ define([
 				if (urldata.storagePrompt !== true && !editor.storagePromptClosed) {
 					$('#dialog_box').hide();
 				}
+
+				objectPanelsController.render();
 			};
 
 			var updateToolButtonState = function() {

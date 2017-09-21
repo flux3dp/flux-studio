@@ -87,6 +87,8 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 
 		$("#workarea").scrollLeft(portX);
 		$("#workarea").scrollTop(portY);
+
+		window.objectPanelsController.render();
 	};
 	$( "#overview_window_view_box" ).draggable({  containment: "parent"
 		,drag: updateViewPortFromViewBox
