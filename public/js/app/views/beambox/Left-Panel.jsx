@@ -58,7 +58,7 @@ define([
                         min={1}
                         max={40}
                         step={0.1}
-                        default={this.state.maxStrength}
+                        default={Number(this.state.maxStrength)}
                         onChange={(id, newValue)=>{this._handleMaxStrengthChange(newValue)}}/>
                     </div>
                 ),

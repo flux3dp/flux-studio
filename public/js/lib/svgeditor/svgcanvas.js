@@ -7257,7 +7257,6 @@ this.calcRealLocation = function(elem) {
 
 	const width = obj.width * a;
 	const height = obj.height * d;
-	console.log("x:", x,"y:", y,"width:", width, "height:", height);
 	
 	return {
 		x: x,
