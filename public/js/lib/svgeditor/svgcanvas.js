@@ -42,37 +42,6 @@ if (window.opera) {
 
 }());
 
-function calRealLocaltion(elem) {
-		var matrix, matr, a, b, c, d, e, f;
-		var x, y, width, height;
-		var key, value;
-		var obj = new Object();
-
-	  var ts = $.attr(elem, 'transform');
-		var xform = $.attr(elem, 'data-xform');
-		var elemX = parseFloat($.attr(elem, 'x'));
-		var elemY = parseFloat($.attr(elem, 'y'));
-
-		xform.split(" ").forEach((pair) => {
-				[key, value] = pair.split("=");
-				if (value === undefined) { return };
-				obj[key] = parseFloat(value);
-		});
-		matrix = ts.match(/matrix\(.*?\)/g);
-
-		matrix.forEach((element) => {
-				matr = element.substring(7, element.length - 1);
-				[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
-
-				x = a * obj.x + c * obj.y + e + a * elemX;
-				y = b * obj.x + d * obj.y + f + d * elemY;
-
-				width = obj.width * a;
-				height = obj.height * d;
-
-				console.log("x:", x,"y:", y,"width:", width, "height:", height);
-		});
-};
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions
 //
@@ -2065,7 +2034,6 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
-				calRealLocaltion(elem);
 				return;
 			case 'zoom':
 				if (rubberBox != null) {
@@ -7265,6 +7233,38 @@ this.getPrivateMethods = function() {
 		walkTree: svgedit.utilities.walkTree
 	};
 	return obj;
+};
+
+this.calcRealLocation = function(elem) {
+	const ts = $(elem).attr('transform');
+	const xform = $(elem).attr('data-xform');
+	const elemX = parseFloat($(elem).attr('x'));
+	const elemY = parseFloat($(elem).attr('y'));
+
+	const obj = {};
+	xform.split(" ").forEach((pair) => {
+		[key, value] = pair.split("=");
+		if (value === undefined) { return };
+		obj[key] = parseFloat(value);
+	});
+	const matrix = ts.match(/matrix\(.*?\)/g);
+
+	const matr = matrix[0].substring(7, matrix[0].length - 1);
+	[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+
+	const x = a * obj.x + c * obj.y + e + a * elemX;
+	const y = b * obj.x + d * obj.y + f + d * elemY;
+
+	const width = obj.width * a;
+	const height = obj.height * d;
+	console.log("x:", x,"y:", y,"width:", width, "height:", height);
+	
+	return {
+		x: x,
+		y: y,
+		width: width,
+		height: height
+	};
 };
 
 };

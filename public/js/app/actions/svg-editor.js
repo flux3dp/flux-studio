@@ -1811,6 +1811,13 @@ define([
 							label.value = title;
 							setInputWidth(label);
 							$('#g_title').prop('disabled', el_name == 'use');
+
+							if( (el_name === 'use') && ($(elem).attr('data-xform')) ) {
+								const location = svgCanvas.calcRealLocation(elem);
+								objectPanelsController.setPosition(location.x, location.y);
+								objectPanelsController.setWidth(location.width);
+								objectPanelsController.setHeight(location.height);
+							}
 						}
 					}
 					menu_items[(el_name === 'g' ? 'en' : 'dis') + 'ableContextMenuItems']('#ungroup');
@@ -5151,9 +5158,11 @@ define([
 
 			
 			//initialize the view
-			zoomImage(0.2);
-			workarea[0].scrollLeft = 300;
-			workarea[0].scrollTop = 750;
+			// zoomImage(0.2);
+			// workarea[0].scrollLeft = 300;
+			// workarea[0].scrollTop = 750;
+			$('#fit_to_canvas').mouseup();
+			
 			
 		};
 

@@ -33,7 +33,8 @@ define([
         'line':     ['line', 'rotation'],
         'image':    ['position', 'rotation', 'size', 'threshold'],
         'text':     ['rotation'],
-        'g':        ['position', 'rotation']
+        'g':        ['rotation'],
+        'use':      ['position', 'rotation', 'size']
     };
 
     let ObjectPanel = React.createClass({

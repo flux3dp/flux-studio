@@ -50,8 +50,6 @@ define([
                         <div className="control">
                             <span className="text-center header">X</span>
                             <UnitInput
-                                min={0}
-                                max={4000}
                                 unit="mm"
                                 defaultValue={this.state.x}
                                 getValue={this._update_x_handler}
@@ -60,8 +58,6 @@ define([
                         <div className="control">
                             <span className="text-center header">Y</span>
                             <UnitInput
-                                min={0}
-                                max={4000}
                                 unit="mm"
                                 defaultValue={this.state.y}
                                 getValue={this._update_y_handler}
