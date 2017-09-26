@@ -33,9 +33,9 @@ define([
         START: 'START'
     };
 
-    if (!Config.read('beambox-defaults')) {
-        Config.write('beambox-defaults', DefaultConfig);
-    }
+    const customConfig = Config.read('beambox-defaults');
+    const updatedConfig = $.extend({}, DefaultConfig, customConfig);
+    Config.write('beambox-defaults', updatedConfig);
 
 
     return function(args = {}) {

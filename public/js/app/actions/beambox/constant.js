@@ -1,5 +1,5 @@
 define([], function(){
     return {
-        'max-strength': 30,
+        dpmm: 10
     };
 });

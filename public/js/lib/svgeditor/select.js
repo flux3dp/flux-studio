@@ -270,6 +270,8 @@ svgedit.select.Selector.prototype.resize = function(bbox) {
 		mgr.rotateGrip.setAttribute('cx', nbax + (nbaw)/2);
 		mgr.rotateGrip.setAttribute('cy', nbay - (gripRadius*5));
 //	}
+
+	window.objectPanelsController.render();
 };
 
 

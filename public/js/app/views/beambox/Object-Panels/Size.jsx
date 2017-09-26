@@ -13,7 +13,7 @@ define([
         propTypes: {
             width: React.PropTypes.number.isRequired,
             height: React.PropTypes.number.isRequired,
-            type: React.PropTypes.oneOf(['rect','image']).isRequired,
+            type: React.PropTypes.oneOf(['rect', 'image', 'use']).isRequired,
         },
 
         getInitialState: function() {
@@ -34,6 +34,7 @@ define([
             const fn={
                 rect:   FnWrapper.update_rect_width,
                 image:  FnWrapper.update_image_width,
+                use:    function(){console.log('TODO: _update_width_handler')},
             }
             fn[this.props.type](val);
             this.setState({width: val});
@@ -42,6 +43,7 @@ define([
             const fn={
                 rect:   FnWrapper.update_rect_height,
                 image:  FnWrapper.update_image_height,
+                use:    function(){console.log('TODO: _update_height_handler')},
             }
             fn[this.props.type](val);
             this.setState({height: val});            

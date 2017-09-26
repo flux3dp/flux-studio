@@ -2,11 +2,23 @@ define([
     'react',
     'jsx!views/beambox/Object-Panels/Object-Panels',
     'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/beambox/constant'
 ], function(
     React,
     ObjectPanels,
-    FnWrapper
+    FnWrapper,
+    Constant
 ){
+    let _pixel2mm = function(pixel_input) {
+        const dpmm = Constant.dpmm;
+        return Number(pixel_input)/dpmm;
+    };
+
+    let _toFixed = function(val) {
+        const decimal = 2;
+        return Number(Number(val).toFixed(decimal));
+    };
+
     class ObjectPanelsController {
         constructor(reactRoot) {
             this.reactRoot = reactRoot;
@@ -36,7 +48,6 @@ define([
                     threshold:undefined, shading:undefined
                 }
             };
-            this._decimal = 2;
 
             //bind all
             for (let obj = this; obj; obj = Object.getPrototypeOf(obj)){
@@ -61,41 +72,41 @@ define([
         }
 
         setPosition(x, y) {
-            this.data.position.x = this._toFixed(x);
-            this.data.position.y = this._toFixed(y);
+            this.data.position.x = _toFixed(_pixel2mm(x));
+            this.data.position.y = _toFixed(_pixel2mm(y));
         }
         setRotation(val) {
-            this.data.rotation.angle = this._toFixed(val);
+            this.data.rotation.angle = _toFixed(val);
         }
         setWidth(val) {
-            this.data.size.width = this._toFixed(val);
+            this.data.size.width = _toFixed(_pixel2mm(val));
         }
         setHeight(val) {
-            this.data.size.height = this._toFixed(val);
+            this.data.size.height = _toFixed(_pixel2mm(val));
         }
         setEllipsePositionX(val) {
-            this.data.ellipsePosition.cx = this._toFixed(val);
+            this.data.ellipsePosition.cx = _toFixed(_pixel2mm(val));
         }
         setEllipsePositionY(val) {
-            this.data.ellipsePosition.cy = this._toFixed(val);
+            this.data.ellipsePosition.cy = _toFixed(_pixel2mm(val));
         }
         setEllipseRadiusX(val) {
-            this.data.ellipseRadius.rx = this._toFixed(val);
+            this.data.ellipseRadius.rx = _toFixed(_pixel2mm(val));
         }
         setEllipseRadiusY(val) {
-            this.data.ellipseRadius.ry = this._toFixed(val);
+            this.data.ellipseRadius.ry = _toFixed(_pixel2mm(val));
         }
         setLineX1(val) {
-            this.data.line.x1 = this._toFixed(val);
+            this.data.line.x1 = _toFixed(_pixel2mm(val));
         }
         setLineY1(val) {
-            this.data.line.y1 = this._toFixed(val);
+            this.data.line.y1 = _toFixed(_pixel2mm(val));
         }
         setLineX2(val) {
-            this.data.line.x2 = this._toFixed(val);
+            this.data.line.x2 = _toFixed(_pixel2mm(val));
         }
         setLineY2(val) {
-            this.data.line.y2 = this._toFixed(val);
+            this.data.line.y2 = _toFixed(_pixel2mm(val));
         }
 
         setImageShading(val) {
@@ -118,9 +129,7 @@ define([
             React.unmountComponentAtNode(this.reactRoot);
         }
 
-        _toFixed(val) {
-            return Number(Number(val).toFixed(this._decimal));
-        }
+        
 
         _render() {
             React.render(
