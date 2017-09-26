@@ -23,9 +23,11 @@ TODOS
 1. JSDoc
 */
 define([
-	'jsx!views/beambox/Object-Panels-Controller'
+	'jsx!views/beambox/Object-Panels-Controller',
+	'helpers/shortcuts'
 ],function(
-	ObjectPanelsController
+	ObjectPanelsController,
+	Shortcuts
 ){
 	
 	if (window.svgEditor) {
@@ -4570,82 +4572,68 @@ define([
 						else {
 							clickSave();
 						}
-					}, evt: 'mouseup', key: ['S', true]},
+					}, evt: 'mouseup'},
 					{sel: '#tool_export', fn: clickExport, evt: 'mouseup'},
-					{sel: '#tool_open', fn: clickOpen, evt: 'mouseup', key: ['O', true]},
+					{sel: '#tool_open', fn: clickOpen, evt: 'mouseup'},
 					{sel: '#tool_import', fn: clickImport, evt: 'mouseup'},
-					{sel: '#tool_source', fn: showSourceEditor, evt: 'click', key: ['U', true]},
-					{sel: '#tool_wireframe', fn: clickWireframe, evt: 'click', key: ['F', true]},
-					{sel: '#tool_source_cancel,.overlay,#tool_docprops_cancel,#tool_prefs_cancel', fn: cancelOverlays, evt: 'click', key: ['esc', false, false], hidekey: true},
+					{sel: '#tool_source', fn: showSourceEditor, evt: 'click'},
+					{sel: '#tool_wireframe', fn: clickWireframe, evt: 'click'},
+					{sel: '#tool_source_cancel,.overlay,#tool_docprops_cancel,#tool_prefs_cancel', fn: cancelOverlays, evt: 'click'},
 					{sel: '#tool_source_save', fn: saveSourceEditor, evt: 'click'},
 					{sel: '#tool_docprops_save', fn: saveDocProperties, evt: 'click'},
 					{sel: '#tool_docprops', fn: showDocProperties, evt: 'mouseup'},
 					{sel: '#tool_prefs_save', fn: savePreferences, evt: 'click'},
 					{sel: '#tool_prefs_option', fn: function() {showPreferences(); return false;}, evt: 'mouseup'},
-					{sel: '#tool_delete,#tool_delete_multi', fn: deleteSelected, evt: 'click', key: ['del/backspace', true]},
+					{sel: '#tool_delete,#tool_delete_multi', fn: deleteSelected, evt: 'click'},
 					{sel: '#tool_reorient', fn: reorientPath, evt: 'click'},
 					{sel: '#tool_node_link', fn: linkControlPoints, evt: 'click'},
 					{sel: '#tool_node_clone', fn: clonePathNode, evt: 'click'},
 					{sel: '#tool_node_delete', fn: deletePathNode, evt: 'click'},
 					{sel: '#tool_openclose_path', fn: opencloseSubPath, evt: 'click'},
 					{sel: '#tool_add_subpath', fn: addSubPath, evt: 'click'},
-					{sel: '#tool_move_top', fn: moveToTopSelected, evt: 'click', key: 'ctrl+shift+]'},
-					{sel: '#tool_move_bottom', fn: moveToBottomSelected, evt: 'click', key: 'ctrl+shift+['},
+					{sel: '#tool_move_top', fn: moveToTopSelected, evt: 'click'},
+					{sel: '#tool_move_bottom', fn: moveToBottomSelected, evt: 'click'},
 					{sel: '#tool_topath', fn: convertToPath, evt: 'click'},
 					{sel: '#tool_make_link,#tool_make_link_multi', fn: makeHyperlink, evt: 'click'},
 					{sel: '#tool_undo', fn: clickUndo, evt: 'click'},
 					{sel: '#tool_redo', fn: clickRedo, evt: 'click'},
-					{sel: '#tool_clone,#tool_clone_multi', fn: clickClone, evt: 'click', key: ['D', true]},
-					{sel: '#tool_group_elements', fn: clickGroup, evt: 'click', key: ['G', true]},
+					{sel: '#tool_clone,#tool_clone_multi', fn: clickClone, evt: 'click'},
+					{sel: '#tool_group_elements', fn: clickGroup, evt: 'click'},
 					{sel: '#tool_ungroup', fn: clickGroup, evt: 'click'},
 					{sel: '#tool_unlink_use', fn: clickGroup, evt: 'click'},
 					{sel: '[id^=tool_align]', fn: clickAlign, evt: 'click'},
-					// these two lines are required to make Opera work properly with the flyout mechanism
-		//			{sel: '#tools_rect_show', fn: clickRect, evt: 'click'},
-		//			{sel: '#tools_ellipse_show', fn: clickEllipse, evt: 'click'},
 					{sel: '#tool_bold', fn: clickBold, evt: 'mousedown'},
 					{sel: '#tool_italic', fn: clickItalic, evt: 'mousedown'},
-					// {sel: '#sidepanel_handle', fn: toggleSidePanel, key: ['X']},
 					{sel: '#copy_save_done', fn: cancelOverlays, evt: 'click'},
 
 					// Shortcuts not associated with buttons
 
-					{key: 'ctrl+left', fn: function(){rotateSelected(0,1);}},
-					{key: 'ctrl+right', fn: function(){rotateSelected(1,1);}},
-					{key: 'ctrl+shift+left', fn: function(){rotateSelected(0,5);}},
-					{key: 'ctrl+shift+right', fn: function(){rotateSelected(1,5);}},
-					{key: 'shift+O', fn: selectPrev},
-					{key: 'shift+P', fn: selectNext},
-					{key: [modKey+'up', true], fn: function(){zoomImage(2);}},
-					{key: [modKey+'down', true], fn: function(){zoomImage(0.5);}},
-					{key: [modKey+']', true], fn: function(){moveUpDownSelected('Up');}},
-					{key: [modKey+'[', true], fn: function(){moveUpDownSelected('Down');}},
-					{key: ['up', true], fn: function(){moveSelected(0,-1);}},
-					{key: ['down', true], fn: function(){moveSelected(0,1);}},
-					{key: ['left', true], fn: function(){moveSelected(-1,0);}},
-					{key: ['right', true], fn: function(){moveSelected(1,0);}},
-					{key: 'shift+up', fn: function(){moveSelected(0,-10);}},
-					{key: 'shift+down', fn: function(){moveSelected(0,10);}},
-					{key: 'shift+left', fn: function(){moveSelected(-10,0);}},
-					{key: 'shift+right', fn: function(){moveSelected(10,0);}},
-					{key: ['alt+up', true], fn: function(){svgCanvas.cloneSelectedElements(0,-1);}},
-					{key: ['alt+down', true], fn: function(){svgCanvas.cloneSelectedElements(0,1);}},
-					{key: ['alt+left', true], fn: function(){svgCanvas.cloneSelectedElements(-1,0);}},
-					{key: ['alt+right', true], fn: function(){svgCanvas.cloneSelectedElements(1,0);}},
-					{key: ['alt+shift+up', true], fn: function(){svgCanvas.cloneSelectedElements(0,-10);}},
-					{key: ['alt+shift+down', true], fn: function(){svgCanvas.cloneSelectedElements(0,10);}},
-					{key: ['alt+shift+left', true], fn: function(){svgCanvas.cloneSelectedElements(-10,0);}},
-					{key: ['alt+shift+right', true], fn: function(){svgCanvas.cloneSelectedElements(10,0);}},
-					{key: 'A', fn: function(){svgCanvas.selectAllInCurrentLayer();}},
-
-					// Standard shortcuts
-					{key: modKey+'z', fn: clickUndo},
-					{key: modKey + 'shift+z', fn: clickRedo},
-					{key: modKey + 'y', fn: clickRedo},
-
-					{key: modKey+'x', fn: cutSelected},
-					{key: modKey+'c', fn: copySelected},
-					{key: modKey+'v', fn: pasteInCenter}
+					// {key: 'ctrl+left', fn: function(){rotateSelected(0,1);}},
+					// {key: 'ctrl+right', fn: function(){rotateSelected(1,1);}},
+					// {key: 'ctrl+shift+left', fn: function(){rotateSelected(0,5);}},
+					// {key: 'ctrl+shift+right', fn: function(){rotateSelected(1,5);}},
+					// {key: 'shift+O', fn: selectPrev},
+					// {key: 'shift+P', fn: selectNext},
+					// {key: [modKey+'up', true], fn: function(){zoomImage(2);}},
+					// {key: [modKey+'down', true], fn: function(){zoomImage(0.5);}},
+					// {key: [modKey+']', true], fn: function(){moveUpDownSelected('Up');}},
+					// {key: [modKey+'[', true], fn: function(){moveUpDownSelected('Down');}},
+					// {key: ['up', true], fn: function(){moveSelected(0,-1);}},
+					// {key: ['down', true], fn: function(){moveSelected(0,1);}},
+					// {key: ['left', true], fn: function(){moveSelected(-1,0);}},
+					// {key: ['right', true], fn: function(){moveSelected(1,0);}},
+					// {key: 'shift+up', fn: function(){moveSelected(0,-10);}},
+					// {key: 'shift+down', fn: function(){moveSelected(0,10);}},
+					// {key: 'shift+left', fn: function(){moveSelected(-10,0);}},
+					// {key: 'shift+right', fn: function(){moveSelected(10,0);}},
+					// {key: ['alt+up', true], fn: function(){svgCanvas.cloneSelectedElements(0,-1);}},
+					// {key: ['alt+down', true], fn: function(){svgCanvas.cloneSelectedElements(0,1);}},
+					// {key: ['alt+left', true], fn: function(){svgCanvas.cloneSelectedElements(-1,0);}},
+					// {key: ['alt+right', true], fn: function(){svgCanvas.cloneSelectedElements(1,0);}},
+					// {key: ['alt+shift+up', true], fn: function(){svgCanvas.cloneSelectedElements(0,-10);}},
+					// {key: ['alt+shift+down', true], fn: function(){svgCanvas.cloneSelectedElements(0,10);}},
+					// {key: ['alt+shift+left', true], fn: function(){svgCanvas.cloneSelectedElements(-10,0);}},
+					// {key: ['alt+shift+right', true], fn: function(){svgCanvas.cloneSelectedElements(10,0);}},
 				];
 
 				// Tooltips not directly associated with a single function
@@ -4723,6 +4711,16 @@ define([
 							}
 							*/
 						});
+						
+						Shortcuts.on(['del'], deleteSelected);
+						Shortcuts.on(['fnkey', 'x'], cutSelected);
+						Shortcuts.on(['fnkey', 'c'], copySelected);
+						Shortcuts.on(['fnkey', 'v'], pasteInCenter);
+						Shortcuts.on(['fnkey', 'z'], clickUndo);
+						Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
+						Shortcuts.on(['ctrl', 'y'], clickRedo);
+						Shortcuts.on(['fnkey', 'd'], clickClone);
+						Shortcuts.on(['fnkey', 'a'], svgCanvas.selectAllInCurrentLayer);
 
 						// Setup flyouts
 						setupFlyouts(flyouts);
@@ -4734,17 +4732,17 @@ define([
 							function(evt) {$(this).change();evt.preventDefault();}
 						);
 
-						$(window).bind('keydown', 'tab', function(e) {
-							if (ui_context === 'canvas') {
-								e.preventDefault();
-								selectNext();
-							}
-						}).bind('keydown', 'shift+tab', function(e) {
-							if (ui_context === 'canvas') {
-								e.preventDefault();
-								selectPrev();
-							}
-						});
+						// $(window).bind('keydown', 'tab', function(e) {
+						// 	if (ui_context === 'canvas') {
+						// 		e.preventDefault();
+						// 		selectNext();
+						// 	}
+						// }).bind('keydown', 'shift+tab', function(e) {
+						// 	åif (ui_context === 'canvas') {
+						// 		e.preventDefault();
+						// 		selectPrev();
+						// 	}
+						// });
 
 						$('#tool_zoom').dblclick(dblclickZoom);
 					},

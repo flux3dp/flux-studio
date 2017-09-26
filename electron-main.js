@@ -1,6 +1,5 @@
 'use strict';
 
-const electron = require('electron');
 const {app, ipcMain, BrowserWindow} = require('electron');
 
 const BackendManager = require('./src/backend-manager.js');

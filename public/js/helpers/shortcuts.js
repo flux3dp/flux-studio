@@ -27,7 +27,8 @@ define([
             'LEFT'   : keyCodeConstants.KEY_LEFT,
             'UP'     : keyCodeConstants.KEY_UP,
             'RIGHT'  : keyCodeConstants.KEY_RIGHT,
-            'DOWN'   : keyCodeConstants.KEY_DOWN
+            'DOWN'   : keyCodeConstants.KEY_DOWN,
+            'FNKEY'  : (process.platform === 'darwin') ? -91 : keyCodeConstants.KEY_CTRL
         },
         events = [],
         keyCodeStatus = [],
