@@ -42,7 +42,7 @@ if (window.opera) {
 
 }());
 
-function calRealLocaltion(elem) {
+function calRealLocation(elem) {
 		var matrix, matr, a, b, c, d, e, f;
 		var x, y, width, height;
 		var key, value;
@@ -1989,6 +1989,12 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			// intentionally fall-through to select here
 			case 'resize':
 			case 'multiselect':
+				console.log('mouseUp', start_x, start_y);
+				console.log('mouseUp', real_x, real_y);
+				if (start_x === real_x && start_y === real_y) {
+					console.log('click!!');
+				}
+
 				if (rubberBox != null) {
 					rubberBox.setAttribute('display', 'none');
 					curBBoxes = [];
@@ -2065,7 +2071,8 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
-				calRealLocaltion(elem);
+				console.log('elem',elem);
+				calRealLocation(elem);
 				return;
 			case 'zoom':
 				if (rubberBox != null) {

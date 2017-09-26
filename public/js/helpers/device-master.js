@@ -231,7 +231,7 @@ define([
             SocketMaster = new Sm();
             SocketMaster.onTimeout(handleSMTimeout);
 
-        /*/*******************************************************************
+        //*******************************************************************
         // just for backup, can be delete if everything is fine
             // if usb not detected but device us using usb
             if(
@@ -293,19 +293,21 @@ define([
             SocketMaster.setWebSocket(_device.actions);
         };
 
-      //  if (
-      //      _selectedDevice &&
-      //      _selectedDevice.serial === device.serial &&
-      //      _selectedDevice.source === device.source
-      //  ) {
-      //      let d = $.Deferred();
-      //      ProgressActions.close();
-      //      d.resolve(DeviceConstants.CONNECTED);
-      //      //d.resolve(DeviceConstants.TIMEOUT);
+        //***************************************************
+        if (
+            _selectedDevice &&
+            _selectedDevice.serial === device.serial &&
+            _selectedDevice.source === device.source
+        ) {
+            let d = $.Deferred();
+            ProgressActions.close();
+            d.resolve(DeviceConstants.CONNECTED);
+            //d.resolve(DeviceConstants.TIMEOUT);
 //
-      //      console.log('has have connected')
-      //      return d.promise();
-      //  }
+            console.log('has have connected')
+            return d.promise();
+        }
+        //***************************************************
 
         // match the device from the newest received device list
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
@@ -778,6 +780,11 @@ define([
         });
 
         return d.promise();
+    }
+
+    function maintainMove(args) {
+        console.log('mM', args);
+        return SocketMaster.addTask('maintainMove', args);
     }
 
     function enterMaintainMode() {
@@ -1617,6 +1624,7 @@ define([
             this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
             this.stopChangingFilament           = stopChangingFilament;
             this.existDevice                    = existDevice;
+            this.maintainMove                   = maintainMove;
 
             Discover(
                 'device-master',

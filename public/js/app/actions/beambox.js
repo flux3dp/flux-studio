@@ -24,7 +24,7 @@ define([
     fcodeReader,
     AlertActions,
     GlobalActions,
-    test
+    svgeditorFunction
 ) {
     'use strict';
     var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
@@ -35,7 +35,6 @@ define([
         };
 
     var sendToSVGAPI = function(args, settings, callback, fileMode) {
-            console.log('test',test.getThumbnailDataurl());
             console.log('sendToSVGAPI', args, settings, callback, fileMode);
             callback = callback || function() {};
 
@@ -79,35 +78,34 @@ define([
               progressType = progressType || ProgressConstants.NONSTOP;
               var args = [],
                   doLaser = function(settings) {
-                    console.log('Bang!');
-
-                    var uploadFiles = [];
-                    //============for testing ===============================
+                      var uploadFiles = [];
                       var data = svgCanvas.getSvgString();
-                      var blob = new Blob([data], {type: 'image/svg+xml'});
-                      var reader = new FileReader();
+                      svgeditorFunction.fetchThumbnailDataurl().done((thumbnail) => {
+                          var blob = new Blob([thumbnail, data], {type: 'image/svg+xml'});
+                          var reader = new FileReader();
 
-                      reader.readAsArrayBuffer(blob);
-                      reader.onload = function(e) {
-                        uploadFiles.push({
-                          data: reader.result,
-                          //blob: blob,
-                          url: window.URL.createObjectURL(blob),
-                          name: 'svgeditor.svg',
-                          extension: 'svg',
-                          type: "image/svg+xml",
-                          size: blob.size,
-                          index: 0,
-                          totalFiles: 1
-                        });
-                    //============for testing end============================
+                          reader.readAsArrayBuffer(blob);
+                          reader.onload = function(e) {
+                              uploadFiles.push({
+                                data: reader.result,
+                                //blob: blob,
+                                url: window.URL.createObjectURL(blob),
+                                name: 'svgeditor.svg',
+                                extension: 'svg',
+                                type: "image/svg+xml",
+                                size: blob.size,
+                                thumbnailSize: thumbnail.length,
+                                index: 0,
+                                totalFiles: 1
+                              });
 
-                        uploadFiles.forEach(function(file) {
-                          file.uploadName = file.url.split('/').pop();
-                        });
+                              uploadFiles.forEach(function(file) {
+                                file.uploadName = file.url.split('/').pop();
+                              });
 
-                        sendToSVGAPI(uploadFiles, settings, callback, fileMode);
-                      };
+                              sendToSVGAPI(uploadFiles, settings, callback, fileMode);
+                          };
+                      });
                   };
 
               ProgressActions.open(progressType, lang.laser.process_caption, 'Processing...', false);
@@ -115,6 +113,46 @@ define([
               doLaser(settings);
           };
       return {
+          connectDevice: function() {
+              var d = $.Deferred();
+              DeviceMaster.selectDevice(self.state.selectedPrinter).then(function (status) {
+                if (status === DeviceConstants.CONNECTED) {
+                  return d.resolve(status)
+                }else {
+                  return d.reject(status)
+                }
+              });
+              return d.promise()
+          },
+          endMaintainMove: function(args) {
+              DeviceMaster.endMaintainMode();
+          },
+
+          maintainMove: function(args) {
+              DeviceMaster.maintainMove(args);
+          },
+
+          movement: function(movementMode) {
+              var d = $.Deferred();
+              DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
+                console.log('status', status);
+                  if (status === DeviceConstants.CONNECTED) {
+                     if (movementMode === false) {
+                        DeviceMaster.enterMaintainMode();
+                        return d.resolve(DeviceConstants.CONNECTED);
+                     } else if (movementMode === true) {
+                        DeviceMaster.endMaintainMode();
+                        //return d.resolve(DeviceConstants.CONNECTED);
+                     }
+
+                  } else if (status === DeviceConstants.TIMEOUT) {
+                      AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                      return d.resolve(DeviceConstants.TIMEOUT);
+                  };
+              });
+              return d.promise();
+          },
+
           uploadFcode: function(settings) {
                 getToolpath(settings,
                     (blob) => {
