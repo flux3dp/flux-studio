@@ -783,7 +783,6 @@ define([
     }
 
     function maintainMove(args) {
-        console.log('mM', args);
         return SocketMaster.addTask('maintainMove', args);
     }
 

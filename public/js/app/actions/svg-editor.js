@@ -23,11 +23,10 @@ TODOS
 1. JSDoc
 */
 define([
-	'jsx!views/beambox/Object-Panels-Controller'
+	'jsx!views/beambox/Object-Panels-Controller',
 ],function(
-	ObjectPanelsController
+	ObjectPanelsController,
 ){
-	
 	if (window.svgEditor) {
 		return;
 	}
@@ -437,7 +436,7 @@ define([
 
 			const objectPanelsController = new ObjectPanelsController(document.getElementById("object-panels-placeholder"));
 			window.objectPanelsController = objectPanelsController; //we should use Singleton Pattern to avoid global variable.
-			
+
 			// var host = location.hostname,
 			//	onWeb = host && host.indexOf('.') >= 0;
 			// Some FF versions throw security errors here when directly accessing
@@ -1009,7 +1008,7 @@ define([
 					layerlist.append(layerTr.append(layerVis, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
 				}
-				
+
 
 				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 
@@ -1822,7 +1821,7 @@ define([
 					}
 					menu_items[(el_name === 'g' ? 'en' : 'dis') + 'ableContextMenuItems']('#ungroup');
 					menu_items[((el_name === 'g' || !multiselected) ? 'dis' : 'en') + 'ableContextMenuItems']('#group');
-					
+
 					objectPanelsController.render();
 				} // if (elem != null)
 				else if (multiselected) {
@@ -3745,7 +3744,7 @@ define([
 				svgCanvas.open();
 			};
 
-			var clickImport = function() {		
+			var clickImport = function() {
 			};
 
 			var clickUndo = function() {
@@ -5156,14 +5155,14 @@ define([
 				});
 			};
 
-			
+
 			//initialize the view
 			// zoomImage(0.2);
 			// workarea[0].scrollLeft = 300;
 			// workarea[0].scrollTop = 750;
 			$('#fit_to_canvas').mouseup();
-			
-			
+
+
 		};
 
 		editor.ready = function (cb) {

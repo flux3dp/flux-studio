@@ -651,9 +651,8 @@ define([
 
             maintainMove: (args) => {
                 var commend = '';
-                if (args.f) {
-                    commend += ' f:' + args.f;
-                };
+                args.f = args.f || '6000';
+                commend += ' f:' + args.f;
                 if (args.x) {
                     commend += ' x:' + args.x;
                 };

@@ -124,24 +124,32 @@ define([
               });
               return d.promise()
           },
+          enterMaintainMove: function() {
+              DeviceMaster.enterMaintainMode();
+              window.svgCanvas.setMode('maintainMove');
+          },
+
           endMaintainMove: function(args) {
               DeviceMaster.endMaintainMode();
+              window.svgCanvas.setMode('multiselect');
           },
 
           maintainMove: function(args) {
+              console.log('maintainMove', args);
               DeviceMaster.maintainMove(args);
           },
 
           movement: function(movementMode) {
+              var beambox = this;
               var d = $.Deferred();
               DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
-                console.log('status', status);
+                  console.log('status', status);
                   if (status === DeviceConstants.CONNECTED) {
                      if (movementMode === false) {
-                        DeviceMaster.enterMaintainMode();
+                        beambox.enterMaintainMove();
                         return d.resolve(DeviceConstants.CONNECTED);
                      } else if (movementMode === true) {
-                        DeviceMaster.endMaintainMode();
+                        beambox.endMaintainMove();
                         //return d.resolve(DeviceConstants.CONNECTED);
                      }
 

@@ -1,7 +1,7 @@
 define([
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
 ], function(
-    Constant
+    Constant,
 ){
     'use strict';
 
@@ -18,7 +18,7 @@ define([
     let _setCrosshairCursor = function() {
         $('#workarea').css('cursor', 'crosshair');
     };
-    
+
     const funcs =  {
         //main panel
         importImage: function() {
@@ -109,7 +109,7 @@ define([
             const c = $('#export_canvas')[0];
             const cw = c.width = svgCanvas.contentW;
             const ch = c.height = svgCanvas.contentH;
-            
+
             function drawBoard(){
                 const context = c.getContext("2d");
                 const gridW = 50;
@@ -121,12 +121,12 @@ define([
                     context.moveTo(x, 0);
                     context.lineTo(x, ch);
                 }
-            
+
                 for (var x = 0; x <= ch; x += gridH) {
                     context.moveTo(0, x);
                     context.lineTo(cw, x);
                 }
-            
+
                 context.strokeStyle = "#E0E0DF";
                 context.lineWidth = 1;
                 context.stroke();
@@ -137,7 +137,7 @@ define([
             canvg(c, str, {renderCallback: function(){
                 drawBoard();
                 d.resolve(c.toDataURL());
-                
+
             }});
             return d.promise();
         }

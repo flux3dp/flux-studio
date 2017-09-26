@@ -27,7 +27,11 @@
 // 13) coords.js
 // 14) recalculate.js
 
-(function () {
+define([
+	'app/actions/beambox'
+],function(
+	BeamboxEvents
+){
 
 if (!window.console) {
 	window.console = {};
@@ -40,7 +44,6 @@ if (window.opera) {
 	window.console.dir = function(str) {};
 }
 
-}());
 
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions
@@ -1212,6 +1215,10 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		var i, stroke_w,
 			tlist = svgedit.transformlist.getTransformList(mouse_target);
 		switch (current_mode) {
+			case 'maintainMove':
+					started = true;
+					console.log('maintainMove in');
+					break;
 			case 'select':
 				started = true;
 				current_resize_mode = 'none';
@@ -1954,16 +1961,25 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		var useUnit = false; // (curConfig.baseUnit !== 'px');
 		started = false;
 		var attrs, t;
+		console.log('current_mode', current_mode);
 		switch (current_mode) {
-			// intentionally fall-through to select here
-			case 'resize':
-			case 'multiselect':
+			case 'maintainMove':
 				console.log('mouseUp', start_x, start_y);
 				console.log('mouseUp', real_x, real_y);
 				if (start_x === real_x && start_y === real_y) {
 					console.log('click!!');
+					var beamboxEvents = BeamboxEvents.call(this);
+					var move = {
+						f: 6000,
+						x: real_x / 10,
+						y: real_y / 10,
+					};
+					beamboxEvents.maintainMove(move);
 				}
-
+				break;
+			// intentionally fall-through to select here
+			case 'resize':
+			case 'multiselect':
 				if (rubberBox != null) {
 					rubberBox.setAttribute('display', 'none');
 					curBBoxes = [];
@@ -5364,6 +5380,7 @@ this.getMode = function() {
 // Parameters:
 // name - String with the new mode to change to
 this.setMode = function(name) {
+	console.log('setMode', name);
 	pathActions.clear(true);
 	textActions.clear();
 	cur_properties = (selectedElements[0] && selectedElements[0].nodeName == 'text') ? cur_text : cur_shape;
@@ -7273,3 +7290,5 @@ this.calcRealLocation = function(elem) {
 };
 
 };
+
+});

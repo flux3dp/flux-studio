@@ -137,10 +137,9 @@ define([
         _handleTestClick() {
             var self = this;
             var move = {
-                f: 6000,
                 x: 50,
                 y: 20,
-                z: 30
+                z: 20
             };
             this.beamboxEvents.connectDevice()
                 .done(function(status) {
