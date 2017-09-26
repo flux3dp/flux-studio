@@ -127,7 +127,8 @@ define([
                     context.lineTo(cw, x);
                 }
 
-                context.strokeStyle = "#E0E0DF";
+                //context.strokeStyle = "#E0E0DF";
+                context.strokeStyle = "#000000";
                 context.lineWidth = 1;
                 context.stroke();
             }
