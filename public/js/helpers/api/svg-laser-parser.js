@@ -370,7 +370,8 @@ define([
                         ws.send([
                             order_name,
                             file.uploadName,
-                            file.size
+                            file.size,
+                            file.thumbnailSize
                         ].join(' '));
                     };
 

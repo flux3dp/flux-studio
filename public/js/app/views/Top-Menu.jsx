@@ -108,6 +108,13 @@ define([
                     label: lang.menu.cut,
                     imgSrc: 'img/menu/icon-cut.svg'
                 },
+                {
+                    name: 'beambox',
+                    displayName: 'BeamBox',
+                    className: genericClassName,
+                    label: 'Beambox',
+                    imgSrc: 'img/menu/icon-draw.svg'
+                },
             ],
 
             getLog = async function(printer, log) {
@@ -261,13 +268,6 @@ define([
                 displayName: 'Mill',
                 className: genericClassName,
                 label: lang.menu.mill,
-                imgSrc: 'img/menu/icon-draw.svg'
-            });
-            options.push({
-                name: 'beambox',
-                displayName: 'BeamBox',
-                className: genericClassName,
-                label: 'Beambox',
                 imgSrc: 'img/menu/icon-draw.svg'
             });
         }

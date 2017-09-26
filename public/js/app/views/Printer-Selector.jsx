@@ -435,19 +435,19 @@ define([
                 showPassword = self.state.showPassword,
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],
+                wrapperStyle = self.props.WindowStyle,
                 content = self._renderPrinterSelection(lang),
                 hasDefaultPrinter = self.state.hasDefaultPrinter;
 
             if ('string' === typeof self.props.className) {
                 wrapperClass.push(self.props.className);
             }
-
             wrapperClass = cx.apply(null, wrapperClass);
 
             return (
                 true === hasDefaultPrinter ?
                 <span/> :
-                <div className={wrapperClass}>
+                <div className={wrapperClass} style={wrapperStyle}>
                     {content}
                     <div className="arrow arrow-right"/>
                 </div>

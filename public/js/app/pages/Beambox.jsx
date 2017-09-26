@@ -1,6 +1,7 @@
 define([
     'react',
     'app/actions/beambox',
+    'app/constants/device-constants',
     'jsx!views/beambox/Left-Panel',
     'jsx!pages/svg-editor',
     'jsx!widgets/Button-Group',
@@ -12,6 +13,7 @@ define([
 ], function(
     React,
     beamboxEvents,
+    DeviceConstants,
     LeftPanel,
     SvgGenerator,
     ButtonGroup,
@@ -22,9 +24,14 @@ define([
     PrinterSelector
 ) {
     'use strict';
-    
+
     const Config = ConfigHelper();
     const lang = i18n.lang;
+    const machineCommand = {
+        TEST: 'TEST',
+        MOVE: 'MOVE',
+        START: 'START'
+    };
 
     const customConfig = Config.read('beambox-defaults');
     const updatedConfig = $.extend({}, DefaultConfig, customConfig);
@@ -36,14 +43,22 @@ define([
             self = this;
 
         class view extends React.Component {
-        constructor(){
-            super();
-            this.beamboxEvents = beamboxEvents.call(this);
-            this.state = {
-                openPrinterSelectorWindow: false
-            };
-        }
+          constructor(){
+              super();
+              this.beamboxEvents = beamboxEvents.call(this);
+              this.state = {
+                  openPrinterSelectorWindow: false,
+                  connectedMovementMode: false
+                };
+          }
 
+          _fetchMoveLocation() {
+
+          }
+
+          _fetchMoveLocation() {
+
+          }
 
           _fetchFormalSettings(holder) {
               const options = Config.read('beambox-defaults');
@@ -64,12 +79,34 @@ define([
 
           _renderActionButtons() {
               //globalInteraction.onImageChanged(this.state.hasImage);
-
               var cx = React.addons.classSet,
                   buttons = [{
+                      label: 'Test',
+                      className: cx({
+                          'btn-disabled': false,
+                          'btn-default': true,
+                          'btn-hexagon': true,
+                          'btn-get-fcode': true
+                      }),
+                      dataAttrs: {
+                          'ga-event': 'get-laser-test'
+                      },
+                      onClick: this._handleTestClick.bind(this, '-f')
+                  }, {
+                      label: 'Move',
+                      className: cx({
+                          'btn-disabled': false,
+                          'btn-default': true,
+                          'btn-hexagon': true,
+                          'btn-get-fcode': true
+                      }),
+                      dataAttrs: {
+                          'ga-event': 'get-laser-Move'
+                      },
+                      onClick: this._handleMoveClick.bind(this, '-f')
+                  }, {
                       label: lang.laser.get_fcode,
                       className: cx({
-                          //'btn-disabled': !this.state.hasImage,
                           'btn-disabled': false,
                           'btn-default': true,
                           'btn-hexagon': true,
@@ -82,7 +119,6 @@ define([
                   }, {
                       label: lang.monitor.start,
                       className: cx({
-                          //'btn-disabled': !this.state.hasImage,
                           'btn-disabled': false,
                           'btn-default': true,
                           'btn-hexagon': true,
@@ -98,13 +134,72 @@ define([
                 <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons"/>
             );
         }
+        _handleTestClick() {
+            var self = this;
+            var move = {
+                x: 50,
+                y: 20,
+                z: 20
+            };
+            this.beamboxEvents.connectDevice()
+                .done(function(status) {
+                    self.beamboxEvents.maintainMove(move);
+                })
+                .fail(function(status) {
+                    this.setState({
+                        connectedMovementMode: false
+                    });
+                });
+        }
+
+        _handleMoveClick() {
+            var self = this;
+            if (this.state.connectedMovementMode) {
+              this.beamboxEvents.connectDevice()
+                  .done(function(status) {
+                      self.beamboxEvents.endMaintainMove();
+                      self.setState({
+                          connectedMovementMode: false
+                      });
+                  })
+                  .fail(function(status) {
+                      self.setState({
+                          connectedMovementMode: false
+                      });
+                  });
+            } else {
+              this.setState({
+                  openPrinterSelectorWindow: true,
+                  machineCommand: machineCommand.MOVE,
+                  settings: this._fetchMoveLocation(),
+                  printerSelectorWindowStyle: {bottom: '15.5rem'}
+              });
+            }
+        }
 
         _handleStartClick() {
             this.setState({
                 openPrinterSelectorWindow: true,
-                machineCommand: 'start',
-                settings: this._fetchFormalSettings()
+                machineCommand: machineCommand.START,
+                settings: this._fetchFormalSettings(),
+                printerSelectorWindowStyle: {}
             });
+        }
+
+        _renderMovementMode() {
+          if (!this.state.connectedMovementMode) { return ''; }
+          var style = {
+            position: 'absolute',
+            zIndex: 100,
+            right: '16rem',
+            top: '7rem'
+          };
+
+          return (
+            <i className="fa fa-camera-retro fa-5x"
+               style={style}
+               aria-hidden="true"></i>
+          )
         }
 
         _renderPrinterSelectorWindow() {
@@ -116,7 +211,17 @@ define([
                         openPrinterSelectorWindow: false
                     });
 
-                    self.beamboxEvents.uploadFcode(self._fetchFormalSettings());
+                    if (self.state.machineCommand === machineCommand.START) {
+                        self.beamboxEvents.uploadFcode(self._fetchFormalSettings());
+                    }else if (self.state.machineCommand === machineCommand.MOVE) {
+                        self.beamboxEvents.movement(self.state.connectedMovementMode).done(function(status) {
+                          if (status === DeviceConstants.CONNECTED) {
+                            self.setState({
+                              connectedMovementMode: true
+                            });
+                          }
+                        });
+                    };
                 },
                 onClose = function(e) {
                     self.setState({
@@ -130,14 +235,13 @@ define([
                         lang={lang}
                         onClose={onClose}
                         onGettingPrinter={onGettingPrinter}
+                        WindowStyle={this.state.printerSelectorWindowStyle}
                     />
                 );
-
             return (
                 <Modal content={content} onClose={onClose}/>
             );
         }
-
 
           _renderLeftPanel() {
           return (<LeftPanel/>);
@@ -146,10 +250,12 @@ define([
           render() {
             var actionButtons = this._renderActionButtons(),
                 leftPanel = this._renderLeftPanel(),
+                movementMode = this._renderMovementMode(),
                 printerSelector = this._renderPrinterSelectorWindow();
 
             return (
                     <div className="studio-container beambox-studio">
+                        {movementMode}
                         {leftPanel}
                         <Svg />
                         {actionButtons}
