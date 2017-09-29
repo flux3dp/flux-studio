@@ -1,7 +1,7 @@
 define([
     'app/actions/beambox/constant',
 ], function(
-    Constant,
+    Constant
 ){
     'use strict';
 

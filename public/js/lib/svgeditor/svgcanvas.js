@@ -2057,18 +2057,12 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 
 				}
 				return;
+				//zoom is broken
 			case 'zoom':
 				if (rubberBox != null) {
 					rubberBox.setAttribute('display', 'none');
 				}
-				var factor = evt.shiftKey ? 0.5 : 2;
-				call('zoomed', {
-					'x': Math.min(r_start_x, real_x),
-					'y': Math.min(r_start_y, real_y),
-					'width': Math.abs(real_x - r_start_x),
-					'height': Math.abs(real_y - r_start_y),
-					'factor': factor
-				});
+				call('zoomed');
 				return;
 			case 'fhpath':
 				// Check that the path contains at least 2 points; a degenerate one-point path
@@ -2323,26 +2317,18 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
 	$(container).bind('mousewheel DOMMouseScroll', function(e){
-		//if (!e.shiftKey) {return;}
 		e.preventDefault();
 		var evt = e.originalEvent;
 
-		root_sctm = $('#svgcontent g')[0].getScreenCTM().inverse();
-		var pt = svgedit.math.transformPoint( evt.pageX, evt.pageY, root_sctm );
-
-		var bbox = {
-			'x': pt.x,
-			'y': pt.y,
-			'width': 0,
-			'height': 0
+		const cursorPosition = {
+			x: evt.pageX,
+			y: evt.pageY
 		};
 
 		var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 		if (!delta) {return;}
-
-		bbox.factor = Math.max(95/100, Math.min(100/95, (delta)));
-
-		call('zoomed', bbox);
+		const zoomFactor = Math.max(95/100, Math.min(100/95, (delta)));
+		call('zoomed', {factor: zoomFactor, staticPoint: cursorPosition});
 	});
 
 }());
@@ -5306,50 +5292,50 @@ this.getOffset = function() {
 // val - Bounding box object to zoom to or string indicating zoom option
 // editor_w - Integer with the editor's workarea box's width
 // editor_h - Integer with the editor's workarea box's height
-this.setBBoxZoom = function(val, editor_w, editor_h) {
-	var spacer = 0.85;
-	var bb;
-	var calcZoom = function(bb) {
-		if (!bb) {return false;}
-		var w_zoom = Math.round((editor_w / bb.width)*100 * spacer)/100;
-		var h_zoom = Math.round((editor_h / bb.height)*100 * spacer)/100;
-		var zoomlevel = Math.min(w_zoom, h_zoom);
-		canvas.setZoom(zoomlevel);
-		return {'zoom': zoomlevel, 'bbox': bb};
-	};
+// this.setBBoxZoom = function(val, editor_w, editor_h) {
+	// var spacer = 0.85;
+	// var bb;
+	// var calcZoom = function(bb) {
+	// 	if (!bb) {return false;}
+	// 	var w_zoom = Math.round((editor_w / bb.width)*100 * spacer)/100;
+	// 	var h_zoom = Math.round((editor_h / bb.height)*100 * spacer)/100;
+	// 	var zoomlevel = Math.min(w_zoom, h_zoom);
+	// 	canvas.setZoom(zoomlevel);
+	// 	return {'zoom': zoomlevel, 'bbox': bb};
+	// };
 
-	if (typeof val == 'object') {
-		bb = val;
-		if (bb.width == 0 || bb.height == 0) {
-			var newzoom = bb.zoom ? bb.zoom : current_zoom * bb.factor;
-			canvas.setZoom(newzoom);
-			return {'zoom': current_zoom, 'bbox': bb};
-		}
-		return calcZoom(bb);
-	}
+	// if (typeof val == 'object') {
+	// 	bb = val;
+	// 	if (bb.width == 0 || bb.height == 0) {
+	// 		var newzoom = bb.zoom ? bb.zoom : current_zoom * bb.factor;
+	// 		canvas.setZoom(newzoom);
+	// 		return {'zoom': current_zoom, 'bbox': bb};
+	// 	}
+	// 	return calcZoom(bb);
+	// }
 
-	switch (val) {
-		case 'selection':
-			if (!selectedElements[0]) {return;}
-			var sel_elems = $.map(selectedElements, function(n){ if (n) {return n;} });
-			bb = getStrokedBBox(sel_elems);
-			break;
-		case 'canvas':
-			var res = getResolution();
-			spacer = 0.95;
-			bb = {width:res.w, height:res.h , x:0, y:0};
-			break;
-		case 'content':
-			bb = getStrokedBBox();
-			break;
-		case 'layer':
-			bb = getStrokedBBox(getVisibleElements(getCurrentDrawing().getCurrentLayer()));
-			break;
-		default:
-			return;
-	}
-	return calcZoom(bb);
-};
+	// switch (val) {
+	// 	case 'selection':
+	// 		if (!selectedElements[0]) {return;}
+	// 		var sel_elems = $.map(selectedElements, function(n){ if (n) {return n;} });
+	// 		bb = getStrokedBBox(sel_elems);
+	// 		break;
+	// 	case 'canvas':
+	// 		var res = getResolution();
+	// 		spacer = 0.95;
+	// 		bb = {width:res.w, height:res.h , x:0, y:0};
+	// 		break;
+	// 	case 'content':
+	// 		bb = getStrokedBBox();
+	// 		break;
+	// 	case 'layer':
+	// 		bb = getStrokedBBox(getVisibleElements(getCurrentDrawing().getCurrentLayer()));
+	// 		break;
+	// 	default:
+	// 		return;
+	// }
+	// return calcZoom(bb);
+// };
 
 // Function: setZoom
 // Sets the zoom to the given level

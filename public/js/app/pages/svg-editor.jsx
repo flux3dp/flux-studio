@@ -1035,7 +1035,7 @@ define([
                               <span id="zoomLabel" className="zoom_tool icon_label" />
                               <input id="zoom" size={3} defaultValue={100} type="text" />
                             </label>
-                            <div id="zoom_dropdown" className="dropdown">
+                            {/* <div id="zoom_dropdown" className="dropdown">
                               <button />
                               <ul>
                                 <li>1000%</li>
@@ -1058,7 +1058,7 @@ define([
                                 </li>
                                 <li>100%</li>
                               </ul>
-                            </div>
+                            </div> */}
                             <div className="tool_sep" />
                           </div>
                           <div id="tools_bottom_2">

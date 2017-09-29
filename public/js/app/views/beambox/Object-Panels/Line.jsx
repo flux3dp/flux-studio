@@ -27,7 +27,6 @@ define([
         },
         
         componentWillReceiveProps: function(nextProps) {
-            console.log(nextProps);
             this.setState({
                 x1: nextProps.x1,
                 y1: nextProps.y1,
