@@ -4635,7 +4635,7 @@ define([
 							*/
 						});
 						
-						Shortcuts.on(['fnkey', 'del'], deleteSelected);
+						Shortcuts.on(['del'], deleteSelected);
 						Shortcuts.on(['fnkey', 'x'], cutSelected);
 						Shortcuts.on(['fnkey', 'c'], copySelected);
 						Shortcuts.on(['fnkey', 'v'], pasteInCenter);

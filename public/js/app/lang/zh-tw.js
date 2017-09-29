@@ -967,7 +967,14 @@ define(function() {
                 ellipse: '橢圓形',
                 line: '線段',
                 image: '圖片',
-                text: '文字'
+                text: '文字',
+                insert_object_submenu: {
+                    rectangle: '矩形',
+                    ellipse: '橢圓形',
+                    line: '線段',
+                    image: '圖片',
+                    text: '文字'
+                }
             },
             object_panels: {
                 position: '位置',

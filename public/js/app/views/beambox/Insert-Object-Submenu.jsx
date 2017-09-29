@@ -2,14 +2,18 @@ define([
     'jquery',
     'react',
     'jsx!widgets/Dialog-Menu',
-    'app/actions/beambox/svgeditor-function-wrapper'
+    'app/actions/beambox/svgeditor-function-wrapper',
+    'helpers/i18n'
 ], function(
     $,
     React,
     DialogMenu,
-    FnWrapper
+    FnWrapper,
+    i18n
 ){
     'use strict';
+
+    const LANG = i18n.lang.beambox.left_panel.insert_object_submenu;
 
     return React.createClass({
 
@@ -21,19 +25,19 @@ define([
             return (
                 <ul onClick={this._closeDialog}>
                     <li onClick={FnWrapper.insertRectangle}>
-                        Rectangle
+                        {LANG.rectangle}
                     </li>
                     <li onClick={FnWrapper.insertEllipse}>
-                        Ellipse
+                        {LANG.ellipse}
                     </li>
                     <li onClick={FnWrapper.insertLine}>
-                        Line
+                        {LANG.line}
                     </li>
                     <li onClick={FnWrapper.importImage}>
-                        Image
+                        {LANG.image}
                     </li>
                     <li onClick={FnWrapper.insertText}>
-                        Text
+                        {LANG.text}
                     </li>
                 </ul>
             );

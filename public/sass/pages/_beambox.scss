@@ -149,7 +149,7 @@
             }
         }
 
-        #main_button, #tools_top, #tools_left, #tools_bottom {
+        #main_button, #tools_top, #tools_left, #tools_bottom, #rulers {
             @include force-hide();
         }
     }

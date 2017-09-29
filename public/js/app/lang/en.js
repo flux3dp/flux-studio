@@ -971,7 +971,14 @@ define(function() {
                 ellipse: 'Ellipse',
                 line: 'Line',
                 image: 'Image',
-                text: 'Text'
+                text: 'Text',
+                insert_object_submenu: {
+                    rectangle: 'Rectangle',
+                    ellipse: 'Ellipse',
+                    line: 'Line',
+                    image: 'Image',
+                    text: 'Text'
+                }
             },
             object_panels: {
                 position: 'Position',
