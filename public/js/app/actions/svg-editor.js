@@ -24,9 +24,11 @@ TODOS
 */
 define([
 	'jsx!views/beambox/Object-Panels-Controller',
+	'helpers/image-data',
 	'helpers/shortcuts'
 ],function(
 	ObjectPanelsController,
+	ImageData,
 	Shortcuts
 ){
 	if (window.svgEditor) {
@@ -4953,10 +4955,27 @@ define([
 											style: 'pointer-events:inherit',
 											preserveAspectRatio: 'none',
 											"data-threshold": 100,
-											"data-shading": false
+											"data-shading": true,
+											origImage: e.target.result
 										}
 									});
-									svgCanvas.setHref(newImage, e.target.result);
+									ImageData(
+										newImage.getAttribute('origImage'),
+										{
+											height: height,
+											width: width,
+											grayscale: {
+												is_rgba: true,
+												is_shading: Boolean(newImage.getAttribute('data-shading')),
+												threshold: parseInt(newImage.getAttribute('data-threshold')*255/100),
+												is_svg: false
+											},
+											onComplete: function(result) {
+												svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
+											}
+										}
+									);
+									
 									svgCanvas.selectOnly([newImage]);
 									svgCanvas.alignSelectedElements('m', 'page');
 									svgCanvas.alignSelectedElements('c', 'page');

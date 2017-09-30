@@ -3,8 +3,9 @@ define([
     'react',
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
+    'helpers/image-data',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, i18n) {
+], function($, React, FnWrapper, UnitInput, ImageData, i18n) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
@@ -36,17 +37,38 @@ define([
         _writeThreshold: function(val) {
             FnWrapper.write_image_data_threshold(this.props.$me, val);
         },
+        _refreshImage: function() {
+            const $me = this.props.$me;
+            ImageData(
+                $me.attr("origImage"),
+                {
+                    height: $me.height(),
+                    width: $me.width(),
+                    grayscale: {
+                        is_rgba: true,
+                        is_shading: Boolean(this.state.shading),
+                        threshold: parseInt(this.state.threshold*255/100),
+                        is_svg: false
+                    },
+                    onComplete: function(result) {
+                        $me.attr('xlink:href', result.canvas.toDataURL('image/png'));
+                    }
+                }
+            );
+        },
 
         _handleShadingChange: function(event) {
             const val = event.target.checked;
             this.setState({shading: val}, function(){
                 this._writeShading(val);
+                this._refreshImage();
             });
         },
         _handleThresholdChange: function(event) {
             const val = event.target.value;
             this.setState({threshold: val}, function(){
                 this._writeThreshold(val);
+                this._refreshImage();
             });        
         },
         render: function() {
