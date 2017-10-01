@@ -2316,20 +2316,46 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 //	$(window).mouseup(mouseUp);
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
-	$(container).bind('mousewheel DOMMouseScroll', function(e){
-		e.preventDefault();
-		var evt = e.originalEvent;
-
-		const cursorPosition = {
-			x: evt.pageX,
-			y: evt.pageY
-		};
-
-		var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
-		if (!delta) {return;}
-		const zoomFactor = Math.max(95/100, Math.min(100/95, (delta)));
-		call('zoomed', {factor: zoomFactor, staticPoint: cursorPosition});
-	});
+	
+	 window.targetZoom = 1.0;
+	 $(container).bind('mousewheel DOMMouseScroll', function(e){
+		 //if (!e.shiftKey) {return;}
+		 root_sctm = $('#svgcontent g')[0].getScreenCTM().inverse();
+		 e.preventDefault();
+		 let evt = e.originalEvent;
+ 
+		 // Zooming as illustrator
+		 if (e.ctrlKey) {
+			 e.stopImmediatePropagation();
+			 
+			 var pt = svgedit.math.transformPoint( evt.pageX, evt.pageY, root_sctm );
+			 var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
+		 
+			 var bbox = {
+				 'x': pt.x,
+				 'y': pt.y,
+				 'width': 0,
+				 'height': 0
+			 };
+ 
+			 if (!delta) {return;}
+			 window.targetZoom += delta/5000.0;
+			 if(window.targetZoom >= 100) window.targetZoom = 100;
+			 if(window.targetZoom <= 0.1) window.targetZoom = 0.1;
+			 return;
+		 }
+ 
+				 
+		 // Panning as illustrator
+		 
+		 window.w_area.scrollLeft += evt.deltaX / 2.0;
+		 window.w_area.scrollTop += evt.deltaY / 2.0;
+ 
+		 scroll_last_x = evt.deltaX;
+		 scroll_last_y = evt.deltaY;
+ 
+	 });
+ 
 
 }());
 
@@ -5293,48 +5319,48 @@ this.getOffset = function() {
 // editor_w - Integer with the editor's workarea box's width
 // editor_h - Integer with the editor's workarea box's height
 // this.setBBoxZoom = function(val, editor_w, editor_h) {
-	// var spacer = 0.85;
-	// var bb;
-	// var calcZoom = function(bb) {
-	// 	if (!bb) {return false;}
-	// 	var w_zoom = Math.round((editor_w / bb.width)*100 * spacer)/100;
-	// 	var h_zoom = Math.round((editor_h / bb.height)*100 * spacer)/100;
-	// 	var zoomlevel = Math.min(w_zoom, h_zoom);
-	// 	canvas.setZoom(zoomlevel);
-	// 	return {'zoom': zoomlevel, 'bbox': bb};
-	// };
+// var spacer = 0.85;
+// var bb;
+// var calcZoom = function(bb) {
+// 	if (!bb) {return false;}
+// 	var w_zoom = Math.round((editor_w / bb.width)*100 * spacer)/100;
+// 	var h_zoom = Math.round((editor_h / bb.height)*100 * spacer)/100;
+// 	var zoomlevel = Math.min(w_zoom, h_zoom);
+// 	canvas.setZoom(zoomlevel);
+// 	return {'zoom': zoomlevel, 'bbox': bb};
+// };
 
-	// if (typeof val == 'object') {
-	// 	bb = val;
-	// 	if (bb.width == 0 || bb.height == 0) {
-	// 		var newzoom = bb.zoom ? bb.zoom : current_zoom * bb.factor;
-	// 		canvas.setZoom(newzoom);
-	// 		return {'zoom': current_zoom, 'bbox': bb};
-	// 	}
-	// 	return calcZoom(bb);
-	// }
+// if (typeof val == 'object') {
+// 	bb = val;
+// 	if (bb.width == 0 || bb.height == 0) {
+// 		var newzoom = bb.zoom ? bb.zoom : current_zoom * bb.factor;
+// 		canvas.setZoom(newzoom);
+// 		return {'zoom': current_zoom, 'bbox': bb};
+// 	}
+// 	return calcZoom(bb);
+// }
 
-	// switch (val) {
-	// 	case 'selection':
-	// 		if (!selectedElements[0]) {return;}
-	// 		var sel_elems = $.map(selectedElements, function(n){ if (n) {return n;} });
-	// 		bb = getStrokedBBox(sel_elems);
-	// 		break;
-	// 	case 'canvas':
-	// 		var res = getResolution();
-	// 		spacer = 0.95;
-	// 		bb = {width:res.w, height:res.h , x:0, y:0};
-	// 		break;
-	// 	case 'content':
-	// 		bb = getStrokedBBox();
-	// 		break;
-	// 	case 'layer':
-	// 		bb = getStrokedBBox(getVisibleElements(getCurrentDrawing().getCurrentLayer()));
-	// 		break;
-	// 	default:
-	// 		return;
-	// }
-	// return calcZoom(bb);
+// switch (val) {
+// 	case 'selection':
+// 		if (!selectedElements[0]) {return;}
+// 		var sel_elems = $.map(selectedElements, function(n){ if (n) {return n;} });
+// 		bb = getStrokedBBox(sel_elems);
+// 		break;
+// 	case 'canvas':
+// 		var res = getResolution();
+// 		spacer = 0.95;
+// 		bb = {width:res.w, height:res.h , x:0, y:0};
+// 		break;
+// 	case 'content':
+// 		bb = getStrokedBBox();
+// 		break;
+// 	case 'layer':
+// 		bb = getStrokedBBox(getVisibleElements(getCurrentDrawing().getCurrentLayer()));
+// 		break;
+// 	default:
+// 		return;
+// }
+// return calcZoom(bb);
 // };
 
 // Function: setZoom

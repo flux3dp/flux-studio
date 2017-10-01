@@ -1991,7 +1991,19 @@ define([
 				// updateCanvas(); // necessary?
 			};
 
-			var zoomChanged = function(win, zoomData) {
+			// SVGEditor original zoom control adapter
+
+			var zoomData = {
+					zoomLevel: 1,
+					factor: 1,
+					staticPoint: {
+						x: $(window).width()/2,
+						y: $(window).height()/2
+					},
+					autoCenter: false
+				};
+
+			var zoomChanged = svgCanvas.zoomChanged = function(win, data) {
 				const defaultZoomData = {
 					zoomLevel: undefined,
 					factor: 1,
@@ -2001,19 +2013,45 @@ define([
 					},
 					autoCenter: false
 				};
-				const data = $.extend({}, defaultZoomData, zoomData);
-				data.zoomLevel = data.zoomLevel || svgCanvas.getZoom() * data.factor;
+				zoomData = $.extend({}, defaultZoomData, data);
+				window.targetZoom = zoomData.zoomLevel;
+				zoomData.zoomLevel = zoomData.zoomLevel || svgCanvas.getZoom() * zoomData.factor;
+			};
 
-				svgCanvas.setZoom(data.zoomLevel);
+			// Change SVGEditor rendering zoom value
+			var changeRenderingZoom = function(data) {
+				var zoomlevel = data.zoomlevel;
+				if (zoomlevel < 0.001) {
+					zoomlevel = 0.001;
+				}
+
+				svgCanvas.setZoom(zoomlevel);
+
+				$('#zoom').val((zoomlevel*100).toFixed(1));
 
 				if (data.autoCenter) {
-					updateCanvas({autoCenter: true});
+					updateCanvas();
 				} else {
 					updateCanvas({staticPoint: data.staticPoint});
 				}
-
-				zoomDone();
 			};
+
+			// Control Beambox Zoom Animation
+			window.targetZoom = svgCanvas.getZoom();
+			setInterval(function(){
+				var currentZoom = svgCanvas.getZoom(),
+					nextZoom = currentZoom + (window.targetZoom-currentZoom)/2.0;
+
+				if (Math.abs(window.targetZoom - currentZoom) < 0.01) {
+					nextZoom = window.targetZoom;
+					zoomDone();
+				}
+
+				if (currentZoom === nextZoom) { return; };
+				
+				zoomData.zoomlevel = nextZoom;
+				changeRenderingZoom(zoomData);
+			}, 30);
 
 			$('#cur_context_panel').delegate('a', 'click', function() {
 				var link = $(this);
@@ -3140,6 +3178,7 @@ define([
 			(function() {
 				var last_x = null, last_y = null, w_area = workarea[0],
 					panning = false, keypan = false;
+					window.w_area = workarea[0];
 
 				$('#svgcanvas').bind('mousemove mouseup', function(evt) {
 					if (panning === false) {return;}
