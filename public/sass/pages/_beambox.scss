@@ -149,6 +149,23 @@
             }
         }
 
+        #layer-laser-panel-placeholder {
+            .title {
+                width: 40%;
+                display: inline-block;
+            }
+            .ui.ui-control-unit-input-v2 {
+                width: 60%;
+                display: inline-block;
+                .unit {
+                    margin-left: -40px;
+                }
+                input {
+                    width: 100%;
+                }
+            }
+        }
+
         #main_button, #tools_top, #tools_left, #tools_bottom, #rulers {
             @include force-hide();
         }

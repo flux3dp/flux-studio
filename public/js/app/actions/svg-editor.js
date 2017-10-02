@@ -24,10 +24,12 @@ TODOS
 */
 define([
 	'jsx!views/beambox/Object-Panels-Controller',
+	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
 	'helpers/image-data',
 	'helpers/shortcuts'
 ],function(
 	ObjectPanelsController,
+	LaserPanelController,
 	ImageData,
 	Shortcuts
 ){
@@ -440,7 +442,7 @@ define([
 
 			const objectPanelsController = new ObjectPanelsController(document.getElementById("object-panels-placeholder"));
 			window.objectPanelsController = objectPanelsController; //we should use Singleton Pattern to avoid global variable.
-
+			const laserPanelController = new LaserPanelController(document.getElementById("layer-laser-panel-placeholder"));
 			// var host = location.hostname,
 			//	onWeb = host && host.indexOf('.') >= 0;
 			// Some FF versions throw security errors here when directly accessing
@@ -960,40 +962,12 @@ define([
 				}
 			};
 
-			var writeLayerLaserConfigs = function() {
-				const layerLaserConfigs = $('#layerLaserConfigs');
-				const layers = $('#svgcontent').find('g.layer');
-
-
-				layers.each(function(){
-					layername = $(this).find('title').text();
-					const theConfig = layerLaserConfigs.find('table').filter(function(){
-						return $(this).find('.layername').text() === layername;
-					});
-					$(this).attr('data-strength', theConfig.find('[name="layserStrength"]').val());
-					$(this).attr('data-speed', theConfig.find('[name="layserSpeed"]').val());
-				});
-			}
-
-			var populateLayerLaserConfigs = function() {
-				var layerLaserConfigs = $('#layerLaserConfigs');
+			var renderLayerLaserConfigs = function() {
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
 
-				layerLaserConfigs.find('table').each(function() {
-					$(this).hide();
-					if($(this).find('.layername').text() === currentLayerName) {
-						$(this).show();
-					}
-				});
-
-				writeLayerLaserConfigs();
-				layerLaserConfigs.find('input').change(function(){
-					writeLayerLaserConfigs();
-				});
+				laserPanelController.render(currentLayerName);
 			}
-
-
 
 			var populateLayers = function() {
 				svgCanvas.clearSelection();
@@ -1016,7 +990,7 @@ define([
 
 				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 
-				populateLayerLaserConfigs();
+				renderLayerLaserConfigs();
 
 				// handle selection of layer
 				$('#layerlist td.layername')
@@ -1024,7 +998,7 @@ define([
 						$('#layerlist tr.layer').removeClass('layersel');
 						$(this.parentNode).addClass('layersel');
 						svgCanvas.setCurrentLayer(this.textContent);
-						populateLayerLaserConfigs();
+						renderLayerLaserConfigs();
 						evt.preventDefault();
 					})
 					.mouseover(function() {
@@ -1050,27 +1024,15 @@ define([
 			};
 
 			var addLayerLaserConfig = function(layername) {
-				$('#layerLaserConfigs').append(
-					'<table><caption class="layername" hidden>'+ layername +'</caption>\
-					<tbody>\
-						<tr>\
-							<td>Strength</td>\
-							<td><input type="number" name="layserStrength" value="50" min="1" max="100"/></td>\
-						</tr>\
-						<tr>\
-							<td>Speed</td>\
-							<td><input type="number" name="layserSpeed" value="150" min="3" max="300"/></td>\
-						</tr>\
-					</tbody>\
-				  </table>'
-				);
+				laserPanelController.initConfig(layername);
 			}
 
 			var cloneLayerLaserConfig = function(oldName, newName) {
-				const oldConfig = $('#layerLaserConfigs > table').filter(function(){return $(this).find('.layername').text() === oldName;});
-				const newConfig = oldConfig.clone();
-				newConfig.find('.layername').text(newName);
-				$('#layerLaserConfigs').append(newConfig);
+				// const oldConfig = $('#layerLaserConfigs > table').filter(function(){return $(this).find('.layername').text() === oldName;});
+				// const newConfig = oldConfig.clone();
+				// newConfig.find('.layername').text(newName);
+				// $('#layerLaserConfigs').append(newConfig);
+				laserPanelController.cloneConfig(oldName, newName);
 			}
 
 			var showSourceEditor = function(e, forSaving) {

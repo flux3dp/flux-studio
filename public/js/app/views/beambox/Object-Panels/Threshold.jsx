@@ -2,10 +2,9 @@ define([
     'jquery',
     'react',
     'app/actions/beambox/svgeditor-function-wrapper',
-    'jsx!widgets/Unit-Input-v2',
     'helpers/image-data',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, ImageData, i18n) {
+], function($, React, FnWrapper, ImageData, i18n) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
