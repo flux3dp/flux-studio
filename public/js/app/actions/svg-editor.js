@@ -1264,6 +1264,7 @@ define([
 				var contentElem = svgCanvas.getContentElem();
 				var units = svgedit.units.getTypeMap();
 				var unit = units[curConfig.baseUnit]; // 1 = 1px
+				var offset = {x: -41, y: -71};
 
 				// draw x ruler then y ruler
 				for (d = 0; d < 2; d++) {
@@ -1275,10 +1276,8 @@ define([
 					var $hcanv_orig = $('#ruler_' + dim + ' canvas:first');
 
 					// Bit of a hack to fully clear the canvas in Safari & IE9
-					var $hcanv = $hcanv_orig.clone();
-					$hcanv_orig.replaceWith($hcanv);
-
-					var hcanv = $hcanv[0];
+					var hcanv = $hcanv_orig[0],
+						$hcanv = $hcanv_orig;
 
 					// Set the canvas size to the width of the container
 					var ruler_len = scanvas[lentype]();
@@ -1286,10 +1285,36 @@ define([
 					hcanv.parentNode.style[lentype] = total_len + 'px';
 					var ctx_num = 0;
 					var ctx = hcanv.getContext('2d');
+
+
+					hcanv[lentype] = ruler_len;
+
+					// Retina support
+					var ratio = window.devicePixelRatio;
+					if (ratio > 1) {
+						if (isX) {
+							hcanv.style.width  = total_len + 'px';
+							hcanv.width  = total_len * ratio;
+							hcanv.style.height = 15 + 'px';
+							hcanv.height = 15 * ratio;
+						} else {
+							hcanv.style.width  = 15 + 'px';
+							hcanv.width  = 15 * ratio;
+							hcanv.style.height = total_len + 'px';
+							hcanv.height = total_len * ratio;
+						}
+						ctx.scale(ratio, ratio);
+					}
+					if (isX) {
+						ctx.translate(offset.x, 0);
+					} else {
+						ctx.translate(0, offset.y);
+					}
 					var ctx_arr, num, ctx_arr_num;
 
-					ctx.fillStyle = 'rgb(200,0,0)';
-					ctx.fillRect(0, 0, hcanv.width, hcanv.height);
+					ctx.fillStyle = 'rgb(0,0,0)';
+					// ctx.fillRect(0, 0, hcanv.width, hcanv.height);
+					console.log(hcanv.width, hcanv.height);
 
 					// Remove any existing canvasses
 					$hcanv.siblings().remove();
@@ -1312,8 +1337,6 @@ define([
 						// set copy width to last
 						ruler_len = limit;
 					}
-
-					hcanv[lentype] = ruler_len;
 
 					var u_multi = unit * zoom;
 
