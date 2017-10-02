@@ -1,7 +1,7 @@
 define([
     'app/actions/beambox/constant',
 ], function(
-    Constant,
+    Constant
 ){
     'use strict';
 
@@ -112,8 +112,8 @@ define([
 
             function drawBoard(){
                 const context = c.getContext("2d");
-                const gridW = 50;
-                const gridH = 50;
+                const gridW = 100;
+                const gridH = 100;
 
                 context.globalCompositeOperation='destination-over';
 
@@ -129,7 +129,7 @@ define([
 
                 //context.strokeStyle = "#E0E0DF";
                 context.strokeStyle = "#000000";
-                context.lineWidth = 1;
+                context.lineWidth = 2;
                 context.stroke();
             }
 

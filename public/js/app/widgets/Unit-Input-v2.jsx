@@ -33,8 +33,8 @@ define([
 
         getInitialState: function() {
             return {
-                displayValue:   this.props.defaultValue,
-                savedValue:     this.props.defaultValue
+                displayValue:   Number(this.props.defaultValue).toFixed(this.props.decimal),
+                savedValue:     Number(this.props.defaultValue).toFixed(this.props.decimal)
             };
         },
 
@@ -83,8 +83,8 @@ define([
         },
         
 
-        _handleKeyUp: function(e) {
-            e.preventDefault();
+        _handleKeyDown: function(e) {
+            e.stopPropagation();
             const step = Math.abs(this.props.step);
             switch (e.keyCode) {                
                 case keyCodeConstants.KEY_RETURN:
@@ -122,7 +122,7 @@ define([
                         type="text"
                         value={this.state.displayValue}
                         onBlur={this._handleBlur}
-                        onKeyUp={this._handleKeyUp}
+                        onKeyDown={this._handleKeyDown}
                         onChange={this._handleChange}
                     />
                     {_renderUnit}

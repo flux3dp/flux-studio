@@ -24,9 +24,13 @@ TODOS
 */
 define([
 	'jsx!views/beambox/Object-Panels-Controller',
+	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
+	'helpers/image-data',
 	'helpers/shortcuts'
 ],function(
 	ObjectPanelsController,
+	LaserPanelController,
+	ImageData,
 	Shortcuts
 ){
 	if (window.svgEditor) {
@@ -438,7 +442,7 @@ define([
 
 			const objectPanelsController = new ObjectPanelsController(document.getElementById("object-panels-placeholder"));
 			window.objectPanelsController = objectPanelsController; //we should use Singleton Pattern to avoid global variable.
-
+			const laserPanelController = new LaserPanelController(document.getElementById("layer-laser-panel-placeholder"));
 			// var host = location.hostname,
 			//	onWeb = host && host.indexOf('.') >= 0;
 			// Some FF versions throw security errors here when directly accessing
@@ -775,7 +779,7 @@ define([
 			});
 
 			editor.canvas = svgCanvas = new $.SvgCanvas(document.getElementById('svgcanvas'), curConfig);
-			var supportsNonSS, resize_timer, changeZoom, Actions, curScrollPos,
+			var supportsNonSS, resize_timer, Actions, curScrollPos,
 				palette = [ // Todo: Make into configuration item?
 					'#000000', '#3f3f3f', '#7f7f7f', '#bfbfbf', '#ffffff',
 					'#ff0000', '#ff7f00', '#ffff00', '#7fff00',
@@ -958,40 +962,12 @@ define([
 				}
 			};
 
-			var writeLayerLaserConfigs = function() {
-				const layerLaserConfigs = $('#layerLaserConfigs');
-				const layers = $('#svgcontent').find('g.layer');
-
-
-				layers.each(function(){
-					layername = $(this).find('title').text();
-					const theConfig = layerLaserConfigs.find('table').filter(function(){
-						return $(this).find('.layername').text() === layername;
-					});
-					$(this).attr('data-strength', theConfig.find('[name="layserStrength"]').val());
-					$(this).attr('data-speed', theConfig.find('[name="layserSpeed"]').val());
-				});
-			}
-
-			var populateLayerLaserConfigs = function() {
-				var layerLaserConfigs = $('#layerLaserConfigs');
+			var renderLayerLaserConfigs = function() {
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
 
-				layerLaserConfigs.find('table').each(function() {
-					$(this).hide();
-					if($(this).find('.layername').text() === currentLayerName) {
-						$(this).show();
-					}
-				});
-
-				writeLayerLaserConfigs();
-				layerLaserConfigs.find('input').change(function(){
-					writeLayerLaserConfigs();
-				});
+				laserPanelController.render(currentLayerName);
 			}
-
-
 
 			var populateLayers = function() {
 				svgCanvas.clearSelection();
@@ -1014,7 +990,7 @@ define([
 
 				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 
-				populateLayerLaserConfigs();
+				renderLayerLaserConfigs();
 
 				// handle selection of layer
 				$('#layerlist td.layername')
@@ -1022,7 +998,7 @@ define([
 						$('#layerlist tr.layer').removeClass('layersel');
 						$(this.parentNode).addClass('layersel');
 						svgCanvas.setCurrentLayer(this.textContent);
-						populateLayerLaserConfigs();
+						renderLayerLaserConfigs();
 						evt.preventDefault();
 					})
 					.mouseover(function() {
@@ -1048,27 +1024,15 @@ define([
 			};
 
 			var addLayerLaserConfig = function(layername) {
-				$('#layerLaserConfigs').append(
-					'<table><caption class="layername" hidden>'+ layername +'</caption>\
-					<tbody>\
-						<tr>\
-							<td>Strength</td>\
-							<td><input type="number" name="layserStrength" value="50" min="1" max="100"/></td>\
-						</tr>\
-						<tr>\
-							<td>Speed</td>\
-							<td><input type="number" name="layserSpeed" value="150" min="3" max="300"/></td>\
-						</tr>\
-					</tbody>\
-				  </table>'
-				);
+				laserPanelController.initConfig(layername);
 			}
 
 			var cloneLayerLaserConfig = function(oldName, newName) {
-				const oldConfig = $('#layerLaserConfigs > table').filter(function(){return $(this).find('.layername').text() === oldName;});
-				const newConfig = oldConfig.clone();
-				newConfig.find('.layername').text(newName);
-				$('#layerLaserConfigs').append(newConfig);
+				// const oldConfig = $('#layerLaserConfigs > table').filter(function(){return $(this).find('.layername').text() === oldName;});
+				// const newConfig = oldConfig.clone();
+				// newConfig.find('.layername').text(newName);
+				// $('#layerLaserConfigs').append(newConfig);
+				laserPanelController.cloneConfig(oldName, newName);
 			}
 
 			var showSourceEditor = function(e, forSaving) {
@@ -1406,19 +1370,25 @@ define([
 				}
 			}
 
-			var updateCanvas = editor.updateCanvas = function(center, new_ctr) {
-				var w = workarea.width(), h = workarea.height();
-				var w_orig = w, h_orig = h;
-				var zoom = svgCanvas.getZoom();
-				var w_area = workarea;
+			var updateCanvas = editor.updateCanvas = function(zoomData) {
+				let autoCenter = zoomData?zoomData.autoCenter:undefined;
+				const staticPoint = zoomData?zoomData.staticPoint:null;
+				const w_orig = workarea.width(), h_orig = workarea.height(); //固定的工作區大小 只跟視窗大小有關 目前為全視窗
+				var zoom = svgCanvas.getZoom(); //1 for 100%, 0.5 for 50%
 				var cnvs = $('#svgcanvas');
-				var old_ctr = {
-					x: w_area[0].scrollLeft + w_orig/2,
-					y: w_area[0].scrollTop + h_orig/2
+
+				const old_scroll = {
+					left: workarea.scrollLeft(),
+					top: workarea.scrollTop()
 				};
-				var multi = curConfig.canvas_expansion;
+
+				var multi = curConfig.canvas_expansion; 
 				w = Math.max(w_orig, svgCanvas.contentW * zoom * multi);
 				h = Math.max(h_orig, svgCanvas.contentH * zoom * multi);
+
+				if((w_orig >= svgCanvas.contentW * zoom * multi) || (h_orig >= svgCanvas.contentH * zoom * multi)) {
+					autoCenter = true;
+				}
 
 				if (w == w_orig && h == h_orig) {
 					workarea.css('overflow', 'hidden');
@@ -1426,49 +1396,35 @@ define([
 					workarea.css('overflow', 'scroll');
 				}
 
-				var old_can_y = cnvs.height()/2;
-				var old_can_x = cnvs.width()/2;
+				const old_canvas_width = cnvs.width();
 				cnvs.width(w).height(h);
-				var new_can_y = h/2;
-				var new_can_x = w/2;
-				var offset = svgCanvas.updateCanvas(w, h);
+				const new_canvas_width = cnvs.width();
+				
+				svgCanvas.updateCanvas(w, h);
 
-				var ratio = new_can_x / old_can_x;
+				const zoomRatio = new_canvas_width / old_canvas_width;
 
-				var scroll_x = w/2 - w_orig/2;
-				var scroll_y = h/2 - h_orig/2;
-
-				if (!new_ctr) {
-					var old_dist_x = old_ctr.x - old_can_x;
-					var new_x = new_can_x + old_dist_x * ratio;
-
-					var old_dist_y = old_ctr.y - old_can_y;
-					var new_y = new_can_y + old_dist_y * ratio;
-
-					new_ctr = {
-						x: new_x,
-						y: new_y
-					};
-				} else {
-					new_ctr.x += offset.x;
-					new_ctr.y += offset.y;
+				function _scrollToMakeItCenter(workarea, svgcanvas) {
+					workarea.scrollLeft(svgcanvas.width()/2 - workarea.width()/2);
+					workarea.scrollTop(svgcanvas.height()/2 - workarea.height()/2);
 				}
 
-				if (center) {
-					// Go to top-left for larger documents
-					if (svgCanvas.contentW > w_area.width()) {
-						// Top-left
-						workarea[0].scrollLeft = offset.x - 10;
-						workarea[0].scrollTop = offset.y - 10;
-					} else {
-						// Center
-						w_area[0].scrollLeft = scroll_x;
-						w_area[0].scrollTop = scroll_y;
-					}
-				} else {
-					w_area[0].scrollLeft = new_ctr.x - w_orig/2;
-					w_area[0].scrollTop = new_ctr.y - h_orig/2;
+				function _scrollToMakePointStatic(workarea, staticPoint, zoomRatio, old_scroll) {
+					const left_cvs = old_scroll.left + staticPoint.x; //related to canvas
+					const newScrollLeft = left_cvs * zoomRatio - staticPoint.x;
+					workarea.scrollLeft(newScrollLeft);
+
+					const top_cvs = old_scroll.top + staticPoint.y; //related to canvas
+					const newScrollTop = top_cvs * zoomRatio - staticPoint.y;
+					workarea.scrollTop(newScrollTop);
 				}
+
+				if(autoCenter) {
+					_scrollToMakeItCenter(workarea, cnvs);
+				} else if(staticPoint) {
+					_scrollToMakePointStatic(workarea, staticPoint, zoomRatio, old_scroll);
+				}
+				
 				if (curConfig.showRulers) {
 					updateRulers(cnvs, zoom);
 					workarea.scroll();
@@ -1601,7 +1557,7 @@ define([
 
 			// updates the context panel tools based on the selected element
 			var updateContextPanel = function() {
-				var elem = selectedElement;
+ 				var elem = selectedElement;
 				objectPanelsController.setMe($(elem));
 				// If element has just been deleted, consider it null
 				if (elem != null && !elem.parentNode) {elem = null;}
@@ -1997,54 +1953,28 @@ define([
 				// updateCanvas(); // necessary?
 			};
 
-			var zoomChanged = svgCanvas.zoomChanged = function(win, bbox, autoCenter) {
-				var scrbar = 15,
-					// res = svgCanvas.getResolution(), // Currently unused
-					w_area = workarea;
-				// var canvas_pos = $('#svgcanvas').position(); // Currently unused
-				var z_info = svgCanvas.setBBoxZoom(bbox, w_area.width()-scrbar, w_area.height()-scrbar);
-				if (!z_info) {return;}
-				var zoomlevel = z_info.zoom,
-					bb = z_info.bbox;
+			var zoomChanged = function(win, zoomData) {
+				const defaultZoomData = {
+					zoomLevel: undefined,
+					factor: 1,
+					staticPoint: {
+						x: $(window).width()/2,
+						y: $(window).height()/2
+					},
+					autoCenter: false
+				};
+				const data = $.extend({}, defaultZoomData, zoomData);
+				data.zoomLevel = data.zoomLevel || svgCanvas.getZoom() * data.factor;
 
-				if (zoomlevel < 0.001) {
-					changeZoom({value: 0.1});
-					return;
-				}
+				svgCanvas.setZoom(data.zoomLevel);
 
-				$('#zoom').val((zoomlevel*100).toFixed(1));
-
-				if (autoCenter) {
-					updateCanvas();
+				if (data.autoCenter) {
+					updateCanvas({autoCenter: true});
 				} else {
-					updateCanvas(false, {x: bb.x * zoomlevel + (bb.width * zoomlevel)/2, y: bb.y * zoomlevel + (bb.height * zoomlevel)/2});
-				}
-
-				if (svgCanvas.getMode() == 'zoom' && bb.width) {
-					// Go to select if a zoom box was drawn
-					setSelectMode();
+					updateCanvas({staticPoint: data.staticPoint});
 				}
 
 				zoomDone();
-			};
-
-			changeZoom = function(ctl) {
-				var zoomlevel = ctl.value / 100;
-				if (zoomlevel < 0.001) {
-					ctl.value = 0.1;
-					return;
-				}
-				var zoom = svgCanvas.getZoom();
-				var w_area = workarea;
-
-				zoomChanged(window, {
-					width: 0,
-					height: 0,
-					// center pt of scroll position
-					x: (w_area[0].scrollLeft + w_area.width()/2)/zoom,
-					y: (w_area[0].scrollTop + w_area.height()/2)/zoom,
-					zoom: zoomlevel
-				}, true);
 			};
 
 			$('#cur_context_panel').delegate('a', 'click', function() {
@@ -3132,6 +3062,7 @@ define([
 					svgCanvas.changeSelectedAttribute(attr, val);
 				}
 				this.blur();
+				updateContextPanel();
 			});
 
 			// Prevent selection of elements when shift-clicking
@@ -3383,16 +3314,6 @@ define([
 				}
 			});
 
-			editor.addDropDown('#zoom_dropdown', function() {
-				var item = $(this);
-				var val = item.data('val');
-				if (val) {
-					zoomChanged(window, val);
-				} else {
-					changeZoom({value: parseFloat(item.text())});
-				}
-			}, true);
-
 			addAltDropDown('#stroke_linecap', '#linecap_opts', function() {
 				setStrokeOpt(this, true);
 			}, {dropUp: true});
@@ -3497,28 +3418,10 @@ define([
 				}
 			};
 
-			var clickZoom = function() {
-				if (toolButtonClick('#tool_zoom')) {
-					svgCanvas.setMode('zoom');
-					workarea.css('cursor', zoomInIcon);
-				}
-			};
-
-			var zoomImage = function(multiplier) {
-				var res = svgCanvas.getResolution();
-				multiplier = multiplier ? res.zoom * multiplier : 1;
-				// setResolution(res.w * multiplier, res.h * multiplier, true);
-				$('#zoom').val(multiplier * 100);
-				svgCanvas.setZoom(multiplier);
+			var unzoom = function() {
+				svgCanvas.setZoom(1);
+				updateCanvas();
 				zoomDone();
-				updateCanvas(true);
-			};
-
-			var dblclickZoom = function() {
-				if (toolButtonClick('#tool_zoom')) {
-					zoomImage();
-					setSelectMode();
-				}
 			};
 
 			var clickText = function() {
@@ -3655,21 +3558,21 @@ define([
 				updateContextPanel();
 			};
 
-			var clickClear = function() {
-				var dims = curConfig.dimensions;
-				$.confirm(uiStrings.notification.QwantToClear, function(ok) {
-					if (!ok) {return;}
-					setSelectMode();
-					svgCanvas.clear();
-					svgCanvas.setResolution(dims[0], dims[1]);
-					updateCanvas(true);
-					zoomImage();
-					populateLayers();
-					updateContextPanel();
-					prepPaints();
-					svgCanvas.runExtensions('onNewDocument');
-				});
-			};
+			// var clickClear = function() {
+			// 	var dims = curConfig.dimensions;
+			// 	$.confirm(uiStrings.notification.QwantToClear, function(ok) {
+			// 		if (!ok) {return;}
+			// 		setSelectMode();
+			// 		svgCanvas.clear();
+			// 		svgCanvas.setResolution(dims[0], dims[1]);
+			// 		updateCanvas(true);
+			// 		unzoom();
+			// 		populateLayers();
+			// 		updateContextPanel();
+			// 		prepPaints();
+			// 		svgCanvas.runExtensions('onNewDocument');
+			// 	});
+			// };
 
 			var clickBold = function() {
 				svgCanvas.setBold( !svgCanvas.getBold() );
@@ -3862,7 +3765,7 @@ define([
 				var saveChanges = function() {
 					svgCanvas.clearSelection();
 					hideSourceEditor();
-					zoomImage();
+					unzoom();
 					populateLayers();
 					updateTitle();
 					prepPaints();
@@ -4496,21 +4399,6 @@ define([
 				return sug_val;
 			}
 
-			function stepZoom(elem, step) {
-				var orig_val = Number(elem.value);
-				if (orig_val === 0) {return 100;}
-				var sug_val = orig_val + step;
-				if (step === 0) {return orig_val;}
-
-				if (orig_val >= 100) {
-					return sug_val;
-				}
-				if (sug_val >= orig_val) {
-					return orig_val * 2;
-				}
-				return orig_val / 2;
-			}
-
 		//	function setResolution(w, h, center) {
 		//		updateCanvas();
 		// //		w-=0; h-=0;
@@ -4562,8 +4450,8 @@ define([
 					{sel: '#tool_path', fn: clickPath, evt: 'click', key: ['P', true]},
 					{sel: '#tool_text', fn: clickText, evt: 'click', key: ['T', true]},
 					{sel: '#tool_image', fn: clickImage, evt: 'mouseup'},
-					{sel: '#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['Z', true]},
-					{sel: '#tool_clear', fn: clickClear, evt: 'mouseup', key: ['N', true]},
+					// {sel: '#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['Z', true]},
+					// {sel: '#tool_clear', fn: clickClear, evt: 'mouseup', key: ['N', true]},
 					{sel: '#tool_save', fn: function() {
 						if (editingsource) {
 							saveSourceEditor();
@@ -4711,13 +4599,17 @@ define([
 							*/
 						});
 						
+						// 'fnkey' means 'cmd' or 'ctrl'
 						Shortcuts.on(['del'], deleteSelected);
 						Shortcuts.on(['fnkey', 'x'], cutSelected);
 						Shortcuts.on(['fnkey', 'c'], copySelected);
 						Shortcuts.on(['fnkey', 'v'], pasteInCenter);
 						Shortcuts.on(['fnkey', 'z'], clickUndo);
-						Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
-						Shortcuts.on(['ctrl', 'y'], clickRedo);
+						if(process.platform === 'darwin') {
+							Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
+						} else {
+							Shortcuts.on(['ctrl', 'y'], clickRedo);
+						}
 						Shortcuts.on(['fnkey', 'd'], clickClone);
 						Shortcuts.on(['fnkey', 'a'], svgCanvas.selectAllInCurrentLayer);
 
@@ -4743,7 +4635,6 @@ define([
 						// 	}
 						// });
 
-						$('#tool_zoom').dblclick(dblclickZoom);
 					},
 					setTitles: function() {
 						$.each(key_assocs, function(keyval, sel) {
@@ -4840,9 +4731,6 @@ define([
 			$('#font_size').SpinButton({ min: 0.001, stepfunc: stepFontSize, callback: changeFontSize });
 			$('#group_opacity').SpinButton({ min: 0, max: 100, step: 5, callback: changeOpacity });
 			$('#blur').SpinButton({ min: 0, max: 10, step: 0.1, callback: changeBlur });
-			$('#zoom').SpinButton({ min: 0.001, max: 10000, step: 50, stepfunc: stepZoom, callback: changeZoom })
-				// Set default zoom
-				.val(svgCanvas.getZoom() * 100);
 
 			$('#workarea').contextMenu({
 					menu: 'cmenu_canvas',
@@ -5033,10 +4921,27 @@ define([
 											style: 'pointer-events:inherit',
 											preserveAspectRatio: 'none',
 											"data-threshold": 100,
-											"data-shading": false
+											"data-shading": true,
+											origImage: e.target.result
 										}
 									});
-									svgCanvas.setHref(newImage, e.target.result);
+									ImageData(
+										newImage.getAttribute('origImage'),
+										{
+											height: height,
+											width: width,
+											grayscale: {
+												is_rgba: true,
+												is_shading: Boolean(newImage.getAttribute('data-shading')),
+												threshold: parseInt(newImage.getAttribute('data-threshold')*255/100),
+												is_svg: false
+											},
+											onComplete: function(result) {
+												svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
+											}
+										}
+									);
+									
 									svgCanvas.selectOnly([newImage]);
 									svgCanvas.alignSelectedElements('m', 'page');
 									svgCanvas.alignSelectedElements('c', 'page');
@@ -5088,7 +4993,7 @@ define([
 			}
 
 //			$(function() {
-				updateCanvas(true);
+				updateCanvas({autoCenter: true});
 //			});
 
 			//	var revnums = "svg-editor.js ($Rev$) ";
@@ -5160,8 +5065,8 @@ define([
 			// zoomImage(0.2);
 			// workarea[0].scrollLeft = 300;
 			// workarea[0].scrollTop = 750;
-			$('#fit_to_canvas').mouseup();
-
+			// $('#fit_to_canvas').mouseup();
+			zoomChanged(window, {zoomLevel: 0.2})
 
 		};
 

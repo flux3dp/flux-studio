@@ -292,26 +292,8 @@ define([
                           </tbody>
                         </table>
                         
-                        <h4>Laser Config</h4>
-                        <div id="layerLaserConfigs">
-                          <table>
-                            <caption className="layername" hidden>Layer 1</caption>
-                            <tbody>
-                              <tr>
-                                <td>Strength</td>
-                                <td>
-                                  <input type="number" name="layserStrength" defaultValue="50" min="1" max="100"/>
-                                </td>
-                                </tr>
-                              <tr>
-                                <td>Speed</td>
-                                <td>
-                                  <input type="number" name="layserSpeed" defaultValue="150" min="3" max="300"/>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
+                        
+                        
                         <hr/>
                         <span id="selLayerLabel">Move elements to:</span>
                         <select
@@ -324,6 +306,7 @@ define([
                           </option>
                         </select>
                       </div>
+                      <div id="layer-laser-panel-placeholder" />
                       <div
                         id="sidepanel_handle"
                         title="Drag left/right to resize side panel [X]"
@@ -1035,7 +1018,7 @@ define([
                               <span id="zoomLabel" className="zoom_tool icon_label" />
                               <input id="zoom" size={3} defaultValue={100} type="text" />
                             </label>
-                            <div id="zoom_dropdown" className="dropdown">
+                            {/* <div id="zoom_dropdown" className="dropdown">
                               <button />
                               <ul>
                                 <li>1000%</li>
@@ -1058,7 +1041,7 @@ define([
                                 </li>
                                 <li>100%</li>
                               </ul>
-                            </div>
+                            </div> */}
                             <div className="tool_sep" />
                           </div>
                           <div id="tools_bottom_2">

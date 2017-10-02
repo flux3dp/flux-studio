@@ -44,7 +44,7 @@ define([
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
                         {LANG.ellipse_radius}
-                        <span className="value">{this.state.rx} , {this.state.ry}mm</span>
+                        <span className="value">{this.state.rx} , {this.state.ry} mm</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
