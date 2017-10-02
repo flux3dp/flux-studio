@@ -2319,6 +2319,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 	
 	 window.targetZoom = 1.0;
 	 $(container).bind('mousewheel DOMMouseScroll', function(e){
+		 console.log('act!');
 		 //if (!e.shiftKey) {return;}
 		 root_sctm = $('#svgcontent g')[0].getScreenCTM().inverse();
 		 e.preventDefault();
@@ -2330,7 +2331,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			 
 			 var pt = svgedit.math.transformPoint( evt.pageX, evt.pageY, root_sctm );
 			 var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
-		 
+			console.log(delta);
 			 var bbox = {
 				 'x': pt.x,
 				 'y': pt.y,
@@ -2339,7 +2340,14 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			 };
  
 			 if (!delta) {return;}
+
+			 const cursorPosition = {
+				x: evt.pageX,
+				y: evt.pageY
+			 };	
 			 window.targetZoom += delta/5000.0;
+			 window.staticPoint = cursorPosition;
+
 			 if(window.targetZoom >= 100) window.targetZoom = 100;
 			 if(window.targetZoom <= 0.1) window.targetZoom = 0.1;
 			 return;
