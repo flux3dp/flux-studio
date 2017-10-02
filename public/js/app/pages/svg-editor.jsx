@@ -291,8 +291,6 @@ define([
                             </tr>
                           </tbody>
                         </table>
-                        
-                        <h4>Laser Config</h4>
                         <div id="layerLaserConfigs">
                           <table>
                             <caption className="layername" hidden>Layer 1</caption>

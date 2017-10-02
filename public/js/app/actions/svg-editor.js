@@ -1264,7 +1264,7 @@ define([
 				var contentElem = svgCanvas.getContentElem();
 				var units = svgedit.units.getTypeMap();
 				var unit = units[curConfig.baseUnit]; // 1 = 1px
-				var offset = {x: -41, y: -71};
+				var offset = {x: 0, y: -90};
 
 				// draw x ruler then y ruler
 				for (d = 0; d < 2; d++) {
@@ -1311,11 +1311,8 @@ define([
 						ctx.translate(0, offset.y);
 					}
 					var ctx_arr, num, ctx_arr_num;
-
 					ctx.fillStyle = 'rgb(0,0,0)';
-					// ctx.fillRect(0, 0, hcanv.width, hcanv.height);
-					console.log(hcanv.width, hcanv.height);
-
+					
 					// Remove any existing canvasses
 					$hcanv.siblings().remove();
 
@@ -1353,7 +1350,7 @@ define([
 
 					var big_int = multi * u_multi;
 
-					ctx.font = '9px sans-serif';
+					ctx.font = '8px sans-serif';
 
 					var ruler_d = ((contentDim / u_multi) % multi) * u_multi;
 					var label_pos = ruler_d - big_int;
@@ -1388,7 +1385,7 @@ define([
 						}
 
 						if (isX) {
-							ctx.fillText(label, ruler_d+2, 8);
+							ctx.fillText(label, ruler_d+2, 10);
 						} else {
 							// draw label vertically
 							var str = String(label).split('');

@@ -248,6 +248,7 @@ define([
           }
 
           render() {
+
             var actionButtons = this._renderActionButtons(),
                 leftPanel = this._renderLeftPanel(),
                 movementMode = this._renderMovementMode(),
@@ -255,6 +256,7 @@ define([
 
             return (
                     <div className="studio-container beambox-studio">
+                        <div id="grid_mask"></div>
                         {movementMode}
                         {leftPanel}
                         <Svg />
