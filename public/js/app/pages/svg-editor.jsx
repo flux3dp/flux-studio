@@ -291,31 +291,9 @@ define([
                             </tr>
                           </tbody>
                         </table>
-<<<<<<< HEAD
                         
                         
                         
-=======
-                        <div id="layerLaserConfigs">
-                          <table>
-                            <caption className="layername" hidden>Layer 1</caption>
-                            <tbody>
-                              <tr>
-                                <td>Strength</td>
-                                <td>
-                                  <input type="number" name="layserStrength" defaultValue="50" min="1" max="100"/>
-                                </td>
-                                </tr>
-                              <tr>
-                                <td>Speed</td>
-                                <td>
-                                  <input type="number" name="layserSpeed" defaultValue="150" min="3" max="300"/>
-                                </td>
-                              </tr>
-                            </tbody>
-                          </table>
-                        </div>
->>>>>>> beambox/simon-tmp
                         <hr/>
                         <span id="selLayerLabel">Move elements to:</span>
                         <select
