@@ -1229,7 +1229,7 @@ TODOS
 					var ctx = hcanv.getContext('2d');
 					var ctx_arr, num, ctx_arr_num;
 
-					ctx.fillStyle = 'rgb(200,0,0)';
+					ctx.fillStyle = 'rgb(0,0,0)';
 					ctx.fillRect(0, 0, hcanv.width, hcanv.height);
 
 					// Remove any existing canvasses

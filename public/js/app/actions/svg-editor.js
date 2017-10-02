@@ -1226,6 +1226,7 @@ define([
 				var contentElem = svgCanvas.getContentElem();
 				var units = svgedit.units.getTypeMap();
 				var unit = units[curConfig.baseUnit]; // 1 = 1px
+				var offset = {x: 0, y: -90};
 
 				// draw x ruler then y ruler
 				for (d = 0; d < 2; d++) {
@@ -1237,10 +1238,8 @@ define([
 					var $hcanv_orig = $('#ruler_' + dim + ' canvas:first');
 
 					// Bit of a hack to fully clear the canvas in Safari & IE9
-					var $hcanv = $hcanv_orig.clone();
-					$hcanv_orig.replaceWith($hcanv);
-
-					var hcanv = $hcanv[0];
+					var hcanv = $hcanv_orig[0],
+						$hcanv = $hcanv_orig;
 
 					// Set the canvas size to the width of the container
 					var ruler_len = scanvas[lentype]();
@@ -1248,11 +1247,34 @@ define([
 					hcanv.parentNode.style[lentype] = total_len + 'px';
 					var ctx_num = 0;
 					var ctx = hcanv.getContext('2d');
+
+
+					hcanv[lentype] = ruler_len;
+
+					// Retina support
+					var ratio = window.devicePixelRatio;
+					if (ratio > 1) {
+						if (isX) {
+							hcanv.style.width  = total_len + 'px';
+							hcanv.width  = total_len * ratio;
+							hcanv.style.height = 15 + 'px';
+							hcanv.height = 15 * ratio;
+						} else {
+							hcanv.style.width  = 15 + 'px';
+							hcanv.width  = 15 * ratio;
+							hcanv.style.height = total_len + 'px';
+							hcanv.height = total_len * ratio;
+						}
+						ctx.scale(ratio, ratio);
+					}
+					if (isX) {
+						ctx.translate(offset.x, 0);
+					} else {
+						ctx.translate(0, offset.y);
+					}
 					var ctx_arr, num, ctx_arr_num;
-
-					ctx.fillStyle = 'rgb(200,0,0)';
-					ctx.fillRect(0, 0, hcanv.width, hcanv.height);
-
+					ctx.fillStyle = 'rgb(0,0,0)';
+					
 					// Remove any existing canvasses
 					$hcanv.siblings().remove();
 
@@ -1275,8 +1297,6 @@ define([
 						ruler_len = limit;
 					}
 
-					hcanv[lentype] = ruler_len;
-
 					var u_multi = unit * zoom;
 
 					// Calculate the main number interval
@@ -1292,7 +1312,7 @@ define([
 
 					var big_int = multi * u_multi;
 
-					ctx.font = '9px sans-serif';
+					ctx.font = '8px sans-serif';
 
 					var ruler_d = ((contentDim / u_multi) % multi) * u_multi;
 					var label_pos = ruler_d - big_int;
@@ -1327,7 +1347,7 @@ define([
 						}
 
 						if (isX) {
-							ctx.fillText(label, ruler_d+2, 8);
+							ctx.fillText(label, ruler_d+2, 10);
 						} else {
 							// draw label vertically
 							var str = String(label).split('');
@@ -1953,7 +1973,9 @@ define([
 				// updateCanvas(); // necessary?
 			};
 
-			var zoomChanged = function(win, zoomData) {
+			// SVGEditor original zoom control adapter
+
+			var zoomChanged = svgCanvas.zoomChanged = function(win, data) {
 				const defaultZoomData = {
 					zoomLevel: undefined,
 					factor: 1,
@@ -1963,19 +1985,38 @@ define([
 					},
 					autoCenter: false
 				};
-				const data = $.extend({}, defaultZoomData, zoomData);
-				data.zoomLevel = data.zoomLevel || svgCanvas.getZoom() * data.factor;
+				zoomData = $.extend({}, defaultZoomData, data);
+				window.targetZoom = Math.max(0.001, zoomData.zoomLevel);
+				zoomData.zoomLevel = zoomData.zoomLevel || svgCanvas.getZoom() * zoomData.factor;
+			};
 
-				svgCanvas.setZoom(data.zoomLevel);
+			// Control Beambox Zoom Animation
+			window.targetZoom = svgCanvas.getZoom();
+			setInterval(function(){
+				var currentZoom = svgCanvas.getZoom();
+				// Calculate next animation zoom level
+				var nextZoom = currentZoom + (window.targetZoom-currentZoom)/5;
+				
+				// End of animation
+				if (currentZoom === nextZoom) { return; }
+				if(window.targetZoom !== currentZoom) console.log('change');
 
-				if (data.autoCenter) {
-					updateCanvas({autoCenter: true});
-				} else {
-					updateCanvas({staticPoint: data.staticPoint});
-				}
+				if (Math.abs(window.targetZoom - currentZoom) < 0.01) { nextZoom = window.targetZoom;}
+
+				if (window.staticPoint) { zoomData.staticPoint = window.staticPoint };
+				
+				svgCanvas.setZoom(nextZoom);
+
+				$('#zoom').val((nextZoom*100).toFixed(1));
 
 				zoomDone();
-			};
+
+				if (!window.staticPoint) {
+					updateCanvas({autoCenter: true});
+				} else {
+					updateCanvas({staticPoint: window.staticPoint});
+				}
+			}, 1);
 
 			$('#cur_context_panel').delegate('a', 'click', function() {
 				var link = $(this);
@@ -3102,6 +3143,7 @@ define([
 			(function() {
 				var last_x = null, last_y = null, w_area = workarea[0],
 					panning = false, keypan = false;
+					window.w_area = workarea[0];
 
 				$('#svgcanvas').bind('mousemove mouseup', function(evt) {
 					if (panning === false) {return;}

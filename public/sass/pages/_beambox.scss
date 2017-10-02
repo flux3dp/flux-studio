@@ -122,9 +122,11 @@
 
         #sidepanels {
             border: none;
-            width: 180px;
+            width: 151px;
             bottom: initial;
-            padding-top: 35px;
+            padding-top: 40px;
+            padding-left: 0;
+            padding-right: 0;
             background-color: $backgroundColor;
             opacity: 0.8;
             &:hover {
@@ -149,6 +151,7 @@
             }
         }
 
+<<<<<<< HEAD
         #layer-laser-panel-placeholder {
             .title {
                 width: 40%;
@@ -164,6 +167,14 @@
                     width: 100%;
                 }
             }
+=======
+        #layersLabel {
+            display: none;
+        }
+
+        #sidepanel_handle {
+            display: none;
+>>>>>>> beambox/simon-tmp
         }
 
         #main_button, #tools_top, #tools_left, #tools_bottom, #rulers {
@@ -174,4 +185,12 @@
     #svg_source_editor, #docprops, #svg_prefs {
         @include force-hide();
     }
+
+    #layerLaserConfigs {
+        input[type=number] {
+            padding: 5px 3px;
+            margin: 10px;
+        }
+    }
 }
+

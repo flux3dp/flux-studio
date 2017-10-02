@@ -82,7 +82,7 @@ select {
 
 #ruler_corner {
 	top: 41px;
-	left: 41px;
+	left: 0px;
 	width: 15px;
 	height: 15px;
 }
@@ -90,7 +90,7 @@ select {
 #ruler_x {
 	height: 15px;
 	top: 41px;
-	left: 56px;
+	left: 16px;
 	right: 30px;
 	border-bottom: 1px solid;
 	border-left: 1px solid #777;
@@ -99,7 +99,7 @@ select {
 #ruler_y {
 	width: 15px;
 	top: 55px;
-	left: 41px;
+	left: 0px;
 	bottom: 56px;
 	border-right: 1px solid;
 	border-top: 1px solid #777;
@@ -331,6 +331,8 @@ select {
 
 #selLayerNames {
 	display: block;
+	width: auto;
+	padding: 10px 5px;
 }
 
 div.palette_item {
@@ -491,12 +493,11 @@ div.palette_item:first-child {
 #tools_left {
 	position: absolute;
 	border-right: none;
-	width: 32px;
+	width: 41px;
 	top: 40px;
 	left: 1px;
 	margin-top: -2px;
 	padding-left: 2px;
-	background: #D0D0D0; /* Needed so flyout icons don't appear on the left */
 	z-index: 4;
 }
 
@@ -974,7 +975,7 @@ span.zoom_tool {
 	overflow: visible;
 }
 
-@media screen and (max-width:1250px) {
+@media screen {
 	.expanded #palette_holder {
 		left: 560px;
 		overflow-x: scroll;
@@ -983,18 +984,19 @@ span.zoom_tool {
 		height: 30px;
 	}
 	#tools_top {
-		height: 71px;
+		height: 90px;
+		background: #E0E0E0;
 	}
 	#workarea, #sidepanels {
 		top: 70px;
 	}
 	#rulers #ruler_corner,
 	#rulers #ruler_x, #tools_left {
-		top: 71px;
+		top: 90px;
 	}
 
 	#rulers #ruler_y {
-		top: 86px;
+		top: 106px;
 	}
 
 	#cur_context_panel {
@@ -1464,3 +1466,17 @@ ul li.current {
 .contextMenu LI.delete A { background-image: url(images/page_white_delete.png); }
 .contextMenu LI.quit A { background-image: url(images/door.png); }
 */
+
+#main_button, #tools_left, #tools_top {
+	visibility: hidden;
+}
+
+#grid_mask {
+	z-index: 90;
+	position: absolute;
+	top:0;
+	left: 0;
+	background: #E0E0E0;
+	width: 100%;
+	height: 90px;
+}
