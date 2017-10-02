@@ -315,12 +315,7 @@ svgedit.utilities.findDefs = function() {
 		defs = defs[0];
 	} else {
 		defs = svgElement.ownerDocument.createElementNS(NS.SVG, 'defs');
-		if (svgElement.firstChild) {
-			// first child is a comment, so call nextSibling
-			svgElement.insertBefore(defs, svgElement.firstChild.nextSibling);
-		} else {
-			svgElement.appendChild(defs);
-		}
+		svgElement.insertBefore(defs, svgElement.firstChild);
 	}
 	return defs;
 };

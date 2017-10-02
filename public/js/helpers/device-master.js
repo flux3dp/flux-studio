@@ -783,7 +783,14 @@ define([
     }
 
     function maintainMove(args) {
-        return SocketMaster.addTask('maintainMove', args);
+        let d = $.Deferred();
+        SocketMaster.addTask('maintainMove', args)
+            .then((result) => {
+                if (result.status === 'ok') {
+                    return d.resolve();
+                }
+            });
+        return d.promise();
     }
 
     function enterMaintainMode() {

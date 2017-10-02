@@ -1968,9 +1968,9 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				console.log('mouseUp', real_x, real_y);
 				if (start_x === real_x && start_y === real_y) {
 					console.log('click!!');
-					var beamboxEvents = BeamboxEvents.call(this);
+					var beamboxEvents = BeamboxEvents();
 					var move = {
-						f: 6000,
+						f: 4000,
 						x: real_x / 10,
 						y: real_y / 10,
 					};
@@ -7257,6 +7257,8 @@ this.getPrivateMethods = function() {
 	};
 	return obj;
 };
+
+this.selectedPrinter = undefined;
 
 this.calcRealLocation = function(elem) {
 	const ts = $(elem).attr('transform');

@@ -28,6 +28,17 @@ define([
 ) {
     'use strict';
     var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
+    var canvas = document.createElement('canvas');
+     canvas.id = "CursorLayer";
+     canvas.width = 4000;
+     canvas.height = 4000;
+     //canvas.style.top = 0;
+     //canvas.style.zIndex = 8;
+     canvas.style.position = "absolute";
+     canvas.style.visible = false;
+     var ctx = canvas.getContext('2d');
+     var body = document.getElementsByTagName("body")[0];
+     body.appendChild(canvas);
 
     var ExportGCodeProgressing = function(data) {
             ProgressActions.open(ProgressConstants.STEPPING);
@@ -124,19 +135,54 @@ define([
               });
               return d.promise()
           },
-          enterMaintainMove: function() {
+
+          camera: function(selectedPrinter = undefined, args = {}) {
+
+              var cameraStream;
+              var blobtoDataURL = (blob, callback) => {
+                  var fr = new FileReader();
+                  fr.onload = function(e) {
+                    callback(e.target.result);
+                  };
+                  fr.readAsDataURL(blob);
+              };
+              cameraStream = DeviceMaster.streamCamera(selectedPrinter.uuid);
+              cameraStream.subscribe((imageBlob) => {
+                blobtoDataURL(imageBlob, function(dataURL) {
+                    DeviceMaster.stopStreamCamera();
+                    var img = new Image();
+                    img.onload = function(){
+                      console.log('img', img.width, img.height);
+                      ctx.drawImage(img,args.x * 10 - 363, args.y * 10 - 18, 1050, 787.5);
+                    };
+                    img.src = dataURL;
+                    setTimeout(() => {
+                        var canvasDataURL = canvas.toDataURL();
+                        window.svgCanvas.setBackground('#fff', canvasDataURL);
+                    }, 0);
+                });
+              });
+          },
+
+          enterMaintainMove: function(selectedPrinter = '') {
               DeviceMaster.enterMaintainMode();
               window.svgCanvas.setMode('maintainMove');
+              window.svgCanvas.selectedPrinter = selectedPrinter;
           },
 
           endMaintainMove: function(args) {
               DeviceMaster.endMaintainMode();
               window.svgCanvas.setMode('multiselect');
+              window.svgCanvas.selectedPrinter = undefined;
           },
 
           maintainMove: function(args) {
-              console.log('maintainMove', args);
-              DeviceMaster.maintainMove(args);
+              let d = $.Deferred();
+              DeviceMaster.maintainMove(args).done(() => {
+                  this.camera(window.svgCanvas.selectedPrinter, args);
+                  return d.resolve();
+              });
+              return d.promise()
           },
 
           movement: function(movementMode) {
@@ -146,7 +192,7 @@ define([
                   console.log('status', status);
                   if (status === DeviceConstants.CONNECTED) {
                      if (movementMode === false) {
-                        beambox.enterMaintainMove();
+                        beambox.enterMaintainMove(self.state.selectedPrinter);
                         return d.resolve(DeviceConstants.CONNECTED);
                      } else if (movementMode === true) {
                         beambox.endMaintainMove();
