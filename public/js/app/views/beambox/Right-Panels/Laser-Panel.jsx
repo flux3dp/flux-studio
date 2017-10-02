@@ -13,7 +13,7 @@ define([
             layerName:       React.PropTypes.string.isRequired,
             speed:      React.PropTypes.number.isRequired,
             strength:   React.PropTypes.number.isRequired,
-            funcs:      React.PropTypes.func.isRequired
+            funcs:      React.PropTypes.object.isRequired
         },
         
         getInitialState: function() {

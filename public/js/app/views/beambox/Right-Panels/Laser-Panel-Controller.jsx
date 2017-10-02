@@ -10,11 +10,6 @@ define([
         speed: 100,
         strength: 50
     }
-    
-    const _toFixed = function(val) {
-        const decimal = 2;
-        return Number(Number(val).toFixed(decimal));
-    };
 
     const _getLayer = function(name) {
         const layer = $('#svgcontent').find('g.layer').filter(function(){
@@ -43,16 +38,8 @@ define([
     class LaserPanelController {
         constructor(reactRoot) {
             this.reactRoot = reactRoot;
-
-            //bind all
-            for (let obj = this; obj; obj = Object.getPrototypeOf(obj)){
-                for (let name of Object.getOwnPropertyNames(obj)){
-                    if (typeof this[name] === 'function'){
-                        this[name] = this[name].bind(this);
-                    }
-                }
-            }
         }
+        
         initConfig(name) {
             writeSpeed(name, _defaultConfig.speed);
             writeStrength(name, _defaultConfig.strength);
@@ -62,8 +49,6 @@ define([
             writeSpeed(name, _getSpeed(baseName));
             writeStrength(name, _getStrength(baseName));
         }
-
-        
 
         render(name) {
             const speed = _getSpeed(name);

@@ -33,8 +33,8 @@ define([
 
         getInitialState: function() {
             return {
-                displayValue:   this.props.defaultValue,
-                savedValue:     this.props.defaultValue
+                displayValue:   Number(this.props.defaultValue).toFixed(this.props.decimal),
+                savedValue:     Number(this.props.defaultValue).toFixed(this.props.decimal)
             };
         },
 

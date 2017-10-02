@@ -4599,13 +4599,17 @@ define([
 							*/
 						});
 						
+						// 'fnkey' means 'cmd' or 'ctrl'
 						Shortcuts.on(['del'], deleteSelected);
 						Shortcuts.on(['fnkey', 'x'], cutSelected);
 						Shortcuts.on(['fnkey', 'c'], copySelected);
 						Shortcuts.on(['fnkey', 'v'], pasteInCenter);
 						Shortcuts.on(['fnkey', 'z'], clickUndo);
-						Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
-						Shortcuts.on(['ctrl', 'y'], clickRedo);
+						if(process.platform === 'darwin') {
+							Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
+						} else {
+							Shortcuts.on(['ctrl', 'y'], clickRedo);
+						}
 						Shortcuts.on(['fnkey', 'd'], clickClone);
 						Shortcuts.on(['fnkey', 'a'], svgCanvas.selectAllInCurrentLayer);
 
