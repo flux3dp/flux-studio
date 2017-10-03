@@ -28,22 +28,13 @@
 // 14) recalculate.js
 
 define([
-	'app/actions/beambox'
+	'app/actions/beambox',
+	'helpers/i18n',
 ],function(
-	BeamboxEvents
+	BeamboxEvents,
+	i18n
 ){
-
-if (!window.console) {
-	window.console = {};
-	window.console.log = function(str) {};
-	window.console.dir = function(str) {};
-}
-
-if (window.opera) {
-	window.console.log = function(str) { opera.postError(str); };
-	window.console.dir = function(str) {};
-}
-
+	const LANG = i18n.lang.beambox;
 
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions
@@ -2316,55 +2307,82 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 //	$(window).mouseup(mouseUp);
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
-	
-	 window.targetZoom = 1.0;
-	 $(container).bind('mousewheel DOMMouseScroll', function(e){
-		 console.log('act!');
-		 //if (!e.shiftKey) {return;}
-		 root_sctm = $('#svgcontent g')[0].getScreenCTM().inverse();
-		 e.preventDefault();
-		 let evt = e.originalEvent;
- 
-		 // Zooming as illustrator
-		 if (e.ctrlKey) {
-			 e.stopImmediatePropagation();
-			 
-			 var pt = svgedit.math.transformPoint( evt.pageX, evt.pageY, root_sctm );
-			 var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
-			console.log(delta);
-			 var bbox = {
-				 'x': pt.x,
-				 'y': pt.y,
-				 'width': 0,
-				 'height': 0
-			 };
- 
-			 if (!delta) {return;}
 
-			 const cursorPosition = {
-				x: evt.pageX,
-				y: evt.pageY
-			 };	
-			 window.targetZoom += delta/5000.0;
-			 window.staticPoint = cursorPosition;
+	$(container).bind('wheel DOMMouseScroll', (function(){
+		let targetZoom;
+		let timer;
+		let trigger = Date.now();
 
-			 if(window.targetZoom >= 100) window.targetZoom = 100;
-			 if(window.targetZoom <= 0.1) window.targetZoom = 0.1;
-			 return;
-		 }
- 
-				 
-		 // Panning as illustrator
-		 
-		 window.w_area.scrollLeft += evt.deltaX / 2.0;
-		 window.w_area.scrollTop += evt.deltaY / 2.0;
- 
-		 scroll_last_x = evt.deltaX;
-		 scroll_last_y = evt.deltaY;
- 
-	 });
- 
+		return function(e) {
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			const evt = e.originalEvent;
+			evt.stopImmediatePropagation();
+			evt.preventDefault();
 
+			if(targetZoom===undefined) {
+				targetZoom = svgCanvas.getZoom();
+			}
+			
+			if (e.ctrlKey) {
+				_zoomAsIllustrator();
+			} else {
+				_panAsIllustrator();
+			}
+
+			function _zoomAsIllustrator() {
+				const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
+
+				targetZoom *= (1+delta/1000.0);
+				
+				targetZoom = Math.min(100, targetZoom);
+				targetZoom = Math.max(0.1, targetZoom);
+				
+				if(!timer) {
+					const interval = 2;
+					timer = setInterval(_zoomProcess, interval);
+				}
+				
+				// due to wheel event bug (which zoom gesture will sometimes block all other processes), we trigger the zoomProcess about every few miliseconds
+				if(Date.now()-trigger>10) {
+					_zoomProcess();
+					trigger = Date.now();
+				}
+				
+				function _zoomProcess() {
+					
+					// End of animation
+					const currentZoom = svgCanvas.getZoom();						
+					if (currentZoom === targetZoom) {
+						clearInterval(timer);
+						timer = undefined;
+						return;
+					}
+					
+					// Calculate next animation zoom level
+					var nextZoom = currentZoom + (targetZoom - currentZoom)/5;
+					
+					if (Math.abs(targetZoom - currentZoom) < 0.01) {
+						nextZoom = targetZoom;
+					}
+
+					const cursorPosition = {
+						x: evt.pageX,
+						y: evt.pageY
+					};
+
+					call('zoomed', {zoomLevel: nextZoom, staticPoint: cursorPosition});
+				}
+			}
+			function _panAsIllustrator() {
+				const scrollLeft = $('#workarea').scrollLeft() + evt.deltaX / 2.0;
+				const scrollTop = $('#workarea').scrollTop() + evt.deltaY / 2.0;
+				$('#workarea').scrollLeft(scrollLeft);
+				$('#workarea').scrollTop(scrollTop);
+			}
+		};
+	 })());
+ 
 }());
 
 
@@ -5069,7 +5087,7 @@ this.clear = function() {
 	canvas.current_drawing_ = new svgedit.draw.Drawing(svgcontent);
 
 	// create empty first layer
-	canvas.createLayer('Layer 1');
+	canvas.createLayer(LANG.right_panel.layer_panel.layer1);
 
 	// clear the undo stack
 	canvas.undoMgr.resetUndoStack();

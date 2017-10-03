@@ -26,12 +26,14 @@ define([
 	'jsx!views/beambox/Object-Panels-Controller',
 	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
 	'helpers/image-data',
-	'helpers/shortcuts'
+	'helpers/shortcuts',
+	'helpers/i18n'
 ],function(
 	ObjectPanelsController,
 	LaserPanelController,
 	ImageData,
-	Shortcuts
+	Shortcuts,
+	i18n
 ){
 	if (window.svgEditor) {
 		return;
@@ -60,7 +62,7 @@ define([
 			// The iteration algorithm for defaultPrefs does not currently support array/objects
 			defaultPrefs = {
 				// EDITOR OPTIONS (DIALOG)
-				lang: '', // Default to "en" if locale.js detection does not detect another language
+				lang: (i18n.getActiveLang()==='en')?'en':'zh-TW', // Default to "en" if locale.js detection does not detect another language
 				iconsize: '', // Will default to 's' if the window height is smaller than the minimum height and 'm' otherwise
 				bkgd_color: '#FFF',
 				bkgd_url: '',
@@ -975,16 +977,17 @@ define([
 				var selLayerNames = $('#selLayerNames').empty();
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
-				var layer = svgCanvas.getCurrentDrawing().getNumLayers();
+				const layerCount = svgCanvas.getCurrentDrawing().getNumLayers();
 
-				// we get the layers in the reverse z-order (the layer rendered on top is listed first)
-				while (layer--) {
+				let layer = 0;
+				while (layer < layerCount) {
 					var name = drawing.getLayerName(layer);
 					var layerTr = $('<tr class="layer">').toggleClass('layersel', name === currentLayerName);
 					var layerVis = $('<td class="layervis">').toggleClass('layerinvis', !drawing.getLayerVisibility(name));
 					var layerName = $('<td class="layername">' + name + '</td>');
 					layerlist.append(layerTr.append(layerVis, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
+					layer += 1;
 				}
 
 
@@ -1973,9 +1976,7 @@ define([
 				// updateCanvas(); // necessary?
 			};
 
-			// SVGEditor original zoom control adapter
-
-			var zoomChanged = svgCanvas.zoomChanged = function(win, data) {
+			var zoomChanged = function(win, zoomData) {
 				const defaultZoomData = {
 					zoomLevel: undefined,
 					factor: 1,
@@ -1985,38 +1986,19 @@ define([
 					},
 					autoCenter: false
 				};
-				zoomData = $.extend({}, defaultZoomData, data);
-				window.targetZoom = Math.max(0.001, zoomData.zoomLevel);
-				zoomData.zoomLevel = zoomData.zoomLevel || svgCanvas.getZoom() * zoomData.factor;
-			};
+				const data = $.extend({}, defaultZoomData, zoomData);
+				data.zoomLevel = data.zoomLevel || svgCanvas.getZoom() * data.factor;
 
-			// Control Beambox Zoom Animation
-			window.targetZoom = svgCanvas.getZoom();
-			setInterval(function(){
-				var currentZoom = svgCanvas.getZoom();
-				// Calculate next animation zoom level
-				var nextZoom = currentZoom + (window.targetZoom-currentZoom)/5;
-				
-				// End of animation
-				if (currentZoom === nextZoom) { return; }
-				if(window.targetZoom !== currentZoom) console.log('change');
+				svgCanvas.setZoom(data.zoomLevel);
 
-				if (Math.abs(window.targetZoom - currentZoom) < 0.01) { nextZoom = window.targetZoom;}
-
-				if (window.staticPoint) { zoomData.staticPoint = window.staticPoint };
-				
-				svgCanvas.setZoom(nextZoom);
-
-				$('#zoom').val((nextZoom*100).toFixed(1));
-
-				zoomDone();
-
-				if (!window.staticPoint) {
+				if (data.autoCenter) {
 					updateCanvas({autoCenter: true});
 				} else {
-					updateCanvas({staticPoint: window.staticPoint});
+					updateCanvas({staticPoint: data.staticPoint});
 				}
-			}, 1);
+
+				zoomDone();
+			};
 
 			$('#cur_context_panel').delegate('a', 'click', function() {
 				var link = $(this);

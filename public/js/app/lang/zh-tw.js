@@ -961,7 +961,6 @@ define(function() {
         beambox: {
             left_panel: {
                 insert_object: '插入物件',
-                max_strength: '最大雷射強度',
                 preview: '預覽路徑',
                 rectangle: '長方形',
                 ellipse: '橢圓形',
@@ -976,6 +975,15 @@ define(function() {
                     text: '文字'
                 }
             },
+            right_panel: {
+                layer_panel: {
+                    layer1: '圖層 1'
+                },
+                laser_panel: {
+                    strength: '強度',
+                    speed: '速度'
+                },
+            },
             object_panels: {
                 position: '位置',
                 rotation: '旋轉',
@@ -988,11 +996,6 @@ define(function() {
                 laser_config: '雷射設定',
                 shading: '漸層',
                 threshold: '曝光閾值'
-            },
-            layer_panel: {
-                laser_config: 'Laser Config',
-                laser_strength: 'Strength',
-                laser_speed: 'Speed'
             },
             units: {
                 walt: 'W',
