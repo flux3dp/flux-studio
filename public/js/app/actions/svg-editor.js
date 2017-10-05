@@ -49,6 +49,7 @@ define([
 		editor.langChanged = false;
 		editor.showSaveWarning = false;
 		editor.storagePromptClosed = false; // For use with ext-storage.js
+		editor.dimensions = [4000, 4000];
 
 		var svgCanvas, urldata,
 			Utils = svgedit.utilities,
@@ -146,7 +147,7 @@ define([
 				jGraduatePath: 'js/lib/svgeditor/jgraduate/images/',
 				// DOCUMENT PROPERTIES
 				// Change the following to a preference (already in the Document Properties dialog)?
-				dimensions: [4000, 4000],
+				dimensions: editor.dimensions,
 				// EDITOR OPTIONS
 				// Change the following to preferences (already in the Editor Options dialog)?
 				gridSnapping: false,
@@ -1412,7 +1413,7 @@ define([
 					top: workarea.scrollTop()
 				};
 
-				var multi = curConfig.canvas_expansion; 
+				var multi = curConfig.canvas_expansion;
 				w = Math.max(w_orig, svgCanvas.contentW * zoom * multi);
 				h = Math.max(h_orig, svgCanvas.contentH * zoom * multi);
 
@@ -1429,7 +1430,7 @@ define([
 				const old_canvas_width = cnvs.width();
 				cnvs.width(w).height(h);
 				const new_canvas_width = cnvs.width();
-				
+
 				svgCanvas.updateCanvas(w, h);
 
 				const zoomRatio = new_canvas_width / old_canvas_width;
@@ -1454,7 +1455,7 @@ define([
 				} else if(staticPoint) {
 					_scrollToMakePointStatic(workarea, staticPoint, zoomRatio, old_scroll);
 				}
-				
+
 				if (curConfig.showRulers) {
 					updateRulers(cnvs, zoom);
 					workarea.scroll();
@@ -4629,7 +4630,7 @@ define([
 							}
 							*/
 						});
-						
+
 						// 'fnkey' means 'cmd' or 'ctrl'
 						Shortcuts.on(['del'], deleteSelected);
 						Shortcuts.on(['fnkey', 'x'], cutSelected);
@@ -4972,7 +4973,7 @@ define([
 											}
 										}
 									);
-									
+
 									svgCanvas.selectOnly([newImage]);
 									svgCanvas.alignSelectedElements('m', 'page');
 									svgCanvas.alignSelectedElements('c', 'page');

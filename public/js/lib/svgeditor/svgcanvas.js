@@ -493,7 +493,9 @@ var encodableImages = {},
 	lastClickPoint = null,
 
 	// Map of deleted reference elements
-	removedElements = {};
+	removedElements = {},
+
+	justClearSelection = false;
 
 // Clipboard for cut, copy&pasted elements
 canvas.clipBoard = [];
@@ -1206,14 +1208,13 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		var i, stroke_w,
 			tlist = svgedit.transformlist.getTransformList(mouse_target);
 		switch (current_mode) {
-			case 'maintainMove':
-					started = true;
-					console.log('maintainMove in');
-					break;
 			case 'select':
 				started = true;
 				current_resize_mode = 'none';
 				if (right_click) {started = false;}
+				if ( $('#selectorGroup0').css('display') === 'inline' ) {
+					justClearSelection = true;
+				}
 
 				if (mouse_target != svgroot) {
 					// if this element is not yet selected, clear selection and select it
@@ -1245,7 +1246,12 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 				} else if (!right_click){
 					clearSelection();
-					current_mode = 'multiselect';
+					if (canvas.selectedPrinter) {
+							current_mode = 'maintainMove';
+					} else {
+							current_mode = 'multiselect';
+					}
+
 					if (rubberBox == null) {
 						rubberBox = selectorManager.getRubberBandBox();
 					}
@@ -1585,6 +1591,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				}
 				break;
 			case 'multiselect':
+				debugger;
 				real_x *= current_zoom;
 				real_y *= current_zoom;
 				svgedit.utilities.assignAttributes(rubberBox, {
@@ -1947,27 +1954,37 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 
 		var real_x = x;
 		var real_y = y;
+		var beamboxEvents = BeamboxEvents();
 
 		// TODO: Make true when in multi-unit mode
 		var useUnit = false; // (curConfig.baseUnit !== 'px');
 		started = false;
 		var attrs, t;
+		const beamboxMaintainMove = function(x, y) {
+				var move = {
+					f: 4000,
+					x: real_x,
+					y: real_y,
+					z: 50
+				};
+				beamboxEvents.maintainMove(move);
+		};
+
 		console.log('current_mode', current_mode);
 		switch (current_mode) {
 			case 'maintainMove':
-				console.log('mouseUp', start_x, start_y);
-				console.log('mouseUp', real_x, real_y);
-				if (start_x === real_x && start_y === real_y) {
-					console.log('click!!');
-					var beamboxEvents = BeamboxEvents();
-					var move = {
-						f: 4000,
-						x: real_x / 10,
-						y: real_y / 10,
-					};
-					beamboxEvents.maintainMove(move);
-				}
-				break;
+				if (rubberBox != null) {
+					rubberBox.setAttribute('display', 'none');
+					curBBoxes = [];
+				};
+				if (justClearSelection) {
+						justClearSelection = false;
+				} else {
+						if (start_x === real_x && start_y === real_y) {
+				  			beamboxMaintainMove(real_x, real_y);
+						};
+				};
+				current_mode = 'select';
 			// intentionally fall-through to select here
 			case 'resize':
 			case 'multiselect':
@@ -2193,7 +2210,6 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			getCurrentDrawing().releaseId(getId());
 			element.parentNode.removeChild(element);
 			element = null;
-
 			t = evt.target;
 
 			// if this element is in a group, go up until we reach the top-level group

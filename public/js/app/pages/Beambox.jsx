@@ -81,18 +81,6 @@ define([
               //globalInteraction.onImageChanged(this.state.hasImage);
               var cx = React.addons.classSet,
                   buttons = [{
-                //      label: 'Test',
-                //      className: cx({
-                //          'btn-disabled': false,
-                //          'btn-default': true,
-                //          'btn-hexagon': true,
-                //          'btn-get-fcode': true
-                //      }),
-                //      dataAttrs: {
-                //          'ga-event': 'get-laser-test'
-                //      },
-                //      onClick: this._handleTestClick.bind(this, '-f')
-                //  }, {
                       label: 'Move',
                       className: cx({
                           'btn-disabled': false,
