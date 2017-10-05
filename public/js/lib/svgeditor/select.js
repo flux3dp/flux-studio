@@ -339,13 +339,14 @@ svgedit.select.SelectorManager.prototype.initGroup = function() {
 			'element': 'circle',
 			'attr': {
 				'id': ('selectorGrip_resize_' + dir),
-				'fill': '#22C',
+				'fill': '#FFF',
 				'r': gripRadius,
 				'style': ('cursor:' + dir + '-resize'),
 				// This expands the mouse-able area of the grips making them
 				// easier to grab with the mouse.
 				// This works in Opera and WebKit, but does not work in Firefox
 				// see https://bugzilla.mozilla.org/show_bug.cgi?id=500174
+				'stroke': '#000',
 				'stroke-width': 2,
 				'pointer-events': 'all'
 			}

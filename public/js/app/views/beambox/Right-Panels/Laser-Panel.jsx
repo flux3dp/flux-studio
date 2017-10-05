@@ -6,7 +6,7 @@ define([
 ], function($, React, UnitInput, i18n) {
     'use strict';
 
-    // const LANG = i18n.lang.beambox.object_panels;
+    const LANG = i18n.lang.beambox.right_panel.laser_panel;
 
     return React.createClass({
         propTypes: {
@@ -44,9 +44,8 @@ define([
         render: function() {
             return (
                 <div>
-                    <h4>Laser Config: {this.props.layerName}</h4>
                     <div>
-                        <span className='title'>Strength</span>
+                        <span className='title'>{LANG.strength}</span>
                         <UnitInput
                             min={1}
                             max={100}
@@ -57,7 +56,7 @@ define([
                             />
                     </div>
                     <div>
-                        <span className='title'>Speed</span>
+                        <span className='title'>{LANG.speed}</span>
                         <UnitInput
                             min={3}
                             max={300}

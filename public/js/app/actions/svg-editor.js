@@ -26,12 +26,14 @@ define([
 	'jsx!views/beambox/Object-Panels-Controller',
 	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
 	'helpers/image-data',
-	'helpers/shortcuts'
+	'helpers/shortcuts',
+	'helpers/i18n'
 ],function(
 	ObjectPanelsController,
 	LaserPanelController,
 	ImageData,
-	Shortcuts
+	Shortcuts,
+	i18n
 ){
 	if (window.svgEditor) {
 		return;
@@ -61,7 +63,7 @@ define([
 			// The iteration algorithm for defaultPrefs does not currently support array/objects
 			defaultPrefs = {
 				// EDITOR OPTIONS (DIALOG)
-				lang: '', // Default to "en" if locale.js detection does not detect another language
+				lang: (i18n.getActiveLang()==='en')?'en':'zh-TW', // Default to "en" if locale.js detection does not detect another language
 				iconsize: '', // Will default to 's' if the window height is smaller than the minimum height and 'm' otherwise
 				bkgd_color: '#FFF',
 				bkgd_url: '',
@@ -976,16 +978,17 @@ define([
 				var selLayerNames = $('#selLayerNames').empty();
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
-				var layer = svgCanvas.getCurrentDrawing().getNumLayers();
+				const layerCount = svgCanvas.getCurrentDrawing().getNumLayers();
 
-				// we get the layers in the reverse z-order (the layer rendered on top is listed first)
-				while (layer--) {
+				let layer = 0;
+				while (layer < layerCount) {
 					var name = drawing.getLayerName(layer);
 					var layerTr = $('<tr class="layer">').toggleClass('layersel', name === currentLayerName);
 					var layerVis = $('<td class="layervis">').toggleClass('layerinvis', !drawing.getLayerVisibility(name));
 					var layerName = $('<td class="layername">' + name + '</td>');
 					layerlist.append(layerTr.append(layerVis, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
+					layer += 1;
 				}
 
 
@@ -1227,6 +1230,7 @@ define([
 				var contentElem = svgCanvas.getContentElem();
 				var units = svgedit.units.getTypeMap();
 				var unit = units[curConfig.baseUnit]; // 1 = 1px
+				var offset = {x: 0, y: -90};
 
 				// draw x ruler then y ruler
 				for (d = 0; d < 2; d++) {
@@ -1238,10 +1242,8 @@ define([
 					var $hcanv_orig = $('#ruler_' + dim + ' canvas:first');
 
 					// Bit of a hack to fully clear the canvas in Safari & IE9
-					var $hcanv = $hcanv_orig.clone();
-					$hcanv_orig.replaceWith($hcanv);
-
-					var hcanv = $hcanv[0];
+					var hcanv = $hcanv_orig[0],
+						$hcanv = $hcanv_orig;
 
 					// Set the canvas size to the width of the container
 					var ruler_len = scanvas[lentype]();
@@ -1249,11 +1251,34 @@ define([
 					hcanv.parentNode.style[lentype] = total_len + 'px';
 					var ctx_num = 0;
 					var ctx = hcanv.getContext('2d');
+
+
+					hcanv[lentype] = ruler_len;
+
+					// Retina support
+					var ratio = window.devicePixelRatio;
+					if (ratio > 1) {
+						if (isX) {
+							hcanv.style.width  = total_len + 'px';
+							hcanv.width  = total_len * ratio;
+							hcanv.style.height = 15 + 'px';
+							hcanv.height = 15 * ratio;
+						} else {
+							hcanv.style.width  = 15 + 'px';
+							hcanv.width  = 15 * ratio;
+							hcanv.style.height = total_len + 'px';
+							hcanv.height = total_len * ratio;
+						}
+						ctx.scale(ratio, ratio);
+					}
+					if (isX) {
+						ctx.translate(offset.x, 0);
+					} else {
+						ctx.translate(0, offset.y);
+					}
 					var ctx_arr, num, ctx_arr_num;
-
-					ctx.fillStyle = 'rgb(200,0,0)';
-					ctx.fillRect(0, 0, hcanv.width, hcanv.height);
-
+					ctx.fillStyle = 'rgb(0,0,0)';
+					
 					// Remove any existing canvasses
 					$hcanv.siblings().remove();
 
@@ -1276,8 +1301,6 @@ define([
 						ruler_len = limit;
 					}
 
-					hcanv[lentype] = ruler_len;
-
 					var u_multi = unit * zoom;
 
 					// Calculate the main number interval
@@ -1293,7 +1316,7 @@ define([
 
 					var big_int = multi * u_multi;
 
-					ctx.font = '9px sans-serif';
+					ctx.font = '8px sans-serif';
 
 					var ruler_d = ((contentDim / u_multi) % multi) * u_multi;
 					var label_pos = ruler_d - big_int;
@@ -1328,7 +1351,7 @@ define([
 						}
 
 						if (isX) {
-							ctx.fillText(label, ruler_d+2, 8);
+							ctx.fillText(label, ruler_d+2, 10);
 						} else {
 							// draw label vertically
 							var str = String(label).split('');
@@ -3103,6 +3126,7 @@ define([
 			(function() {
 				var last_x = null, last_y = null, w_area = workarea[0],
 					panning = false, keypan = false;
+					window.w_area = workarea[0];
 
 				$('#svgcanvas').bind('mousemove mouseup', function(evt) {
 					if (panning === false) {return;}

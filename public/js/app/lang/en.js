@@ -965,7 +965,6 @@ define(function() {
         beambox: {
             left_panel: {
                 insert_object: 'Insert Object',
-                max_strength: 'Max Laser Strength',
                 preview: 'Preview',
                 rectangle: 'Rectangle',
                 ellipse: 'Ellipse',
@@ -980,6 +979,15 @@ define(function() {
                     text: 'Text'
                 }
             },
+            right_panel: {
+                layer_panel: {
+                    layer1: 'Layer 1'
+                },
+                laser_panel: {
+                    strength: 'Strength',
+                    speed: 'Speed'
+                },
+            },
             object_panels: {
                 position: 'Position',
                 rotation: 'Rotation',
@@ -992,11 +1000,6 @@ define(function() {
                 laser_config: 'Laser Config',
                 shading: 'Shading',
                 threshold: 'Threshold'
-            },
-            layer_panel: {
-                laser_config: 'Laser Config',
-                laser_strength: 'Strength',
-                laser_speed: 'Speed'
             },
             units: {
                 walt: 'W',

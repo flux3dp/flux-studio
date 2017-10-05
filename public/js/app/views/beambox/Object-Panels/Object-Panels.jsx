@@ -1,9 +1,6 @@
 // render by svg-editor. not Beambox
 define([
-    'jquery',
     'react',
-    'app/actions/beambox/svgeditor-function-wrapper',
-    'helpers/i18n',
     'jsx!views/beambox/Object-Panels/Position',
     'jsx!views/beambox/Object-Panels/Rotation',
     'jsx!views/beambox/Object-Panels/Size',
@@ -11,10 +8,8 @@ define([
     'jsx!views/beambox/Object-Panels/EllipseRadius',
     'jsx!views/beambox/Object-Panels/Line',
     'jsx!views/beambox/Object-Panels/Threshold',
-], function($, 
-    React, 
-    FnWrapper, 
-    i18n, 
+], function(
+    React,
     PositionPanel, 
     RotationPanel, 
     SizePanel, 
@@ -25,7 +20,6 @@ define([
 ) {
     'use strict';
 
-    const lang = i18n.lang;
     const validPanels = {
         'unknown':  [],
         'rect':     ['position', ,'rotation', 'size'],
@@ -70,10 +64,21 @@ define([
             return panelsToBeRender;
         },
         render: function() {
+            function _between(input, min, max) {
+                input = Math.min(input, max);
+                input = Math.max(input, min);
+                return input;
+            }
+
+            let left = $('#selectorGrip_resize_e').offset().left;
+            left = _between(left, 0, $(window).width()-240);
+            let top = $('#selectorGrip_resize_e').offset().top;
+            top = _between(top, 100, $(window).height()-80);
+            
             const positionStyle = {
                 position: 'absolute',
-                top: $('#selectorGrip_resize_se').offset().top,
-                left: $('#selectorGrip_resize_se').offset().left
+                top: top,
+                left: left
             };
 
             return (

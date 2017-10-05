@@ -186,7 +186,7 @@ define([
     svgLaserParser
 ) {
     let Config = ConfigHelper(),
-        lang = i18n.lang;
+        LANG = i18n.lang.beambox;
 
     'use strict';
 
@@ -301,8 +301,8 @@ define([
                           title="Move selected elements to a different layer"
                           disabled="disabled"
                           >
-                          <option selected="selected" value="layer1">
-                            Layer 1
+                          <option selected="selected" value={LANG.right_panel.layer_panel.layer1}>
+                            {LANG.right_panel.layer_panel.layer1}
                           </option>
                         </select>
                       </div>

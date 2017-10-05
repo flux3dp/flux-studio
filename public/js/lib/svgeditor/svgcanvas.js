@@ -28,22 +28,13 @@
 // 14) recalculate.js
 
 define([
-	'app/actions/beambox'
+	'app/actions/beambox',
+	'helpers/i18n',
 ],function(
-	BeamboxEvents
+	BeamboxEvents,
+	i18n
 ){
-
-if (!window.console) {
-	window.console = {};
-	window.console.log = function(str) {};
-	window.console.dir = function(str) {};
-}
-
-if (window.opera) {
-	window.console.log = function(str) { opera.postError(str); };
-	window.console.dir = function(str) {};
-}
-
+	const LANG = i18n.lang.beambox;
 
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions
@@ -2332,21 +2323,82 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 //	$(window).mouseup(mouseUp);
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
-	$(container).bind('mousewheel DOMMouseScroll', function(e){
-		e.preventDefault();
-		var evt = e.originalEvent;
 
-		const cursorPosition = {
-			x: evt.pageX,
-			y: evt.pageY
+	$(container).bind('wheel DOMMouseScroll', (function(){
+		let targetZoom;
+		let timer;
+		let trigger = Date.now();
+
+		return function(e) {
+			e.stopImmediatePropagation();
+			e.preventDefault();
+			const evt = e.originalEvent;
+			evt.stopImmediatePropagation();
+			evt.preventDefault();
+
+			if(targetZoom===undefined) {
+				targetZoom = svgCanvas.getZoom();
+			}
+			
+			if (e.ctrlKey) {
+				_zoomAsIllustrator();
+			} else {
+				_panAsIllustrator();
+			}
+
+			function _zoomAsIllustrator() {
+				const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
+
+				targetZoom *= (1+delta/1000.0);
+				
+				targetZoom = Math.min(100, targetZoom);
+				targetZoom = Math.max(0.1, targetZoom);
+				
+				if(!timer) {
+					const interval = 2;
+					timer = setInterval(_zoomProcess, interval);
+				}
+				
+				// due to wheel event bug (which zoom gesture will sometimes block all other processes), we trigger the zoomProcess about every few miliseconds
+				if(Date.now()-trigger>10) {
+					_zoomProcess();
+					trigger = Date.now();
+				}
+				
+				function _zoomProcess() {
+					
+					// End of animation
+					const currentZoom = svgCanvas.getZoom();						
+					if (currentZoom === targetZoom) {
+						clearInterval(timer);
+						timer = undefined;
+						return;
+					}
+					
+					// Calculate next animation zoom level
+					var nextZoom = currentZoom + (targetZoom - currentZoom)/5;
+					
+					if (Math.abs(targetZoom - currentZoom) < 0.01) {
+						nextZoom = targetZoom;
+					}
+
+					const cursorPosition = {
+						x: evt.pageX,
+						y: evt.pageY
+					};
+
+					call('zoomed', {zoomLevel: nextZoom, staticPoint: cursorPosition});
+				}
+			}
+			function _panAsIllustrator() {
+				const scrollLeft = $('#workarea').scrollLeft() + evt.deltaX / 2.0;
+				const scrollTop = $('#workarea').scrollTop() + evt.deltaY / 2.0;
+				$('#workarea').scrollLeft(scrollLeft);
+				$('#workarea').scrollTop(scrollTop);
+			}
 		};
-
-		var delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
-		if (!delta) {return;}
-		const zoomFactor = Math.max(95/100, Math.min(100/95, (delta)));
-		call('zoomed', {factor: zoomFactor, staticPoint: cursorPosition});
-	});
-
+	 })());
+ 
 }());
 
 
@@ -5051,7 +5103,7 @@ this.clear = function() {
 	canvas.current_drawing_ = new svgedit.draw.Drawing(svgcontent);
 
 	// create empty first layer
-	canvas.createLayer('Layer 1');
+	canvas.createLayer(LANG.right_panel.layer_panel.layer1);
 
 	// clear the undo stack
 	canvas.undoMgr.resetUndoStack();
@@ -5309,48 +5361,48 @@ this.getOffset = function() {
 // editor_w - Integer with the editor's workarea box's width
 // editor_h - Integer with the editor's workarea box's height
 // this.setBBoxZoom = function(val, editor_w, editor_h) {
-	// var spacer = 0.85;
-	// var bb;
-	// var calcZoom = function(bb) {
-	// 	if (!bb) {return false;}
-	// 	var w_zoom = Math.round((editor_w / bb.width)*100 * spacer)/100;
-	// 	var h_zoom = Math.round((editor_h / bb.height)*100 * spacer)/100;
-	// 	var zoomlevel = Math.min(w_zoom, h_zoom);
-	// 	canvas.setZoom(zoomlevel);
-	// 	return {'zoom': zoomlevel, 'bbox': bb};
-	// };
+// var spacer = 0.85;
+// var bb;
+// var calcZoom = function(bb) {
+// 	if (!bb) {return false;}
+// 	var w_zoom = Math.round((editor_w / bb.width)*100 * spacer)/100;
+// 	var h_zoom = Math.round((editor_h / bb.height)*100 * spacer)/100;
+// 	var zoomlevel = Math.min(w_zoom, h_zoom);
+// 	canvas.setZoom(zoomlevel);
+// 	return {'zoom': zoomlevel, 'bbox': bb};
+// };
 
-	// if (typeof val == 'object') {
-	// 	bb = val;
-	// 	if (bb.width == 0 || bb.height == 0) {
-	// 		var newzoom = bb.zoom ? bb.zoom : current_zoom * bb.factor;
-	// 		canvas.setZoom(newzoom);
-	// 		return {'zoom': current_zoom, 'bbox': bb};
-	// 	}
-	// 	return calcZoom(bb);
-	// }
+// if (typeof val == 'object') {
+// 	bb = val;
+// 	if (bb.width == 0 || bb.height == 0) {
+// 		var newzoom = bb.zoom ? bb.zoom : current_zoom * bb.factor;
+// 		canvas.setZoom(newzoom);
+// 		return {'zoom': current_zoom, 'bbox': bb};
+// 	}
+// 	return calcZoom(bb);
+// }
 
-	// switch (val) {
-	// 	case 'selection':
-	// 		if (!selectedElements[0]) {return;}
-	// 		var sel_elems = $.map(selectedElements, function(n){ if (n) {return n;} });
-	// 		bb = getStrokedBBox(sel_elems);
-	// 		break;
-	// 	case 'canvas':
-	// 		var res = getResolution();
-	// 		spacer = 0.95;
-	// 		bb = {width:res.w, height:res.h , x:0, y:0};
-	// 		break;
-	// 	case 'content':
-	// 		bb = getStrokedBBox();
-	// 		break;
-	// 	case 'layer':
-	// 		bb = getStrokedBBox(getVisibleElements(getCurrentDrawing().getCurrentLayer()));
-	// 		break;
-	// 	default:
-	// 		return;
-	// }
-	// return calcZoom(bb);
+// switch (val) {
+// 	case 'selection':
+// 		if (!selectedElements[0]) {return;}
+// 		var sel_elems = $.map(selectedElements, function(n){ if (n) {return n;} });
+// 		bb = getStrokedBBox(sel_elems);
+// 		break;
+// 	case 'canvas':
+// 		var res = getResolution();
+// 		spacer = 0.95;
+// 		bb = {width:res.w, height:res.h , x:0, y:0};
+// 		break;
+// 	case 'content':
+// 		bb = getStrokedBBox();
+// 		break;
+// 	case 'layer':
+// 		bb = getStrokedBBox(getVisibleElements(getCurrentDrawing().getCurrentLayer()));
+// 		break;
+// 	default:
+// 		return;
+// }
+// return calcZoom(bb);
 // };
 
 // Function: setZoom
