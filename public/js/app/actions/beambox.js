@@ -32,8 +32,6 @@ define([
      canvas.id = "CursorLayer";
      canvas.width = 4000;
      canvas.height = 4000;
-     //canvas.style.top = 0;
-     //canvas.style.zIndex = 8;
      canvas.style.position = "absolute";
      canvas.style.visible = false;
      var ctx = canvas.getContext('2d');
@@ -46,7 +44,6 @@ define([
         };
 
     var sendToSVGAPI = function(args, settings, callback, fileMode) {
-            console.log('sendToSVGAPI', args, settings, callback, fileMode);
             callback = callback || function() {};
 
             var laserParser = svgWebSocket,
@@ -54,7 +51,6 @@ define([
                     laserParser.uploadToSvgeditorAPI(args).done(onComputeFinished);
                 },
                 onComputeFinished = function() {
-                    console.log('onComputeFinished')
                     var names = [],
                         all_svg = laserParser.History.get();
 
@@ -152,8 +148,7 @@ define([
                     DeviceMaster.stopStreamCamera();
                     var img = new Image();
                     img.onload = function(){
-                      console.log('img', img.width, img.height);
-                      ctx.drawImage(img,args.x * 10 - 363, args.y * 10 - 18, 1050, 787.5);
+                      ctx.drawImage(img, args.x * 10 - 363, args.y * 10 - 18, 1050, 787.5);
                     };
                     img.src = dataURL;
                     setTimeout(() => {
@@ -166,22 +161,26 @@ define([
 
           enterMaintainMove: function(selectedPrinter = '') {
               DeviceMaster.enterMaintainMode();
-              window.svgCanvas.setMode('maintainMove');
               window.svgCanvas.selectedPrinter = selectedPrinter;
           },
 
           endMaintainMove: function(args) {
               DeviceMaster.endMaintainMode();
-              window.svgCanvas.setMode('multiselect');
               window.svgCanvas.selectedPrinter = undefined;
           },
 
           maintainMove: function(args) {
               let d = $.Deferred();
-              DeviceMaster.maintainMove(args).done(() => {
-                  this.camera(window.svgCanvas.selectedPrinter, args);
-                  return d.resolve();
-              });
+              if ( args.x < 0 || args.x > canvas.width || args.y < 0 || args.y > canvas.height) {
+                d.reject();
+              } else {
+                args.x = args.x / 10,
+                args.y = args.y / 10,
+                DeviceMaster.maintainMove(args).done(() => {
+                    this.camera(window.svgCanvas.selectedPrinter, args);
+                    return d.resolve();
+                });
+              }
               return d.promise()
           },
 
@@ -189,7 +188,6 @@ define([
               var beambox = this;
               var d = $.Deferred();
               DeviceMaster.selectDevice(self.state.selectedPrinter).then(function(status) {
-                  console.log('status', status);
                   if (status === DeviceConstants.CONNECTED) {
                      if (movementMode === false) {
                         beambox.enterMaintainMove(self.state.selectedPrinter);
