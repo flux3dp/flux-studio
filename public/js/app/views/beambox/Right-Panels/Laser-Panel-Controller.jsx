@@ -8,7 +8,8 @@ define([
 
     const _defaultConfig = {
         speed: 100,
-        strength: 50
+        strength: 50,
+        mode: 'ENGRAVE' //CUT, ENGRAVE
     }
 
     const _getLayer = function(name) {
@@ -16,53 +17,73 @@ define([
             return $(this).find('title').text() === name;
         });
         return layer;
+    }
+    const _getData = function(name, attr) {
+        let val = _getLayer(name).attr('data-' + attr);
+        val = val||_writeData(name, attr, _defaultConfig[attr]);
+        return val;
+    }
+    const _writeData = function(name, attr, val) {
+        return _getLayer(name).attr('data-' + attr, val);
+    }
 
+    const _getMode = function(name) {
+        return _getData(name, 'mode');
     }
     const _getSpeed = function(name) {
-        let speed = _getLayer(name).attr('data-speed');
-        speed = speed||writeSpeed(name, _defaultConfig.speed);
-        return speed;
+        return _getData(name, 'speed');
     }
     const _getStrength = function(name) {
-        let strength = _getLayer(name).attr('data-strength');
-        strength = strength||writeStrength(name, _defaultConfig.strength);
-        return strength;  
+        return _getData(name, 'strength');
+    }
+    
+
+    const writeMode = function(name, val) {
+        return _writeData(name, 'mode', val);
     }
     const writeSpeed = function(name, val) {
-        return _getLayer(name).attr('data-speed', val);
+        return _writeData(name, 'speed', val);
     }
     const writeStrength = function(name, val) {
-        return _getLayer(name).attr('data-strength', val);        
+        return _writeData(name, 'strength', val);
     }
+    
 
     class LaserPanelController {
         constructor(reactRoot) {
             this.reactRoot = reactRoot;
+            this.funcs = {
+                writeSpeed: writeSpeed,
+                writeStrength: writeStrength,
+                writeMode: writeMode
+            }
         }
         
         initConfig(name) {
+            writeMode(name, _defaultConfig.mode);
             writeSpeed(name, _defaultConfig.speed);
             writeStrength(name, _defaultConfig.strength);
         }
 
         cloneConfig(name, baseName) {
+            writeMode(name, _getMode(baseName));            
             writeSpeed(name, _getSpeed(baseName));
             writeStrength(name, _getStrength(baseName));
         }
 
         render(name) {
+            debugger;
             const speed = _getSpeed(name);
             const strength = _getStrength(name);
-            const funcs = {
-                writeSpeed: writeSpeed,
-                writeStrength: writeStrength
-            }
+            const mode = _getMode(name);
+            
             React.render(
                 <LaserPanel
                     layerName={name}
                     speed={speed}
                     strength={strength}
-                    funcs={funcs}
+                    mode={mode}
+                    funcs={this.funcs}
                 />
                 ,this.reactRoot
             );

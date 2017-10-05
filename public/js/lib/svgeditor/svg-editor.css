@@ -1466,17 +1466,3 @@ ul li.current {
 .contextMenu LI.delete A { background-image: url(images/page_white_delete.png); }
 .contextMenu LI.quit A { background-image: url(images/door.png); }
 */
-
-#main_button, #tools_left, #tools_top {
-	visibility: hidden;
-}
-
-#grid_mask {
-	z-index: 90;
-	position: absolute;
-	top:0;
-	left: 0;
-	background: #E0E0E0;
-	width: 100%;
-	height: 90px;
-}

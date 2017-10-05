@@ -18,7 +18,8 @@ define([
         getInitialState: function() {
             return {
                 rx: this.props.rx,
-                ry: this.props.ry
+                ry: this.props.ry,
+                isRatioPreserve: true
             };
         },
         
@@ -30,47 +31,68 @@ define([
         },
 
         _update_rx_handler: function(val) {
+            if(this.state.isRatioPreserve) {
+                const ry = val * (this.state.ry/this.state.rx);
+                FnWrapper.update_ellipse_ry(ry);
+                this.setState({ry: ry}); 
+            }
             FnWrapper.update_ellipse_rx(val);
             this.setState({rx: val});
         },
         _update_ry_handler: function(val) {
+            if(this.state.isRatioPreserve) {
+                const rx = val * (this.state.rx/this.state.ry);
+                FnWrapper.update_ellipse_rx(rx);
+                this.setState({rx: rx}); 
+            }
             FnWrapper.update_ellipse_ry(val);
             this.setState({ry: val});            
+        },
+        _ratio_handler: function(e) {
+            this.setState({
+                isRatioPreserve: e.target.checked
+            });
         },
         render: function() {
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher"/>
-                    <p className="caption">
-                        {LANG.ellipse_radius}
-                        <span className="value">{this.state.rx} , {this.state.ry} mm</span>
-                    </p>
-                    <label className="accordion-body">
-                        <div className="control">
-                            <span className="text-center header">RX</span>
-                            <UnitInput
-                                min={0}
-                                max={4000}
-                                unit="mm"
-                                defaultValue={this.state.rx}
-                                getValue={this._update_rx_handler}
-                            />
-                        </div>
-                        <div className="control">
-                            <span className="text-center header">RY</span>
-                            <UnitInput
-                                min={0}
-                                max={4000}
-                                unit="mm"
-                                defaultValue={this.state.ry}
-                                getValue={this._update_ry_handler}
-                            />
-                        </div>
+                        <input type="checkbox" className="accordion-switcher"/>
+                        <p className="caption">
+                            {LANG.ellipse_radius}
+                            <span className="value">{this.state.rx} , {this.state.ry} mm</span>
+                        </p>
+                        <label className="accordion-body">
+                            <div>
+                                <div className="control">
+                                    <span className="text-center header">RX</span>
+                                    <UnitInput
+                                        min={0}
+                                        max={4000}
+                                        unit="mm"
+                                        defaultValue={this.state.rx}
+                                        getValue={this._update_rx_handler}
+                                    />
+                                </div>
+                                <div className="control">
+                                    <span className="text-center header">RY</span>
+                                    <UnitInput
+                                        min={0}
+                                        max={4000}
+                                        unit="mm"
+                                        defaultValue={this.state.ry}
+                                        getValue={this._update_ry_handler}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
+                                <label htmlFor="togglePreserveRatio"><i className={this.state.isRatioPreserve?"fa fa-lock":"fa fa-unlock-alt"}></i></label>
+                            </div>
+                        </label>
                     </label>
-                </label>
-            </div>
-            );
+                </div>
+                );
         }
         
     });

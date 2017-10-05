@@ -8,6 +8,19 @@ define([
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
+
+    const update_width_funcs = {
+        rect:   FnWrapper.update_rect_width,
+        image:  FnWrapper.update_image_width,
+        use:    function(){console.log('TODO: _update_width_handler')},
+    }
+    const update_height_funcs = {
+        rect:   FnWrapper.update_rect_height,
+        image:  FnWrapper.update_image_height,
+        use:    function(){console.log('TODO: _update_height_handler')},
+    }
+    let _update_width = ()=>{};
+    let _update_height = ()=>{};
     
     return React.createClass({
         propTypes: {
@@ -19,8 +32,14 @@ define([
         getInitialState: function() {
             return {
                 width: this.props.width,
-                height: this.props.height
+                height: this.props.height,
+                isRatioPreserve: true
             };
+        },
+
+        componentWillMount: function() {
+            _update_width = update_width_funcs[this.props.type];
+            _update_height = update_height_funcs[this.props.type];
         },
         
         componentWillReceiveProps: function(nextProps) {
@@ -31,22 +50,27 @@ define([
         },
 
         _update_width_handler: function(val) {
-            const fn={
-                rect:   FnWrapper.update_rect_width,
-                image:  FnWrapper.update_image_width,
-                use:    function(){console.log('TODO: _update_width_handler')},
+            if(this.state.isRatioPreserve) {
+                const height = val * (this.state.height/this.state.width);
+                _update_height(height);
+                this.setState({height: height});
             }
-            fn[this.props.type](val);
+            _update_width(val);
             this.setState({width: val});
         },
         _update_height_handler: function(val) {
-            const fn={
-                rect:   FnWrapper.update_rect_height,
-                image:  FnWrapper.update_image_height,
-                use:    function(){console.log('TODO: _update_height_handler')},
+            if(this.state.isRatioPreserve) {
+                const width = val * (this.state.width/this.state.height);
+                _update_width(width);
+                this.setState({width: width});
             }
-            fn[this.props.type](val);
+            _update_height(val);
             this.setState({height: val});            
+        },
+        _ratio_handler: function(e) {
+            this.setState({
+                isRatioPreserve: e.target.checked
+            });
         },
         render: function() {
             return (
@@ -55,29 +79,39 @@ define([
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
                         {LANG.size}
-                        <span className="value">{this.state.width} x {this.state.height}mm</span>
+                        <span className="value">{this.state.width} x {this.state.height} mm</span>
                     </p>
+                    
+                    
                     <label className="accordion-body">
-                        <div className="control">
-                            <span className="text-center header">{LANG.width}</span>
-                            <UnitInput
-                                min={0}
-                                max={4000}
-                                unit="mm"
-                                defaultValue={this.state.width}
-                                getValue={this._update_width_handler}
-                            />
+                        <div>
+                            <div className="control">
+                                <span className="text-center header">{LANG.width} mm</span>
+                                <UnitInput
+                                    min={0}
+                                    max={4000}
+                                    unit="mm"
+                                    defaultValue={this.state.width}
+                                    getValue={this._update_width_handler}
+                                />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">{LANG.height} mm</span>
+                                <UnitInput
+                                    min={0}
+                                    max={4000}
+                                    unit="mm"
+                                    defaultValue={this.state.height}
+                                    getValue={this._update_height_handler}
+                                />
+                            </div>
                         </div>
-                        <div className="control">
-                            <span className="text-center header">{LANG.height}</span>
-                            <UnitInput
-                                min={0}
-                                max={4000}
-                                unit="mm"
-                                defaultValue={this.state.height}
-                                getValue={this._update_height_handler}
-                            />
+
+                        <div>
+                            <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
+                            <label htmlFor="togglePreserveRatio"><i className={this.state.isRatioPreserve?"fa fa-lock":"fa fa-unlock-alt"}></i></label>
                         </div>
+
                     </label>
                 </label>
             </div>

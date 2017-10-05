@@ -985,7 +985,9 @@ define(function() {
                 },
                 laser_panel: {
                     strength: 'Strength',
-                    speed: 'Speed'
+                    speed: 'Speed',
+                    cut: 'Cut',
+                    engrave: 'Engrave'
                 },
             },
             object_panels: {

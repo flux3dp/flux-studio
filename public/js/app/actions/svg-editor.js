@@ -990,6 +990,13 @@ define([
 					layer += 1;
 				}
 
+				if((layerCount <= 1)) {
+					$('#selLayerLabel').hide();
+					$('#selLayerNames').hide();
+				} else {
+					$('#selLayerLabel').show();
+					$('#selLayerNames').show();
+				}
 
 				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
 

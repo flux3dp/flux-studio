@@ -981,7 +981,9 @@ define(function() {
                 },
                 laser_panel: {
                     strength: '強度',
-                    speed: '速度'
+                    speed: '速度',
+                    cut: '切割',
+                    engrave: '雕刻'
                 },
             },
             object_panels: {
