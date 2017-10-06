@@ -1265,8 +1265,9 @@ define(function() {
         },
         change_filament: {
             home_caption: 'Change Filament',
-            load_filament_caption: 'LOAD FILAMENT',
-            unload_filament_caption: 'UNLOAD FILAMENT',
+            load_filament_caption: 'LOAD',
+            load_flexible_filament_caption: 'LOAD FLEXIBLE',
+            unload_filament_caption: 'UNLOAD',
             cancel: 'CANCEL',
             load_filament: 'Load Filament',
             load_flexible_filament: 'Load Flexible Filament',
