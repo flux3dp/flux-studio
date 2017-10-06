@@ -30,12 +30,14 @@
 define([
 	'app/actions/beambox',
 	'helpers/i18n',
+	'helpers/api/config'
 ],function(
 	BeamboxEvents,
-	i18n
+	i18n,
+	ConfigHelper
 ){
 	const LANG = i18n.lang.beambox;
-
+	const Config = ConfigHelper();
 // Class: SvgCanvas
 // The main SvgCanvas class that manages all SVG-related functions
 //
@@ -1591,7 +1593,6 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				}
 				break;
 			case 'multiselect':
-				debugger;
 				real_x *= current_zoom;
 				real_y *= current_zoom;
 				svgedit.utilities.assignAttributes(rubberBox, {
@@ -2323,7 +2324,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 //	$(window).mouseup(mouseUp);
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
-
+	
 	$(container).bind('wheel DOMMouseScroll', (function(){
 		let targetZoom;
 		let timer;
@@ -2339,11 +2340,19 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			if(targetZoom===undefined) {
 				targetZoom = svgCanvas.getZoom();
 			}
-			
-			if (e.ctrlKey) {
-				_zoomAsIllustrator();
+
+			const mouseInputDevice = Config.read('beambox-preference')['mouse-input-device'];
+			const isTouchpad = (mouseInputDevice==='TOUCHPAD');
+
+			if(isTouchpad) {
+				if (e.ctrlKey) {
+					_zoomAsIllustrator();
+				} else {
+					_panAsIllustrator();
+				}
 			} else {
-				_panAsIllustrator();
+				_zoomAsIllustrator();
+				//panning is default behavior when pressing middle button
 			}
 
 			function _zoomAsIllustrator() {

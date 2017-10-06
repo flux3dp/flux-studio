@@ -34,6 +34,12 @@ define([
                 opts.onFinished(value);
 
                 return value;
+            },
+
+            update: function(key, item_key, item_value) {
+                const configs = this.read(key);
+                configs[item_key] = item_value;
+                this.write(key, configs);
             }
         };
 

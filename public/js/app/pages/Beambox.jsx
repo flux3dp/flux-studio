@@ -10,6 +10,7 @@ define([
     'helpers/i18n',
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
+    'app/actions/alert-actions'
 ], function(
     React,
     beamboxEvents,
@@ -21,7 +22,8 @@ define([
     DefaultConfig,
     i18n,
     Modal,
-    PrinterSelector
+    PrinterSelector,
+    AlertActions
 ) {
     'use strict';
 
@@ -33,10 +35,30 @@ define([
         START: 'START'
     };
 
-    const customConfig = Config.read('beambox-defaults');
+    const customConfig = Config.read('beambox-preference');
     const updatedConfig = $.extend({}, DefaultConfig, customConfig);
-    Config.write('beambox-defaults', updatedConfig);
+    Config.write('beambox-preference', updatedConfig);
+    
+    function chooseIsTouchpad() {
+        AlertActions.showPopupYesNo(
+            'confirm_mouse_input_device',
+            '您習慣使用Touchpad嗎？<br/>針對不同輸入設備，<br/>我們提供Touchpad及滑鼠更順暢的操作體驗。',
+            '您使用的是Touchpad嗎？ (TODO: 英文缺)',
+            [],
+            {
+                yes: ()=>{
+                    Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
+                },
+                no: ()=>{
+                    Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
+                }
+            }
+        );
+    }    
 
+    if(!Config.read('beambox-preference')['mouse-input-device']) {
+        chooseIsTouchpad();
+    }
 
     return function(args = {}) {
         let Svg = SvgGenerator(args);
@@ -61,7 +83,7 @@ define([
           }
 
           _fetchFormalSettings(holder) {
-              const options = Config.read('beambox-defaults');
+              const options = Config.read('beambox-preference');
             //   const max = options['max-strength'];
                 //   max = lang.laser.advanced.form.power.max;
               return {
@@ -231,7 +253,7 @@ define([
           }
 
           render() {
-
+            
             var actionButtons = this._renderActionButtons(),
                 leftPanel = this._renderLeftPanel(),
                 movementMode = this._renderMovementMode(),

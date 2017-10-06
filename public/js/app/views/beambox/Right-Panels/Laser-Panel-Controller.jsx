@@ -72,17 +72,16 @@ define([
         }
 
         render(name) {
-            debugger;
+            const mode = _getMode(name);
             const speed = _getSpeed(name);
             const strength = _getStrength(name);
-            const mode = _getMode(name);
             
             React.render(
                 <LaserPanel
                     layerName={name}
+                    mode={mode}
                     speed={speed}
                     strength={strength}
-                    mode={mode}
                     funcs={this.funcs}
                 />
                 ,this.reactRoot
