@@ -499,7 +499,8 @@ define(function() {
                 savePreset: '儲存參數',
                 reloadPreset: '重置參數',
                 printing: '列印溫度',
-                firstLayerTemperature: '首層溫度'
+                firstLayerTemperature: '首層溫度',
+                flexibleMaterial: '軟性材料'
             },
             mode: [
                 {
@@ -1260,11 +1261,13 @@ define(function() {
         },
         change_filament: {
             home_caption: '更換線料',
-            load_filament_caption: '自動進料',
-            unload_filament_caption: '自動退料',
+            load_filament_caption: '進料',
+            load_flexible_filament_caption: '進軟料',
+            unload_filament_caption: '退料',
             cancel: '取消',
-            load_filament: '自動進料',
-            unload_filament: '自動退料',
+            load_filament: '進料',
+            load_flexible_filament: '進軟料',
+            unload_filament: '退料',
             next: '下一步',
             heating_nozzle: '列印工具頭加熱中',
             unloading: '自動退料中',

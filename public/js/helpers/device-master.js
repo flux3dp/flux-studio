@@ -619,7 +619,7 @@ define([
         return d.promise();
     }
 
-    function changeFilament(type) {
+    function changeFilament(type, flexible) {
         _stopChangingFilament = false;
         let d = $.Deferred();
         SocketMaster.addTask('enterMaintainMode').then(() => {
@@ -629,7 +629,7 @@ define([
         })
         .then(() => {
             if(!_stopChangingFilament) {
-                return SocketMaster.addTask('changeFilament', type);
+                return SocketMaster.addTask('changeFilament', type, flexible);
             }
         })
         .then(() => {

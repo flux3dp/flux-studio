@@ -486,7 +486,8 @@ define(function() {
                 savePreset: 'Save Config',
                 reloadPreset: 'Reset Config',
                 printing: 'Printing',
-                firstLayerTemperature: 'First Layer'
+                firstLayerTemperature: 'First Layer',
+                flexibleMaterial: 'Flexible Material'
             },
             mode: [
                 {
@@ -1268,6 +1269,7 @@ define(function() {
             unload_filament_caption: 'UNLOAD FILAMENT',
             cancel: 'CANCEL',
             load_filament: 'Load Filament',
+            load_flexible_filament: 'Load Flexible Filament',
             unload_filament: 'Unload Filament',
             next: 'NEXT',
             heating_nozzle: 'Heating nozzle',

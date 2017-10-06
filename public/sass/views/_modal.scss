@@ -428,7 +428,7 @@
         .btn {
             width: 100%;
 
-            &:first-child {
+            &:first-child, &:nth-child(2) {
                 margin: 0 0 24px 0;
             }
         }
