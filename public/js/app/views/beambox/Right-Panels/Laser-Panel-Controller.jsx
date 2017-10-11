@@ -36,9 +36,19 @@ define([
     const _getStrength = function(name) {
         return _getData(name, 'strength');
     }
+    const _getStoredStrength = function(name) {
+        return _getData(name, 'storedStrength');
+    }
     
 
     const writeMode = function(name, val) {
+        const prevMode = _getMode(name);
+        if(prevMode==='ENGRAVE' && val==='CUT') {
+            _writeStoredStrength(name, _getStrength(name));
+            writeStrength(name, 100);
+        } else if(prevMode==='CUT' && val==='ENGRAVE') {
+            writeStrength(name, _getStoredStrength(name));
+        }
         return _writeData(name, 'mode', val);
     }
     const writeSpeed = function(name, val) {
@@ -46,6 +56,9 @@ define([
     }
     const writeStrength = function(name, val) {
         return _writeData(name, 'strength', val);
+    }
+    const _writeStoredStrength = function(name, val) {
+        return _writeData(name, 'storedStrength', val);
     }
     
 
@@ -60,15 +73,15 @@ define([
         }
         
         initConfig(name) {
-            writeMode(name, _defaultConfig.mode);
             writeSpeed(name, _defaultConfig.speed);
             writeStrength(name, _defaultConfig.strength);
+            writeMode(name, _defaultConfig.mode);
         }
 
         cloneConfig(name, baseName) {
-            writeMode(name, _getMode(baseName));            
             writeSpeed(name, _getSpeed(baseName));
             writeStrength(name, _getStrength(baseName));
+            writeMode(name, _getMode(baseName));            
         }
 
         render(name) {
