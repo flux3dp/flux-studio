@@ -10,7 +10,9 @@ define([
     'helpers/i18n',
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
-    'app/actions/alert-actions'
+    'app/actions/alert-actions',
+    'jsx!views/beambox/Object-Panels-Controller',
+    'jsx!views/beambox/Right-Panels/Laser-Panel-Controller'
 ], function(
     React,
     beamboxEvents,
@@ -23,7 +25,9 @@ define([
     i18n,
     Modal,
     PrinterSelector,
-    AlertActions
+    AlertActions,
+    ObjectPanelsController,
+    LaserPanelController
 ) {
     'use strict';
 
@@ -38,6 +42,9 @@ define([
     const customConfig = Config.read('beambox-preference');
     const updatedConfig = $.extend({}, DefaultConfig, customConfig);
     Config.write('beambox-preference', updatedConfig);
+
+    ObjectPanelsController.init("object-panels-placeholder");
+    LaserPanelController.init("layer-laser-panel-placeholder");
     
     function chooseIsTouchpad() {
         AlertActions.showPopupYesNo(

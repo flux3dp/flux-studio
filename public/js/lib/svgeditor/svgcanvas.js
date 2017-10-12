@@ -30,11 +30,13 @@
 define([
 	'app/actions/beambox',
 	'helpers/i18n',
-	'helpers/api/config'
+	'helpers/api/config',
+	'jsx!views/beambox/Object-Panels-Controller'
 ],function(
 	BeamboxEvents,
 	i18n,
-	ConfigHelper
+	ConfigHelper,
+	ObjectPanelsController
 ){
 	const LANG = i18n.lang.beambox;
 	const Config = ConfigHelper();
@@ -534,7 +536,8 @@ this.addExtension = function(name, ext_func) {
 				svgroot: svgroot,
 				svgcontent: svgcontent,
 				nonce: getCurrentDrawing().getNonce(),
-				selectorManager: selectorManager
+				selectorManager: selectorManager,
+				ObjectPanelsController: ObjectPanelsController
 			}));
 		} else {
 			ext = ext_func;
@@ -1589,6 +1592,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						}
 
 						call('transition', selectedElements);
+						ObjectPanelsController.setEditable(false);
 					}
 				}
 				break;
@@ -1721,6 +1725,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				selectorManager.requestSelector(selected).resize();
 
 				call('transition', selectedElements);
+				ObjectPanelsController.setEditable(false);
 
 				break;
 			case 'zoom':
@@ -1921,6 +1926,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 
 				canvas.setRotationAngle(angle<-180?(360+angle):angle, true);
 				call('transition', selectedElements);
+				ObjectPanelsController.setEditable(false);
 				break;
 			default:
 				break;
@@ -1941,6 +1947,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 	// identified, a ChangeElementCommand is created and stored on the stack for those attrs
 	// this is done in when we recalculate the selected dimensions()
 	var mouseUp = function(evt) {
+		ObjectPanelsController.setEditable(true);
 		if (evt.button === 2) {return;}
 		var tempJustSelected = justSelected;
 		justSelected = null;
@@ -2065,6 +2072,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
+				
 				return;
 				//zoom is broken
 			case 'zoom':

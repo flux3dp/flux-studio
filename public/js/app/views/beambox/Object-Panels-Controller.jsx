@@ -20,8 +20,8 @@ define([
     };
 
     class ObjectPanelsController {
-        constructor(reactRoot) {
-            this.reactRoot = reactRoot;
+        constructor() {
+            this.reactRoot = '';
             this.isVisible = false;
             this.type = 'unknown';
             this.$me = $();
@@ -59,8 +59,16 @@ define([
             }
         }
 
-        setVisibility(show) {
-            this.isVisible = Boolean(show);
+        init(reactRoot) {
+            this.reactRoot = reactRoot;
+        }
+
+        setVisibility(isVisible) {
+            this.isVisible = isVisible;
+        }
+
+        setEditable(isEditable) {
+            this.isEditable = isEditable;
         }
 
         setType(type) {
@@ -126,7 +134,7 @@ define([
         }
 
         unmount() {
-            React.unmountComponentAtNode(this.reactRoot);
+            React.unmountComponentAtNode(document.getElementById(this.reactRoot));
         }
 
         
@@ -134,14 +142,16 @@ define([
         _render() {
             React.render(
                 <ObjectPanels
+                isEditable={this.isEditable}
                 type={this.type}
                 data={this.data}
                 $me={this.$me}
-                />, this.reactRoot
+                />, document.getElementById(this.reactRoot)
             );
         }
     }
 
+    const instance = new ObjectPanelsController();
 
-    return ObjectPanelsController;
+    return instance;
 });

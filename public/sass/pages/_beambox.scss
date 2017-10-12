@@ -30,13 +30,19 @@
         box-shadow: 1px 1px 5px #333;
         margin-top: 10px;
         margin-left: 10px;
+        transition: left .1s ease, top .1s ease, opacity .1s ease;
+        &.unselectable {
+            opacity: 0.5;
+            user-select: none;
+            pointer-events: none;
+        }
         .object-panel {
             @include flexbox();
             font-size: 20px;
             transition: all .1s ease;
             z-index: 1;
             will-change: top,left,transform;
-    
+
             .accordion-body {
                 overflow: visible;
                 position: relative;

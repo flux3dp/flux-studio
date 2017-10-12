@@ -1,15 +1,17 @@
 // render by svg-editor. not Beambox
 define([
     'react',
+    'plugins/classnames/index',
     'jsx!views/beambox/Object-Panels/Position',
     'jsx!views/beambox/Object-Panels/Rotation',
     'jsx!views/beambox/Object-Panels/Size',
     'jsx!views/beambox/Object-Panels/EllipsePosition',
     'jsx!views/beambox/Object-Panels/EllipseRadius',
     'jsx!views/beambox/Object-Panels/Line',
-    'jsx!views/beambox/Object-Panels/Threshold',
+    'jsx!views/beambox/Object-Panels/Threshold'
 ], function(
     React,
+    ClassNames,
     PositionPanel, 
     RotationPanel, 
     SizePanel, 
@@ -23,7 +25,7 @@ define([
     const validPanels = {
         'unknown':  [],
         'rect':     ['position', ,'rotation', 'size'],
-        'ellipse':  ['ellipsePosition', 'ellipseRadius'],
+        'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
         'image':    ['position', 'rotation', 'size', 'threshold'],
         'text':     ['rotation'],
@@ -31,22 +33,31 @@ define([
         'use':      ['position', 'rotation', 'size']
     };
 
+    function _getValidPanels(type) {
+        return validPanels[type]||validPanels['unknown'];
+    }
+
+    function _between(input, min, max) {
+        input = Math.min(input, max);
+        input = Math.max(input, min);
+        return input;
+    }
+
     let ObjectPanel = React.createClass({
         propTypes: {
             type: React.PropTypes.oneOf(Object.keys(validPanels)).isRequired,
             data: React.PropTypes.object.isRequired,
-            $me: React.PropTypes.object.isRequired
+            $me: React.PropTypes.object.isRequired,
+            isEditable: React.PropTypes.bool.isRequired
         },
                   
-        _getValidPanels: function(type) {
-            return validPanels[type]||validPanels['unknown'];
-        },
+        
         _renderPanels: function() {
             const data = this.props.data;
             const type = this.props.type;
             const $me = this.props.$me;
 
-            const validPanels = this._getValidPanels(this.props.type);
+            const validPanels = _getValidPanels(this.props.type);
             let panelsToBeRender = [];
             validPanels.forEach(function(panelName) {
                 let panel;
@@ -63,16 +74,36 @@ define([
             });
             return panelsToBeRender;
         },
-        render: function() {
-            function _between(input, min, max) {
-                input = Math.min(input, max);
-                input = Math.max(input, min);
-                return input;
-            }
+        
+        _findPositionStyle: function() {
+            const angle = function(){
+                const A = $('#selectorGrip_resize_w').offset();
+                const B = $('#selectorGrip_resize_e').offset();
+                const dX = B.left - A.left;
+                const dY = B.top - A.top;
+                const radius = Math.atan2(-dY, dX);
+                let degree = radius * (180 / Math.PI);
+                if(degree<0) degree += 360;
+                return degree;
+            }();
+            
+            const thePoint = (function () {
+                const E = $('#selectorGrip_resize_e').offset();
+                const S = $('#selectorGrip_resize_s').offset();
+                const W = $('#selectorGrip_resize_w').offset();
+                const N = $('#selectorGrip_resize_n').offset();
+                function isAngleIn(a, b) {
+                    return (a <= angle) && (angle < b);
+                }
+                if (isAngleIn(45+3,135+3)) return S;
+                if (isAngleIn(135+3,225+3)) return W;
+                if (isAngleIn(225+3,315+3))return N;
+                return E;
+            })();
 
-            let left = $('#selectorGrip_resize_e').offset().left;
+            let left = thePoint.left;
             left = _between(left, 0, $(window).width()-240);
-            let top = $('#selectorGrip_resize_e').offset().top;
+            let top = thePoint.top - 32;
             top = _between(top, 100, $(window).height()-80);
             
             const positionStyle = {
@@ -80,9 +111,14 @@ define([
                 top: top,
                 left: left
             };
+            return positionStyle;
+        },
 
+        render: function() {
+            const positionStyle = this._findPositionStyle();
+            const classes = ClassNames('object-panels', {'unselectable': !(this.props.isEditable)});
             return (
-                <div className='object-panels' style={positionStyle}>
+                <div className={classes} style={positionStyle}>
                     {this._renderPanels()}
                 </div>
             );

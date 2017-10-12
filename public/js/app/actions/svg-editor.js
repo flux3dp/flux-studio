@@ -443,9 +443,6 @@ define([
 
 		editor.init = function () {
 
-			const objectPanelsController = new ObjectPanelsController(document.getElementById("object-panels-placeholder"));
-			window.objectPanelsController = objectPanelsController; //we should use Singleton Pattern to avoid global variable.
-			const laserPanelController = new LaserPanelController(document.getElementById("layer-laser-panel-placeholder"));
 			// var host = location.hostname,
 			//	onWeb = host && host.indexOf('.') >= 0;
 			// Some FF versions throw security errors here when directly accessing
@@ -969,7 +966,7 @@ define([
 				var drawing = svgCanvas.getCurrentDrawing();
 				var currentLayerName = drawing.getCurrentLayerName();
 
-				laserPanelController.render(currentLayerName);
+				LaserPanelController.render(currentLayerName);
 			}
 
 			var populateLayers = function() {
@@ -1035,7 +1032,7 @@ define([
 			};
 
 			var addLayerLaserConfig = function(layername) {
-				laserPanelController.initConfig(layername);
+				LaserPanelController.initConfig(layername);
 			}
 
 			var cloneLayerLaserConfig = function(oldName, newName) {
@@ -1043,7 +1040,7 @@ define([
 				// const newConfig = oldConfig.clone();
 				// newConfig.find('.layername').text(newName);
 				// $('#layerLaserConfigs').append(newConfig);
-				laserPanelController.cloneConfig(oldName, newName);
+				LaserPanelController.cloneConfig(oldName, newName);
 			}
 
 			var showSourceEditor = function(e, forSaving) {
@@ -1464,7 +1461,7 @@ define([
 					$('#dialog_box').hide();
 				}
 
-				objectPanelsController.render();
+				ObjectPanelsController.render();
 			};
 
 			var updateToolButtonState = function() {
@@ -1589,7 +1586,7 @@ define([
 			// updates the context panel tools based on the selected element
 			var updateContextPanel = function() {
  				var elem = selectedElement;
-				objectPanelsController.setMe($(elem));
+				ObjectPanelsController.setMe($(elem));
 				// If element has just been deleted, consider it null
 				if (elem != null && !elem.parentNode) {elem = null;}
 				var currentLayerName = svgCanvas.getCurrentDrawing().getCurrentLayerName();
@@ -1603,7 +1600,7 @@ define([
 					' #use_panel, #a_panel').hide();
 				if (elem != null) {
 					var elname = elem.nodeName;
-					objectPanelsController.setType(elname);
+					ObjectPanelsController.setType(elname);
 					// If this is a link with no transform and one child, pretend
 					// its child is selected
 //					if (elname === 'a') { // && !$(elem).attr('transform')) {
@@ -1612,7 +1609,7 @@ define([
 
 					var angle = svgCanvas.getRotationAngle(elem);
 					$('#angle').val(angle);
-					objectPanelsController.setRotation(angle);
+					ObjectPanelsController.setRotation(angle);
 
 					var blurval = svgCanvas.getBlur(elem);
 					$('#blur').val(blurval);
@@ -1657,7 +1654,7 @@ define([
 							$('#selected_x').val(x || 0);
 							$('#selected_y').val(y || 0);
 							$('#xy_panel').show();
-							objectPanelsController.setPosition(x||0, y||0);
+							ObjectPanelsController.setPosition(x||0, y||0);
 						}
 
 						// Elements in this array cannot be converted to a path
@@ -1703,16 +1700,16 @@ define([
 						use: []
 					};
 					const objectPanelsControllerSetter = {
-						width: 	objectPanelsController.setWidth,
-						height: objectPanelsController.setHeight,
-						cx:		objectPanelsController.setEllipsePositionX,
-						cy: 	objectPanelsController.setEllipsePositionY,
-						rx:		objectPanelsController.setEllipseRadiusX,
-						ry:		objectPanelsController.setEllipseRadiusY,
-						x1:		objectPanelsController.setLineX1,
-						y1:		objectPanelsController.setLineY1,
-						x2:		objectPanelsController.setLineX2,
-						y2:		objectPanelsController.setLineY2,
+						width: 	ObjectPanelsController.setWidth,
+						height: ObjectPanelsController.setHeight,
+						cx:		ObjectPanelsController.setEllipsePositionX,
+						cy: 	ObjectPanelsController.setEllipsePositionY,
+						rx:		ObjectPanelsController.setEllipseRadiusX,
+						ry:		ObjectPanelsController.setEllipseRadiusY,
+						x1:		ObjectPanelsController.setLineX1,
+						y1:		ObjectPanelsController.setLineY1,
+						x2:		ObjectPanelsController.setLineX2,
+						y2:		ObjectPanelsController.setLineY2,
 					}
 
 					var el_name = elem.tagName;
@@ -1791,8 +1788,8 @@ define([
 							} else {
 								shading = Boolean(shading);
 							}
-							objectPanelsController.setImageShading(shading);
-							objectPanelsController.setImageThreshold(threshold);
+							ObjectPanelsController.setImageShading(shading);
+							ObjectPanelsController.setImageThreshold(threshold);
 						} // image
 						else if (el_name === 'g' || el_name === 'use') {
 							$('#container_panel').show();
@@ -1804,16 +1801,16 @@ define([
 
 							if( (el_name === 'use') && ($(elem).attr('data-xform')) ) {
 								const location = svgCanvas.calcRealLocation(elem);
-								objectPanelsController.setPosition(location.x, location.y);
-								objectPanelsController.setWidth(location.width);
-								objectPanelsController.setHeight(location.height);
+								ObjectPanelsController.setPosition(location.x, location.y);
+								ObjectPanelsController.setWidth(location.width);
+								ObjectPanelsController.setHeight(location.height);
 							}
 						}
 					}
 					menu_items[(el_name === 'g' ? 'en' : 'dis') + 'ableContextMenuItems']('#ungroup');
 					menu_items[((el_name === 'g' || !multiselected) ? 'dis' : 'en') + 'ableContextMenuItems']('#group');
 
-					objectPanelsController.render();
+					ObjectPanelsController.render();
 				} // if (elem != null)
 				else if (multiselected) {
 					$('#multiselected_panel').show();

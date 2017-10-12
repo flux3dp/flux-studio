@@ -63,15 +63,18 @@ define([
     
 
     class LaserPanelController {
-        constructor(reactRoot) {
-            this.reactRoot = reactRoot;
+        constructor() {
+            this.reactRoot = '';
             this.funcs = {
                 writeSpeed: writeSpeed,
                 writeStrength: writeStrength,
                 writeMode: writeMode
             }
         }
-        
+        init(reactRoot) {
+            this.reactRoot = reactRoot;
+        }
+
         initConfig(name) {
             writeSpeed(name, _defaultConfig.speed);
             writeStrength(name, _defaultConfig.strength);
@@ -97,11 +100,12 @@ define([
                     strength={strength}
                     funcs={this.funcs}
                 />
-                ,this.reactRoot
+                ,document.getElementById(this.reactRoot)
             );
         }
     }
 
+    const instance = new LaserPanelController();
 
-    return LaserPanelController;
+    return instance;
 });

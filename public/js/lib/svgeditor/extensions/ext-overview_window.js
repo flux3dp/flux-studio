@@ -10,7 +10,8 @@
  */
 
 var overviewWindowGlobals = {};
-svgEditor.addExtension("overview_window", function() {	'use strict';
+svgEditor.addExtension("overview_window", function(S) {
+	'use strict';
 
 	// Define and insert the base html element.
 	var propsWindowHtml= "\
@@ -88,7 +89,7 @@ svgEditor.addExtension("overview_window", function() {	'use strict';
 		$("#workarea").scrollLeft(portX);
 		$("#workarea").scrollTop(portY);
 
-		window.objectPanelsController.render();
+		S.ObjectPanelsController.render();
 	};
 	$( "#overview_window_view_box" ).draggable({  containment: "parent"
 		,drag: updateViewPortFromViewBox

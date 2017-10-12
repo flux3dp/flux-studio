@@ -15,8 +15,12 @@
 // 3) browser.js
 // 4) math.js
 // 5) svgutils.js
-
-(function() {'use strict';
+define([
+	'jsx!views/beambox/Object-Panels-Controller'
+], function(
+	ObjectPanelsController
+){
+'use strict';
 
 if (!svgedit.select) {
 	svgedit.select = {};
@@ -135,8 +139,8 @@ svgedit.select.Selector.prototype.showGrips = function(show) {
 		this.updateGripCursors(svgedit.utilities.getRotationAngle(elem));
 	}
 
-	window.objectPanelsController.setVisibility(show);
-	window.objectPanelsController.render();
+	ObjectPanelsController.setVisibility(show);
+	ObjectPanelsController.render();
 };
 
 // Function: svgedit.select.Selector.resize
@@ -270,8 +274,7 @@ svgedit.select.Selector.prototype.resize = function(bbox) {
 		mgr.rotateGrip.setAttribute('cx', nbax + (nbaw)/2);
 		mgr.rotateGrip.setAttribute('cy', nbay - (gripRadius*5));
 //	}
-
-	window.objectPanelsController.render();
+	ObjectPanelsController.render();
 };
 
 
@@ -481,7 +484,7 @@ svgedit.select.SelectorManager.prototype.releaseSelector = function(elem) {
 		}
 	}
 	
-	window.objectPanelsController.unmount();
+	ObjectPanelsController.unmount();
 };
 
 // Function: svgedit.select.SelectorManager.getRubberBandBox
@@ -545,4 +548,4 @@ svgedit.select.getSelectorManager = function() {
 	return selectorManager_;
 };
 
-}());
+});
