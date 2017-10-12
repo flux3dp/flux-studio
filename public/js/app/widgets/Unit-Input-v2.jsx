@@ -15,7 +15,8 @@ define([
             min: React.PropTypes.number,
             max: React.PropTypes.number,
             step: React.PropTypes.number,
-            decimal: React.PropTypes.number
+            decimal: React.PropTypes.number,
+            disabled: React.PropTypes.bool
         },
 
         getDefaultProps: function() {
@@ -27,7 +28,8 @@ define([
                 min: Number.MIN_SAFE_INTEGER,
                 max: Number.MAX_SAFE_INTEGER,
                 step: 1,
-                decimal: 2
+                decimal: 2,
+                disabled: false
             };
         },
 
@@ -124,6 +126,7 @@ define([
                         onBlur={this._handleBlur}
                         onKeyDown={this._handleKeyDown}
                         onChange={this._handleChange}
+                        disabled={this.props.disabled}
                     />
                     {_renderUnit}
                 </div>

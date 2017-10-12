@@ -4807,7 +4807,7 @@ this.importSvgString = function(xmlString) {
 		clearSelection();
 
 		var bb = svgedit.utilities.getBBox(use_el),
-				ratio = 25.4 / dpi * 10;
+				ratio = 25.4 / dpi * 10; // inch to mm
 
 		ts = 'scale(' + ratio + ')';
 

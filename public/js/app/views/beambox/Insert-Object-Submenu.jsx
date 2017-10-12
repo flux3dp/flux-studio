@@ -36,9 +36,9 @@ define([
                     <li onClick={FnWrapper.importImage}>
                         {LANG.image}
                     </li>
-                    <li onClick={FnWrapper.insertText}>
+                    {/* <li onClick={FnWrapper.insertText}>
                         {LANG.text}
-                    </li>
+                    </li> */}
                 </ul>
             );
         }

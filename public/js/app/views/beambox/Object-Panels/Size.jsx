@@ -73,6 +73,7 @@ define([
             });
         },
         render: function() {
+            const disableInput = (this.props.type === 'use');
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
@@ -93,6 +94,7 @@ define([
                                     unit="mm"
                                     defaultValue={this.state.width}
                                     getValue={this._update_width_handler}
+                                    disabled={disableInput}
                                 />
                             </div>
                             <div className="control">
@@ -103,6 +105,7 @@ define([
                                     unit="mm"
                                     defaultValue={this.state.height}
                                     getValue={this._update_height_handler}
+                                    disabled={disableInput}
                                 />
                             </div>
                         </div>
