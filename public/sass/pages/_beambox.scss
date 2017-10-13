@@ -28,8 +28,6 @@
     .object-panels {
         display: absolute;
         box-shadow: 1px 1px 5px #333;
-        margin-top: 10px;
-        margin-left: 10px;
         transition: left .1s ease, top .1s ease, opacity .1s ease;
         &.unselectable {
             opacity: 0.5;
@@ -46,22 +44,44 @@
             .accordion-body {
                 overflow: visible;
                 position: relative;
-    
-                .icon-locker {
-                    bottom: 0;
-                    cursor: pointer;
-                    height: 20px;
-                    left: 100%;
-                    margin: auto;
-                    position: absolute;
-                    top: 0;
-                    width: 20px;
-                }
                 .ui.ui-control-unit-input-v2 {
                     .unit {
                         font-size: 10px;
                         margin-left: -30px;
                     }
+                    input[disabled] {
+                        background-color:#f2f2f2;
+                        cursor: not-allowed;
+                    }
+                }
+                &.with-lock {
+                    display: flex;
+                    > div {
+                        align-items: center;
+                        display: inline-block;
+                    }
+                    .lock {
+                        margin-left: 15px;
+                        display: inline-flex;
+                        justify-content: center;
+                        i {
+                            font-size: 27px;
+                            color: #999;
+                            &:hover {
+                                color: black;
+                            }
+                        }
+                    }
+                    .ui.ui-control-unit-input-v2 {
+                        input {
+                            width: 100px;
+                        }
+                    }
+                }
+                .shading-checkbox {
+                    color: #666;
+                    margin-left: 17px;
+                    font-size: 22px;
                 }
             }
     

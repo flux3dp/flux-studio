@@ -62,7 +62,7 @@ define([
                             {LANG.ellipse_radius}
                             <span className="value">{this.state.rx} , {this.state.ry} mm</span>
                         </p>
-                        <label className="accordion-body">
+                        <label className="accordion-body  with-lock">
                             <div>
                                 <div className="control">
                                     <span className="text-center header">RX</span>
@@ -85,7 +85,7 @@ define([
                                     />
                                 </div>
                             </div>
-                            <div>
+                            <div className='lock'>
                                 <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
                                 <label htmlFor="togglePreserveRatio"><i className={this.state.isRatioPreserve?"fa fa-lock":"fa fa-unlock-alt"}></i></label>
                             </div>

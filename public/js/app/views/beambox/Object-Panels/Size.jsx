@@ -84,10 +84,10 @@ define([
                     </p>
                     
                     
-                    <label className="accordion-body">
+                    <label className="accordion-body with-lock">
                         <div>
                             <div className="control">
-                                <span className="text-center header">{LANG.width} mm</span>
+                                <span className="text-center header">{LANG.width}</span>
                                 <UnitInput
                                     min={0}
                                     max={4000}
@@ -98,7 +98,7 @@ define([
                                 />
                             </div>
                             <div className="control">
-                                <span className="text-center header">{LANG.height} mm</span>
+                                <span className="text-center header">{LANG.height}</span>
                                 <UnitInput
                                     min={0}
                                     max={4000}
@@ -110,7 +110,7 @@ define([
                             </div>
                         </div>
 
-                        <div>
+                        <div className='lock'>
                             <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
                             <label htmlFor="togglePreserveRatio"><i className={this.state.isRatioPreserve?"fa fa-lock":"fa fa-unlock-alt"}></i></label>
                         </div>

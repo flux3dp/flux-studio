@@ -12,7 +12,8 @@ define([
     return React.createClass({
         propTypes: {
             x: React.PropTypes.number.isRequired,
-            y: React.PropTypes.number.isRequired
+            y: React.PropTypes.number.isRequired,
+            type: React.PropTypes.oneOf('rect', 'image', 'use').isRequired
         },
 
         getInitialState: function() {
@@ -38,6 +39,7 @@ define([
             this.setState({y: y});            
         },
         render: function() {
+            const disableInput = (this.props.type === 'use');            
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
@@ -53,6 +55,7 @@ define([
                                 unit="mm"
                                 defaultValue={this.state.x}
                                 getValue={this._update_x_handler}
+                                disabled={disableInput}
                             />
                         </div>
                         <div className="control">
@@ -61,6 +64,7 @@ define([
                                 unit="mm"
                                 defaultValue={this.state.y}
                                 getValue={this._update_y_handler}
+                                disabled={disableInput}
                             />
                         </div>
                     </label>

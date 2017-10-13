@@ -56,10 +56,11 @@ define([
             );
         },
 
-        _handleShadingChange: function(event) {
-            const val = event.target.checked;
-            this.setState({shading: val}, function(){
-                this._writeShading(val);
+        _handleShadingClick: function(event) {
+            const currentShading = this.state.shading;
+            const newShading = !currentShading;
+            this.setState({shading: newShading}, function(){
+                this._writeShading(newShading);
                 this._refreshImage();
             });
         },
@@ -82,7 +83,9 @@ define([
                     <label className="accordion-body">
                         <div className="control">
                             <span className="text-center header">{LANG.shading}</span>
-                            <input type="checkbox" checked={this.state.shading} onChange={this._handleShadingChange}/>
+                            <label className='shading-checkbox' onClick={this._handleShadingClick}>
+                                <i className={this.state.shading ? "fa fa-toggle-on" : "fa fa-toggle-off"}></i>
+                            </label>
                         </div>
                         <div className="control">
                             <span className="text-center header">{LANG.threshold}</span>

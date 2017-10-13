@@ -27,21 +27,17 @@ define([
         'rect':     ['position', ,'rotation', 'size'],
         'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
-        'image':    ['position', 'rotation', 'size', 'threshold'],
+        'image':    ['position', 'size', 'rotation', 'threshold'],
         'text':     ['rotation'],
         'g':        ['rotation'],
-        'use':      ['position', 'rotation', 'size']
+        'use':      ['rotation', 'position', 'size']
     };
 
     function _getValidPanels(type) {
         return validPanels[type]||validPanels['unknown'];
     }
 
-    function _between(input, min, max) {
-        input = Math.min(input, max);
-        input = Math.max(input, min);
-        return input;
-    }
+    
 
     let ObjectPanel = React.createClass({
         propTypes: {
@@ -62,7 +58,7 @@ define([
             validPanels.forEach(function(panelName) {
                 let panel;
                 switch (panelName) {
-                    case 'position':        panel = <PositionPanel key={panelName} x={data.position.x} y={data.position.y}/>;       break;
+                    case 'position':        panel = <PositionPanel key={panelName} x={data.position.x} y={data.position.y} type={type}/>;       break;
                     case 'rotation':        panel = <RotationPanel key={panelName} angle={data.rotation.angle} />;                  break;
                     case 'size':            panel = <SizePanel key={panelName} width={data.size.width} height={data.size.height} type={type}/>;         break;
                     case 'ellipsePosition': panel = <EllipsePositionPanel key={panelName} cx={data.ellipsePosition.cx} cy={data.ellipsePosition.cy}/>;  break;
@@ -101,15 +97,28 @@ define([
                 return E;
             })();
 
-            let left = thePoint.left;
-            left = _between(left, 0, $(window).width()-240);
-            let top = thePoint.top - 32;
-            top = _between(top, 100, $(window).height()-80);
-            
+            thePoint.top -= 40;
+            thePoint.left += 35;
+
+            // constrain position not exceed window
+            const constrainedPosition = (function(){
+                function _between(input, min, max) {
+                    input = Math.min(input, max);
+                    input = Math.max(input, min);
+                    return input;
+                }
+                const left = _between(thePoint.left, 0, $(window).width()-240);
+                const top = _between(thePoint.top, 100, $(window).height()-80);
+                return {
+                    left: left,
+                    top: top
+                };
+            })();
+
             const positionStyle = {
                 position: 'absolute',
-                top: top,
-                left: left
+                top: constrainedPosition.top,
+                left: constrainedPosition.left
             };
             return positionStyle;
         },
