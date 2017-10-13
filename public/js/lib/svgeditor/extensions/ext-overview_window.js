@@ -21,7 +21,7 @@ svgEditor.addExtension("overview_window", function(S) {
 					<svg id=\"overviewMiniView\" width=\"131\" height=\"131\" x=\"0\" y=\"0\" viewBox=\"0 0 4800 3600\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\
 						<use x=\"0\" y=\"0\" xlink:href=\"#svgroot\"> </use>\
 					 </svg>\
-					 <div id=\"overview_window_view_box\" style=\"min-width:50px; min-height:50px; position:absolute; top:30px; left:30px; z-index:5; background-color:rgb(0,74,189); opacity: 0.3;\">\
+					 <div id=\"overview_window_view_box\" style=\"min-width:50px; min-height:50px; position:absolute; top:30px; left:30px; z-index:0; background-color:rgb(0,74,189); opacity: 0.3;\">\
 					 </div>\
 				 </div>\
 			</div>\

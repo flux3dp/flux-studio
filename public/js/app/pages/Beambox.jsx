@@ -49,8 +49,8 @@ define([
     function chooseIsTouchpad() {
         AlertActions.showPopupYesNo(
             'confirm_mouse_input_device',
-            '您習慣使用Touchpad嗎？<br/>針對不同輸入設備，<br/>我們提供Touchpad及滑鼠更順暢的操作體驗。',
-            '您使用的是Touchpad嗎？ (TODO: 英文缺)',
+            '您使用的是Touchpad嗎？<br/>針對不同輸入設備，<br/>我們提供Touchpad及滑鼠更順暢的操作體驗。',
+            '',
             [],
             {
                 yes: ()=>{

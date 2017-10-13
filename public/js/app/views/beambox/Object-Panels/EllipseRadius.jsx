@@ -87,7 +87,7 @@ define([
                             </div>
                             <div className='lock'>
                                 <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
-                                <label htmlFor="togglePreserveRatio"><div>┐</div><i className={this.state.isRatioPreserve?"fa fa-lock":"fa fa-unlock-alt"}></i><div>┘</div></label>
+                                <label htmlFor="togglePreserveRatio"><div>┐</div><i className={this.state.isRatioPreserve?"fa fa-expand locked":"fa fa-expand unlocked"}></i><div>┘</div></label>
                             </div>
                         </label>
                     </label>

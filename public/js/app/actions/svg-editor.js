@@ -3948,6 +3948,7 @@ define([
 
 			(function() {
 				workarea.scroll(function() {
+					ObjectPanelsController.render();
 					// TODO: jQuery's scrollLeft/Top() wouldn't require a null check
 					if ($('#ruler_x').length != 0) {
 						$('#ruler_x')[0].scrollLeft = workarea[0].scrollLeft;

@@ -213,7 +213,7 @@ svgEditor.readLang({
 		"invalidAttrValGiven":"數值給定錯誤",
 		"noContentToFitTo":"找不到符合的內容",
 		"dupeLayerName":"喔不！已經有另一個同樣名稱的圖層了！",
-		"enterUniqueLayerName":"請輸入一個名稱不重複的",
+		"enterUniqueLayerName":"請輸入一個不重複的名稱",
 		"enterNewLayerName":"請輸入新圖層的名稱",
 		"layerHasThatName":"圖層本來就是這個名稱（抱怨）",
 		"QmoveElemsToLayer":"要搬移所選取的物件到'%s'層嗎?",

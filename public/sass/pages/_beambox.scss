@@ -67,6 +67,13 @@
                             }
                             i {
                                 margin-left: 5px;
+                                transform: scale(-1, 1);
+                                &.locked {
+                                    color: #444;
+                                }
+                                &.unlocked {
+                                    color: #dddddd;
+                                }
                             }
                         }
                     }
@@ -152,8 +159,10 @@
             background-color: $backgroundColor;
             box-shadow: 0px 0px 5px black;
             opacity: 0.9;
+            z-index: 2;
             &:hover {
                 opacity: 1;
+                z-index: 4;
             }
             #layerpanel {
                 display: block;
@@ -171,14 +180,19 @@
                     .layervis {
                         text-align: center;
                     }
-                    tr.layersel, tr.layersel.layer:hover{
-                        color: white;
-                        background-color: #444;
-                        font-weight: lighter;
-                    }
-                    tr.layer:hover {
-                        color: black;
-                        background-color: #ddd;
+                    tr.layer {
+                        .layername {
+                            padding: 3px 0px;
+                        }
+                        &.layersel, &.layersel:hover {
+                            color: white;
+                            background-color: #444;
+                            font-weight: lighter;
+                        }
+                        &:hover {
+                            color: black;
+                            background-color: #ddd;
+                        }
                     }
                 }
                 .selLayerBlock {
@@ -236,6 +250,7 @@
                 }
             }
         }
+        
         #main_button,
         #tools_top,
         #tools_left,
@@ -243,6 +258,50 @@
             @include force-hide();
         }
     }
+    #dialog_box {
+        .overlay {
+            opacity: 0.1;
+        }
+        #dialog_container {
+            color: #626262;
+            border-radius: 0;
+            border:none;
+            background-color: #f8f8f8;
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 18px;
+            height: initial;
+            #dialog_content {
+                font-size: 18px;
+                margin: 0;
+                margin-bottom: 10px;
+                background-color: unset;
+                border: none;
+                height: initial;
+            }
+            #dialog_buttons {
+                input[type=text] {
+                    font-size: 16px;
+                    padding-left: 10px;
+                }
+                input[type=button] {
+                    font-size: 1.3rem;
+                    padding: 6px 12px;                
+                    margin-top: 10px;
+                    background-color: unset;
+                    color: #C0C0C0;
+                    border: 2px solid #C0C0C0;
+                    &:hover {
+                        border: 2px solid #424242;
+                        color: #424242;
+                    }
+                    &:focus {
+                        outline: 0;
+                    }
+                }
+            }
+        }
+    }
+
     #svg_source_editor,
     #docprops,
     #svg_prefs,
@@ -255,7 +314,7 @@
     }
     
     #grid_mask {
-        z-index: 90;
+        z-index: 5;
         position: absolute;
         top: 0;
         left: 0;
