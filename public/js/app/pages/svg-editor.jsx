@@ -238,7 +238,6 @@ define([
                     </div>
                     <div id="sidepanels">
                       <div id="layerpanel">
-                        <h3 id="layersLabel">Layers</h3>
                         <fieldset id="layerbuttons">
                           <div
                             id="layer_new"
@@ -291,21 +290,20 @@ define([
                             </tr>
                           </tbody>
                         </table>
-                        
-                        
-                        
-                        <hr/>
-                        <span id="selLayerLabel">Move elements to:</span>
-                        <select
-                          id="selLayerNames"
-                          title="Move selected elements to a different layer"
-                          disabled="disabled"
-                          >
-                          <option selected="selected" value={LANG.right_panel.layer_panel.layer1}>
-                            {LANG.right_panel.layer_panel.layer1}
-                          </option>
-                        </select>
+                        <div className='selLayerBlock'>
+                          <span id="selLayerLabel">Move elements to:</span>
+                          <select
+                            id="selLayerNames"
+                            title="Move selected elements to a different layer"
+                            disabled="disabled"
+                            >
+                            <option selected="selected" value={LANG.right_panel.layer_panel.layer1}>
+                              {LANG.right_panel.layer_panel.layer1}
+                            </option>
+                          </select>
+                        </div>
                       </div>
+                      <hr/>
                       <div id="layer-laser-panel-placeholder" />
                       <div
                         id="sidepanel_handle"

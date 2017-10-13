@@ -49,17 +49,17 @@ define([
 
         _renderMode: function() {
             return (
-                <div>
+                <div className="mode">
                     <label>
                         <input type="radio" value="CUT" 
                             checked={this.state.mode === 'CUT'} 
-                            onChange={this._handleModeChange} />
+                            onChange={this._handleModeChange} hidden />
                         {LANG.cut}
                     </label>
                     <label>
                         <input type="radio" value="ENGRAVE" 
                             checked={this.state.mode === 'ENGRAVE'} 
-                            onChange={this._handleModeChange} />
+                            onChange={this._handleModeChange} hidden />
                         {LANG.engrave}
                     </label>
                 </div>

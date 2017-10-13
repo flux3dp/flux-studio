@@ -14,7 +14,7 @@ html, body, div{
 
 #browser-not-supported {
 	font-size: 0.8em;
-	font-family: Verdana, Helvetica, Arial;
+	/* font-family: Verdana, Helvetica, Arial; */
 	color: #000000;
 }
 
@@ -26,8 +26,8 @@ html, body, div{
 }
 
 #svg_editor {
-	font-size: 8pt;
-	font-family: Verdana, Helvetica, Arial;
+	font-size: 10pt;
+	/* font-family: Verdana, Helvetica, Arial; */
 	color: #000000;
 }
 
@@ -192,8 +192,6 @@ select {
 	position:relative;
 	top: 0px;
 	bottom: 0;
-	left: 12px;
-	width: 0;
 	overflow: hidden;
 	margin: 0;
 	-moz-user-select: none;
@@ -317,12 +315,12 @@ select {
 }
 
 #layerlist td.layername:hover {
-	color: blue;
-	font-style: italic;
+	/* color: blue; */
+	/* font-style: italic; */
 }
 
 #layerlist tr.layersel td.layername {
-	font-weight: bold;
+	/* font-weight: bold; */
 }
 
 #selLayerLabel {
@@ -406,7 +404,7 @@ div.palette_item:first-child {
 	font-weight: bold;
 	padding-left: 34px;
 	line-height: 32px;
-	font-family: sans-serif;
+	/* font-family: sans-serif; */
 }
 
 #main_menu {
@@ -1129,7 +1127,7 @@ ul li.current {
 	border: 1px outset #777;
 	opacity: 1.0;
 /*	width: 450px;*/
-	font-family: Verdana, Helvetica, sans-serif;
+	/* font-family: Verdana, Helvetica, sans-serif; */
 	font-size: .8em;
 	z-index: 20001;
 }
@@ -1318,7 +1316,7 @@ ul li.current {
 
 #dialog_container {
 	position: absolute;
-	font-family: Verdana;
+	/* font-family: Verdana; */
 	text-align: center;
 	left: 50%;
 	top: 50%;
@@ -1330,7 +1328,7 @@ ul li.current {
 	z-index: 50001;
 	background: #CCC;
 	border: 1px outset #777;
-	font-family:Verdana,Helvetica,sans-serif;
+	/* font-family:Verdana,Helvetica,sans-serif; */
 	font-size:0.8em;
 }
 

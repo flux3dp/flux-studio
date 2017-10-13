@@ -1,6 +1,5 @@
 .beambox-studio {
     padding: 5px;
-
     .left-panel {
         margin: 0 0 0 30px;
         z-index: 1;
@@ -20,11 +19,10 @@
                     width: 110px;
                     padding-left: 10px;
                     padding-right: 10px;
-                }         
+                }
             }
         }
     }
-
     .object-panels {
         display: absolute;
         box-shadow: 1px 1px 5px #333;
@@ -39,8 +37,7 @@
             font-size: 20px;
             transition: all .1s ease;
             z-index: 1;
-            will-change: top,left,transform;
-
+            will-change: top, left, transform;
             .accordion-body {
                 overflow: visible;
                 position: relative;
@@ -50,13 +47,13 @@
                         margin-left: -30px;
                     }
                     input[disabled] {
-                        background-color:#f2f2f2;
+                        background-color: #f2f2f2;
                         cursor: not-allowed;
                     }
                 }
                 &.with-lock {
                     display: flex;
-                    > div {
+                    >div {
                         align-items: center;
                         display: inline-block;
                     }
@@ -82,54 +79,47 @@
                     color: #666;
                     margin-left: 17px;
                     font-size: 22px;
+                    cursor: pointer;
                 }
             }
-    
             .caption {
                 margin: 0;
             }
-            
             .accordion .caption .value {
                 color: #999;
             }
-
             .controls {
                 background: #FFFFFF;
                 display: block;
                 margin: 0;
                 padding: 0 20px;
                 width: 240px;
-                border: 1px #ddd solid;                
+                border: 1px #ddd solid;
                 .control {
                     .text-center.header {
                         color: #999;
                     }
                     font-size: 20px;
                     margin: 0 0 10px 0;
-        
                     .input-fullsize {
                         margin: 0;
                         width: 100%;
                     }
-
                     .input-halfsize {
-                        display: inline-block;                        
+                        display: inline-block;
                         width: 45%;
                         input {
                             width: 80%;
                         }
                     }
-                    > div {
+                    >div {
                         margin-right: unset;
                     }
-
                     input[type='range'] {
                         border: unset;
                     }
-    
                 }
             }
-    
             .caption {
                 @include flexbox();
                 color: $primaryColor;
@@ -139,10 +129,8 @@
             }
         }
     }
-
     #svg_editor {
         color: #000;
-
         #workarea {
             border: none;
             top: 0px;
@@ -153,61 +141,109 @@
                 background: $backgroundColor;
             }
         }
-
         #sidepanels {
             border: none;
             width: 151px;
             bottom: initial;
-            padding-top: 40px;
-            padding-left: 0;
-            padding-right: 0;
+            padding-top: 60px;
+            padding-left: 10px;
+            padding-right: 10px;
             background-color: $backgroundColor;
-            opacity: 0.8;
+            box-shadow: 0px 0px 5px black;
+            opacity: 0.9;
             &:hover {
                 opacity: 1;
             }
             #layerpanel {
+                display: block;
                 overflow: initial;
-
                 #layerbuttons {
                     padding: 0;
                     width: 129px;
-                    .layer_button{
-                        padding: 0 3px;
+                    .layer_button {
+                        padding: 0 2.5px;
                         width: initial;
                         height: initial;
                     }
                 }
+                #layerlist {
+                    .layervis {
+                        text-align: center;
+                    }
+                    tr.layersel, tr.layersel.layer:hover{
+                        color: white;
+                        background-color: #444;
+                    }
+                    tr.layer:hover {
+                        color: black;
+                        background-color: #ddd;
+                    }
+                }
+                .selLayerBlock {
+                    margin-top: 10px;
+                    margin-bottom: 15px;
+                    #selLayerNames {
+                        width: 100%;
+                        background-color: #444;
+                        color: #ddd;
+                        padding: 3px 3px 3px 13px;
+                        cursor: point;
+                    }
+                }
             }
-            
             #sidepanel_handle {
                 @include force-hide();
             }
         }
-
         #layer-laser-panel-placeholder {
-            .title {
-                width: 40%;
-                display: inline-block;
+            min-height: 180px;
+            margin-top: 20px;
+            .mode {
+                border: 1px #333 solid;
+                margin-bottom: 10px;
+                label {
+                    display: inline-block;
+                    text-align: center;
+                    width: 50%;
+                    span {
+                        display: inline-block;
+                        width: 100%;
+                        padding: 5px;
+                        font-weight: bold;
+                        color: #333;
+                        background-color: #ddd;
+                        cursor: pointer;
+                    }
+                    input:checked+span {
+                        color: #ddd;
+                        background-color: #444;
+                        transition: background-color .3s ease;
+                    }
+                }
             }
             .ui.ui-control-unit-input-v2 {
-                width: 60%;
-                display: inline-block;
+                margin-bottom: 7px;
                 .unit {
                     margin-left: -40px;
+                    font-size: 10px;
                 }
                 input {
-                    width: 100%;
+                    margin-left: 10%;
+                    width: 90%;
+                    padding: 3px 0px 3px 12px;
                 }
             }
         }
-
-        #main_button, #tools_top, #tools_left, #tools_bottom {
+        #main_button,
+        #tools_top,
+        #tools_left,
+        #tools_bottom {
             @include force-hide();
         }
     }
-
-    #svg_source_editor, #docprops, #svg_prefs {
+    #svg_source_editor,
+    #docprops,
+    #svg_prefs {
         @include force-hide();
     }
 }
@@ -215,12 +251,13 @@
 #tools_top {
     z-index: 91;
 }
+
 #grid_mask {
-	z-index: 90;
-	position: absolute;
-	top:0;
-	left: 0;
-	background: #E0E0E0;
-	width: 100%;
-	height: 90px;
+    z-index: 90;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #E0E0E0;
+    width: 100%;
+    height: 90px;
 }

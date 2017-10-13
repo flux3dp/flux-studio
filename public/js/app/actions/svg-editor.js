@@ -941,6 +941,28 @@ define([
 				r_intervals.push(5 * i);
 			}
 
+			const displayChangeLayerBlock = function(maybeVisible) {
+				const block = $('.selLayerBlock');
+
+				const isHide = (function(){
+					if(!maybeVisible) return true;
+					if(svgCanvas.getCurrentDrawing().getNumLayers() <= 1) return true;
+
+					if(multiselected) return false;
+					if(selectedElement) return false;
+					
+					if(!(multiselected && selectedElement)) return true;
+
+					return true;
+				})();
+
+				if (isHide) {
+					block.hide();
+				} else {
+					block.show();
+				}
+			}
+
 			// This function highlights the layer passed in (by fading out the other layers)
 			// if no layer is passed in, this function restores the other layers
 			var toggleHighlightLayer = function(layerNameToHighlight) {
@@ -988,15 +1010,9 @@ define([
 					layer += 1;
 				}
 
-				if((layerCount <= 1)) {
-					$('#selLayerLabel').hide();
-					$('#selLayerNames').hide();
-				} else {
-					$('#selLayerLabel').show();
-					$('#selLayerNames').show();
-				}
+				displayChangeLayerBlock(true);
 
-				$('td.layervis', layerlist).append('<i class="fa fa-eye" aria-hidden="ture"></i>');
+				$('td.layervis', layerlist).append('<i class="fa fa-eye"></i>');
 
 				renderLayerLaserConfigs();
 
@@ -1830,11 +1846,12 @@ define([
 				if ( (elem && !is_node)	|| multiselected) {
 					// update the selected elements' layer
 					$('#selLayerNames').removeAttr('disabled').val(currentLayerName);
-
+					displayChangeLayerBlock(true);
 					// Enable regular menu options
 					canv_menu.enableContextMenuItems('#delete,#cut,#copy,#move_front,#move_up,#move_down,#move_back');
 				} else {
 					$('#selLayerNames').attr('disabled', 'disabled');
+					displayChangeLayerBlock(false);
 				}
 			};
 
