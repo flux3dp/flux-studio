@@ -4335,81 +4335,6 @@ define([
 				});
 			});
 
-			/* keep sidepanel visible. (but there are still some related code seperate)
-			var SIDEPANEL_MAXWIDTH = 300;
-			var SIDEPANEL_OPENWIDTH = 150;
-			var sidedrag = -1, sidedragging = false, allowmove = false;
-
-			var changeSidePanelWidth = function(delta) {
-				var rulerX = $('#ruler_x');
-				var w = document.getElementById("sidepanels").offsetWidth + delta;
-
-				document.getElementById("sidepanels").style.width = w.toString() + 'px';
-				$('#layerpanel').width('+=' + delta);
-
-				rulerX.css('right', parseInt(rulerX.css('right'), 10) + delta);
-				workarea.css('right', parseInt(workarea.css('right'), 10) + delta);
-
-				svgCanvas.runExtensions('workareaResized');
-
-				// var rulerX = $('#ruler_x');
-				// $('#sidepanels').width('+=' + delta);
-				// $('#layerpanel').width('+=' + delta);
-				// rulerX.css('right', parseInt(rulerX.css('right'), 10) + delta);
-				// workarea.css('right', parseInt(workarea.css('right'), 10) + delta);
-				// svgCanvas.runExtensions('workareaResized');
-			};
-
-			var resizeSidePanel = function(evt) {
-				if (!allowmove) {return;}
-				if (sidedrag == -1) {return;}
-				sidedragging = true;
-				var deltaX = sidedrag - evt.pageX;
-				var sideWidth = $('#sidepanels').width();
-				if (sideWidth + deltaX > SIDEPANEL_MAXWIDTH) {
-					deltaX = SIDEPANEL_MAXWIDTH - sideWidth;
-					sideWidth = SIDEPANEL_MAXWIDTH;
-				} else if (sideWidth + deltaX < 2) {
-					deltaX = 2 - sideWidth;
-					sideWidth = 2;
-				}
-				if (deltaX == 0) {return;}
-				sidedrag -= deltaX;
-				changeSidePanelWidth(deltaX);
-			};
-
-			// if width is non-zero, then fully close it, otherwise fully open it
-			// the optional close argument forces the side panel closed
-			var toggleSidePanel = function(close) {
-				var w = $('#sidepanels').width();
-				var deltaX = (w > 2 || close ? 2 : SIDEPANEL_OPENWIDTH) - w;
-				changeSidePanelWidth(deltaX);
-			};
-
-			$('#sidepanel_handle')
-				.mousedown(function(evt) {
-					sidedrag = evt.pageX;
-					$(window).mousemove(resizeSidePanel);
-					allowmove = false;
-					// Silly hack for Chrome, which always runs mousemove right after mousedown
-					setTimeout(function() {
-						allowmove = true;
-					}, 20);
-				})
-				.mouseup(function(evt) {
-					if (!sidedragging) {toggleSidePanel();}
-					sidedrag = -1;
-					sidedragging = false;
-				});
-
-			$(window).mouseup(function() {
-				sidedrag = -1;
-				sidedragging = false;
-				$('#svg_editor').unbind('mousemove', resizeSidePanel);
-			});
-			//end keep sidepanel visible.
-			*/
-
 			populateLayers();
 
 		//	function changeResolution(x,y) {
@@ -5112,8 +5037,30 @@ define([
 			// workarea[0].scrollLeft = 300;
 			// workarea[0].scrollTop = 750;
 			// $('#fit_to_canvas').mouseup();
-			zoomChanged(window, {zoomLevel: 0.2})
+			zoomChanged(window, {zoomLevel: 0.2});
 
+			//greyscale all svgContent
+			(function(){
+				const svgdoc = document.getElementById('svgcanvas').ownerDocument;
+				const greyscaleFilter = svgdoc.createElementNS(svgedit.NS.SVG, 'filter');
+				svgCanvas.assignAttributes(greyscaleFilter, {
+					'id': 'greyscaleFilter'
+				});
+
+				const greyscaleMatrix = svgdoc.createElementNS(svgedit.NS.SVG, 'feColorMatrix');
+				svgCanvas.assignAttributes(greyscaleMatrix, {
+					type: 'matrix',
+					values: "0.3333 0.3333 0.3333 0  0\
+							0.3333 0.3333 0.3333 0  0\
+							0.3333 0.3333 0.3333 0  0\
+							0 	   0      0      1  0"
+				});
+				greyscaleFilter.appendChild(greyscaleMatrix);
+				$('#svgroot defs').append(greyscaleFilter);
+				$(svgcontent).attr({
+					filter: "url(#greyscaleFilter)"
+				});
+			})();
 		};
 
 		editor.ready = function (cb) {
