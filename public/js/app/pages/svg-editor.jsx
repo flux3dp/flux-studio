@@ -218,6 +218,7 @@ define([
                           <canvas width={15} />
                         </div>
                       </div>
+                      <div id="ruler_unit_shower">mm</div>
                     </div>
                     <div id="workarea">
                       <style
@@ -290,7 +291,9 @@ define([
                             </tr>
                           </tbody>
                         </table>
-                        <div className='selLayerBlock'>
+                        
+                      </div>
+                      <div className='selLayerBlock'>
                           <span id="selLayerLabel">Move elements to:</span>
                           <select
                             id="selLayerNames"
@@ -302,8 +305,6 @@ define([
                             </option>
                           </select>
                         </div>
-                      </div>
-                      <hr/>
                       <div id="layer-laser-panel-placeholder" />
                       <div
                         id="sidepanel_handle"

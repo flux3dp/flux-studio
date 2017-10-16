@@ -9,7 +9,7 @@ svgEditor.readLang({
 		"key_del": "刪除", 
 		"key_down": "下", 
 		"key_up": "上", 
-		"more_opts": "More Options",
+		"more_opts": "更多選項",
 		"url": "URL",
 		"width": "Width",
 		"height": "Height"
@@ -154,9 +154,9 @@ svgEditor.readLang({
 		"new": "新增圖層",
 		"rename": "重新命名圖層",
 		"move_up": "向上移動圖層",
-		"dupe": "Duplicate Layer",
-		"merge_down": "Merge Down",
-		"merge_all": "Merge All",
+		"dupe": "複製圖層",
+		"merge_down": "合併圖層",
+		"merge_all": "合併全部圖層",
 		"move_elems_to": "移動物件到:",
 		"move_selected": "移動被點選的物件其他圖層"
 	},

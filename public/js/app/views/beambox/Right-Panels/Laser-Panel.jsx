@@ -51,7 +51,7 @@ define([
             return (
                 <div className="mode">
                     <div>
-                        <i className="fa fa-cogs"></i> {this.props.layerName}
+                    &nbsp;&nbsp;<i className="fa fa-cogs"></i>&nbsp;&nbsp;&nbsp;{this.props.layerName}
                     </div>
                     <label>
                         <input type="radio" value="CUT" 

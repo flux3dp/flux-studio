@@ -963,6 +963,9 @@ define(function() {
             }
         },
         beambox: {
+            popup: {
+                are_you_touchpad_user: 'Are you using touchpad?<br/>We optimize better user experience for touchpad and mouse.'
+            },
             left_panel: {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
