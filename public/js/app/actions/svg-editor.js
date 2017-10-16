@@ -1355,7 +1355,7 @@ define([
 							ctx.lineTo(0, cur_d);
 						}
 
-						num = (label_pos - contentDim) / u_multi;
+						num = (label_pos - contentDim) / u_multi/10;
 						var label;
 						if (multi >= 1) {
 							label = Math.round(num);

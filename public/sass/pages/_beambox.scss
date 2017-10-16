@@ -214,9 +214,16 @@
         #layer-laser-panel-placeholder {
             min-height: 180px;
             margin-top: 20px;
+            border: 1px #333 solid;
+            box-shadow: 4px 5px 14px #444;        
             .mode {
-                border: 1px #333 solid;
                 margin-bottom: 10px;
+                border-bottom: 1px #333 solid;                
+                div {
+                    border-bottom: 1px #333 solid;
+                    padding: 2px;
+                    text-align: center;
+                }
                 label {
                     display: inline-block;
                     text-align: center;
@@ -237,6 +244,9 @@
                     }
                 }
             }
+            .panel {
+                padding-left: 10px;
+            }
             .ui.ui-control-unit-input-v2 {
                 margin-bottom: 7px;
                 .unit {
@@ -244,7 +254,6 @@
                     font-size: 10px;
                 }
                 input {
-                    margin-left: 10%;
                     width: 90%;
                     padding: 3px 0px 3px 12px;
                 }

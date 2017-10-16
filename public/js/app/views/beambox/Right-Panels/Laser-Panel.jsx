@@ -50,6 +50,9 @@ define([
         _renderMode: function() {
             return (
                 <div className="mode">
+                    <div>
+                        <i className="fa fa-cogs"></i> {this.props.layerName}
+                    </div>
                     <label>
                         <input type="radio" value="CUT" 
                             checked={this.state.mode === 'CUT'} 
@@ -67,7 +70,7 @@ define([
         },
         _renderStrength: function() {
             return (
-                <div>
+                <div className='panel'>
                     <span className='title'>{LANG.strength}</span>
                     <UnitInput
                         min={1}
@@ -82,7 +85,7 @@ define([
         },
         _renderSpeed: function() {
             return (
-                <div>
+                <div className='panel'>
                     <span className='title'>{LANG.speed}</span>
                     <UnitInput
                         min={3}
