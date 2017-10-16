@@ -1808,37 +1808,31 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				shape.setAttributeNS(null, 'r', rad);
 				break;
 			case 'ellipse':
-				const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);
+
+				const newData = (function(){
+					const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);					
+						const leftPoint = {
+						x: pre.cx - pre.rx,
+						y: pre.cy
+					};
+					const rx = Math.abs(x - leftPoint.x);
+					const ry = Math.abs(evt.shiftKey?(rx):(y - leftPoint.y));
+
+					const cx = leftPoint.x + rx;
+					const cy = leftPoint.y;
+
+					return {
+						cx: cx,
+						cy: cy,
+						rx: rx,
+						ry: ry
+					}
+				})();
 				
-				// const leftTop = {
-				// 	x: pre.cx - pre.rx,
-				// 	y: pre.cy - pre.ry
-				// };
-
-				// const rx = Math.abs(x - leftTop.x);
-				// const ry = Math.abs(evt.shiftKey?(rx):(y - leftTop.y));
-
-				// const cx = leftTop.x + rx;
-				// const cy = leftTop.y + ry;
-
-				const leftPoint = {
-					x: pre.cx - pre.rx,
-					y: pre.cy
-				};
-
-				const rx = Math.abs(x - leftPoint.x);
-				const ry = Math.abs(evt.shiftKey?(rx):(y - leftPoint.y));
-
-				const cx = leftPoint.x + rx;
-				const cy = leftPoint.y;
-
-
-				if (curConfig.gridSnapping) {
-					x = svgedit.utilities.snapToGrid(x);
-					cx = svgedit.utilities.snapToGrid(cx);
-					y = svgedit.utilities.snapToGrid(y);
-					cy = svgedit.utilities.snapToGrid(cy);
-				}
+				cx = newData.cx;
+				cy = newData.cy;
+				rx = newData.rx;
+				ry = newData.ry;
 
 				shape.setAttributeNS(null, 'cx', cx );
 				shape.setAttributeNS(null, 'cy', cy );
