@@ -1004,7 +1004,8 @@ define(function() {
                 points: 'Points',
                 laser_config: 'Laser Config',
                 shading: 'Shading',
-                threshold: 'Threshold'
+                threshold: 'Threshold',
+                lock_desc: 'Preserve the ratio of width and height (SHIFT)'
             },
             units: {
                 walt: 'W',

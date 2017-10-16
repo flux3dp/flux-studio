@@ -125,6 +125,22 @@ define([
             this.data.image.threshold = val;            
         }
 
+        isResizeFixed() {
+            // a bit hack to get state of ellipseRadius and size panel
+            if(this.type==='use') {
+                console.log('Don\'t forget to take type[use] into account!');
+            }
+
+            const useSizePanel = ['rect', 'image']; // 'use'
+            const useRadiusPanel = ['ellipse'];
+
+            if(useSizePanel.includes(this.type) || useRadiusPanel.includes(this.type)) {
+                return $('.object-panels #togglePreserveRatio').is(':checked');
+            } else {
+                return false;
+            }
+        }
+
         render() {
             if(this.isVisible) {
                 this._render();
@@ -152,6 +168,6 @@ define([
     }
 
     const instance = new ObjectPanelsController();
-
+window.a = instance;
     return instance;
 });

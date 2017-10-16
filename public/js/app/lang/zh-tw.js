@@ -1000,7 +1000,8 @@ define(function() {
                 points: '端點',
                 laser_config: '雷射設定',
                 shading: '漸層',
-                threshold: '曝光閾值'
+                threshold: '曝光閾值',
+                lock_desc: '縮放時固定比例 (SHIFT)'
             },
             units: {
                 walt: 'W',
