@@ -19,7 +19,7 @@ define([
             return {
                 rx: this.props.rx,
                 ry: this.props.ry,
-                isRatioPreserve: true
+                isRatioPreserve: false
             };
         },
         
@@ -65,7 +65,7 @@ define([
                         <label className="accordion-body  with-lock">
                             <div>
                                 <div className="control">
-                                    <span className="text-center header">Rx</span>
+                                    <span className="text-center header">X</span>
                                     <UnitInput
                                         min={0}
                                         max={4000}
@@ -75,7 +75,7 @@ define([
                                     />
                                 </div>
                                 <div className="control">
-                                    <span className="text-center header">Ry</span>
+                                    <span className="text-center header">Y</span>
                                     <UnitInput
                                         min={0}
                                         max={4000}
@@ -87,7 +87,7 @@ define([
                             </div>
                             <div className='lock'>
                                 <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
-                                <label htmlFor="togglePreserveRatio"><div>┐</div><i className={this.state.isRatioPreserve?"fa fa-expand locked":"fa fa-expand unlocked"}></i><div>┘</div></label>
+                                <label htmlFor="togglePreserveRatio" title={LANG.lock_desc}><div>┐</div><i className={this.state.isRatioPreserve?"fa fa-expand locked":"fa fa-expand unlocked"}></i><div>┘</div></label>
                             </div>
                         </label>
                     </label>

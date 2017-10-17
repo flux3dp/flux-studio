@@ -49,8 +49,8 @@ define([
     function chooseIsTouchpad() {
         AlertActions.showPopupCustomGroup(
             'confirm_mouse_input_device',
-            '您使用的是Touchpad嗎？<br/>針對不同輸入設備，<br/>我們提供Touchpad及滑鼠更順暢的操作體驗。',
-            ['TOUCHPAD', 'MOUSE'],
+            lang.beambox.popup.select_favor_input_device,
+            [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
             '',
             '',
             [

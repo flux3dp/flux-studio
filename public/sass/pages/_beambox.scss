@@ -62,6 +62,7 @@
                         margin-left: 10px;
                         label {
                             font-size: 27px;
+                            cursor: pointer;
                             &:hover {
                                 color: black;
                             }
@@ -167,16 +168,24 @@
             #layerpanel {
                 display: block;
                 overflow: initial;
+                border: 1px #333 solid;
+                // box-shadow: 4px 5px 14px #444;
+            
                 #layerbuttons {
                     padding: 0;
-                    width: 129px;
+                    width: 100%;
+                    border: none;
                     .layer_button {
-                        padding: 0 2.5px;
-                        width: initial;
-                        height: initial;
+                        padding: 3px 0;
+                        &:hover {
+                            background-color: #808080;
+                            color: white;
+                            cursor: pointer;
+                        }
                     }
                 }
                 #layerlist {
+                    width: 100%;
                     .layervis {
                         text-align: center;
                     }
@@ -187,7 +196,7 @@
                         &.layersel, &.layersel:hover {
                             color: white;
                             background-color: #444;
-                            font-weight: lighter;
+                            font-weight: normal;
                         }
                         &:hover {
                             color: black;
@@ -195,28 +204,36 @@
                         }
                     }
                 }
-                .selLayerBlock {
-                    margin-top: 10px;
-                    margin-bottom: 15px;
-                    #selLayerNames {
-                        width: 100%;
-                        background-color: #444;
-                        color: #ddd;
-                        padding: 3px 3px 3px 13px;
-                        cursor: point;
-                    }
-                }
+                
             }
             #sidepanel_handle {
                 @include force-hide();
             }
         }
+        .selLayerBlock {
+            margin-top: 18px;
+            margin-bottom: 15px;
+            #selLayerNames {
+                width: 100%;
+                background-color: #444;
+                color: #ddd;
+                padding: 3px 3px 3px 13px;
+                cursor: pointer;
+            }
+        }
         #layer-laser-panel-placeholder {
             min-height: 180px;
             margin-top: 20px;
+            border: 1px #333 solid;
+            box-shadow: 4px 5px 14px #444;
             .mode {
-                border: 1px #333 solid;
                 margin-bottom: 10px;
+                border-bottom: 1px #333 solid;                
+                div {
+                    border-bottom: 1px #333 solid;
+                    padding: 2px;
+                    // text-align: center;
+                }
                 label {
                     display: inline-block;
                     text-align: center;
@@ -229,6 +246,10 @@
                         color: #333;
                         background-color: #ddd;
                         cursor: pointer;
+                        &:hover {
+                            background-color: #808080;
+                            color: white;
+                        }
                     }
                     input:checked+span {
                         color: #ddd;
@@ -237,6 +258,9 @@
                     }
                 }
             }
+            .panel {
+                padding-left: 10px;
+            }
             .ui.ui-control-unit-input-v2 {
                 margin-bottom: 7px;
                 .unit {
@@ -244,13 +268,20 @@
                     font-size: 10px;
                 }
                 input {
-                    margin-left: 10%;
                     width: 90%;
                     padding: 3px 0px 3px 12px;
                 }
             }
         }
-        
+        #ruler_unit_shower {
+            top: 89px;
+            right: 153px;
+            padding-left: 10px;
+            padding-right: 8px;
+            color: #333;
+            font-size: 12px;
+            font-weight: 300;
+        }
         #main_button,
         #tools_top,
         #tools_left,

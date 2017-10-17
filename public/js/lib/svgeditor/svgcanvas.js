@@ -1703,7 +1703,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				}
 
 				translateOrigin.setTranslate(-(left+tx), -(top+ty));
-				if (evt.shiftKey) {
+				if (ObjectPanelsController.isResizeFixed() || evt.shiftKey) {
 					if (sx == 1) {sx = sy;}
 					else {sy = sx;}
 				}
@@ -1808,18 +1808,37 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				shape.setAttributeNS(null, 'r', rad);
 				break;
 			case 'ellipse':
-				c = $(shape).attr(['cx', 'cy']);
-				cx = c.cx;
-				cy = c.cy;
-				if (curConfig.gridSnapping) {
-					x = svgedit.utilities.snapToGrid(x);
-					cx = svgedit.utilities.snapToGrid(cx);
-					y = svgedit.utilities.snapToGrid(y);
-					cy = svgedit.utilities.snapToGrid(cy);
-				}
-				shape.setAttributeNS(null, 'rx', Math.abs(x - cx) );
-				var ry = Math.abs(evt.shiftKey?(x - cx):(y - cy));
+
+				const newData = (function(){
+					const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);					
+						const leftPoint = {
+						x: pre.cx - pre.rx,
+						y: pre.cy
+					};
+					const rx = Math.abs(x - leftPoint.x);
+					const ry = Math.abs(evt.shiftKey?(rx):(y - leftPoint.y));
+
+					const cx = leftPoint.x + rx;
+					const cy = leftPoint.y;
+
+					return {
+						cx: cx,
+						cy: cy,
+						rx: rx,
+						ry: ry
+					}
+				})();
+				
+				cx = newData.cx;
+				cy = newData.cy;
+				rx = newData.rx;
+				ry = newData.ry;
+
+				shape.setAttributeNS(null, 'cx', cx );
+				shape.setAttributeNS(null, 'cy', cy );
+				shape.setAttributeNS(null, 'rx', rx );
 				shape.setAttributeNS(null, 'ry', ry );
+
 				break;
 			case 'fhellipse':
 			case 'fhrect':

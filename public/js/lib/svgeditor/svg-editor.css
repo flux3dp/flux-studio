@@ -75,7 +75,7 @@ select {
 
 #rulers > div {
 	position: absolute;
-	background: #DDD;
+	background: #E0E0E0;
 	z-index: 1;
 	overflow: hidden;
 }
@@ -91,7 +91,7 @@ select {
 	height: 15px;
 	top: 41px;
 	left: 16px;
-	right: 30px;
+	right: 155px;
 	border-bottom: 1px solid;
 	border-left: 1px solid #777;
 }
@@ -233,28 +233,29 @@ select {
 #layerbuttons {
 	margin: 0;
 	padding: 0;
-	padding-left: 2px;
+	/* padding-left: 2px;
 	padding-right: 2px;
-	width: 125px;
-	height: 20px;
-	border-right: 1px solid #FFFFFF;
+	width: 125px; */
+	/* height: 20px; */
+	/* border-right: 1px solid #FFFFFF;
 	border-bottom: 1px solid #FFFFFF;
 	border-left: 1px solid #808080;
-	border-top: 1px solid #808080;
+	border-top: 1px solid #808080; */
 	overflow: hidden;
 }
 
 .layer_button {
-	width: 14px;
-	height: 14px;
-	padding: 1px;
-	border-left: 1px solid #FFFFFF;
-	border-top: 1px solid #FFFFFF;
-	border-right: 1px solid #808080;
-	border-bottom: 1px solid #808080;
+	width: 16.666%;
+	text-align: center;
+	/* height: 14px; */
+	/* padding: 1px; */
+	/* border-left: 1px solid #FFFFFF; */
+	/* border-top: 1px solid #FFFFFF; */
+	/* border-right: 1px solid #808080; */
+	/* border-bottom: 1px solid #808080; */
 	cursor: pointer;
 	float: left;
-	margin-right: 3px;
+	/* margin-right: 3px; */
 }
 
 .layer_button:last-child {
@@ -262,22 +263,22 @@ select {
 }
 
 .layer_buttonpressed {
-	width: 14px;
+	/* width: 14px;
 	height: 14px;
 	padding: 1px;
 	border-right: 1px solid #FFFFFF;
 	border-bottom: 1px solid #FFFFFF;
 	border-left: 1px solid #808080;
-	border-top: 1px solid #808080;
+	border-top: 1px solid #808080; */
 	cursor: pointer;
 }
 
 #layerlist {
-	margin: 1px;
+	/* margin: 1px; */
 	padding: 0;
-	width: 127px;
+	width: 100%;
 	border-collapse: collapse;
-	border: 1px solid #808080;
+	/* border: 1px solid #808080; */
 	background-color: #FFFFFF;
 }
 

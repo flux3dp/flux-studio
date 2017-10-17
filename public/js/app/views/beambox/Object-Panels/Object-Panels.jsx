@@ -1,4 +1,3 @@
-// render by svg-editor. not Beambox
 define([
     'react',
     'plugins/classnames/index',
@@ -37,8 +36,8 @@ define([
         return validPanels[type]||validPanels['unknown'];
     }
 
-    
 
+    
     let ObjectPanel = React.createClass({
         propTypes: {
             type: React.PropTypes.oneOf(Object.keys(validPanels)).isRequired,

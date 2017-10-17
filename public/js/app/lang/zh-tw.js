@@ -959,6 +959,11 @@ define(function() {
             }
         },
         beambox: {
+            popup: {
+                select_favor_input_device: '為了提供更好的使用者體驗<br/>請選擇你喜愛的輸入裝置',
+                touchpad: '觸控板',
+                mouse: '滑鼠'
+            },
             left_panel: {
                 insert_object: '插入物件',
                 preview: '預覽路徑',
@@ -997,7 +1002,8 @@ define(function() {
                 points: '端點',
                 laser_config: '雷射設定',
                 shading: '漸層',
-                threshold: '曝光閾值'
+                threshold: '曝光閾值',
+                lock_desc: '縮放時固定比例 (SHIFT)'
             },
             units: {
                 walt: 'W',
