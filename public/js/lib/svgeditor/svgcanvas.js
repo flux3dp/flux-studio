@@ -28,7 +28,7 @@
 // 14) recalculate.js
 
 define([
-	'app/actions/beambox',
+	'app/actions/beambox/beambox',
 	'helpers/i18n',
 	'helpers/api/config',
 	'jsx!views/beambox/Object-Panels-Controller'

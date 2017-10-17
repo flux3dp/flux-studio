@@ -1,6 +1,6 @@
 requirejs.config({
   paths: {
-      svgEditor:          'app/actions/svg-editor',
+      svgEditor:          'app/actions/beambox/svg-editor',
 
       jsHotkeys:          'lib/svgeditor/js-hotkeys/jquery.hotkeys.min',
       jquerybbq:          'lib/svgeditor/jquerybbq/jquery.bbq.min',

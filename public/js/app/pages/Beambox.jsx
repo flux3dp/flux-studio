@@ -1,6 +1,6 @@
 define([
     'react',
-    'app/actions/beambox',
+    'app/actions/beambox/beambox',
     'app/constants/device-constants',
     'jsx!views/beambox/Left-Panel',
     'jsx!pages/svg-editor',
