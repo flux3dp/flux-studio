@@ -499,7 +499,10 @@ define([
                 $('#growls').remove();
             },
 
-            _handlePopup: function(type, id, caption, message, customText, args) {
+            _handlePopup: function(type, id, caption, message, customText, args, callback={}) {
+                var customTextGroup = Array.isArray(customText) ? customText : [''];
+                console.log('_handlepopup_callback', callback);
+
                 this.setState({
                     showNotificationModal : true,
                     type                  : type,
@@ -507,7 +510,9 @@ define([
                     caption               : caption,
                     message               : message,
                     customText            : customText,
+                    customTextGroup       : customTextGroup,
                     args                  : args,
+                    callback              : callback,
                     displayImages         : (args && args.images != null),
                     images                : (args && args.images != null ? args.images : [] ),
                     imgClass              : (args && args.imgClass) ? args.imgClass : ''
@@ -529,9 +534,13 @@ define([
             },
 
             _handlePopupFeedBack: function(type) {
+                console.log('sourceId', this.state.sourceId);
                 switch (type) {
                 case 'custom':
                     AlertActions.notifyCustom(this.state.sourceId);
+                    break;
+                case 'customGroup':
+                    AlertActions.notifyCustomGroup(this.state.sourceId);
                     break;
                 case 'retry':
                     AlertActions.notifyRetry(this.state.sourceId);
@@ -662,11 +671,13 @@ define([
                             caption={this.state.caption}
                             message={this.state.message}
                             customText={this.state.customText}
+                            customTextGroup={this.state.customTextGroup}
                             onRetry={this._handlePopupFeedBack.bind(null, 'retry')}
                             onAbort={this._handlePopupFeedBack.bind(null, 'abort')}
                             onYes={this._handlePopupFeedBack.bind(null, 'yes')}
                             onNo={this._handlePopupFeedBack.bind(null,'no')}
                             onCustom={this._handlePopupFeedBack.bind(null, 'custom')}
+                            onCustomGroup={this.state.callback}
                             onClose={this._handleNotificationModalClose}
                             images={this.state.images}
                             displayImages={this.state.displayImages}

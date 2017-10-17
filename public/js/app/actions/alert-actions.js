@@ -97,6 +97,19 @@ define([
             }
         },
 
+        showPopupCustomGroup: function(id, message, customText, caption, args, callback) {
+            callback = callback ? callback : ()=>{};
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.SHOW_POPUP_CUSTOM_GROUP,
+                id: id,
+                caption: caption,
+                message: message,
+                customText: customText,
+                args: args,
+                callback: callback
+            });
+        },
+
         showPopupCustomCancel: function(id, message, customText, caption, callback) {
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.SHOW_POPUP_CUSTOM_CANCEL,
@@ -171,6 +184,13 @@ define([
             AlertDispatcher.dispatch({
                 actionType: AlertConstants.NOTIFY_CUSTOM, id
             });
+        },
+
+        notifyCustomGroup: function(id) {
+            AlertDispatcher.dispatch({
+                actionType: AlertConstants.NOTIFY_CUSTOM_GROUP, id
+            });
+
         },
 
         notifyAnswer: function(id, isYes) {

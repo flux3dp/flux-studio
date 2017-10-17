@@ -960,7 +960,9 @@ define(function() {
         },
         beambox: {
             popup: {
-                are_you_touchpad_user: '您使用的是Touchpad嗎？<br/>針對不同輸入設備，<br/>我們提供Touchpad及滑鼠更順暢的操作體驗。'
+                select_favor_input_device: '為了提供更好的使用者體驗<br/>請選擇你喜愛的輸入裝置',
+                touchpad: '觸控板',
+                mouse: '滑鼠'
             },
             left_panel: {
                 insert_object: '插入物件',

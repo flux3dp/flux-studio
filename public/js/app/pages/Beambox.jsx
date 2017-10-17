@@ -45,23 +45,24 @@ define([
 
     ObjectPanelsController.init("object-panels-placeholder");
     LaserPanelController.init("layer-laser-panel-placeholder");
-    
+
     function chooseIsTouchpad() {
-        AlertActions.showPopupYesNo(
+        AlertActions.showPopupCustomGroup(
             'confirm_mouse_input_device',
-            lang.beambox.popup.are_you_touchpad_user,
+            lang.beambox.popup.select_favor_input_device,
+            [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
             '',
-            [],
-            {
-                yes: ()=>{
+            '',
+            [
+              () => {
                     Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
-                },
-                no: ()=>{
+              },
+              () => {
                     Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
-                }
-            }
+              },
+            ]
         );
-    }    
+    }
 
     if(!Config.read('beambox-preference')['mouse-input-device']) {
         chooseIsTouchpad();
@@ -260,7 +261,7 @@ define([
           }
 
           render() {
-            
+
             var actionButtons = this._renderActionButtons(),
                 leftPanel = this._renderLeftPanel(),
                 movementMode = this._renderMovementMode(),

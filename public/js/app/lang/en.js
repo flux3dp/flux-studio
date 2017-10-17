@@ -964,7 +964,9 @@ define(function() {
         },
         beambox: {
             popup: {
-                are_you_touchpad_user: 'Are you using touchpad?<br/>We optimize better user experience for touchpad and mouse.'
+                select_favor_input_device: 'Better user experience has been optimized<br/>Please select your favorite input device.',
+                touchpad: 'TouchPad',
+                mouse: 'Mouse'
             },
             left_panel: {
                 insert_object: 'Insert Object',
