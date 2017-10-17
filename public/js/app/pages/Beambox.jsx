@@ -45,23 +45,24 @@ define([
 
     ObjectPanelsController.init("object-panels-placeholder");
     LaserPanelController.init("layer-laser-panel-placeholder");
-    
+
     function chooseIsTouchpad() {
-        AlertActions.showPopupYesNo(
+        AlertActions.showPopupCustomGroup(
             'confirm_mouse_input_device',
             '您使用的是Touchpad嗎？<br/>針對不同輸入設備，<br/>我們提供Touchpad及滑鼠更順暢的操作體驗。',
+            ['TOUCHPAD', 'MOUSE'],
             '',
-            [],
-            {
-                yes: ()=>{
+            '',
+            [
+              () => {
                     Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
-                },
-                no: ()=>{
+              },
+              () => {
                     Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
-                }
-            }
+              },
+            ]
         );
-    }    
+    }
 
     if(!Config.read('beambox-preference')['mouse-input-device']) {
         chooseIsTouchpad();
@@ -260,7 +261,7 @@ define([
           }
 
           render() {
-            
+
             var actionButtons = this._renderActionButtons(),
                 leftPanel = this._renderLeftPanel(),
                 movementMode = this._renderMovementMode(),

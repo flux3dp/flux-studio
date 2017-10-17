@@ -23,6 +23,7 @@ define([
         NOTIFY_NO               = 'no',
         NOTIFY_CANCEL           = 'cancel', // including the "no", "cancel", "ok" button fired
         NOTIFY_CUSTOM           = 'custom',
+        NOTIFY_CUSTOM_GROUP     = 'customGroup',
         NOTIFY_ANSWER           = 'answer',
         AlertStore;
 
@@ -70,6 +71,10 @@ define([
 
         onCustom(callback, oneTime) {
             oneTime === true ? this.once(NOTIFY_CUSTOM, callback) : this.on(NOTIFY_CUSTOM, callback);
+        },
+
+        onCustomGroup(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_CUSTOM_GROUP, callback) : this.on(NOTIFY_CUSTOM_GROUP, callback);
         },
 
         onAnswer(callback) {
@@ -172,6 +177,10 @@ define([
                     AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText, payload.args);
                 },
 
+                'SHOW_POPUP_CUSTOM_GROUP': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_GROUP, payload.id, payload.caption, payload.message, payload.customText, payload.args, payload.callback);
+                },
+
                 'SHOW_POPUP_CUSTOM_CANCEL': function() {
                     AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.caption, payload.message, payload.customText);
                 },
@@ -206,6 +215,10 @@ define([
 
                 'NOTIFY_CUSTOM': function() {
                     AlertStore.emit(NOTIFY_CUSTOM, payload.id);
+                },
+
+                'NOTIFY_CUSTOM_GROUP': function() {
+                    AlertStore.emit(NOTIFY_CUSTOM_GROUP, payload.id);
                 },
 
                 'NOTIFY_ANSWER': function() {

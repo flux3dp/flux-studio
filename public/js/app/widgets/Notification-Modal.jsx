@@ -25,13 +25,14 @@ define([
                 lang        : React.PropTypes.object,
                 type        : React.PropTypes.oneOf(acceptableTypes),
                 customText  : React.PropTypes.string,
+                customTextGroup : React.PropTypes.array,
                 escapable   : React.PropTypes.bool,
                 caption     : React.PropTypes.string,
                 message     : React.PropTypes.string,
                 onRetry     : React.PropTypes.func,
                 onAbort     : React.PropTypes.func,
                 onYes       : React.PropTypes.func,
-                onNo       : React.PropTypes.func,
+                onNo        : React.PropTypes.func,
                 onCustom    : React.PropTypes.func,
                 onClose     : React.PropTypes.func,
                 displayImages   : React.PropTypes.bool,
@@ -51,6 +52,7 @@ define([
                     onNo      : function() {},
                     onCustom  : function() {},
                     onClose   : function() {},
+                    onCustomGroup: [],
                     displayImages: false,
                     images: []
                 };
@@ -62,7 +64,6 @@ define([
 
             componentDidMount: function() {
                 var self = this;
-
                 shortcuts.on(['esc'], function(e) {
                     self.props.onClose(e);
                 });
@@ -100,6 +101,10 @@ define([
             _onCustom: function(e, reactid) {
                 this.props.onCustom(e);
                 this._onClose.apply(null, [e, reactid, 'custom']);
+            },
+            _onCustomGroup: function(idx) {
+                this.props.onCustomGroup[idx]();
+                this.props.onClose();
             },
 
             _getTypeTitle: function() {
@@ -145,10 +150,12 @@ define([
                     }
                     this.props.onClose();
                 };
-                buttons.push({
-                    label: this._getCloseButtonCaption(),
-                    onClick: onclose_bind_with_on_no.bind(this)
-                });
+                if (this.props.type !== AlertConstants.CUSTOM_GROUP) {
+                    buttons.push({
+                        label: this._getCloseButtonCaption(),
+                        onClick: onclose_bind_with_on_no.bind(this)
+                    });
+                }
 
                 switch (this.props.type) {
                 case AlertConstants.YES_NO:
@@ -194,6 +201,20 @@ define([
                         onClick: this._onCustom
                     }];
                     break;
+
+                case AlertConstants.CUSTOM_GROUP:
+                    var self = this;
+                    this.props.customTextGroup.forEach(function(customText, idx) {
+                      buttons.push({
+                          label: customText,
+                          dataAttrs: {
+                            'ga-enent': customText
+                          },
+                          onClick: function() { self._onCustomGroup(idx) }
+                      });
+                    });
+                    break;
+
                 case AlertConstants.CUSTOM_CANCEL:
                     buttons.push({
                         label: this.props.customText,
@@ -212,7 +233,6 @@ define([
                 if(!this.props.open) {
                     return (<div/>);
                 }
-
                 var typeTitle = this._getTypeTitle(),
                     buttons = this._getButtons(),
                     content = (
