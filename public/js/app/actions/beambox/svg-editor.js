@@ -27,13 +27,15 @@ define([
 	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
 	'helpers/image-data',
 	'helpers/shortcuts',
-	'helpers/i18n'
+	'helpers/i18n',
+	'app/actions/beambox/constant'
 ],function(
 	ObjectPanelsController,
 	LaserPanelController,
 	ImageData,
 	Shortcuts,
-	i18n
+	i18n,
+	Constant
 ){
 	if (window.svgEditor) {
 		return;
@@ -49,7 +51,7 @@ define([
 		editor.langChanged = false;
 		editor.showSaveWarning = false;
 		editor.storagePromptClosed = false; // For use with ext-storage.js
-		editor.dimensions = [4000, 4000];
+		editor.dimensions = [Constant.dimension.width, Constant.dimension.height];
 
 		var svgCanvas, urldata,
 			Utils = svgedit.utilities,

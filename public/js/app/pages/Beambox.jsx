@@ -39,33 +39,36 @@ define([
         START: 'START'
     };
 
-    const customConfig = Config.read('beambox-preference');
-    const updatedConfig = $.extend({}, DefaultConfig, customConfig);
-    Config.write('beambox-preference', updatedConfig);
+    (function(){
+        const customConfig = Config.read('beambox-preference');
+        const updatedConfig = $.extend({}, DefaultConfig, customConfig);
+        Config.write('beambox-preference', updatedConfig);
+    })();
 
     ObjectPanelsController.init("object-panels-placeholder");
     LaserPanelController.init("layer-laser-panel-placeholder");
 
-    function chooseIsTouchpad() {
-        AlertActions.showPopupCustomGroup(
-            'confirm_mouse_input_device',
-            lang.beambox.popup.select_favor_input_device,
-            [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
-            '',
-            '',
-            [
-              () => {
-                    Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
-              },
-              () => {
-                    Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
-              },
-            ]
-        );
-    }
+    
 
     if(!Config.read('beambox-preference')['mouse-input-device']) {
-        chooseIsTouchpad();
+        function chooseIsTouchpad() {
+            AlertActions.showPopupCustomGroup(
+                'confirm_mouse_input_device',
+                lang.beambox.popup.select_favor_input_device,
+                [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
+                '',
+                '',
+                [
+                  () => {
+                        Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
+                  },
+                  () => {
+                        Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
+                  },
+                ]
+            );
+        }
+        chooseIsTouchpad();        
     }
 
     return function(args = {}) {
@@ -80,14 +83,6 @@ define([
                   openPrinterSelectorWindow: false,
                   connectedMovementMode: false
                 };
-          }
-
-          _fetchMoveLocation() {
-
-          }
-
-          _fetchMoveLocation() {
-
           }
 
           _fetchFormalSettings(holder) {
