@@ -106,15 +106,15 @@ select {
 }
 
 #ruler_x canvas:first-child {
-	margin-left: -16px;
+	margin-left: -17px;
 }
 
 #ruler_x canvas {
 	float: left;
 }
 
-#ruler_y canvas {
-	margin-top: -16px;
+#ruler_y canvas:first-child {
+	margin-top: -107px;
 }
 
 #ruler_x > div,

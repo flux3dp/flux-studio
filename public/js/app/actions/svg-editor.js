@@ -1250,9 +1250,13 @@ define([
 				var contentElem = svgCanvas.getContentElem();
 				var units = svgedit.units.getTypeMap();
 				var unit = units[curConfig.baseUnit]; // 1 = 1px
-				var offset = {x: -1, y: -91};
 
 				// draw x ruler then y ruler
+				/* 這裡code很亂 值得注意的點有：
+					1. ruler的位置由css下 如top和margin
+					2. 當超過limit時 會畫很多個canvas (參見"if (ruler_len >= limit)"段)
+					3. 上述這些canvas根據css margin排列 因某種神秘原因ruler_y的canvas要加上margin-top:-3px
+				*/
 				for (d = 0; d < 2; d++) {
 					var isX = (d === 0);
 					var dim = isX ? 'x' : 'y';
@@ -1291,11 +1295,7 @@ define([
 						}
 						ctx.scale(ratio, ratio);
 					}
-					if (isX) {
-						ctx.translate(offset.x, 0);
-					} else {
-						ctx.translate(0, offset.y);
-					}
+					
 					var ctx_arr, num, ctx_arr_num;
 					ctx.fillStyle = '#333';
 					
@@ -1311,6 +1311,12 @@ define([
 						for (i = 1; i < ctx_arr_num; i++) {
 							hcanv[lentype] = limit;
 							copy = hcanv.cloneNode(true);
+							if(isX){
+								$(copy).css('margin-left', 0);								
+							}
+							else {
+								$(copy).css('margin-top', -3);
+							}
 							hcanv.parentNode.appendChild(copy);
 							ctx_arr[i] = copy.getContext('2d');
 						}
@@ -1324,7 +1330,7 @@ define([
 					var u_multi = unit * zoom;
 
 					// Calculate the main number interval
-					var raw_m = 50 / u_multi;
+					var raw_m = 100 / u_multi;
 					var multi = 1;
 					for (i = 0; i < r_intervals.length; i++) {
 						num = r_intervals[i];
@@ -1337,13 +1343,14 @@ define([
 					var big_int = multi * u_multi;
 
 					ctx.font = '12px sans-serif';
-
+					if(!isX){
+						ctx.textAlign = 'center';
+					}
 					var ruler_d = ((contentDim / u_multi) % multi) * u_multi;
 					var label_pos = ruler_d - big_int;
 					// draw big intervals
 					while (ruler_d < total_len) {
 						label_pos += big_int;
-						// var real_d = ruler_d - contentDim; // Currently unused
 
 						var cur_d = Math.round(ruler_d) + 0.5;
 						if (isX) {
@@ -1355,13 +1362,13 @@ define([
 							ctx.lineTo(0, cur_d);
 						}
 
-						num = (label_pos - contentDim) / u_multi/10;
+						num = (label_pos - contentDim) / u_multi /10;
 						var label;
-						if (multi >= 1) {
+						if (multi >= 10) {
 							label = Math.round(num);
 						}
 						else {
-							var decs = String(multi).split('.')[1].length;
+							var decs = String(multi/10).split('.')[1].length;
 							label = num.toFixed(decs);
 						}
 
@@ -1375,8 +1382,13 @@ define([
 						} else {
 							// draw label vertically
 							var str = String(label).split('');
+							let isDecimal = false;
 							for (i = 0; i < str.length; i++) {
-								ctx.fillText(str[i], 1, (ruler_d+12) + i*12);
+								if(str[i]==='.') isDecimal=true;
+								let posY = isDecimal?i*12-8:i*12;
+								if(str[i]==='.') ctx.textAlign = 'left';
+								ctx.fillText(str[i], 5, (ruler_d+12) + posY);
+								if(str[i]==='.') ctx.textAlign = 'center';
 							}
 						}
 
@@ -1393,6 +1405,11 @@ define([
 									continue;
 								}
 								ctx = ctx_arr[ctx_num];
+								if(!isX){								
+									ctx.textAlign = 'center';
+								}
+								ctx.font = '12px sans-serif';
+								
 								ruler_d -= limit;
 								sub_d = Math.round(ruler_d + part * i) + 0.5;
 							}
