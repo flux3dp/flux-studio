@@ -124,7 +124,7 @@
                     >div {
                         margin-right: unset;
                     }
-                    input[type='range'] {
+                    input[type=range] {
                         border: unset;
                     }
                 }
@@ -201,6 +201,13 @@
                         &:hover {
                             color: black;
                             background-color: #ddd;
+                            
+                        }
+                        &:not(.layersel):first-child {
+                            &:hover {
+                                border-top: 1px #999 solid;
+                            }
+                            border-top: 1px white solid;
                         }
                     }
                 }
@@ -301,6 +308,8 @@
             box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
             padding: 18px;
             height: initial;
+            width: 400px;
+            margin-left: -200px;
             #dialog_content {
                 font-size: 18px;
                 margin: 0;

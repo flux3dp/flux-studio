@@ -4305,7 +4305,7 @@ define([
 				var total = svgCanvas.getCurrentDrawing().getNumLayers();
 				if (curIndex > 0 || curIndex < total-1) {
 					curIndex += pos;
-					svgCanvas.setCurrentLayerPosition(total-curIndex-1);
+					svgCanvas.setCurrentLayerPosition(curIndex);
 					populateLayers();
 				}
 			}
@@ -4760,9 +4760,6 @@ define([
 				switch ( action ) {
 					case 'dupe':
 						cloneLayer();
-						break;
-					case 'delete':
-						deleteLayer();
 						break;
 					case 'merge_down':
 						mergeLayer();
