@@ -1810,7 +1810,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			case 'ellipse':
 
 				const newData = (function(){
-					const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);					
+					const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);
 						const leftPoint = {
 						x: pre.cx - pre.rx,
 						y: pre.cy
@@ -1828,7 +1828,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						ry: ry
 					}
 				})();
-				
+
 				cx = newData.cx;
 				cy = newData.cy;
 				rx = newData.rx;
@@ -2091,7 +2091,20 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
-				
+    		//=================================================================
+    		if (selectedElements[0] != null) {
+    			console.log('in');
+    					var prams = {
+    							x: 100,
+    							y: 0,
+    							width: 100,
+    							height: 100
+    				  };
+    			canvas.calcRelativeLocation(selectedElements[0], prams);
+
+    		};
+    		//=================================================================
+
 				return;
 				//zoom is broken
 			case 'zoom':
@@ -2351,7 +2364,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 //	$(window).mouseup(mouseUp);
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
-	
+
 	$(container).bind('wheel DOMMouseScroll', (function(){
 		let targetZoom;
 		let timer;
@@ -2386,34 +2399,34 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 
 				targetZoom *= (1+delta/1000.0);
-				
+
 				targetZoom = Math.min(100, targetZoom);
 				targetZoom = Math.max(0.1, targetZoom);
-				
+
 				if(!timer) {
 					const interval = 2;
 					timer = setInterval(_zoomProcess, interval);
 				}
-				
+
 				// due to wheel event bug (which zoom gesture will sometimes block all other processes), we trigger the zoomProcess about every few miliseconds
 				if(Date.now()-trigger>10) {
 					_zoomProcess();
 					trigger = Date.now();
 				}
-				
+
 				function _zoomProcess() {
-					
+
 					// End of animation
-					const currentZoom = svgCanvas.getZoom();						
+					const currentZoom = svgCanvas.getZoom();
 					if (currentZoom === targetZoom) {
 						clearInterval(timer);
 						timer = undefined;
 						return;
 					}
-					
+
 					// Calculate next animation zoom level
 					var nextZoom = currentZoom + (targetZoom - currentZoom)/5;
-					
+
 					if (Math.abs(targetZoom - currentZoom) < 0.01) {
 						nextZoom = targetZoom;
 					}
@@ -2434,7 +2447,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			}
 		};
 	 })());
- 
+
 }());
 
 
@@ -7379,6 +7392,43 @@ this.calcRealLocation = function(elem) {
 		width: width,
 		height: height
 	};
+};
+
+this.calcRelativeLocation = function(elem, prams) {
+		console.log('prams', elem, prams);
+		const ts = $(elem).attr('transform');
+		const xform = $(elem).attr('data-xform');
+		const elemX = parseFloat($(elem).attr('x'));
+		const elemY = parseFloat($(elem).attr('y'));
+
+		const obj = {};
+		xform.split(" ").forEach((pair) => {
+			[key, value] = pair.split("=");
+			if (value === undefined) { return };
+			obj[key] = parseFloat(value);
+		});
+
+		const matrix = ts.match(/matrix\(.*?\)/g);
+
+		const matr = matrix[0].substring(7, matrix[0].length - 1);
+		[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+
+		console.log('ts', ts);
+		console.log('obj', obj);
+		console.log('a,b,c,d,e,f', a,b,c,d,e,f);
+
+		const x = a * obj.x + c * obj.y + e + a * elemX;
+		const y = b * obj.x + d * obj.y + f + d * elemY;
+
+		const width = obj.width * a;
+		const height = obj.height * d;
+
+		console.log('x, y, width, height', x, y, width, height);
+
+		var test = prams.x - x;
+		console.log('test', test);
+		//elem.setAttribute('x', test);
+
 };
 
 };
