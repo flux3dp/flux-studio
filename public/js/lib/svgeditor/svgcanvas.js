@@ -31,12 +31,15 @@ define([
 	'app/actions/beambox/beambox',
 	'helpers/i18n',
 	'helpers/api/config',
-	'jsx!views/beambox/Object-Panels-Controller'
+	'jsx!views/beambox/Object-Panels-Controller',
+	'app/actions/beambox/preview-mode-controller',
+
 ],function(
 	BeamboxEvents,
 	i18n,
 	ConfigHelper,
-	ObjectPanelsController
+	ObjectPanelsController,
+	PreviewModeController
 ){
 	const LANG = i18n.lang.beambox;
 	const Config = ConfigHelper();
@@ -1251,8 +1254,8 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 				} else if (!right_click){
 					clearSelection();
-					if (canvas.selectedPrinter) {
-							current_mode = 'maintainMove';
+					if (PreviewModeController.isPreviewMode()) {
+							current_mode = 'preview';
 					} else {
 							current_mode = 'multiselect';
 					}
@@ -1981,25 +1984,16 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 
 		var real_x = x;
 		var real_y = y;
-		var beamboxEvents = BeamboxEvents();
 
 		// TODO: Make true when in multi-unit mode
 		var useUnit = false; // (curConfig.baseUnit !== 'px');
 		started = false;
 		var attrs, t;
-		const beamboxMaintainMove = function(x, y) {
-				var move = {
-					f: 4000,
-					x: real_x,
-					y: real_y,
-					z: 50
-				};
-				beamboxEvents.maintainMove(move);
-		};
+
 
 		console.log('current_mode', current_mode);
 		switch (current_mode) {
-			case 'maintainMove':
+			case 'preview':
 				if (rubberBox != null) {
 					rubberBox.setAttribute('display', 'none');
 					curBBoxes = [];
@@ -2008,7 +2002,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						justClearSelection = false;
 				} else {
 						if (start_x === real_x && start_y === real_y) {
-				  			beamboxMaintainMove(real_x, real_y);
+				  			PreviewModeController.preview(real_x, real_y);
 						};
 				};
 				current_mode = 'select';
@@ -7348,7 +7342,6 @@ this.getPrivateMethods = function() {
 	return obj;
 };
 
-this.selectedPrinter = undefined;
 
 this.calcRealLocation = function(elem) {
 	const ts = $(elem).attr('transform');

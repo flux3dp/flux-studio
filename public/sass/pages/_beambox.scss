@@ -12,6 +12,10 @@
                 div {
                     pointer-events: visible;
                 }
+                &.preview-mode-on {
+                    background: #333;
+                    color: #E0E0DF;
+                }
             }
             .dialog-window {
                 pointer-events: visible;

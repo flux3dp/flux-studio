@@ -60,7 +60,8 @@ define([
                 forceAuth: false,
                 onGettingPrinter: function() {},
                 onUnmount: function() {},
-                onClose: function() {}
+                onClose: function() {},
+                arrowDirection: 'right' //'left'
             };
         },
 
@@ -444,12 +445,14 @@ define([
             }
             wrapperClass = cx.apply(null, wrapperClass);
 
+            const arrowClass = `arrow arrow-${this.props.arrowDirection}`;
+
             return (
                 true === hasDefaultPrinter ?
                 <span/> :
                 <div className={wrapperClass} style={wrapperStyle}>
                     {content}
-                    <div className="arrow arrow-right"/>
+                    <div className={arrowClass}/>
                 </div>
             );
         }

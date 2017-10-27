@@ -27,14 +27,8 @@ define([
     Constant
 ) {
         'use strict';
+        const lang = i18n.get();
         var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
-
-        const canvas = document.createElement('canvas');
-        canvas.width = Constant.dimension.width;
-        canvas.height = Constant.dimension.height;
-        canvas.style.position = "absolute";
-        canvas.style.visible = false;
-        const ctx = canvas.getContext('2d');
 
         var ExportGCodeProgressing = function (data) {
             ProgressActions.open(ProgressConstants.STEPPING);
@@ -74,49 +68,52 @@ define([
             );
         };
 
+        
+
+        var getToolpath = function (settings, callback, progressType, fileMode) {
+            fileMode = fileMode || '-f';
+            progressType = progressType || ProgressConstants.NONSTOP;
+            var args = [],
+                doLaser = function (settings) {
+                    var uploadFiles = [];
+                    var data = svgCanvas.getSvgString();
+                    svgeditorFunction.fetchThumbnailDataurl().done((thumbnail) => {
+                        var blob = new Blob([thumbnail, data], { type: 'image/svg+xml' });
+                        var reader = new FileReader();
+
+                        reader.readAsArrayBuffer(blob);
+                        reader.onload = function (e) {
+                            uploadFiles.push({
+                                data: reader.result,
+                                //blob: blob,
+                                url: window.URL.createObjectURL(blob),
+                                name: 'svgeditor.svg',
+                                extension: 'svg',
+                                type: "image/svg+xml",
+                                size: blob.size,
+                                thumbnailSize: thumbnail.length,
+                                index: 0,
+                                totalFiles: 1
+                            });
+
+                            uploadFiles.forEach(function (file) {
+                                file.uploadName = file.url.split('/').pop();
+                            });
+
+                            sendToSVGAPI(uploadFiles, settings, callback, fileMode);
+                        };
+                    });
+                };
+
+            ProgressActions.open(progressType, lang.laser.process_caption, 'Processing...', false);
+
+            doLaser(settings);
+        };
+
         return function (args = {}) {
-            var self = this,
-                lang = i18n.get();
+            var self = this;
 
-            var getToolpath = function (settings, callback, progressType, fileMode) {
-                fileMode = fileMode || '-f';
-                progressType = progressType || ProgressConstants.NONSTOP;
-                var args = [],
-                    doLaser = function (settings) {
-                        var uploadFiles = [];
-                        var data = svgCanvas.getSvgString();
-                        svgeditorFunction.fetchThumbnailDataurl().done((thumbnail) => {
-                            var blob = new Blob([thumbnail, data], { type: 'image/svg+xml' });
-                            var reader = new FileReader();
-
-                            reader.readAsArrayBuffer(blob);
-                            reader.onload = function (e) {
-                                uploadFiles.push({
-                                    data: reader.result,
-                                    //blob: blob,
-                                    url: window.URL.createObjectURL(blob),
-                                    name: 'svgeditor.svg',
-                                    extension: 'svg',
-                                    type: "image/svg+xml",
-                                    size: blob.size,
-                                    thumbnailSize: thumbnail.length,
-                                    index: 0,
-                                    totalFiles: 1
-                                });
-
-                                uploadFiles.forEach(function (file) {
-                                    file.uploadName = file.url.split('/').pop();
-                                });
-
-                                sendToSVGAPI(uploadFiles, settings, callback, fileMode);
-                            };
-                        });
-                    };
-
-                ProgressActions.open(progressType, lang.laser.process_caption, 'Processing...', false);
-
-                doLaser(settings);
-            };
+            
             return {
                 connectDevice: function () {
                     var d = $.Deferred();
@@ -130,78 +127,8 @@ define([
                     return d.promise()
                 },
 
-                camera: function (selectedPrinter = undefined, args = {}) {
 
-                    var cameraStream;
-                    var blobtoDataURL = (blob, callback) => {
-                        var fr = new FileReader();
-                        fr.onload = function (e) {
-                            callback(e.target.result);
-                        };
-                        fr.readAsDataURL(blob);
-                    };
-                    cameraStream = DeviceMaster.streamCamera(selectedPrinter.uuid);
-                    cameraStream.subscribe((imageBlob) => {
-                        blobtoDataURL(imageBlob, function (dataURL) {
-                            DeviceMaster.stopStreamCamera();
-                            var img = new Image();
-                            img.onload = function () {
-                                ctx.drawImage(img, args.x * 10 - 363, args.y * 10 - 18, 1050, 787.5);
-                            };
-                            img.src = dataURL;
-                            setTimeout(() => {
-                                var canvasDataURL = canvas.toDataURL();
-                                window.svgCanvas.setBackground('#fff', canvasDataURL);
-                            }, 0);
-                        });
-                    });
-                },
-
-                enterMaintainMove: function (selectedPrinter = '') {
-                    DeviceMaster.enterMaintainMode();
-                    window.svgCanvas.selectedPrinter = selectedPrinter;
-                },
-
-                endMaintainMove: function (args) {
-                    DeviceMaster.endMaintainMode();
-                    window.svgCanvas.selectedPrinter = undefined;
-                },
-
-                maintainMove: function (args) {
-                    let d = $.Deferred();
-                    if (args.x < 0 || args.x > Constant.dimension.width || args.y < 0 || args.y > Constant.dimension.height) {
-                        d.reject();
-                    } else {
-                        args.x = args.x / 10,
-                            args.y = args.y / 10,
-                            DeviceMaster.maintainMove(args).done(() => {
-                                this.camera(window.svgCanvas.selectedPrinter, args);
-                                return d.resolve();
-                            });
-                    }
-                    return d.promise()
-                },
-
-                movement: function (movementMode) {
-                    var beambox = this;
-                    var d = $.Deferred();
-                    DeviceMaster.selectDevice(self.state.selectedPrinter).then(function (status) {
-                        if (status === DeviceConstants.CONNECTED) {
-                            if (movementMode === false) {
-                                beambox.enterMaintainMove(self.state.selectedPrinter);
-                                return d.resolve(DeviceConstants.CONNECTED);
-                            } else if (movementMode === true) {
-                                beambox.endMaintainMove();
-                                //return d.resolve(DeviceConstants.CONNECTED);
-                            }
-
-                        } else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                            return d.resolve(DeviceConstants.TIMEOUT);
-                        };
-                    });
-                    return d.promise();
-                },
+                
 
                 uploadFcode: function (settings) {
                     getToolpath(settings,

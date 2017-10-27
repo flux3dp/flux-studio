@@ -168,6 +168,6 @@ define([
     }
 
     const instance = new ObjectPanelsController();
-window.a = instance;
+
     return instance;
 });
