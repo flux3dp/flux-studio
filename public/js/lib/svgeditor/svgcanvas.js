@@ -1813,7 +1813,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			case 'ellipse':
 
 				const newData = (function(){
-					const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);					
+					const pre = $(shape).attr(['cx', 'cy', 'rx', 'ry']);
 						const leftPoint = {
 						x: pre.cx - pre.rx,
 						y: pre.cy
@@ -1831,7 +1831,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						ry: ry
 					}
 				})();
-				
+
 				cx = newData.cx;
 				cy = newData.cy;
 				rx = newData.rx;
@@ -2085,7 +2085,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
-				
+
 				return;
 				//zoom is broken
 			case 'zoom':
@@ -2345,7 +2345,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 //	$(window).mouseup(mouseUp);
 
 	 //TODO(rafaelcastrocouto): User preference for shift key and zoom factor
-	
+
 	$(container).bind('wheel DOMMouseScroll', (function(){
 		let targetZoom;
 		let timer;
@@ -2391,16 +2391,15 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					const interval = 2;
 					timer = setInterval(_zoomProcess, interval);
 				}
-				
+
 				// due to wheel event bug (which zoom gesture will sometimes block all other processes), we trigger the zoomProcess about every few miliseconds
 				if(Date.now()-trigger>10) {
 					_zoomProcess();
 					trigger = Date.now();
 				}
-				
+
 				function _zoomProcess() {
 					durationCounter++;
-					console.log(durationCounter);
 					// End of animation
 					const currentZoom = svgCanvas.getZoom();						
 					if ((currentZoom === targetZoom) || (durationCounter >= DURATION)) {
@@ -2408,10 +2407,10 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 						timer = undefined;
 						return;
 					}
-					
+
 					// Calculate next animation zoom level
 					var nextZoom = currentZoom + (targetZoom - currentZoom)/5;
-					
+
 					if (Math.abs(targetZoom - currentZoom) < 0.01) {
 						nextZoom = targetZoom;
 					}
@@ -2432,7 +2431,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			}
 		};
 	 })());
- 
+
 }());
 
 
@@ -7347,36 +7346,100 @@ this.getPrivateMethods = function() {
 };
 
 
-this.calcRealLocation = function(elem) {
-	const ts = $(elem).attr('transform');
-	const xform = $(elem).attr('data-xform');
-	const elemX = parseFloat($(elem).attr('x'));
-	const elemY = parseFloat($(elem).attr('y'));
+  this.calcRealLocation = function(elem) {
+	  const ts = $(elem).attr('transform');
+	  const xform = $(elem).attr('data-xform');
+	  const elemX = parseFloat($(elem).attr('x'));
+	  const elemY = parseFloat($(elem).attr('y'));
 
-	const obj = {};
-	xform.split(" ").forEach((pair) => {
-		[key, value] = pair.split("=");
-		if (value === undefined) { return };
-		obj[key] = parseFloat(value);
-	});
-	const matrix = ts.match(/matrix\(.*?\)/g);
+	  const obj = {};
+	  xform.split(" ").forEach((pair) => {
+		  [key, value] = pair.split("=");
+		  if (value === undefined) { return };
+		  obj[key] = parseFloat(value);
+	  });
+	  const matrix = ts.match(/matrix\(.*?\)/g);
 
-	const matr = matrix[0].substring(7, matrix[0].length - 1);
-	[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+	  const matr = matrix[0].substring(7, matrix[0].length - 1);
+	  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
 
-	const x = a * obj.x + c * obj.y + e + a * elemX;
-	const y = b * obj.x + d * obj.y + f + d * elemY;
+	  const x = a * obj.x + c * obj.y + e + a * elemX;
+	  const y = b * obj.x + d * obj.y + f + d * elemY;
 
-	const width = obj.width * a;
-	const height = obj.height * d;
+	  const width = obj.width * a;
+	  const height = obj.height * d;
 
-	return {
-		x: x,
-		y: y,
-		width: width,
-		height: height
-	};
-};
+	  return {
+		  x: x,
+		  y: y,
+		  width: width,
+		  height: height
+	  };
+  };
+
+  String.prototype.format = function() {
+    a = this;
+    for (k in arguments) {
+      a = a.replace("{" + k + "}", arguments[k])
+    }
+    return a
+  };
+
+  this.calcLocation = function(elem, para, val) {
+		  const ts = $(elem).attr('transform');
+		  const xform = $(elem).attr('data-xform');
+		  const elemX = parseFloat($(elem).attr('x'));
+		  const elemY = parseFloat($(elem).attr('y'));
+
+		  const obj = {};
+		  xform.split(" ").forEach((pair) => {
+			  	[key, value] = pair.split("=");
+			  	if (value === undefined) { return };
+			  	obj[key] = parseFloat(value);
+		  });
+
+		  const matrix = ts.match(/matrix\(.*?\)/g);
+		  const matr = matrix[0].substring(7, matrix[0].length - 1);
+		  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+
+		  const x = a * obj.x + c * obj.y + e + a * elemX;
+		  const y = b * obj.x + d * obj.y + f + d * elemY;
+		  const width = obj.width * a;
+		  const height = obj.height * d;
+
+		  if (para === undefined) {
+	        return {
+		          x: x,
+		          y: y,
+		          width: width,
+		          height: height
+	        };
+		  }
+
+		  let offsetX, offsetY, scaleX, scaleY, newMatrix;
+		  switch (para) {
+				  case 'x':
+						  offsetX = (val - x) / a + elemX;
+						  return offsetX;
+						  break;
+				  case 'y':
+						  offsetY = (val - y) / d + elemY;
+						  return offsetY;
+						  break;
+				  case 'width':
+						  scaleX = val / obj.width;
+						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(scaleX,b,c,d,e,f);
+						  return newMatrix;
+						  break;
+				  case 'height':
+						  scaleY = val / obj.height;
+						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(a,b,c,scaleY,e,f);
+						  return newMatrix;
+						  break;
+				  default:
+						  return 'default';
+		  }
+  };
 
 };
 
