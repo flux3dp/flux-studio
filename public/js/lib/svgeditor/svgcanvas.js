@@ -2085,19 +2085,6 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 				}
-    		//=================================================================
-    		if (selectedElements[0] != null) {
-    			console.log('in');
-    					var prams = {
-    							x: 100,
-    							y: 0,
-    							width: 100,
-    							height: 100
-    				  };
-    			canvas.calcRelativeLocation(selectedElements[0], prams);
-
-    		};
-    		//=================================================================
 
 				return;
 				//zoom is broken
@@ -7356,73 +7343,100 @@ this.getPrivateMethods = function() {
 };
 
 
-this.calcRealLocation = function(elem) {
-	const ts = $(elem).attr('transform');
-	const xform = $(elem).attr('data-xform');
-	const elemX = parseFloat($(elem).attr('x'));
-	const elemY = parseFloat($(elem).attr('y'));
+  this.calcRealLocation = function(elem) {
+	  const ts = $(elem).attr('transform');
+	  const xform = $(elem).attr('data-xform');
+	  const elemX = parseFloat($(elem).attr('x'));
+	  const elemY = parseFloat($(elem).attr('y'));
 
-	const obj = {};
-	xform.split(" ").forEach((pair) => {
-		[key, value] = pair.split("=");
-		if (value === undefined) { return };
-		obj[key] = parseFloat(value);
-	});
-	const matrix = ts.match(/matrix\(.*?\)/g);
+	  const obj = {};
+	  xform.split(" ").forEach((pair) => {
+		  [key, value] = pair.split("=");
+		  if (value === undefined) { return };
+		  obj[key] = parseFloat(value);
+	  });
+	  const matrix = ts.match(/matrix\(.*?\)/g);
 
-	const matr = matrix[0].substring(7, matrix[0].length - 1);
-	[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+	  const matr = matrix[0].substring(7, matrix[0].length - 1);
+	  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
 
-	const x = a * obj.x + c * obj.y + e + a * elemX;
-	const y = b * obj.x + d * obj.y + f + d * elemY;
+	  const x = a * obj.x + c * obj.y + e + a * elemX;
+	  const y = b * obj.x + d * obj.y + f + d * elemY;
 
-	const width = obj.width * a;
-	const height = obj.height * d;
+	  const width = obj.width * a;
+	  const height = obj.height * d;
 
-	return {
-		x: x,
-		y: y,
-		width: width,
-		height: height
-	};
-};
+	  return {
+		  x: x,
+		  y: y,
+		  width: width,
+		  height: height
+	  };
+  };
 
-this.calcRelativeLocation = function(elem, prams) {
-		console.log('prams', elem, prams);
-		const ts = $(elem).attr('transform');
-		const xform = $(elem).attr('data-xform');
-		const elemX = parseFloat($(elem).attr('x'));
-		const elemY = parseFloat($(elem).attr('y'));
+  String.prototype.format = function() {
+    a = this;
+    for (k in arguments) {
+      a = a.replace("{" + k + "}", arguments[k])
+    }
+    return a
+  };
 
-		const obj = {};
-		xform.split(" ").forEach((pair) => {
-			[key, value] = pair.split("=");
-			if (value === undefined) { return };
-			obj[key] = parseFloat(value);
-		});
+  this.calcLocation = function(elem, para, val) {
+		  const ts = $(elem).attr('transform');
+		  const xform = $(elem).attr('data-xform');
+		  const elemX = parseFloat($(elem).attr('x'));
+		  const elemY = parseFloat($(elem).attr('y'));
 
-		const matrix = ts.match(/matrix\(.*?\)/g);
+		  const obj = {};
+		  xform.split(" ").forEach((pair) => {
+			  	[key, value] = pair.split("=");
+			  	if (value === undefined) { return };
+			  	obj[key] = parseFloat(value);
+		  });
 
-		const matr = matrix[0].substring(7, matrix[0].length - 1);
-		[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+		  const matrix = ts.match(/matrix\(.*?\)/g);
+		  const matr = matrix[0].substring(7, matrix[0].length - 1);
+		  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
 
-		console.log('ts', ts);
-		console.log('obj', obj);
-		console.log('a,b,c,d,e,f', a,b,c,d,e,f);
+		  const x = a * obj.x + c * obj.y + e + a * elemX;
+		  const y = b * obj.x + d * obj.y + f + d * elemY;
+		  const width = obj.width * a;
+		  const height = obj.height * d;
 
-		const x = a * obj.x + c * obj.y + e + a * elemX;
-		const y = b * obj.x + d * obj.y + f + d * elemY;
+		  if (para === undefined) {
+	        return {
+		          x: x,
+		          y: y,
+		          width: width,
+		          height: height
+	        };
+		  }
 
-		const width = obj.width * a;
-		const height = obj.height * d;
-
-		console.log('x, y, width, height', x, y, width, height);
-
-		var test = prams.x - x;
-		console.log('test', test);
-		//elem.setAttribute('x', test);
-
-};
+		  let offsetX, offsetY, scaleX, scaleY, newMatrix;
+		  switch (para) {
+				  case 'x':
+						  offsetX = (val - x) / a + elemX;
+						  return offsetX;
+						  break;
+				  case 'y':
+						  offsetY = (val - y) / d + elemY;
+						  return offsetY;
+						  break;
+				  case 'width':
+						  scaleX = val / obj.width;
+						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(scaleX,b,c,d,e,f);
+						  return newMatrix;
+						  break;
+				  case 'height':
+						  scaleY = val / obj.height;
+						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(a,b,c,scaleY,e,f);
+						  return newMatrix;
+						  break;
+				  default:
+						  return 'default';
+		  }
+  };
 
 };
 
