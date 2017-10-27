@@ -969,7 +969,10 @@ define([
 
         opts = {
             availableUsbChannel: _device.source === 'h2h' ? parseInt(_device.uuid) : -1,
-            onError: function(message) { console.log('error from camera ws', message); }
+            onError: function(message) {
+                console.log('error from camera ws', message);
+                cameraStream.onError(message);
+            }
         };
 
         const initCamera = () => {

@@ -2,6 +2,7 @@
  * the view of printer selector
  */
 .select-printer {
+    pointer-events: visible;
     background: #FFF;
     color: #b3b3b3;
     font-size: 1rem;
@@ -29,6 +30,9 @@
         left: 100%;
         position: absolute;
         fill: #fff;
+        &.arrow-left {
+            left: -28px;
+        }
     }
 
     .device {

@@ -27,13 +27,15 @@ define([
 	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
 	'helpers/image-data',
 	'helpers/shortcuts',
-	'helpers/i18n'
+	'helpers/i18n',
+	'app/actions/beambox/constant'
 ],function(
 	ObjectPanelsController,
 	LaserPanelController,
 	ImageData,
 	Shortcuts,
-	i18n
+	i18n,
+	Constant
 ){
 	if (window.svgEditor) {
 		return;
@@ -49,7 +51,7 @@ define([
 		editor.langChanged = false;
 		editor.showSaveWarning = false;
 		editor.storagePromptClosed = false; // For use with ext-storage.js
-		editor.dimensions = [4000, 4000];
+		editor.dimensions = [Constant.dimension.width, Constant.dimension.height];
 
 		var svgCanvas, urldata,
 			Utils = svgedit.utilities,
@@ -2129,19 +2131,19 @@ define([
 							var func = function(event) {
 								var options = opts;
 								//find the currently selected tool if comes from keystroke
-								if (event.type === 'keydown') {
-									var flyoutIsSelected = $(options.parent + '_show').hasClass('tool_button_current');
-									var currentOperation = $(options.parent + '_show').attr('data-curopt');
-									$.each(holders[opts.parent], function(i, tool) {
-										if (tool.sel == currentOperation) {
-											if (!event.shiftKey || !flyoutIsSelected) {
-												options = tool;
-											} else {
-												options = holders[opts.parent][i+1] || holders[opts.parent][0];
-											}
-										}
-									});
-								}
+								// if (event.type === 'keydown') {
+								// 	var flyoutIsSelected = $(options.parent + '_show').hasClass('tool_button_current');
+								// 	var currentOperation = $(options.parent + '_show').attr('data-curopt');
+								// 	$.each(holders[opts.parent], function(i, tool) {
+								// 		if (tool.sel == currentOperation) {
+								// 			if (!event.shiftKey || !flyoutIsSelected) {
+								// 				options = tool;
+								// 			} else {
+								// 				options = holders[opts.parent][i+1] || holders[opts.parent][0];
+								// 			}
+								// 		}
+								// 	});
+								// }
 								if ($(this).hasClass('disabled')) {return false;}
 								if (toolButtonClick(show_sel)) {
 									options.fn();
