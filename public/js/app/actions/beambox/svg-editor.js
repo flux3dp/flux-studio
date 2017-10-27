@@ -153,7 +153,7 @@ define([
 				// EDITOR OPTIONS
 				// Change the following to preferences (already in the Editor Options dialog)?
 				gridSnapping: false,
-				gridColor: '#000',
+				gridColor: '#ddd',
 				baseUnit: 'px',
 				snappingStep: 10,
 				showRulers: true,
@@ -1456,7 +1456,7 @@ define([
 				if (w == w_orig && h == h_orig) {
 					workarea.css('overflow', 'hidden');
 				} else {
-					workarea.css('overflow', 'scroll');
+					workarea.css('overflow', 'hidden');
 				}
 
 				const old_canvas_width = cnvs.width();
@@ -4595,6 +4595,7 @@ define([
 						Shortcuts.on(['fnkey', 'x'], cutSelected);
 						Shortcuts.on(['fnkey', 'c'], copySelected);
 						Shortcuts.on(['fnkey', 'v'], pasteInCenter);
+						Shortcuts.on(['fnkey', 'shift', 'v'], ()=>{svgCanvas.pasteElements('in_place')});
 						Shortcuts.on(['fnkey', 'z'], clickUndo);
 						if(process.platform === 'darwin') {
 							Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
@@ -4602,7 +4603,16 @@ define([
 							Shortcuts.on(['ctrl', 'y'], clickRedo);
 						}
 						Shortcuts.on(['fnkey', 'd'], clickClone);
-						Shortcuts.on(['fnkey', 'a'], svgCanvas.selectAllInCurrentLayer);
+						Shortcuts.on(['fnkey', 'a'], (e)=>{
+							console.log(e);
+							e.preventDefault();
+							e.stopPropagation();
+							svgCanvas.selectAllInCurrentLayer();
+						});
+						Shortcuts.on(['up'], ()=>{moveSelected(0, -1);});
+						Shortcuts.on(['down'], ()=>{moveSelected(0, 1);});
+						Shortcuts.on(['left'], ()=>{moveSelected(-1, 0);});
+						Shortcuts.on(['right'], ()=>{moveSelected(1, 0);});
 
 						// Setup flyouts
 						setupFlyouts(flyouts);
@@ -4931,8 +4941,8 @@ define([
 									);
 
 									svgCanvas.selectOnly([newImage]);
-									svgCanvas.alignSelectedElements('m', 'page');
-									svgCanvas.alignSelectedElements('c', 'page');
+									svgCanvas.alignSelectedElements('l', 'page');
+									svgCanvas.alignSelectedElements('t', 'page');
 									updateContextPanel();
 									$('#dialog_box').hide();
 								};

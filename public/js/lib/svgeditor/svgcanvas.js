@@ -1560,8 +1560,8 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 
 					if (evt.shiftKey) {
 						xya = svgedit.math.snapToAngle(start_x, start_y, x, y);
-						x = xya.x;
-						y = xya.y;
+						dx = xya.x - start_x;
+						dy = xya.y - start_y;
 					}
 
 					if (dx != 0 || dy != 0) {
@@ -2350,6 +2350,8 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		let targetZoom;
 		let timer;
 		let trigger = Date.now();
+		const DURATION = 10;
+		let durationCounter = 0;
 
 		return function(e) {
 			e.stopImmediatePropagation();
@@ -2379,11 +2381,12 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			function _zoomAsIllustrator() {
 				const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 
-				targetZoom *= (1+delta/1000.0);
+				targetZoom *= (1+delta/2000.0);
 				
 				targetZoom = Math.min(100, targetZoom);
 				targetZoom = Math.max(0.1, targetZoom);
 				
+				durationCounter = 0;
 				if(!timer) {
 					const interval = 2;
 					timer = setInterval(_zoomProcess, interval);
@@ -2396,10 +2399,11 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				}
 				
 				function _zoomProcess() {
-					
+					durationCounter++;
+					console.log(durationCounter);
 					// End of animation
 					const currentZoom = svgCanvas.getZoom();						
-					if (currentZoom === targetZoom) {
+					if ((currentZoom === targetZoom) || (durationCounter >= DURATION)) {
 						clearInterval(timer);
 						timer = undefined;
 						return;

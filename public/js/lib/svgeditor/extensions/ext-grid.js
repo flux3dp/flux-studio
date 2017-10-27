@@ -98,7 +98,6 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		var cur_d = 0.5;
 		var part = big_int / 10;
 
-		ctx.globalAlpha = 0.2;
 		ctx.strokeStyle = svgEditor.curConfig.gridColor;
 		for (i = 1; i < 10; i++) {
 			var sub_d = Math.round(part * i) + 0.5;
@@ -111,7 +110,7 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		}
 		ctx.stroke();
 		ctx.beginPath();
-		ctx.globalAlpha = 0.5;
+		ctx.strokeStyle = '#AAA';
 		ctx.moveTo(cur_d, big_int);
 		ctx.lineTo(cur_d, 0);
 

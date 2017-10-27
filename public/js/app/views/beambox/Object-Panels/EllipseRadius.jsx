@@ -31,6 +31,7 @@ define([
         },
 
         _update_rx_handler: function(val) {
+            val = val / 2;
             if(this.state.isRatioPreserve) {
                 const ry = val * (this.state.ry/this.state.rx);
                 FnWrapper.update_ellipse_ry(ry);
@@ -40,6 +41,7 @@ define([
             this.setState({rx: val});
         },
         _update_ry_handler: function(val) {
+            val = val / 2;
             if(this.state.isRatioPreserve) {
                 const rx = val * (this.state.rx/this.state.ry);
                 FnWrapper.update_ellipse_rx(rx);
@@ -60,7 +62,7 @@ define([
                         <input type="checkbox" className="accordion-switcher"/>
                         <p className="caption">
                             {LANG.ellipse_radius}
-                            <span className="value">{this.state.rx} , {this.state.ry} mm</span>
+                            <span className="value">{this.state.rx * 2}, {this.state.ry * 2} mm</span>
                         </p>
                         <label className="accordion-body  with-lock">
                             <div>
@@ -70,7 +72,7 @@ define([
                                         min={0}
                                         max={4000}
                                         unit="mm"
-                                        defaultValue={this.state.rx}
+                                        defaultValue={this.state.rx * 2}
                                         getValue={this._update_rx_handler}
                                     />
                                 </div>
@@ -80,14 +82,14 @@ define([
                                         min={0}
                                         max={4000}
                                         unit="mm"
-                                        defaultValue={this.state.ry}
+                                        defaultValue={this.state.ry * 2}
                                         getValue={this._update_ry_handler}
                                     />
                                 </div>
                             </div>
                             <div className='lock'>
                                 <input type="checkbox" checked={this.state.isRatioPreserve} id="togglePreserveRatio" onChange={this._ratio_handler} hidden/>
-                                <label htmlFor="togglePreserveRatio" title={LANG.lock_desc}><div>┐</div><i className={this.state.isRatioPreserve?"fa fa-expand locked":"fa fa-expand unlocked"}></i><div>┘</div></label>
+                                <label htmlFor="togglePreserveRatio" title={LANG.lock_desc}><div>┐</div><i className={this.state.isRatioPreserve?"fa fa-lock locked":"fa fa-unlock-alt unlocked"}></i><div>┘</div></label>
                             </div>
                         </label>
                     </label>

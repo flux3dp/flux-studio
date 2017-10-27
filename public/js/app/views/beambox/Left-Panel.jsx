@@ -78,7 +78,7 @@ define([
             return {
                 label: (
                     <div onClick={this._handlePreviewClick}>
-                        <span>LANG.preview</span>
+                        <span>{LANG.preview}</span>
                     </div>
                 ),
                 disable: false,

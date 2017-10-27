@@ -998,7 +998,7 @@ define(function() {
                 width: '寬',
                 height: '長',
                 center: '圓心',
-                ellipse_radius: '長短軸',
+                ellipse_radius: '大小',
                 points: '端點',
                 laser_config: '雷射設定',
                 shading: '漸層',

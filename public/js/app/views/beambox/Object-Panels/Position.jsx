@@ -46,7 +46,7 @@ define([
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
                         {LANG.position}
-                        <span className="value">{this.state.x} , {this.state.y}mm</span>
+                        <span className="value">{this.state.x}, {this.state.y} mm</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">

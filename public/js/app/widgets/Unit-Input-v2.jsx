@@ -96,10 +96,10 @@ define([
                     this.setState({displayValue: this.state.savedValue});
                     return;
                 case keyCodeConstants.KEY_UP:
-                    this._updateValue(parseFloat(this.state.savedValue) + step);
+                    this._updateValue(Math.round(parseFloat(this.state.savedValue) + step));
                     return;
                 case keyCodeConstants.KEY_DOWN:
-                    this._updateValue(parseFloat(this.state.savedValue) - step);    
+                    this._updateValue(Math.round(parseFloat(this.state.savedValue) - step));
                     return;
                 
                 default:

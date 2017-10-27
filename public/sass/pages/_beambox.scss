@@ -1,4 +1,5 @@
 .beambox-studio {
+    user-select: none;
     padding: 5px;
     .left-panel {
         margin: 0 0 0 30px;
@@ -130,6 +131,7 @@
                     }
                     input[type=range] {
                         border: unset;
+                        cursor: pointer;
                     }
                 }
             }
@@ -243,7 +245,7 @@
                 div {
                     border-bottom: 1px #333 solid;
                     padding: 2px;
-                    // text-align: center;
+                    text-align: center;
                 }
                 label {
                     display: inline-block;

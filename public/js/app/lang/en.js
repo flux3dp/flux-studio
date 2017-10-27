@@ -1002,7 +1002,7 @@ define(function() {
                 width: 'Width',
                 height: 'Height',
                 center: 'Center',
-                ellipse_radius: 'Radius',
+                ellipse_radius: 'Size',
                 points: 'Points',
                 laser_config: 'Laser Config',
                 shading: 'Shading',

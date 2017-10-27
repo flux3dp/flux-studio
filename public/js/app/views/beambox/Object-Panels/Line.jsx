@@ -58,7 +58,7 @@ define([
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
                         {LANG.points}
-                        <span className="value">A  ( {this.state.x1} , {this.state.y1} ) mm<br/>B  ( {this.state.x2} , {this.state.y2} ) mm</span>
+                        <span className="value">A  ( {this.state.x1}, {this.state.y1} ) mm<br/>B  ( {this.state.x2}, {this.state.y2} ) mm</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
