@@ -4604,7 +4604,6 @@ define([
 						}
 						Shortcuts.on(['fnkey', 'd'], clickClone);
 						Shortcuts.on(['fnkey', 'a'], (e)=>{
-							console.log(e);
 							e.preventDefault();
 							e.stopPropagation();
 							svgCanvas.selectAllInCurrentLayer();
@@ -4613,6 +4612,7 @@ define([
 						Shortcuts.on(['down'], ()=>{moveSelected(0, 1);});
 						Shortcuts.on(['left'], ()=>{moveSelected(-1, 0);});
 						Shortcuts.on(['right'], ()=>{moveSelected(1, 0);});
+						Shortcuts.on(['esc'], clickSelect);
 
 						// Setup flyouts
 						setupFlyouts(flyouts);

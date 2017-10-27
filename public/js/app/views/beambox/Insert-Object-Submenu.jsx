@@ -3,20 +3,25 @@ define([
     'react',
     'jsx!widgets/Dialog-Menu',
     'app/actions/beambox/svgeditor-function-wrapper',
-    'helpers/i18n'
+    'helpers/i18n',
+    'helpers/shortcuts',
 ], function(
     $,
     React,
     DialogMenu,
     FnWrapper,
-    i18n
+    i18n,
+    Shortcuts
 ){
     'use strict';
 
     const LANG = i18n.lang.beambox.left_panel.insert_object_submenu;
 
     return React.createClass({
-
+        componentDidMount: function(){
+            Shortcuts.on(['esc'], this._closeDialog);
+            $('#svgcanvas').mouseup(this._closeDialog);
+        },
         _closeDialog: function() {
             $('.dialog-opener:checked').removeAttr('checked');
         },

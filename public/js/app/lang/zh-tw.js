@@ -985,7 +985,7 @@ define(function() {
                     layer1: '圖層 1'
                 },
                 laser_panel: {
-                    strength: '強度',
+                    strength: '功率',
                     speed: '速度',
                     cut: '切割',
                     engrave: '雕刻'

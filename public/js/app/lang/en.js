@@ -989,7 +989,7 @@ define(function() {
                     layer1: 'Layer 1'
                 },
                 laser_panel: {
-                    strength: 'Strength',
+                    strength: 'Power',
                     speed: 'Speed',
                     cut: 'Cut',
                     engrave: 'Engrave'

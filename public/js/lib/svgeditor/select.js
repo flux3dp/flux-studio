@@ -119,7 +119,23 @@ svgedit.select.Selector.prototype.updateGripCursors = function(angle) {
 	}
 	var i = 0;
 	for (dir in selectorManager_.selectorGrips) {
-		selectorManager_.selectorGrips[dir].setAttribute('style', ('cursor:' + dir_arr[i] + '-resize'));
+		const cursorDirection = (function(){
+			switch(dir_arr[i]) {
+				case 'e':
+				case 'w':
+					return 'ew';				
+				case 'n':
+				case 's':
+					return 'ns';
+				case 'ne':
+				case 'sw':
+					return 'nesw';
+				case 'nw':
+				case 'se':
+					return 'nwse';
+			}
+		})();
+		selectorManager_.selectorGrips[dir].setAttribute('style', ('cursor:' + cursorDirection + '-resize'));
 		i++;
 	}
 };

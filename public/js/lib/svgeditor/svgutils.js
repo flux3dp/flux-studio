@@ -573,7 +573,6 @@ svgedit.utilities.getPathDFromElement = function(elem) {
 				rx = ry = $(elem).attr('r');
 			}
 
-			console.log('1324', a)
 			d = svgedit.utilities.getPathDFromSegments([
 				['M',[(cx-rx),(cy)]],
 				['C',[(cx-rx),(cy-ry/num), (cx-rx/num),(cy-ry), (cx),(cy-ry)]],

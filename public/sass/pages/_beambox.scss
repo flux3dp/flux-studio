@@ -9,6 +9,7 @@
         pointer-events: none;
         .ui-dialog-menu-item {
             .dialog-label {
+                transition: all .1s ease;
                 min-width: auto;
                 div {
                     pointer-events: visible;

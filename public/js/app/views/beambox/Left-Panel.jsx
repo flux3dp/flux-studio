@@ -98,13 +98,12 @@ define([
             .done(()=>{
                 this.setState({ isPreviewMode: true });
             }).fail(()=>{
-                AlertActions.showPopupError('menu-item', '連線異常'); // TODO: translate or find the status and show it
+                AlertActions.showPopupError('menu-item', i18n.lang.device.disconnectedError.message.replace( /%s/, auth_printer.name ));
             });
         },
 
         _renderPrinterSelecter: function() {
             const __onGettingPrinter = (auth_printer) => {
-                console.log('start');
                 __closePrinterSelector();
                 this._startPreviewMode(auth_printer);
             }
