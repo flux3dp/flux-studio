@@ -71,13 +71,15 @@ define([
     // Better select device
     function select(device, opts) {
         let d = $.Deferred();
-        selectDevice(device).then((result) => {
-            if (result == DeviceConstants.CONNECTED) {
-                d.resolve();
-            } else {
-                d.reject();
-            }
-        });
+            selectDevice(device).then((result) => {
+                if (result == DeviceConstants.CONNECTED) {
+                    d.resolve();
+                } else {
+                    d.reject();
+                }
+            },
+            (errmsg)=>{console.log('should handle errMsg here', errmsg)}
+        );
 
         return d.promise();
     }

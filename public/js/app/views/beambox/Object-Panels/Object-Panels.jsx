@@ -23,13 +23,12 @@ define([
 
     const validPanels = {
         'unknown':  [],
-        'rect':     ['position', ,'rotation', 'size'],
+        'rect':     ['position', 'size', 'rotation'],
         'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
         'image':    ['position', 'size', 'rotation', 'threshold'],
         'text':     ['rotation'],
-        'g':        ['rotation'],
-        'use':      ['rotation', 'position', 'size']
+        'use':      ['position', 'size', 'rotation']
     };
 
     function _getValidPanels(type) {

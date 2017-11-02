@@ -39,11 +39,12 @@ define([
             this.setState({y: y});            
         },
         render: function() {
-            const disableInput = (this.props.type === 'use');            
+            const disableInput = (this.props.type === 'use');
+            const expandAccordion = !(this.props.type === 'use');
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher"/>
+                    <input type="checkbox" className="accordion-switcher" defaultChecked={expandAccordion}/>
                     <p className="caption">
                         {LANG.position}
                         <span className="value">{this.state.x}, {this.state.y} mm</span>

@@ -42,7 +42,7 @@ define([
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher"/>
+                    <input type="checkbox" className="accordion-switcher" defaultChecked={true} />
                     <p className="caption">
                         {LANG.center}
                         <span className="value">{this.state.cx}, {this.state.cy} mm</span>

@@ -74,10 +74,11 @@ define([
         },
         render: function() {
             const disableInput = (this.props.type === 'use');
+            const expandAccordion = !(this.props.type === 'use');
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher"/>
+                    <input type="checkbox" className="accordion-switcher" defaultChecked={expandAccordion}/>
                     <p className="caption">
                         {LANG.size}
                         <span className="value">{this.state.width} x {this.state.height} mm</span>

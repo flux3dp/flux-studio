@@ -59,7 +59,7 @@ define([
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                        <input type="checkbox" className="accordion-switcher"/>
+                        <input type="checkbox" className="accordion-switcher" defaultChecked={true} />
                         <p className="caption">
                             {LANG.ellipse_radius}
                             <span className="value">{this.state.rx * 2}, {this.state.ry * 2} mm</span>
