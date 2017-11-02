@@ -650,20 +650,20 @@ define([
             },
 
             maintainMove: (args) => {
-                var commend = '';
+                var command = '';
                 args.f = args.f || '6000';
-                commend += ' f:' + args.f;
-                if (args.x) {
-                    commend += ' x:' + args.x;
+                command += ' f:' + args.f;
+                if (typeof args.x !== 'undefined') {
+                    command += ' x:' + args.x;
                 };
-                if (args.y) {
-                    commend += ' y:' + args.y;
+                if (typeof args.y !== 'undefined') {
+                    command += ' y:' + args.y;
                 };
-                if (args.z) {
-                    commend += ' z:' + args.z;
+                if (typeof args.z !== 'undefined') {
+                    command += ' z:' + args.z;
                 };
-                console.log('maintainMove', commend);
-                return useDefaultResponse(`maintain move${commend}`);
+                console.log('maintainMove', command);
+                return useDefaultResponse(`maintain move${command}`);
             },
 
             endMaintainMode: () => {

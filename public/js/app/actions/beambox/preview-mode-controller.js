@@ -80,6 +80,9 @@ define([
         }
 
         preview(x, y) { 
+            const constrainedXY = this._constrainPreviewXY(x, y);
+            x = constrainedXY.x;
+            y = constrainedXY.y;
             this._getPhotoAfterMove(x, y)
             .done((imgUrl)=>{
                 this._drawIntoBackground(imgUrl, x, y);
@@ -131,23 +134,32 @@ define([
             );
         }
 
+        _constrainPreviewXY(x, y) {
+            const maxWidth = Constant.dimension.width;
+            const maxHeight = Constant.dimension.height;
+            x = Math.max(x, Constant.camera.offsetX * 10);
+            x = Math.min(x, maxWidth);
+            y = Math.max(y, Constant.camera.offsetY * 10);
+            y = Math.min(y, maxHeight);
+            return {
+                x: x,
+                y: y
+            };
+        }
+
         _getPhotoAfterMove(x, y) {
             // x, y in pixel
             let d = $.Deferred();
-            const maxWidth = Constant.dimension.width;
-            const maxHeight = Constant.dimension.height
-            if (x < 0 || x > maxWidth || y < 0 || y > maxHeight) {
-                return d.reject();
-            }
-
+            const movementX = x / 10 - Constant.camera.offsetX; // mm
+            const movementY = y / 10 - Constant.camera.offsetY; // mm
             let movement = {
-                f: 6000, // speed
-                x: x/10,
-                y: y/10
+                f: Constant.camera.movementSpeed,
+                x: movementX, // mm
+                y: movementY  // mm
             };
 
+            // for develop and test in delta
             if (this._getStoredPrinter().model.includes('delta')) {
-                // for develop and test in delta
                 movement.x = Math.min(movement.x, 50);
                 movement.y = Math.min(movement.y, 50);
                 movement.z = 50;
@@ -155,7 +167,7 @@ define([
 
             DeviceMaster.maintainMove(movement)
             .done(() => {
-                this._getPhotoFromStream(x, y)
+                this._getPhotoFromStream()
                 .done((imgUrl)=>{ d.resolve(imgUrl); })
                 .fail(()=>{ d.reject(); });
             })
@@ -166,25 +178,39 @@ define([
             
         }
 
-        _getPhotoFromStream(x, y) {
+        _getPhotoFromStream() {
             const d = $.Deferred();
             
-            this.cameraStream.take(1).subscribe((imageBlob) => {
-                const imgUrl = URL.createObjectURL(imageBlob); 
-                d.resolve(imgUrl);
-            });
+            const waitTimeForMovementStop = 300; //millisecond. this value need optimized
+            setTimeout(() => {
+                this.cameraStream.take(1).subscribe((imageBlob) => {
+                    const imgUrl = URL.createObjectURL(imageBlob); 
+                    d.resolve(imgUrl);
+                });
+            }, waitTimeForMovementStop);
 
             return d.promise();
         }
 
         _drawIntoBackground(imgUrl, x, y) {
             const img = new Image();
-            img.style.opacity = 0.5;
             img.src = imgUrl;
             img.onload = () => {
                 // free unused blob memory
                 URL.revokeObjectURL(imgUrl);
-                this.canvas.getContext('2d').drawImage(img, x - 363, y - 18, 1050, 787.5); // magic number
+                
+                // crop it into a square
+                const w = img.width;
+                const h = img.height;
+                const cropSize = Math.min(w, h);
+                const sx = (w - cropSize)/2;
+                const sy = (h - cropSize)/2;
+
+                
+                const scaledSize = cropSize * Constant.camera.scaleRatio;
+                const positionX = x - scaledSize/2;
+                const positionY = y - scaledSize/2;
+                this.canvas.getContext('2d').drawImage(img, sx, sy, cropSize, cropSize, positionX, positionY, scaledSize, scaledSize);
                 this.canvas.toBlob((blob) => {
                     if (this.cameraCanvasUrl) {
                         URL.revokeObjectURL(this.cameraCanvasUrl);

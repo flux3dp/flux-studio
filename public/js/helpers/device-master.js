@@ -78,7 +78,7 @@ define([
                     d.reject();
                 }
             },
-            (errmsg)=>{console.log('should handle errMsg here', errmsg)}
+            (errmsg)=>{console.log('Device Master Select Error. Should handle errMsg here', errmsg)}
         );
 
         return d.promise();

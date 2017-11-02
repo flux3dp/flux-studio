@@ -49,6 +49,7 @@ define([
             const __endPreviewMode = () => {
                 PreviewModeController.end()
                 .always(()=>{
+                    FnWrapper.useSelectTool();
                     this.setState({isPreviewMode: false});
                 });
             }
@@ -94,11 +95,15 @@ define([
                 this.setState({ isPreviewMode: false });
             };
 
+            $(workarea).css('cursor', 'wait');
+
             PreviewModeController.start(auth_printer, errorCallback)
             .done(()=>{
                 this.setState({ isPreviewMode: true });
+                $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
             }).fail(()=>{
                 AlertActions.showPopupError('menu-item', i18n.lang.device.disconnectedError.message.replace( /%s/, auth_printer.name ));
+                FnWrapper.useSelectTool();
             });
         },
 

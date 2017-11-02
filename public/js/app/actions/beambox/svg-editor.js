@@ -25,6 +25,7 @@ TODOS
 define([
 	'jsx!views/beambox/Object-Panels-Controller',
 	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
+	'app/actions/beambox/preview-mode-controller',
 	'helpers/image-data',
 	'helpers/shortcuts',
 	'helpers/i18n',
@@ -32,6 +33,7 @@ define([
 ],function(
 	ObjectPanelsController,
 	LaserPanelController,
+	PreviewModeController,
 	ImageData,
 	Shortcuts,
 	i18n,
@@ -918,10 +920,13 @@ define([
 				if (curr.length && curr[0].id !== 'tool_select') {
 					curr.removeClass('tool_button_current').addClass('tool_button');
 					$('#tool_select').addClass('tool_button_current').removeClass('tool_button');
-					$('#styleoverrides').text('#svgcanvas svg *{cursor:move;pointer-events:all} #svgcanvas svg{cursor:default}');
+					//$('#styleoverrides').text('#svgcanvas svg *{cursor:move;pointer-events:all} #svgcanvas svg{cursor:default}');
 				}
 				svgCanvas.setMode('select');
 				workarea.css('cursor', 'auto');
+				if(PreviewModeController.isPreviewMode()) {
+					$(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
+				}
 			};
 
 			// used to make the flyouts stay on the screen longer the very first time

@@ -7224,7 +7224,7 @@ this.setBackground = function(color, url) {
 				'width': '100%',
 				'height': '100%',
 				'preserveAspectRatio': 'xMinYMin',
-				'style':'pointer-events:none'
+				'style':'pointer-events:none; opacity: 0.7;',
 			});
 			bg.appendChild(bg_img);
 		}
