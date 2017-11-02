@@ -182,9 +182,16 @@ define([
             img.style.opacity = 0.5;
             img.src = imgUrl;
             img.onload = () => {
+                // free unused blob memory
+                URL.revokeObjectURL(imgUrl);
                 this.canvas.getContext('2d').drawImage(img, x - 363, y - 18, 1050, 787.5); // magic number
-                const canvasDataURL = this.canvas.toDataURL();
-                window.svgCanvas.setBackground('#fff', canvasDataURL);
+                this.canvas.toBlob((blob) => {
+                    if (this.cameraCanvasUrl) {
+                        URL.revokeObjectURL(this.cameraCanvasUrl);
+                    }
+                    this.cameraCanvasUrl = URL.createObjectURL(blob);
+                    window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
+                });
             };
         }
     }
