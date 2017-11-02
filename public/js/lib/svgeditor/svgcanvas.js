@@ -7226,9 +7226,9 @@ this.setBackground = function(color, url) {
 				'preserveAspectRatio': 'xMinYMin',
 				'style':'pointer-events:none'
 			});
+			bg.appendChild(bg_img);
 		}
 		setHref(bg_img, url);
-		bg.appendChild(bg_img);
 	} else if (bg_img) {
 		bg_img.parentNode.removeChild(bg_img);
 	}
