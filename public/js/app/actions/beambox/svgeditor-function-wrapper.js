@@ -107,37 +107,68 @@ define([
                 $('<canvas>', {id: 'export_canvas'}).appendTo('body');
             }
             const c = $('#export_canvas')[0];
-            const cw = c.width = svgCanvas.contentW;
-            const ch = c.height = svgCanvas.contentH;
 
-            function drawBoard(){
-                const context = c.getContext("2d");
+            function drawBoard(canvas){
+                const context = canvas.getContext("2d");
                 const gridW = 100;
                 const gridH = 100;
 
-                context.globalCompositeOperation='destination-over';
+                // context.globalCompositeOperation='destination-over';
 
-                for (var x = 0; x <= cw; x += gridW) {
+                for (var x = 0; x <= canvas.width; x += gridW) {
                     context.moveTo(x, 0);
-                    context.lineTo(x, ch);
+                    context.lineTo(x, canvas.height);
                 }
 
-                for (var x = 0; x <= ch; x += gridH) {
+                for (var x = 0; x <= canvas.height; x += gridH) {
                     context.moveTo(0, x);
-                    context.lineTo(cw, x);
+                    context.lineTo(canvas.width, x);
                 }
 
                 //context.strokeStyle = "#E0E0DF";
-                context.strokeStyle = "#000000";
+                context.strokeStyle = "#fff";
                 context.lineWidth = 2;
                 context.stroke();
             }
 
+            function grayscale (input) {
+                var inputContext = input.getContext("2d");
+                var imageData = inputContext.getImageData(0, 0, input.width, input.height);
+                var data = imageData.data;
+             
+                var arraylength = input.width * input.height * 4;
+             
+                for (var i=arraylength-1; i>0;i-=4)
+                {
+                    //R= i-3, G = i-2 and B = i-1
+                    var gray = 0.333 * data[i-3] + 0.333 * data[i-2] + 0.333 * data[i-1];
+                    data[i-3] = gray;
+                    data[i-2] = gray;
+                    data[i-1] = gray;
+             
+                }
+                
+                var output = document.createElement('canvas');
+                output.width = input.width;
+                output.height = input.height;
+                var outputContext = output.getContext("2d");
+             
+                outputContext.putImageData(imageData, 0, 0);
+                return output;
+            }
+
             const d = $.Deferred();
 
-            canvg(c, str, {renderCallback: function(){
-                drawBoard();
-                d.resolve(c.toDataURL());
+            const strWithoutFilter = str.replace('filter="url(#greyscaleFilter)"', '');
+            // This is a bit hack.
+            // canvg cannot read this filter because it is defined outside of str.
+            // so we remove it, and grayscale it again when it transfers into canvas.
+            
+            canvg(c, strWithoutFilter, {renderCallback: function(){
+                let grayscaleCanvas = grayscale(c);
+                drawBoard(grayscaleCanvas);
+                d.resolve(grayscaleCanvas.toDataURL());
+                //window.open().document.write('<img src="'+ grayscaleCanvas.toDataURL() + '"/>');
 
             }});
             return d.promise();
