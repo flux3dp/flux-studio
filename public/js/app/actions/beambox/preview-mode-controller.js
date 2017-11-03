@@ -79,12 +79,14 @@ define([
             return d.promise();
         }
 
-        preview(x, y) { 
+        preview(x, y) {
+            $(workarea).css('cursor', 'wait');            
             const constrainedXY = this._constrainPreviewXY(x, y);
             x = constrainedXY.x;
             y = constrainedXY.y;
             this._getPhotoAfterMove(x, y)
             .done((imgUrl)=>{
+                $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');                
                 this._drawIntoBackground(imgUrl, x, y);
             });
         }
