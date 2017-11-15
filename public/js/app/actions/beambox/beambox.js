@@ -35,12 +35,12 @@ define([
             ProgressActions.updating(data.message, data.percentage * 100);
         };
 
-        var sendToSVGAPI = function (args, settings, callback, fileMode) {
+        var sendToSVGAPI = function (files, settings, callback, fileMode) {
             callback = callback || function () { };
 
             var laserParser = svgWebSocket,
                 onSetParamsFinished = function () {
-                    laserParser.uploadToSvgeditorAPI(args).done(onComputeFinished);
+                    laserParser.uploadToSvgeditorAPI(files).done(onComputeFinished);
                 },
                 onComputeFinished = function () {
                     var names = [],
@@ -54,7 +54,9 @@ define([
                         names,
                         {
                             onProgressing: ExportGCodeProgressing,
-                            onFinished: callback,
+                            onFinished: function(fcodeBlob) {
+                                callback(fcodeBlob, files[files.length-1].url); // note: last one of files is the thumbnail
+                            },
                             fileMode: fileMode
                         }
                     );
@@ -86,7 +88,7 @@ define([
                             uploadFiles.push({
                                 data: reader.result,
                                 //blob: blob,
-                                url: window.URL.createObjectURL(blob),
+                                url: thumbnail,
                                 name: 'svgeditor.svg',
                                 extension: 'svg',
                                 type: "image/svg+xml",
@@ -132,26 +134,18 @@ define([
 
                 uploadFcode: function (settings) {
                     getToolpath(settings,
-                        (blob) => {
-                            var blobUrl = window.URL,
-                                fcodeReaderMethods = fcodeReader(),
-                                parseFCode = function () {
-                                    fcodeReaderMethods.getThumbnail().then((data) => {
-                                        ProgressActions.close();
-                                        DeviceMaster.selectDevice(self.state.selectedPrinter).then(function (status) {
-                                            if (status === DeviceConstants.CONNECTED) {
-                                                GlobalActions.showMonitor(self.state.selectedPrinter, blob, blobUrl.createObjectURL(data), 'engrave');
-                                            }
-                                            else if (status === DeviceConstants.TIMEOUT) {
-                                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                                            }
-                                        });
-                                    });
-                                };
-
+                        (blob, thumbnailDataURL) => {
                             ProgressActions.updating(lang.message.uploading_fcode, 100);
-                            fcodeReaderMethods.upload(blob).then(() => {
-                                parseFCode();
+                            DeviceMaster.selectDevice(self.state.selectedPrinter).then(function (status) {
+                                ProgressActions.close();
+                                if (status === DeviceConstants.CONNECTED) {
+                                    GlobalActions.showMonitor(self.state.selectedPrinter, blob, thumbnailDataURL, 'engrave');
+                                }
+                                else if (status === DeviceConstants.TIMEOUT) {
+                                    AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                                }
+                            }).fail(function () {
+                                ProgressActions.close();
                             });
                         },
                         ProgressConstants.STEPPING,
