@@ -10,7 +10,7 @@ define(function() {
         opts.threshold = ('number' === typeof opts.threshold ? opts.threshold : 128);
         opts.is_shading = ('boolean' === typeof opts.is_shading ? opts.is_shading : true);
         opts.is_svg = ('boolean' === typeof opts.is_svg ? opts.is_svg : false);
-        var binary = [],
+        var binary = new Uint8Array(opts.is_rgba ? data.length : data.length / 4),
             WHITE = 255,
             BLACK = 0,
             grayscale,
@@ -18,14 +18,12 @@ define(function() {
             red, green, blue, alpha;
 
         for (i = 0; i < data.length; i += 4) {
+            var binaryIndex = Math.floor(i / 4);
             if (false === opts.is_svg) {
                 // http://yolijn.com/convert-rgba-to-rgb
                 alpha = data[i + 3] / 255;
-                red = (1 - alpha) * WHITE + alpha * data[i];
-                green = (1 - alpha) * WHITE + alpha * data[i + 1];
-                blue = (1 - alpha) * WHITE + alpha * data[i + 2];
                 // refers to http://en.wikipedia.org/wiki/Grayscale
-                grayscale = parseInt(red * 0.299 + green * 0.587 + blue * 0.114, 10);
+                grayscale = (1 - alpha) * WHITE + alpha * Math.round(0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2]);
 
                 // is shading?
                 if (false === opts.is_shading && opts.threshold > grayscale) {
@@ -35,38 +33,23 @@ define(function() {
                 grayscale = (opts.threshold > grayscale ? grayscale : WHITE);
 
                 if (false === opts.is_rgba) {
-                    if (0 === data[i + 3]) {
-                        binary.push(WHITE);
-                    }
-                    else {
-                        binary.push(grayscale);
-                    }
-
+                    binary[binaryIndex] = data[i + 3] === 0 ? WHITE : grayscale;
                 }
                 else {
-                    for (j = 0; j < 3; j++) {
-                        binary.push(grayscale);
-                    }
-
-                    binary.push(WHITE === grayscale ? 0 : data[i + 3]);
+                    binary[i] = binary[i + 1] = binary[i + 2] = grayscale; 
+                    binary[i + 3] = WHITE === grayscale ? 0 : data[i + 3];
                 }
             }
             else {
                 // 3 is alpha
                 if (false === opts.is_rgba) {
-                    if (0 < data[i + 3]) {
-                        binary.push(BLACK);
-                    }
-                    else {
-                        binary.push(WHITE);
-                    }
-                }
-                else {
+                    binary[binaryIndex] = data[i + 3] > 0 ? BLACK : WHITE;
+                } else {
                     for (j = 0; j < 3; j++) {
-                        binary.push(0 < data[i + j] ? WHITE : BLACK);
+                        binary[i + j] = 0 < data[i + j] ? WHITE : BLACK;
                     }
 
-                    binary.push(0 < data[i + 3] ? WHITE : BLACK);
+                    binary[i + 3] = data[i + 3] > 0 ? 0 : data[i + 3];
                 }
             }
         }

@@ -141,7 +141,7 @@ define([
                 for (var i=arraylength-1; i>0;i-=4)
                 {
                     //R= i-3, G = i-2 and B = i-1
-                    var gray = 0.2126 * data[i-3] + 0.7152 * data[i-2] + 0.0722 * data[i-1];
+                    var gray = 0.299 * data[i-3] + 0.587 * data[i-2] + 0.114 * data[i-1];
                     data[i-3] = gray;
                     data[i-2] = gray;
                     data[i-1] = gray;
