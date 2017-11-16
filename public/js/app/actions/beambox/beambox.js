@@ -79,7 +79,7 @@ define([
                 doLaser = function (settings) {
                     var uploadFiles = [];
                     var data = svgCanvas.getSvgString();
-                    svgeditorFunction.fetchThumbnailDataurl().done((thumbnail) => {
+                    svgeditorFunction.fetchThumbnailDataurl().done((thumbnail, thumbnailBlobURL) => {
                         var blob = new Blob([thumbnail, data], { type: 'image/svg+xml' });
                         var reader = new FileReader();
 
@@ -88,7 +88,7 @@ define([
                             uploadFiles.push({
                                 data: reader.result,
                                 //blob: blob,
-                                url: thumbnail,
+                                url: thumbnailBlobURL,
                                 name: 'svgeditor.svg',
                                 extension: 'svg',
                                 type: "image/svg+xml",

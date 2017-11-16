@@ -110,8 +110,8 @@ define([
 
             function drawBoard(canvas){
                 const context = canvas.getContext("2d");
-                const gridW = 100;
-                const gridH = 100;
+                const gridW = 20;
+                const gridH = 20;
 
                 // context.globalCompositeOperation='destination-over';
 
@@ -126,8 +126,8 @@ define([
                 }
 
                 //context.strokeStyle = "#E0E0DF";
-                context.strokeStyle = "#fff";
-                context.lineWidth = 2;
+                context.strokeStyle = "#AAA";
+                context.lineWidth = 1;
                 context.stroke();
             }
 
@@ -141,16 +141,16 @@ define([
                 for (var i=arraylength-1; i>0;i-=4)
                 {
                     //R= i-3, G = i-2 and B = i-1
-                    var gray = 0.333 * data[i-3] + 0.333 * data[i-2] + 0.333 * data[i-1];
+                    var gray = 0.2126 * data[i-3] + 0.7152 * data[i-2] + 0.0722 * data[i-1];
                     data[i-3] = gray;
                     data[i-2] = gray;
                     data[i-1] = gray;
              
                 }
-                
+
                 var output = document.createElement('canvas');
-                output.width = input.width;
-                output.height = input.height;
+                output.width = 800;
+                output.height = 800;
                 var outputContext = output.getContext("2d");
              
                 outputContext.putImageData(imageData, 0, 0);
@@ -164,10 +164,15 @@ define([
             // canvg cannot read this filter because it is defined outside of str.
             // so we remove it, and grayscale it again when it transfers into canvas.
             
-            canvg(c, strWithoutFilter, {renderCallback: function(){
-                let grayscaleCanvas = grayscale(c);
-                drawBoard(grayscaleCanvas);
-                d.resolve(grayscaleCanvas.toDataURL());
+            canvg(c, strWithoutFilter, {
+                scaleWidth: 800,
+                scaleHeight: 800,
+                renderCallback: function () {
+                    let grayscaleCanvas = grayscale(c);
+                    drawBoard(grayscaleCanvas);
+                    grayscaleCanvas.toBlob(function (blob) {
+                        d.resolve(grayscaleCanvas.toDataURL(), URL.createObjectURL(blob));
+                });
                 //window.open().document.write('<img src="'+ grayscaleCanvas.toDataURL() + '"/>');
 
             }});
