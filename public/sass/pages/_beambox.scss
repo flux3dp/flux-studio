@@ -1,4 +1,7 @@
 .beambox-studio {
+    svg:not(:root) {
+        overflow: visible;
+    }
     user-select: none;
     padding: 5px;
     .left-panel {

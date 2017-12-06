@@ -140,7 +140,7 @@ define([
 				colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
 				initTool: 'select',
 				exportWindowType: 'new', // 'same' (todo: also support 'download')
-				wireframe: false,
+				wireframe: true,
 				showlayers: true,
 				no_save_warning: true,
 				// PATH CONFIGURATION
@@ -1840,7 +1840,7 @@ define([
 							$('#g_title').prop('disabled', el_name == 'use');
 
 							if( (el_name === 'use') && ($(elem).attr('data-xform')) ) {
-								const location = svgCanvas.calcRealLocation(elem);
+								const location = svgCanvas.getSvgRealLocation(elem);
 								ObjectPanelsController.setPosition(location.x, location.y);
 								ObjectPanelsController.setWidth(location.width);
 								ObjectPanelsController.setHeight(location.height);

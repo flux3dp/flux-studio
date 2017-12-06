@@ -4,7 +4,8 @@ define([
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, i18n) {
+    'app/actions/beambox/constant'
+], function($, React, FnWrapper, UnitInput, i18n, Constant) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
@@ -31,20 +32,26 @@ define([
         },
 
         _update_x_handler: function(x) {
-            FnWrapper.update_selected_x(x);
+            if(this.props.type === 'use') {
+                svgCanvas.setSvgElemPosition('x', x * Constant.dpmm);
+            } else {
+                FnWrapper.update_selected_x(x);
+            }
             this.setState({x: x});
         },
         _update_y_handler: function(y) {
-            FnWrapper.update_selected_y(y);
+            if(this.props.type === 'use') {
+                svgCanvas.setSvgElemPosition('y', y * Constant.dpmm);
+            } else {
+                FnWrapper.update_selected_y(y);
+            }
             this.setState({y: y});            
         },
         render: function() {
-            const disableInput = (this.props.type === 'use');
-            const expandAccordion = !(this.props.type === 'use');
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher" defaultChecked={expandAccordion}/>
+                    <input type="checkbox" className="accordion-switcher" defaultChecked={true}/>
                     <p className="caption">
                         {LANG.position}
                         <span className="value">{this.state.x}, {this.state.y} mm</span>
@@ -56,7 +63,6 @@ define([
                                 unit="mm"
                                 defaultValue={this.state.x}
                                 getValue={this._update_x_handler}
-                                disabled={disableInput}
                             />
                         </div>
                         <div className="control">
@@ -65,7 +71,6 @@ define([
                                 unit="mm"
                                 defaultValue={this.state.y}
                                 getValue={this._update_y_handler}
-                                disabled={disableInput}
                             />
                         </div>
                     </label>

@@ -126,12 +126,7 @@ define([
         }
 
         isResizeFixed() {
-            // a bit hack to get state of ellipseRadius and size panel
-            if(this.type==='use') {
-                console.log('Don\'t forget to take type[use] into account!');
-            }
-
-            const useSizePanel = ['rect', 'image']; // 'use'
+            const useSizePanel = ['rect', 'image', 'use']; // 'use'
             const useRadiusPanel = ['ellipse'];
 
             if(useSizePanel.includes(this.type) || useRadiusPanel.includes(this.type)) {

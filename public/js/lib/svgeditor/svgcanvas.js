@@ -1304,7 +1304,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				$.each(init_bbox, function(key, val) {
 					bb[key] = val/current_zoom;
 				});
-				init_bbox = bb;
+				init_bbox = (mouse_target.tagName == 'use') ? svgCanvas.getSvgRealLocation(mouse_target) : bb;
 
 				// append three dummy transforms to the tlist so that
 				// we can translate,scale,translate in mousemove
@@ -1968,7 +1968,6 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		var attrs, t;
 
 
-		console.log('current_mode', current_mode);
 		switch (current_mode) {
 			case 'preview':
 				if (rubberBox != null) {
@@ -5444,7 +5443,6 @@ this.getMode = function() {
 // Parameters:
 // name - String with the new mode to change to
 this.setMode = function(name) {
-	console.log('setMode', name);
 	pathActions.clear(true);
 	textActions.clear();
 	cur_properties = (selectedElements[0] && selectedElements[0].nodeName == 'text') ? cur_text : cur_shape;
@@ -7323,100 +7321,175 @@ this.getPrivateMethods = function() {
 };
 
 
-  this.calcRealLocation = function(elem) {
-	  const ts = $(elem).attr('transform');
-	  const xform = $(elem).attr('data-xform');
-	  const elemX = parseFloat($(elem).attr('x'));
-	  const elemY = parseFloat($(elem).attr('y'));
+this.getSvgRealLocation = function(elem) {
+	const ts = $(elem).attr('transform');
+	const xform = $(elem).attr('data-xform');
+	const elemX = parseFloat($(elem).attr('x'));
+	const elemY = parseFloat($(elem).attr('y'));
 
-	  const obj = {};
-	  xform.split(" ").forEach((pair) => {
-		  [key, value] = pair.split("=");
-		  if (value === undefined) { return };
-		  obj[key] = parseFloat(value);
-	  });
-	  const matrix = ts.match(/matrix\(.*?\)/g);
+	const obj = {};
+	xform.split(" ").forEach((pair) => {
+		[key, value] = pair.split("=");
+		if (value === undefined) { return };
+		obj[key] = parseFloat(value);
+	});
+	const matrix = ts.match(/matrix\(.*?\)/g);
 
-	  const matr = matrix[0].substring(7, matrix[0].length - 1);
-	  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+	const matr = matrix[0].substring(7, matrix[0].length - 1);
+	[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
 
-	  const x = a * obj.x + c * obj.y + e + a * elemX;
-	  const y = b * obj.x + d * obj.y + f + d * elemY;
+	const x = a * obj.x + c * obj.y + e + a * elemX;
+	const y = b * obj.x + d * obj.y + f + d * elemY;
 
-	  const width = obj.width * a;
-	  const height = obj.height * d;
+	const width = obj.width * a;
+	const height = obj.height * d;
 
-	  return {
-		  x: x,
-		  y: y,
-		  width: width,
-		  height: height
-	  };
-  };
+	return {
+		x: x,
+		y: y,
+		width: width,
+		height: height
+	};
+};
 
-  String.prototype.format = function() {
-    a = this;
-    for (k in arguments) {
-      a = a.replace("{" + k + "}", arguments[k])
-    }
-    return a
-  };
+String.prototype.format = function() {
+	a = this;
+	for (k in arguments) {
+		a = a.replace("{" + k + "}", arguments[k])
+	}
+	return a;
+};
 
-  this.calcLocation = function(elem, para, val) {
-		  const ts = $(elem).attr('transform');
-		  const xform = $(elem).attr('data-xform');
-		  const elemX = parseFloat($(elem).attr('x'));
-		  const elemY = parseFloat($(elem).attr('y'));
+//   this.calcLocation = function(elem, para, val) {
+// 		  const ts = $(elem).attr('transform');
+// 		  const xform = $(elem).attr('data-xform');
+// 		  const elemX = parseFloat($(elem).attr('x'));
+// 		  const elemY = parseFloat($(elem).attr('y'));
 
-		  const obj = {};
-		  xform.split(" ").forEach((pair) => {
-			  	[key, value] = pair.split("=");
-			  	if (value === undefined) { return };
-			  	obj[key] = parseFloat(value);
-		  });
+// 		  const obj = {};
+// 		  xform.split(" ").forEach((pair) => {
+// 			  	[key, value] = pair.split("=");
+// 			  	if (value === undefined) { return };
+// 			  	obj[key] = parseFloat(value);
+// 		  });
 
-		  const matrix = ts.match(/matrix\(.*?\)/g);
-		  const matr = matrix[0].substring(7, matrix[0].length - 1);
-		  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+// 		  const matrix = ts.match(/matrix\(.*?\)/g);
+// 		  const matr = matrix[0].substring(7, matrix[0].length - 1);
+// 		  [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
 
-		  const x = a * obj.x + c * obj.y + e + a * elemX;
-		  const y = b * obj.x + d * obj.y + f + d * elemY;
-		  const width = obj.width * a;
-		  const height = obj.height * d;
+// 		  const x = a * obj.x + c * obj.y + e + a * elemX;
+// 		  const y = b * obj.x + d * obj.y + f + d * elemY;
+// 		  const width = obj.width * a;
+// 		  const height = obj.height * d;
 
-		  if (para === undefined) {
-	        return {
-		          x: x,
-		          y: y,
-		          width: width,
-		          height: height
-	        };
-		  }
+// 		  if (para === undefined) {
+// 	        return {
+// 		          x: x,
+// 		          y: y,
+// 		          width: width,
+// 		          height: height
+// 	        };
+// 		  }
 
-		  let offsetX, offsetY, scaleX, scaleY, newMatrix;
-		  switch (para) {
-				  case 'x':
-						  offsetX = (val - x) / a + elemX;
-						  return offsetX;
-						  break;
-				  case 'y':
-						  offsetY = (val - y) / d + elemY;
-						  return offsetY;
-						  break;
-				  case 'width':
-						  scaleX = val / obj.width;
-						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(scaleX,b,c,d,e,f);
-						  return newMatrix;
-						  break;
-				  case 'height':
-						  scaleY = val / obj.height;
-						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(a,b,c,scaleY,e,f);
-						  return newMatrix;
-						  break;
-				  default:
-						  return 'default';
-		  }
-  };
+// 		  let offsetX, offsetY, scaleX, scaleY, newMatrix;
+// 		  switch (para) {
+// 				  case 'x':
+// 						  offsetX = (val - x) / a + elemX;
+// 						  return offsetX;
+// 						  break;
+// 				  case 'y':
+// 						  offsetY = (val - y) / d + elemY;
+// 						  return offsetY;
+// 						  break;
+// 				  case 'width':
+// 						  scaleX = val / obj.width;
+// 						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(scaleX,b,c,d,e+(a-scaleX)*(obj.x+elemX),f);
+// 						  return newMatrix;
+// 						  break;
+// 				  case 'height':
+// 						  scaleY = val / obj.height;
+// 						  newMatrix = 'matrix({0}, {1}, {2}, {3}, {4}, {5})'.format(a,b,c,scaleY,e,f+(b-scaleY)*(obj.y+elemY));
+// 						  return newMatrix;
+// 						  break;
+// 				  default:
+// 						  return 'default';
+// 		  }
+//   };
+this.setSvgElemPosition = function(para, val) {
+	const selected = selectedElements[0];
+	const realLocation = this.getSvgRealLocation(selected);
+	let dx = 0;
+	let dy = 0;
+	switch (para) {
+		case 'x':
+			dx = val - realLocation.x;
+			break;
+		case 'y':
+			dy = val - realLocation.y;
+			break;
+	}
+
+	let xform = svgroot.createSVGTransform();
+	let tlist = svgedit.transformlist.getTransformList(selected);
+	
+	xform.setTranslate(dx, dy);
+	if (tlist.numberOfItems) {
+		tlist.insertItemBefore(xform, 0);
+	} else {
+		tlist.appendItem(xform);
+	}
+
+	selectorManager.requestSelector(selected).resize();
+	recalculateAllSelectedDimensions();
+
+}
+// refer to resize behavior in mouseup mousemove mousedown
+this.setSvgElemSize = function(para, val) {
+	const selected = selectedElements[0];
+	const realLocation = this.getSvgRealLocation(selected);
+	let sx = 1;
+	let sy = 1;
+	switch (para) {
+		case 'width':
+			sx = val/realLocation.width;
+			break;
+		case 'height':
+			sy = val/realLocation.height;
+			break;
+	}
+	
+	startTransform = selected.getAttribute('transform');//???maybe non need
+
+	const tlist = svgedit.transformlist.getTransformList(selected);
+	const left = realLocation.x;
+	const top = realLocation.y;
+	
+	// update the transform list with translate,scale,translate
+	let translateOrigin = svgroot.createSVGTransform();
+	let	scale = svgroot.createSVGTransform();
+	let translateBack = svgroot.createSVGTransform();
+	
+	translateOrigin.setTranslate(-left, -top);
+	scale.setScale(sx, sy);
+	translateBack.setTranslate(left, top);
+	
+	const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
+	if (hasMatrix) {
+		const pos = svgedit.utilities.getRotationAngle(selected) ? 1 : 0;
+		tlist.insertItemBefore(translateOrigin, pos);
+		tlist.insertItemBefore(scale, pos);
+		tlist.insertItemBefore(translateBack, pos);
+	} else {
+		tlist.appendItem(translateBack);
+		tlist.appendItem(scale);
+		tlist.appendItem(translateOrigin);
+	}
+
+	selectorManager.requestSelector(selected).resize();
+	
+	selectorManager.requestSelector(selected).showGrips(true);
+	recalculateAllSelectedDimensions();
+}
 
 };
 

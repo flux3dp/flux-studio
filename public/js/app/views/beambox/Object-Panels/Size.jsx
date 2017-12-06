@@ -4,7 +4,8 @@ define([
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, i18n) {
+    'app/actions/beambox/constant'
+], function($, React, FnWrapper, UnitInput, i18n, Constant) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
@@ -12,12 +13,12 @@ define([
     const update_width_funcs = {
         rect:   FnWrapper.update_rect_width,
         image:  FnWrapper.update_image_width,
-        use:    function(){console.log('TODO: _update_width_handler')},
+        use:    val => svgCanvas.setSvgElemSize('width', val * Constant.dpmm),
     }
     const update_height_funcs = {
         rect:   FnWrapper.update_rect_height,
         image:  FnWrapper.update_image_height,
-        use:    function(){console.log('TODO: _update_height_handler')},
+        use:    val => svgCanvas.setSvgElemSize('height', val * Constant.dpmm),
     }
     let _update_width = ()=>{};
     let _update_height = ()=>{};
@@ -33,7 +34,7 @@ define([
             return {
                 width: this.props.width,
                 height: this.props.height,
-                isRatioPreserve: (this.props.type==='image')?true:false
+                isRatioPreserve: (this.props.type!=='rect')?true:false
             };
         },
 
@@ -73,12 +74,10 @@ define([
             });
         },
         render: function() {
-            const disableInput = (this.props.type === 'use');
-            const expandAccordion = !(this.props.type === 'use');
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher" defaultChecked={expandAccordion}/>
+                    <input type="checkbox" className="accordion-switcher" defaultChecked={true}/>
                     <p className="caption">
                         {LANG.size}
                         <span className="value">{this.state.width} x {this.state.height} mm</span>
@@ -95,7 +94,6 @@ define([
                                     unit="mm"
                                     defaultValue={this.state.width}
                                     getValue={this._update_width_handler}
-                                    disabled={disableInput}
                                 />
                             </div>
                             <div className="control">
@@ -106,7 +104,6 @@ define([
                                     unit="mm"
                                     defaultValue={this.state.height}
                                     getValue={this._update_height_handler}
-                                    disabled={disableInput}
                                 />
                             </div>
                         </div>
