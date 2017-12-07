@@ -37,7 +37,8 @@ define([
             },
 
             update: function(key, item_key, item_value) {
-                const configs = this.read(key);
+                let configs = this.read(key);
+                if(configs === '') configs = {};
                 configs[item_key] = item_value;
                 this.write(key, configs);
             }

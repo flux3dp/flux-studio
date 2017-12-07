@@ -43,7 +43,7 @@ define([
                     }
 
                     if (true === redirect) {
-                        location.hash = '#studio/print/';
+                        location.hash = '#studio/' + (config().read('default-app')||'print');
                     }
                     d.resolve();
                 }

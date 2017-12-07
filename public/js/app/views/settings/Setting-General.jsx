@@ -85,6 +85,10 @@ define([
             config().write(id, e.target.value);
         },
 
+        _updateBeamboxPreference: function(item_key, e) {
+            config().update('beambox-preference', item_key, e.target.value);
+        },
+
         _removeDefaultMachine: function() {
             if(confirm(this.state.lang.settings.confirm_remove_default)) {
               initializeMachine.defaultPrinter.clear();
@@ -108,9 +112,11 @@ define([
                 pokeIP = config().read('poke-ip-addr'),
                 lang = this.state.lang,
                 notificationOptions = [],
+                defaultAppOptions = [],
                 projectionOptions = [],
                 antialiasingOptions = [],
                 defaultModelOptions = [],
+                defaultBeamboxModelOptions = [],
                 options = [];
 
             Object.keys(supported_langs).map(l => {
@@ -132,6 +138,39 @@ define([
                     label: lang.settings.notification_on,
                     selected: config().read('notification') === '1'
                 }
+            ];
+
+            defaultAppOptions = [
+                {
+                    value: 'print',
+                    label: lang.menu.print,
+                    selected: config().read('default-app') === 'print'
+                },
+                {
+                    value: 'laser',
+                    label: lang.menu.laser,
+                    selected: config().read('default-app') === 'laser'
+                },
+                {
+                    value: 'scan',
+                    label: lang.menu.scan,
+                    selected: config().read('default-app') === 'scan'
+                },
+                {
+                    value: 'draw',
+                    label: lang.menu.draw,
+                    selected: config().read('default-app') === 'draw'
+                },
+                {
+                    value: 'cut',
+                    label: lang.menu.cut,
+                    selected: config().read('default-app') === 'cut'
+                },
+                {
+                    value: 'beambox',
+                    label: lang.menu.beambox,
+                    selected: config().read('default-app') === 'beambox'
+                },
             ];
 
             projectionOptions = [
@@ -179,6 +218,24 @@ define([
                 }
             ];
 
+            defaultBeamboxModelOptions = [
+                {
+                    value: '',
+                    label: lang.settings.none,
+                    selected: config().read('beambox-preference')['model'] === ''
+                },
+                {
+                    value: 'fbb1b',
+                    label: 'BeamBox',
+                    selected: config().read('beambox-preference')['model'] === 'fbb1b'
+                },
+                {
+                    value: 'fbb1p',
+                    label: 'BeamBox Pro',
+                    selected: config().read('beambox-preference')['model'] === 'fbb1p'
+                }
+            ];
+
             if (printer.name != undefined) {
               default_machine_button = <a className="font3"
                           onClick={this._removeDefaultMachine}
@@ -207,6 +264,25 @@ define([
                         />
                     </Controls>
 
+                    <Controls label={lang.settings.default_app}>
+                        <SelectView
+                            className="font3"
+                            options={defaultAppOptions}
+                            onChange={this._updateOptions.bind(null, 'default-app')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.default_machine}>
+                      <table style={tableStyle}>
+                        <tr>
+                          <td>{printer.name}</td>
+                          <td>
+                            {default_machine_button}
+                          </td>
+                        </tr>
+                      </table>
+                    </Controls>
+
                     <Controls label={lang.settings.ip}>
                         <input
                             type="text"
@@ -215,6 +291,8 @@ define([
                             onBlur={this._checkIPFormat}
                         />
                     </Controls>
+
+                    <div className="subtitle">{lang.settings.delta_series}</div>
 
                     <Controls label={lang.settings.projection}>
                         <SelectView
@@ -243,15 +321,14 @@ define([
                         />
                     </Controls>
 
-                    <Controls label={lang.settings.default_machine}>
-                      <table style={tableStyle}>
-                        <tr>
-                          <td>{printer.name}</td>
-                          <td>
-                            {default_machine_button}
-                          </td>
-                        </tr>
-                      </table>
+                    <div className="subtitle">{lang.settings.beambox_series}</div>
+                    
+                    <Controls label={lang.settings.default_beambox_model}>
+                        <SelectView
+                            className="font3"
+                            options={defaultBeamboxModelOptions}
+                            onChange={this._updateBeamboxPreference.bind(null, 'model')}
+                        />
                     </Controls>
 
                     <Controls label="">

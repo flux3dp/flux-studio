@@ -293,6 +293,8 @@ define(function() {
             setting: '設定',
             draw: '繪圖',
             cut: '切割',
+            beambox: 'BeamBox',
+            mill: 'MILL'
         },
         settings: {
             on: '開',
@@ -317,7 +319,11 @@ define(function() {
             confirm_reset: '確認要重置 FLUX Studio?',
             language: '語言',
             notifications: '通知',
+            default_app: '預設功能',
+            delta_series: 'Delta 系列',
+            beambox_series: 'BeamBox 系列',
             default_model: '預設型號（列印參數）',
+            default_beambox_model: '預設型號',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: '無',
