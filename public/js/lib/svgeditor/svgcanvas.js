@@ -4795,6 +4795,22 @@ this.importSvgString = function(xmlString) {
 	//		};
 
 			svgedit.utilities.findDefs().appendChild(symbol);
+			
+			//remove invisible nodes (such as invisible layer in Illustrator)
+			$(symbol).find("*").filter(function(){
+				return ($(this).css('display') === 'none');
+			}).remove();
+
+			//add prefix(which constrain css selector to symbol's id) to prevent 
+			const origionStyle = $(symbol).find('style').text();
+			//the regrex indicate the css selector, but the selector may contain comma, so we replace it again.
+			let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
+				const prefix = '#' + symbol.id + ' ';
+				match = match.replace(',', ',' + prefix);
+				return prefix + match;
+			});
+			$(symbol).find('style').text(prefixedStyle);
+
 			batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(symbol));
 		}
 
