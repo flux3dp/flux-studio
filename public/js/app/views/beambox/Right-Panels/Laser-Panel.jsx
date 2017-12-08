@@ -13,7 +13,6 @@ define([
             layerName:  React.PropTypes.string.isRequired,
             speed:      React.PropTypes.number.isRequired,
             strength:   React.PropTypes.number.isRequired,
-            mode:       React.PropTypes.oneOf(['CUT', 'ENGRAVE']).isRequired,
             funcs:      React.PropTypes.object.isRequired
         },
         
@@ -21,7 +20,6 @@ define([
             return {
                 speed:      this.props.speed,
                 strength:   this.props.strength,
-                mode:       this.props.mode
             };
         },
 
@@ -29,7 +27,6 @@ define([
             this.setState({
                 speed:      nextProps.speed,
                 strength:   nextProps.strength,
-                mode:       nextProps.mode
             });
         },
 
@@ -41,33 +38,7 @@ define([
             this.setState({strength: val})
             this.props.funcs.writeStrength(this.props.layerName, val);
         },
-        _handleModeChange: function(e) {
-            const mode = e.target.value;
-            this.setState({mode: mode});
-            this.props.funcs.writeMode(this.props.layerName, mode);
-        },
 
-        _renderMode: function() {
-            return (
-                <div className="mode">
-                    <div>
-                        {this.props.layerName}
-                    </div>
-                    <label>
-                        <input type="radio" value="CUT" 
-                            checked={this.state.mode === 'CUT'} 
-                            onChange={this._handleModeChange} hidden />
-                        {LANG.cut}
-                    </label>
-                    <label>
-                        <input type="radio" value="ENGRAVE" 
-                            checked={this.state.mode === 'ENGRAVE'} 
-                            onChange={this._handleModeChange} hidden />
-                        {LANG.engrave}
-                    </label>
-                </div>
-            );
-        },
         _renderStrength: function() {
             return (
                 <div className='panel'>
@@ -100,14 +71,15 @@ define([
         },
         
         render: function() {
-            const modePanel = this._renderMode();
             const speedPanel = this._renderSpeed();
             const strengthPanel = this._renderStrength();
             return (
                 <div>
-                    {modePanel}
+                    <div className="layername">
+                        {this.props.layerName}
+                    </div>
                     <div>
-                        {(this.state.mode==='ENGRAVE')?strengthPanel:''}
+                        {strengthPanel}
                         {speedPanel}
                     </div>
                 </div>

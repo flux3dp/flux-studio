@@ -243,37 +243,11 @@
             margin-top: 20px;
             border: 1px #333 solid;
             box-shadow: 4px 5px 14px #444;
-            .mode {
+            .layername {
                 margin-bottom: 10px;
                 border-bottom: 1px #333 solid;                
-                div {
-                    border-bottom: 1px #333 solid;
-                    padding: 2px;
-                    text-align: center;
-                }
-                label {
-                    display: inline-block;
-                    text-align: center;
-                    width: 50%;
-                    span {
-                        display: inline-block;
-                        width: 100%;
-                        padding: 5px;
-                        font-weight: bold;
-                        color: #333;
-                        background-color: #ddd;
-                        cursor: pointer;
-                        &:hover {
-                            background-color: #808080;
-                            color: white;
-                        }
-                    }
-                    input:checked+span {
-                        color: #ddd;
-                        background-color: #444;
-                        transition: background-color .3s ease;
-                    }
-                }
+                padding: 2px;
+                text-align: center;
             }
             .panel {
                 padding-left: 10px;

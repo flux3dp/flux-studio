@@ -293,7 +293,7 @@ define(function() {
             setting: '設定',
             draw: '繪圖',
             cut: '切割',
-            beambox: 'BeamBox',
+            beambox: 'BEAMBOX',
             mill: 'MILL'
         },
         settings: {
