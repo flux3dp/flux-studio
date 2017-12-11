@@ -388,6 +388,10 @@ define([
                     });
                 };
 
+                _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
+                    console.log('TODO: CALIBRATE_BEAMBOX_CAMERA');
+                };
+
                 _action['CHANGE_FILAMENT'] = (device) => {
                     DeviceMaster.selectDevice(device).then(function(status) {
                         DeviceMaster.getReport().then(report => {

@@ -124,6 +124,8 @@ function createWindow () {
             preload: path.join(__dirname, 'src', 'main-window-entry.js')
         },
         vibrancy: 'light'});
+    
+    mainWindow.maximize();
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'public/index.html'),

@@ -40,7 +40,8 @@ define([
             this.canvas.height = Constant.dimension.height;
         }
 
-        //main function
+        //main functions
+        
         start(selectedPrinter, errCallback) {
             const d = $.Deferred();
             
