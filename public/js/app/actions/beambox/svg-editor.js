@@ -29,7 +29,8 @@ define([
 	'helpers/image-data',
 	'helpers/shortcuts',
 	'helpers/i18n',
-	'app/actions/beambox/constant'
+	'app/actions/beambox/constant',
+	'helpers/dxf2svg'
 ],function(
 	ObjectPanelsController,
 	LaserPanelController,
@@ -37,7 +38,8 @@ define([
 	ImageData,
 	Shortcuts,
 	i18n,
-	Constant
+	Constant,
+	dxfToSvg
 ){
 	if (window.svgEditor) {
 		return;
@@ -4965,7 +4967,37 @@ define([
 							};
 							reader.readAsDataURL(file);
 						}
+					} else if(file.name.toLowerCase().indexOf('.dxf') > 0) {
+						console.log("Load DXF");
+						reader = new FileReader();
+						reader.onloadend = function(e) {
+							let svg = dxfToSvg(e.target.result, {divideLayer: true});
+							console.log('transferred svg: ', svg);
+							let newElement;
+
+							// Seperate layers
+							Object.keys(svg).map((key) => {
+								if (svg[key] == "") return;
+								svgCanvas.createLayer(key);
+								newElement = svgCanvas.importSvgString(svg[key], true);
+							});
+							
+
+							svgCanvas.ungroupSelectedElement();
+							svgCanvas.ungroupSelectedElement();
+							svgCanvas.groupSelectedElements();
+							svgCanvas.alignSelectedElements('m', 'page');
+							svgCanvas.alignSelectedElements('c', 'page');
+							// highlight imported element, otherwise we get strange empty selectbox
+							svgCanvas.selectOnly([newElement]);
+							// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+							$('#dialog_box').hide();
+						};
+						reader.readAsText(file);
+					} else {
+						$('#dialog_box').hide();
 					}
+
 				};
 
 				workarea[0].addEventListener('dragenter', onDragEnter, false);
