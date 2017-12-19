@@ -33,7 +33,7 @@ module.exports = {
         update_toolhead: 'Toolhead Firmware',
         set_as_default: 'Set as Default',
         calibrate_origin: 'Calibrate Origin ( Home )',
-        calibrate_beambox_camera: 'Calibrate BeamBox Camera',
+        calibrate_beambox_camera: 'Calibrate Beambox Camera',
         movement_test: 'Run Movement Test',
         turn_on_laser: 'Turn On Scanning Laser',
         auto_leveling_clean: 'Run Auto Leveling with Clean Data',

@@ -177,6 +177,7 @@ define(function() {
             connect_flux: 'Connect the Machine',
             via_usb: 'Using USB Cable',
             via_wifi: 'Using Wi-Fi',
+            select_machine_type: 'Please select the machine',
             name_your_flux: 'Name Your Machine',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
@@ -237,7 +238,8 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.'
+                    content_delta: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.',
+                    content_beambox: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n2. Try replug it and wait for 10 sec.',
                 },
 
                 wifi_connection: {
@@ -321,7 +323,7 @@ define(function() {
             notifications: 'Notifications',
             default_app: 'Default app',
             delta_series: 'Delta Series',
-            beambox_series: 'BeamBox Series',
+            beambox_series: 'Beambox Series',
             default_model: 'Default Model<br />(For Print Settings)',
             default_beambox_model: 'Default Model',
             fd1: 'FLUX Delta',

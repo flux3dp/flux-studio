@@ -110,7 +110,7 @@ define([
                 },
                 {
                     name: 'beambox',
-                    displayName: 'BeamBox',
+                    displayName: 'Beambox',
                     className: genericClassName,
                     label: lang.menu.beambox,
                     imgSrc: 'img/menu/icon-draw.svg'

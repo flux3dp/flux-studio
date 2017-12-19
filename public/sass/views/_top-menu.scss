@@ -52,6 +52,10 @@
                 list-style: none;
                 margin: 0;
                 padding: 0;
+                flex-wrap: wrap;
+                align-content: space-between;
+                width: 450px;
+                height: 128px;
             }
         }
 
@@ -73,11 +77,10 @@
     .item {
         color: #b3b3b3;
         font-size: 1rem;
-        margin: 0 3.3rem 0 0;
         padding: 0;
         text-align: center;
-        flex: 1;
         cursor: pointer;
+        width: 90px;
 
         img {
             height: 3.2rem;
@@ -92,8 +95,8 @@
             -webkit-filter: brightness(70%);
         }
 
-        p,
-        &:last-child {
+        p {
+            text-align: center;
             margin: 0;
         }
     }

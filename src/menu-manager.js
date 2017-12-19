@@ -141,7 +141,7 @@ function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
     let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`;
     console.log('TODO: change beambox model name');
-    const modelType = (data.model === 'laser-b1')?'beambox-series':'delta-series';
+    const modelType = ((data.model === 'fbb1b')||(data.model === 'fbb1p'))?'beambox-series':'delta-series';
     let submenu = [];
     if(modelType === 'beambox-series') {
         submenu = [

@@ -226,12 +226,12 @@ define([
                 },
                 {
                     value: 'fbb1b',
-                    label: 'BeamBox',
+                    label: 'Beambox',
                     selected: config().read('beambox-preference')['model'] === 'fbb1b'
                 },
                 {
                     value: 'fbb1p',
-                    label: 'BeamBox Pro',
+                    label: 'Beambox Pro',
                     selected: config().read('beambox-preference')['model'] === 'fbb1p'
                 }
             ];

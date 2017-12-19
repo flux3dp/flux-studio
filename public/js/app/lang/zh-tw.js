@@ -177,6 +177,7 @@ define(function() {
             connect_flux: '連接機器',
             via_usb: '使用 USB',
             via_wifi: '使用 WiFi',
+            select_machine_type: '請選擇您的機種',            
             name_your_flux: '為你的機器取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -232,12 +233,13 @@ define(function() {
             errors: {
                 error: '錯誤',
                 close: '關閉',
-                not_found: '無法找到 FLUX Delta',
+                not_found: '無法找到機器',
                 not_support: '請透過隨身碟更新 Delta 韌體到 v1.6 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認 1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮 2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a> 3. 重新插拔線並稍等 10 秒鐘'
+                    content_delta: '別擔心！請確認\n1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮\n2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n3. 重新插拔線並稍等 10 秒鐘',
+                    content_beambox: '別擔心！請確認\n1. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n2. 重新插拔線並稍等 10 秒鐘'
                 },
 
                 wifi_connection: {
@@ -321,7 +323,7 @@ define(function() {
             notifications: '通知',
             default_app: '預設功能',
             delta_series: 'Delta 系列',
-            beambox_series: 'BeamBox 系列',
+            beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',
             default_beambox_model: '預設型號',
             fd1: 'FLUX Delta',
