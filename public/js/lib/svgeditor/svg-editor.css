@@ -501,15 +501,21 @@ div.palette_item:first-child {
 }
 
 #workarea.wireframe #svgcontent * {
-	fill: none;
+	fill: #FFFFFF;
+	fill-opacity: 0;
 	stroke: #000;
 	stroke-width: 1px;
 	stroke-opacity: 1.0;
 	stroke-dasharray: 0;
 	opacity: 1;
-	pointer-events: stroke;
 	vector-effect: non-scaling-stroke;
 	filter: none;
+	/* TODO:
+	Better way to do object selection:
+		Duplicate the origina object, and use invisible outline with stroke width: 5px,
+		so that object can be selected with some error tolerance.
+	*/
+	/* pointer-events: stroke; */
 }
 
 #workarea.wireframe #svgcontent text {
