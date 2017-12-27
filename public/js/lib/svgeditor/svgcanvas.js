@@ -748,8 +748,8 @@ this.prepareSvg = function(newDoc) {
 		paths = newDoc.getElementsByTagNameNS(NS.SVG, 'path');
 	for (i = 0, len = paths.length; i < len; ++i) {
 		path = paths[i];
-		// path.setAttribute('d', pathActions.convertPath(path));
-		// pathActions.fixEnd(path);
+		path.setAttribute('d', pathActions.convertPath(path));
+		pathActions.fixEnd(path);
 	}
 };
 
@@ -1063,10 +1063,21 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		return selectorManager.selectorParentGroup;
 	}
 
-	while (mouse_target.parentNode !== (current_group || current_layer)) {
+	while (mouse_target && mouse_target.parentNode !== (current_group || current_layer)) {
+		if (mouse_target.parentNode && mouse_target.parentNode.getAttribute('class') === 'layer') {
+			// Select layer of mouse_target
+			var title = $(mouse_target.parentNode).find('title')[0];
+			if (title) {
+				svgCanvas.setCurrentLayer(title.innerHTML);
+				window.populateLayers();
+				selectOnly([mouse_target], true);
+				return mouse_target;
+			}
+		}
 		mouse_target = mouse_target.parentNode;
 	}
 
+	if (!mouse_target) {return svgroot;}
 //
 //	// go up until we hit a child of a layer
 //	while (mouse_target.parentNode.parentNode.tagName == 'g') {
@@ -1197,7 +1208,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 		// if it is a selector grip, then it must be a single element selected,
 		// set the mouse_target to that and update the mode to rotate/resize
 
-		if (mouse_target == selectorManager.selectorParentGroup && selectedElements[0] != null) {
+		if (mouse_target === selectorManager.selectorParentGroup && selectedElements[0] != null) {
 			var grip = evt.target;
 			var griptype = elData(grip, 'type');
 			// rotating
@@ -4710,7 +4721,7 @@ this.setSvgString = function(xmlString) {
 // * import should happen in top-left of current zoomed viewport
 this.importSvgString = function(xmlString) {
 	var j, rootTransform = '';
-
+	var symbols = [], use_el;
 	try {
 		// Get unique ID
 		var uid = svgedit.utilities.encode64(xmlString.length + xmlString).substr(0,32);
@@ -4727,12 +4738,12 @@ this.importSvgString = function(xmlString) {
 		var batchCmd = new svgedit.history.BatchCommand('Import Image');
 		var symbol;
 		if (useExisting) {
-			symbol = import_ids[uid].symbol;
+			symbols.push(import_ids[uid].symbol);
 			rootTransform = import_ids[uid].xform;
 		} else {
 			// convert string into XML document
 			var newDoc = svgedit.utilities.text2xml(xmlString);
-			rootTransform = newDoc.documentElement.getAttribute('transform') || '';
+			rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
 			this.prepareSvg(newDoc);
 
 			// import new svg document into our document
@@ -4743,6 +4754,21 @@ this.importSvgString = function(xmlString) {
 			} else {
 				svg = svgdoc.importNode(newDoc.documentElement, true);
 			}
+
+			var layeredSvg = true, groups = [];
+			for(var i = 0; i < svg.childNodes.length; i++) {
+				var child = svg.childNodes[i];
+				console.log('child', child);
+				if (['defs', 'title'].indexOf(child.tagName) >= 0) continue;
+				if(child.tagName != 'g' || child.id == null) {
+					layeredSvg = false;
+					break;
+				} else {
+					groups.push(child);
+				}
+			}
+
+			if (!layeredSvg) {
 
 			uniquifyElems(svg);
 
@@ -4763,111 +4789,66 @@ this.importSvgString = function(xmlString) {
 				canvash = +svgcontent.getAttribute('height');
 			// imported content should be 1/3 of the canvas on its largest dimension
 
-
-			symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
-			var defs = svgedit.utilities.findDefs();
-
 			if (svgedit.browser.isGecko()) {
-				// Move all gradients into root for Firefox, workaround for this bug:
-				// https://bugzilla.mozilla.org/show_bug.cgi?id=353575
+				// Move all gradients into root for Firefox, workaround for this bug: https://bugzilla.mozilla.org/show_bug.cgi?id=353575
 				// TODO: Make this properly undo-able.
 				$(svg).find('linearGradient, radialGradient, pattern').appendTo(defs);
 			}
 
-			while (svg.firstChild) {
-				var first = svg.firstChild;
-				symbol.appendChild(first);
-			}
-			var attrs = svg.attributes;
-			var i;
-			for (i = 0; i < attrs.length; i++) {
-				var attr = attrs[i];
-				symbol.setAttribute(attr.nodeName, attr.value);
-			}
-			symbol.id = getNextId();
+			symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
 
+			} else {
+				for (var i in groups) {
+					symbols.push(this.makeSymbol(groups[i], [], batchCmd));
+				}
+			}
 			// Store data
 	//		import_ids[uid] = {
 	//			symbol: symbol,
 	//			xform: ts
 	//		};
+		}
 
-			svgedit.utilities.findDefs().appendChild(symbol);
-			
-			//remove invisible nodes (such as invisible layer in Illustrator)
-			$(symbol).find("*").filter(function(){
-				return ($(this).css('display') === 'none');
-			}).remove();
+		for (var i = 0; i < symbols.length; i++) {
+			var symbol = symbols[i];
+			use_el = svgdoc.createElementNS(NS.SVG, 'use');
+			use_el.id = getNextId();
+			setHref(use_el, '#' + symbol.id);
 
-			//add prefix(which constrain css selector to symbol's id) to prevent 
-			const origionStyle = $(symbol).find('style').text();
-			//the regrex indicate the css selector, but the selector may contain comma, so we replace it again.
-			let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
-				const prefix = '#' + symbol.id + ' ';
-				match = match.replace(',', ',' + prefix);
-				return prefix + match;
+			if (symbol.getAttribute('data-id') != null) {
+				svgCanvas.createLayer(symbol.getAttribute('data-id'));
+			}
+
+			(current_group || getCurrentDrawing().getCurrentLayer()).appendChild(use_el);
+			batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
+			clearSelection();
+
+			var bb = svgedit.utilities.getBBox(use_el);
+			// Scale 
+			var dpi = 72,	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
+				svgUnitScaling = 25.4 / dpi * 10, // inch to mm
+				mt = rootTransform.scale(svgUnitScaling),
+				matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+
+			use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+
+			svgedit.recalculate.recalculateDimensions(use_el);
+
+			$(use_el).data('symbol', symbol).data('ref', symbol);
+			addToSelection([use_el]);
+
+			// TODO: Find way to add this in a recalculateDimensions-parsable way
+	//				if (vb[0] != 0 || vb[1] != 0)
+	//					ts = 'translate(' + (-vb[0]) + ',' + (-vb[1]) + ') ' + ts;
+			addCommandToHistory(batchCmd);
+			call('changed', [svgcontent]);
+
+			var dataXform = '';
+			$.each(bb, function(key, value) {
+				dataXform += key + '=' + value + ' ';
 			});
-			$(symbol).find('style').text(prefixedStyle);
-
-			batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(symbol));
+			use_el.setAttribute('data-xform', dataXform);
 		}
-
-		var use_el = svgdoc.createElementNS(NS.SVG, 'use');
-		use_el.id = getNextId();
-		setHref(use_el, '#' + symbol.id);
-
-		(current_group || getCurrentDrawing().getCurrentLayer()).appendChild(use_el);
-		batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
-		clearSelection();
-
-		var bb = svgedit.utilities.getBBox(use_el);
-
-		rootTransformMatrix = svgroot.createSVGMatrix();
-		
-		// Parse SVG root element transform attribute
-		for (var i in rootTransform = rootTransform.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g)) {
-			var c = rootTransform[i].match(/[\w\.\-]+/g);
-			var key = c.shift();
-			var value = c;
-			if ( key === 'translate' ) {
-				if (c.length === 1) c[1] = c[0];
-				rootTransformMatrix = rootTransformMatrix.translate(parseFloat(c[0]), parseFloat(c[1]));
-			}
-			if ( key === 'scale' ) {
-				if (c.length === 1) {
-					rootTransformMatrix = rootTransformMatrix.scale(parseFloat(c[0]));
-				} else {
-					rootTransformMatrix = rootTransformMatrix.scaleNonUniform(parseFloat(c[0]), parseFloat(c[1]));
-				}
-			}
-			if ( key === 'rotate' ) {
-				rootTransformMatrix = rootTransformMatrix.rotate(c[0]);
-			}
-		}
-		// Scale 
-		var dpi = 72,	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
-			svgUnitScaling = 25.4 / dpi * 10, // inch to mm
-			mt = rootTransformMatrix.scale(svgUnitScaling),
-			matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
-		use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
-
-		svgedit.recalculate.recalculateDimensions(use_el);
-
-		$(use_el).data('symbol', symbol).data('ref', symbol);
-		addToSelection([use_el]);
-
-		// TODO: Find way to add this in a recalculateDimensions-parsable way
-//				if (vb[0] != 0 || vb[1] != 0)
-//					ts = 'translate(' + (-vb[0]) + ',' + (-vb[1]) + ') ' + ts;
-		addCommandToHistory(batchCmd);
-		call('changed', [svgcontent]);
-
-		var dataXform = "";
-		$.each(bb, function(key, value) {
-			dataXform += key + '=' + value + ' ';
-		});
-		use_el.setAttribute('data-xform', dataXform);
-
 	} catch(e) {
 		console.log(e);
 		return null;
@@ -4876,6 +4857,48 @@ this.importSvgString = function(xmlString) {
 
 	// we want to return the element so we can automatically select it
 	return use_el;
+};
+
+this.makeSymbol = function(elem, attrs, batchCmd) {
+	var symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
+	if (elem.tagName !== 'g') {
+		while (elem.firstChild) {
+			var first = elem.firstChild;
+			symbol.appendChild(first);
+		}
+	} else {
+		symbol.appendChild(elem);
+	}
+	var defs = svgedit.utilities.findDefs();
+	symbol.append(elem);
+
+	for (var i = 0; i < attrs.length; i++) {
+		var attr = attrs[i];
+		symbol.setAttribute(attr.nodeName, attr.value);
+	}
+	symbol.id = getNextId();
+	symbol.setAttribute('data-id', elem.id);
+
+	svgedit.utilities.findDefs().appendChild(symbol);
+	
+	//remove invisible nodes (such as invisible layer in Illustrator)
+	$(symbol).find('*').filter(function(){
+		return ($(this).css('display') === 'none');
+	}).remove();
+
+	//add prefix(which constrain css selector to symbol's id) to prevent 
+	const origionStyle = $(symbol).find('style').text();
+	//the regrex indicate the css selector, but the selector may contain comma, so we replace it again.
+	let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
+		const prefix = '#' + symbol.id + ' ';
+		match = match.replace(',', ',' + prefix);
+		return prefix + match;
+	});
+	$(symbol).find('style').text(prefixedStyle);
+
+	batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(symbol));
+
+	return symbol;
 };
 
 // TODO(codedread): Move all layer/context functions in draw.js
@@ -7354,20 +7377,20 @@ this.getPrivateMethods = function() {
 
 
 this.getSvgRealLocation = function(elem) {
-	const ts = $(elem).attr('transform');
+	const ts = $(elem).attr('transform') || '';
 	const xform = $(elem).attr('data-xform');
-	const elemX = parseFloat($(elem).attr('x'));
-	const elemY = parseFloat($(elem).attr('y'));
+	const elemX = parseFloat($(elem).attr('x') || '0');
+	const elemY = parseFloat($(elem).attr('y') || '0');
 
 	const obj = {};
-	xform.split(" ").forEach((pair) => {
+	xform.split(' ').forEach((pair) => {
 		[key, value] = pair.split("=");
 		if (value === undefined) { return };
 		obj[key] = parseFloat(value);
 	});
 	const matrix = ts.match(/matrix\(.*?\)/g);
 
-	const matr = matrix[0].substring(7, matrix[0].length - 1);
+	const matr = matrix ? matrix[0].substring(7, matrix[0].length - 1) : '1,0,0,1,0,0';
 	[a, b, c, d, e, f] = matr.split(',').map(parseFloat);
 
 	const x = a * obj.x + c * obj.y + e + a * elemX;

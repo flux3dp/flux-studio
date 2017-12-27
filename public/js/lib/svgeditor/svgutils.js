@@ -1133,7 +1133,6 @@ svgedit.utilities.buildJSPDFCallback = function (callJSPDF) {
 	});
 };
 
-
 /**
  * Prevents default browser click behaviour on the given element
  * @param img - The DOM element to prevent the click on
@@ -1380,3 +1379,31 @@ svgedit.utilities.convertPath = function(path, toRel) {
 
 
 }());
+
+svgedit.utilities.getMatrixFromTransformAttr = function(str) {
+
+	matrix = svgroot.createSVGMatrix();
+			
+	// Parse SVG root element transform attribute
+	for (var i in str = str.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g)) {
+		var c = str[i].match(/[\w\.\-]+/g);
+		var key = c.shift();
+		var value = c;
+		if ( key === 'translate' ) {
+			if (c.length === 1) c[1] = c[0];
+			matrix = matrix.translate(parseFloat(c[0]), parseFloat(c[1]));
+		}
+		if ( key === 'scale' ) {
+			if (c.length === 1) {
+				matrix = matrix.scale(parseFloat(c[0]));
+			} else {
+				matrix = matrix.scaleNonUniform(parseFloat(c[0]), parseFloat(c[1]));
+			}
+		}
+		if ( key === 'rotate' ) {
+			matrix = matrix.rotate(c[0]);
+		}
+	}
+
+	return matrix;
+};
