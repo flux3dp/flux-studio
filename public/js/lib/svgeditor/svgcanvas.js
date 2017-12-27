@@ -4709,10 +4709,7 @@ this.setSvgString = function(xmlString) {
 // was obtained
 // * import should happen in top-left of current zoomed viewport
 this.importSvgString = function(xmlString) {
-	var j, ts, importingSVG = null;
-	var rootTransform = '';
-	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
-	var dpi = 72;
+	var j, rootTransform = '';
 
 	try {
 		// Get unique ID
@@ -4731,7 +4728,7 @@ this.importSvgString = function(xmlString) {
 		var symbol;
 		if (useExisting) {
 			symbol = import_ids[uid].symbol;
-			ts = import_ids[uid].xform;
+			rootTransform = import_ids[uid].xform;
 		} else {
 			// convert string into XML document
 			var newDoc = svgedit.utilities.text2xml(xmlString);
@@ -4823,9 +4820,7 @@ this.importSvgString = function(xmlString) {
 		batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 		clearSelection();
 
-		var bb = svgedit.utilities.getBBox(use_el),
-				ratio = 25.4 / dpi * 10; // inch to mm
-
+		var bb = svgedit.utilities.getBBox(use_el);
 
 		rootTransformMatrix = svgroot.createSVGMatrix();
 		
@@ -4849,8 +4844,11 @@ this.importSvgString = function(xmlString) {
 				rootTransformMatrix = rootTransformMatrix.rotate(c[0]);
 			}
 		}
-		var mt = rootTransformMatrix.scale(ratio, ratio);
-		var matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+		// Scale 
+		var dpi = 72,	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
+			svgUnitScaling = 25.4 / dpi * 10, // inch to mm
+			mt = rootTransformMatrix.scale(svgUnitScaling),
+			matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
 		use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
 
 		svgedit.recalculate.recalculateDimensions(use_el);
