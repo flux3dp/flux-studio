@@ -748,8 +748,8 @@ this.prepareSvg = function(newDoc) {
 		paths = newDoc.getElementsByTagNameNS(NS.SVG, 'path');
 	for (i = 0, len = paths.length; i < len; ++i) {
 		path = paths[i];
-		path.setAttribute('d', pathActions.convertPath(path));
-		pathActions.fixEnd(path);
+		// path.setAttribute('d', pathActions.convertPath(path));
+		// pathActions.fixEnd(path);
 	}
 };
 
@@ -4732,7 +4732,7 @@ this.importSvgString = function(xmlString) {
 		} else {
 			// convert string into XML document
 			var newDoc = svgedit.utilities.text2xml(xmlString);
-			rootTransform = newDoc.documentElement.getAttribute('transform');
+			rootTransform = newDoc.documentElement.getAttribute('transform') || '';
 			this.prepareSvg(newDoc);
 
 			// import new svg document into our document
