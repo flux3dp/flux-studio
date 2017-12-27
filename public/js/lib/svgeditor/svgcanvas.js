@@ -1155,7 +1155,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			svgCanvas.cloneSelectedElements(0, 0);
 		}
 
-		root_sctm = $('#svgcontent g')[0].getScreenCTM().inverse();
+		root_sctm = $('#svgcontent')[0].getScreenCTM().inverse();
 
 		var pt = svgedit.math.transformPoint( evt.pageX, evt.pageY, root_sctm ),
 			mouse_x = pt.x * current_zoom,
@@ -4709,7 +4709,8 @@ this.setSvgString = function(xmlString) {
 // was obtained
 // * import should happen in top-left of current zoomed viewport
 this.importSvgString = function(xmlString) {
-	var j, ts;
+	var j, ts, importingSVG = null;
+	var rootTransform = '';
 	//72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
 	var dpi = 72;
 
@@ -4734,7 +4735,7 @@ this.importSvgString = function(xmlString) {
 		} else {
 			// convert string into XML document
 			var newDoc = svgedit.utilities.text2xml(xmlString);
-
+			rootTransform = newDoc.documentElement.getAttribute('transform');
 			this.prepareSvg(newDoc);
 
 			// import new svg document into our document
@@ -4825,15 +4826,32 @@ this.importSvgString = function(xmlString) {
 		var bb = svgedit.utilities.getBBox(use_el),
 				ratio = 25.4 / dpi * 10; // inch to mm
 
-		ts = 'scale(' + ratio + ')';
 
-		// Hack to make recalculateDimensions understand how to scale
-		ts = 'translate(0) ' + ts + ' translate(0)';
-
-
-
-
-		use_el.setAttribute('transform', ts);
+		rootTransformMatrix = svgroot.createSVGMatrix();
+		
+		// Parse SVG root element transform attribute
+		for (var i in rootTransform = rootTransform.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g)) {
+			var c = rootTransform[i].match(/[\w\.\-]+/g);
+			var key = c.shift();
+			var value = c;
+			if ( key === 'translate' ) {
+				if (c.length === 1) c[1] = c[0];
+				rootTransformMatrix = rootTransformMatrix.translate(parseFloat(c[0]), parseFloat(c[1]));
+			}
+			if ( key === 'scale' ) {
+				if (c.length === 1) {
+					rootTransformMatrix = rootTransformMatrix.scale(parseFloat(c[0]));
+				} else {
+					rootTransformMatrix = rootTransformMatrix.scaleNonUniform(parseFloat(c[0]), parseFloat(c[1]));
+				}
+			}
+			if ( key === 'rotate' ) {
+				rootTransformMatrix = rootTransformMatrix.rotate(c[0]);
+			}
+		}
+		var mt = rootTransformMatrix.scale(ratio, ratio);
+		var matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+		use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
 
 		svgedit.recalculate.recalculateDimensions(use_el);
 
