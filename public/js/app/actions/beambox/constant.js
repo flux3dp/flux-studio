@@ -6,12 +6,18 @@ define([], function(){
             height: 3800
         },
         camera: {
-            movementSpeed: (200 * 60), // mm/minutes
-            offsetX: 20,    //mm
-            offsetY: 40,    //mm
+            movementSpeed: (300 * 60), // mm/minutes
+            waitTimeForMovementStop: 300, // ms wait for movement stop to make sure camera is not shaking and get nice enough picture
             imgWidth: 1280, //pixel
             imgHeight: 720, //pixel
-            scaleRatio: (600 / 720), // pixel on studio / pixel on beambox machine; 與焦距成正比
+            offsetX_ideal: 20,    //mm
+            offsetY_ideal: 41.5,    //mm
+            scaleRatio_ideal: (585 / 720), // pixel on studio / pixel on beambox machine; 與焦距成正比
+            calibrationPicture: {
+                centerX: 70, //mm
+                centerY: 70, //mm
+                size: 40 //mm
+            }
         }
     };
 });

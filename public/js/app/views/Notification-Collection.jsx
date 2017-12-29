@@ -23,6 +23,7 @@ define([
     'jsx!views/Update-Dialog',
     'jsx!views/Change-Filament',
     'jsx!views/Head-Temperature',
+    'jsx!views/beambox/Camera-Calibration',
     'app/actions/global-actions',
     'app/stores/global-store',
     'jsx!views/print/Monitor',
@@ -58,6 +59,7 @@ define([
     UpdateDialog,
     ChangeFilament,
     HeadTemperature,
+    CameraCalibration,
     GlobalActions,
     GlobalStore,
     Monitor,
@@ -140,6 +142,12 @@ define([
                         show        : false,
                         device      : {}
                     },
+
+                    cameraCalibration: {
+                        open: false,
+                        device: {}
+                    },
+
                     firstDevice: {
                         info: {}, // device info
                         apiResponse: {}, // device info
@@ -182,6 +190,8 @@ define([
                 AlertStore.onUpdate(this._showUpdate);
                 AlertStore.onChangeFilament(this._showChangeFilament);
                 AlertStore.onShowHeadTemperature(this._showHeadTemperature);
+                AlertStore.onCameraCalibration(this._showCameraCalibration);
+                
 
                 if (true === isUnsupportedMacOSX) {
                     AlertActions.showPopupError('unsupported_mac_osx', lang.message.unsupport_osx_version);
@@ -295,6 +305,15 @@ define([
                         }
                     });
                 }
+            },
+
+            _showCameraCalibration: function(payload) {
+                this.setState({
+                    cameraCalibration: {
+                        open: true,
+                        device: payload.device
+                    }
+                });
             },
 
             _hideChangeFilament: function() {
@@ -623,10 +642,27 @@ define([
                 );
             },
 
+            _renderCameraCalibration: function() {
+                return (
+                    <CameraCalibration
+                        device={this.state.cameraCalibration.device}
+                        onClose={()=>{
+                            this.setState({
+                                cameraCalibration: {
+                                    open: false,
+                                    device: {}
+                                }
+                            });
+                        }}
+                    />
+                );
+            },
+
             render : function() {
                 var monitorPanel = this.state.showMonitor ? this._renderMonitorPanel() : '',
                     filament = this.state.changeFilament.open ? this._renderChangeFilament() : '',
                     headTemperature = this.state.headTemperature.show ? this._renderHeadTemperature() : '',
+                    cameraCalibration = this.state.cameraCalibration.open ? this._renderCameraCalibration() : '',
                     latestVersion = (
                         'toolhead' === this.state.application.type ?
                         this.state.application.device.toolhead_version :
@@ -663,6 +699,7 @@ define([
 
                         {filament}
                         {headTemperature}
+                        {cameraCalibration}
 
                         <NotificationModal
                             lang={lang}

@@ -1121,7 +1121,8 @@ define(function() {
             movement_test: 'Movement Test Before Print',
             machine_radius: 'Delta Radius',
             disable: 'Disable',
-            enable: 'Enable'
+            enable: 'Enable',
+            beambox_should_use_touch_panel_to_adjust: 'Beambox settings should be adjusted from Beambox touch panel.'            
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1351,6 +1352,21 @@ define(function() {
             set: 'set',
             incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead',
             attach_toolhead: 'Please connect the printing toolhead'
+        },
+        camera_calibration: {
+            camera_calibration: 'Camera Calibration',            
+            next: 'NEXT',
+            cancel: 'CANCEL',
+            back: 'BACK',
+            finish: 'DONE',
+            please_place_paper: 'Please place an A4 white paper at left-top corner of workarea',
+            please_refocus: 'Please focus the platform properly',
+            taking_picture: 'Taking Picture...',
+            start_engrave: 'START ENGRAVE',
+            analyze_result_fail: 'Fail to analyze captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            drawing_calibration_image: 'Drawing calibration image...',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            calibrate_done: 'Calibration done. Better camera accurency is given when focus precisely.'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',

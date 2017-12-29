@@ -12,7 +12,8 @@ define([
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
     'jsx!views/beambox/Object-Panels-Controller',
-    'jsx!views/beambox/Right-Panels/Laser-Panel-Controller'
+    'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
+    'app/actions/global-interaction', //need to include to run this
 ], function(
     React,
     beamboxEvents,

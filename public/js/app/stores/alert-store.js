@@ -16,6 +16,7 @@ define([
         CLOSE_POPUP             = 'closePopup',
         UPDATE_EVENT            = 'update',
         CHANGE_FILAMENT_EVENT   = 'change_filament',
+        CAMERA_CALIBRATION_EVENT= 'camera_calibration',
         EDIT_HEAD_TEMPERATURE   = 'edit_head_temperature',
         NOTIFY_RETRY            = 'retry',
         NOTIFY_ABORT            = 'abort',
@@ -35,6 +36,10 @@ define([
 
         onShowHeadTemperature(callback) {
             this.on(EDIT_HEAD_TEMPERATURE, callback);
+        },
+
+        onCameraCalibration(callback) {
+            this.on(CAMERA_CALIBRATION_EVENT, callback);
         },
 
         onUpdate(callback) {
@@ -239,6 +244,10 @@ define([
 
                 'SHOW_POPUP_CHANGE_FILAMENT': function() {
                     AlertStore.emit(CHANGE_FILAMENT_EVENT, payload);
+                },
+
+                'SHOW_POPUP_CAMERA_CALIBRATION': function() {
+                    AlertStore.emit(CAMERA_CALIBRATION_EVENT, payload);
                 }
 
             };

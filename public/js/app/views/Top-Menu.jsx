@@ -389,7 +389,16 @@ define([
                 };
 
                 _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
-                    console.log('TODO: CALIBRATE_BEAMBOX_CAMERA');
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
+                    DeviceMaster.select(device)
+                    .done(() => {
+                        ProgressActions.close();                        
+                        AlertActions.showCameraCalibration(device);
+                    })
+                    .fail(() => {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                    });
                 };
 
                 _action['CHANGE_FILAMENT'] = (device) => {

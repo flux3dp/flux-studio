@@ -47,11 +47,14 @@ define([
                 }
             }
             const __endPreviewMode = () => {
-                PreviewModeController.end()
-                .always(()=>{
+                try {
+                    PreviewModeController.end();
+                } catch (error) {
+                    console.log(error);                    
+                } finally {
                     FnWrapper.useSelectTool();
                     this.setState({isPreviewMode: false});
-                });
+                }
             }
 
             if(!this.state.isPreviewMode) {
@@ -89,22 +92,25 @@ define([
             };
         },
 
-        _startPreviewMode: function(auth_printer) {
+        _startPreviewMode: async function(auth_printer) {
             const errorCallback = (errMessage) => {
                 AlertActions.showPopupError('menu-item', errMessage);
                 this.setState({ isPreviewMode: false });
+                $(workarea).css('cursor', 'auto');
             };
 
             $(workarea).css('cursor', 'wait');
 
-            PreviewModeController.start(auth_printer, errorCallback)
-            .done(()=>{
+            try {
+                await PreviewModeController.start(auth_printer, errorCallback)
                 this.setState({ isPreviewMode: true });
                 $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
-            }).fail(()=>{
-                AlertActions.showPopupError('menu-item', i18n.lang.device.disconnectedError.message.replace( /%s/, auth_printer.name ));
+                
+            } catch (error) {
+                console.log(error);
+                AlertActions.showPopupError('menu-item', error);
                 FnWrapper.useSelectTool();
-            });
+            }
         },
 
         _renderPrinterSelecter: function() {

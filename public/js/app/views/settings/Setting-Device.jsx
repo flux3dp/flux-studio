@@ -75,9 +75,25 @@ define([
                 this.setState({ config: {} });
                 return;
             }
-            // clearTimeout(this.t);
+
             let usingUSB = deviceName.indexOf('(USB)') !== -1;
-            this._getDeviceConfig(deviceName.replace(' (USB)', ''), usingUSB);
+            let device = DeviceMaster.getAvailableDevices().filter(d => {
+                let a = d.name === deviceName.replace(' (USB)', '');
+                if(usingUSB) {
+                    a = a && d.source === 'h2h';
+                };
+                return a;
+            })[0];
+
+            this.setState({ device }, ()=>{
+                if(device.model === 'fbb1b' || device.model === 'fbb1p') {
+                    
+                } else {
+                    this._getDeviceConfig();
+                }
+            });
+            
+
         },
 
         _handleComponentValueChange: function(id, value, source) {
@@ -162,7 +178,10 @@ define([
 
             if(nameList.length === 0) {
                 return (
-                    <div>{lang.device.please_wait}</div>
+                    <div style={{
+                        'margin-top': '20px',
+                        'color': '#333' 
+                    }}>{lang.device.please_wait}</div>
                 );
             }
 
@@ -179,7 +198,7 @@ define([
 
         },
 
-        _getDeviceConfig: function(deviceName, usingUSB) {
+        _getDeviceConfig: function() {
             const types = ['LASER_DOWN', 'FAN_FAILURE', 'TILT', 'SHAKE'];
             const pad = (num, size) => {
                 var s = num + '';
@@ -203,15 +222,7 @@ define([
                 return t;
             };
 
-            let device = DeviceMaster.getAvailableDevices().filter(d => {
-                let a = d.name === deviceName;
-                if(usingUSB) {
-                    a = a && d.source === 'h2h';
-                };
-                return a;
-            })[0];
-
-            this.setState({ device });
+            const device = this.state.device;
 
             FirmwareVersionChecker.check(device, 'UPGRADE_KIT_PROFILE_SETTING').then(allowUpgradeKit => {
                 allowUpgradeKit = allowUpgradeKit && device.model === 'delta-1';
@@ -225,26 +236,27 @@ define([
             }).then((allowM666R_MMTest) => {
                 this.setState({ allowM666R_MMTest });
                 this.allowM666R_MMTest = allowM666R_MMTest;
-                return DeviceMaster.getDeviceSettings(this.allowBacklash, this.allowUpgradeKit, this.allowM666R_MMTest);
-            }).then((config) => {
-                config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
-                this.setState({ config });
-
-                if(config['backlash']) {
-                    let _value = this.state.config['backlash'];
-                    _value = _value.split(' ')[0].split(':')[1];
-                    this.setState({ backlash: parseFloat(_value) / 80 });
-                }
-
-                if(config['leveling']) {
-                    let _value = this.state.config['leveling'].split(' '),
-                        leveling = {};
-                    _value.map((v) => { return v.split(':'); }).map((v) => {
-                        leveling[v[0]] = v[1];
-                    });
-                    this.setState({ machine_radius: parseFloat(leveling['R']) });
-                    console.log('leveling', leveling);
-                }
+                DeviceMaster.getDeviceSettings(this.allowBacklash, this.allowUpgradeKit, this.allowM666R_MMTest)
+                .then((config) => {
+                    config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
+                    this.setState({ config });
+    
+                    if(config['backlash']) {
+                        let _value = this.state.config['backlash'];
+                        _value = _value.split(' ')[0].split(':')[1];
+                        this.setState({ backlash: parseFloat(_value) / 80 });
+                    }
+    
+                    if(config['leveling']) {
+                        let _value = this.state.config['leveling'].split(' '),
+                            leveling = {};
+                        _value.map((v) => { return v.split(':'); }).map((v) => {
+                            leveling[v[0]] = v[1];
+                        });
+                        this.setState({ machine_radius: parseFloat(leveling['R']) });
+                        console.log('leveling', leveling);
+                    }
+                });
             });
         },
 
@@ -548,6 +560,7 @@ define([
         },
 
         render : function() {
+            const isBeamoxSeries = this.state.device && ['fbb1b', 'fbb1p', 'laser-b1'].includes(this.state.device.model);
             let deviceList      = this._getDeviceList(),
                 correction      = this._renderCorrectionSetting(),
                 detectFilament  = this._renderDetectFilamentSetting(),
@@ -561,10 +574,8 @@ define([
                 playerPostBack  = this._renderPlayerPostBack(),
                 movementTest    = this._renderMovementTest(),
                 machineRadius   = this._renderMachineRadius();
-
-            return (
-                <div className="form general">
-                    {deviceList}
+            const deltaPanel = (
+                <div>
                     {correction}
                     {detectFilament}
                     {filterHeadError}
@@ -577,6 +588,20 @@ define([
                     {playerPostBack}
                     {movementTest}
                     {machineRadius}
+                </div>
+            );
+            const beamboxPanel = (
+                <div style={{
+                    'margin-top': '20px',
+                    'color': '#333' 
+                }}>
+                    {lang.device.beambox_should_use_touch_panel_to_adjust}
+                </div>
+            );
+            return (
+                <div className="form general">
+                    {deviceList}                
+                    {this.state.device?isBeamoxSeries?beamboxPanel:deltaPanel:''}
                 </div>
             );
         }

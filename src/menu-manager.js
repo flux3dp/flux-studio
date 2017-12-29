@@ -140,17 +140,14 @@ function getDeviceMenuId(uuid, data) {
 function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
     let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`;
-    console.log('TODO: change beambox model name');
-    const modelType = ((data.model === 'fbb1b')||(data.model === 'fbb1p'))?'beambox-series':'delta-series';
+    const modelType = (['fbb1b', 'fbb1p', 'laser-b1'].includes(data.model))?'beambox-series':'delta-series';
     let submenu = [];
     if(modelType === 'beambox-series') {
         submenu = [
             { id: 'DASHBOARD', uuid, serial, source, label: r.dashboard, click: callback },
             { id: 'MACHINE_INFO', uuid, serial, source, label: r.machine_info, click: callback },
             { type: 'separator' },
-            { id: 'COMMANDS', uuid, serial, source, label: r.commands, submenu: [
-                { id: 'CALIBRATE_BEAMBOX_CAMERA', label: r.calibrate_beambox_camera, uuid, serial, source, click: callback },
-            ]},
+            { id: 'CALIBRATE_BEAMBOX_CAMERA', uuid, serial, source, label: r.calibrate_beambox_camera, click: callback },
             { type: 'separator' },
             { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [
             ]},

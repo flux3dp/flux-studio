@@ -1118,7 +1118,8 @@ define(function() {
             machine_radius: 'Delta機構半徑',
             postback_url: '狀態回傳URL',
             disable: '關閉',
-            enable: '開啟'
+            enable: '開啟',
+            beambox_should_use_touch_panel_to_adjust: '請至 Beambox 觸控面板調整設定。'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -1347,6 +1348,21 @@ define(function() {
             set: '設定',
             incorrect_toolhead: '錯誤工具頭，請使用列印工具頭',
             attach_toolhead: '請插上列印工具頭'
+        },
+        camera_calibration: {
+            camera_calibration: '相機校正',
+            next: '下一步',
+            cancel: '取消',
+            back: '上一步',
+            finish: '完成',
+            please_place_paper: '請將乾淨 A4 白紙放在工作區域的左上角',
+            please_refocus: '請將工作平台對焦',
+            taking_picture: '擷取圖片中...',
+            start_engrave: '開始繪製校正圖片',
+            analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
+            drawing_calibration_image: '繪製校正圖片中...',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
+            calibrate_done: '校正相機完成<br/>使用時請正確對焦已取得良好的預覽效果。'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',

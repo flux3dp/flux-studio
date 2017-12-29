@@ -75,7 +75,7 @@ define([
                 if (result == DeviceConstants.CONNECTED) {
                     d.resolve();
                 } else {
-                    d.reject();
+                    d.reject(lang.message.connectionTimeout);
                 }
             },
             (errmsg)=>{console.log('Device Master Select Error. Should handle errMsg here', errmsg)}
@@ -492,8 +492,6 @@ define([
         let d = $.Deferred(),
             statusChanged = false;
 
-        ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
-
         let t = setInterval(() => {
             SocketMaster.addTask('report')
             .then(r => {
@@ -502,9 +500,12 @@ define([
                 if (st_id === 64) {
                     clearInterval(t);
                     setTimeout(() => {
-                        quit();
-                        d.resolve();
-                    }, 300);
+                        quit().then(() => {
+                            d.resolve();
+                        }).fail(() => {
+                            d.reject("Quit failed");
+                        });
+                    }, 2000);
                 } else if (( st_id === 128 || st_id === 48 || st_id === 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
@@ -533,13 +534,41 @@ define([
             go(blob).fail(() => {
                 // Error while uploading task
                 d.reject(["UPLOAD_FAILED"]);
-            }).then(waitTillCompleted).fail((error) => {
-                // Error while running test
-                d.reject(error);
-            }).then(() => {
-                // Completed
-                d.resolve();
-            });
+            })
+            .then(()=>{
+                ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);                
+                waitTillCompleted().fail((error) => {
+                    // Error while running test
+                    d.reject(error);
+                }).then(() => {
+                    // Completed
+                    d.resolve();
+                });
+            })
+        });
+
+        return d.promise();
+    }
+
+    function runBeamboxCameraTest() {
+        let d = $.Deferred();
+
+        fetch(DeviceConstants.BEAMBOX_CAMERA_TEST).then(res => res.blob()).then(blob => {
+            go(blob)
+            .fail(() => {
+                d.reject("UPLOAD_FAILED"); // Error while uploading task
+            })
+            .then(()=>{
+                ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);                
+                waitTillCompleted()
+                .fail((err) => {
+                    d.reject(err); // Error while running test
+                })
+                .then(()=>{
+                    d.resolve();
+                });
+                
+            })
         });
 
         return d.promise();
@@ -1323,6 +1352,10 @@ define([
         return _availableDevices;
     }
 
+    function getDeviceSetting(name) {
+        return SocketMaster.addTask('getDeviceSetting', name);
+    }
+
     function getDeviceSettings(withBacklash, withUpgradeKit, withM666R_MMTest) {
         let d = $.Deferred(),
             settings = {},
@@ -1358,7 +1391,7 @@ define([
                     let { key, value } = r;
                     settings[key] = value;
                     go(w.next());
-                });
+                }).fail((err)=>{console.log(err)});
             }
             else {
                 d.resolve(settings);
@@ -1611,6 +1644,7 @@ define([
             this.endMaintainMode                = endMaintainMode;
             this.getDeviceList                  = getDeviceList;
             this.getDeviceSettings              = getDeviceSettings;
+            this.getDeviceSetting               = getDeviceSetting;
             this.setDeviceSetting               = setDeviceSetting;
             this.getCloudValidationCode         = getCloudValidationCode;
             this.enableCloud                    = enableCloud;
@@ -1630,6 +1664,7 @@ define([
             this.endLoadingDuringPause          = endLoadingDuringPause;
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
             this.runMovementTests               = runMovementTests;
+            this.runBeamboxCameraTest          = runBeamboxCameraTest;
             this.getDeviceBySerial              = getDeviceBySerial;
             this.getAvailableDevices            = getAvailableDevices;
             this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
