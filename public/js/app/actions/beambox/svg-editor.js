@@ -996,7 +996,7 @@ define([
 				var currentLayerName = drawing.getCurrentLayerName();
 
 				LaserPanelController.render(currentLayerName);
-			}
+			};
 
 			var populateLayers = function() {
 				svgCanvas.clearSelection();
@@ -1053,6 +1053,8 @@ define([
 					layerlist.append('<tr><td style="color:white">_</td><td/></tr>');
 				}
 			};
+
+			window.populateLayers = populateLayers;
 
 			var addLayerLaserConfig = function(layername) {
 				LaserPanelController.initConfig(layername);
