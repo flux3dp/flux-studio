@@ -132,7 +132,7 @@ define([
                     onClose={__onClose}
                     onGettingPrinter={__onGettingPrinter}
                     WindowStyle={{
-                        top: 'calc(50% - 212px)',
+                        top: 'calc(50% - 180px)',
                         left: '173px'
                     }}
                     arrowDirection="left"

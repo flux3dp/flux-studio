@@ -990,7 +990,7 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: '圖層 1'
+                    layer1: '預設圖層'
                 },
                 laser_panel: {
                     strength: '功率',

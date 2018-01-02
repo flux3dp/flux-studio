@@ -993,7 +993,7 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: 'Layer 1'
+                    layer1: 'Default Layer'
                 },
                 laser_panel: {
                     strength: 'Power',

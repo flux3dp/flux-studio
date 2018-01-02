@@ -393,7 +393,6 @@ wireframe_top_delay = 0
 wireframe_top_jump = 0.6
 wireframe_up_half_speed = 0.3
 xy_offset = -0.07
-z_offset = 0
 z_seam_type = shortest
 z_seam_x = 85
 z_seam_y = 510
