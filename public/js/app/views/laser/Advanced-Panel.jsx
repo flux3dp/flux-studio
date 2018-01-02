@@ -164,7 +164,7 @@ define([
             var self = this;
             if (this.state.customBg) {
                 config().write('laser-custom-bg', '');
-                $('.laser-object').css({background :'url(img/laser-platform2.png)', 'background-size': '100% 100%'});
+                $('.laser-object').css({background :'url(img/laser-platform.png)', 'background-size': '100% 100%'});
                 self.setState({customBg: false });
             }else {
                 $('input[data-ref=importBg]').click();
