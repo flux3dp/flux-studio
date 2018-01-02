@@ -91,7 +91,7 @@ select {
 	height: 15px;
 	top: 41px;
 	left: 16px;
-	right: 155px;
+	right: 0px;
 	border-bottom: 1px solid;
 	border-left: 1px solid #777;
 }
@@ -100,7 +100,7 @@ select {
 	width: 15px;
 	top: 55px;
 	left: 0px;
-	bottom: 56px;
+	bottom: 0px;
 	border-right: 1px solid;
 	border-top: 1px solid #777;
 }
