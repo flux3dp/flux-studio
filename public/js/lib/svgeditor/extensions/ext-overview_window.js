@@ -26,7 +26,7 @@ svgEditor.addExtension("overview_window", function(S) {
 				 </div>\
 			</div>\
 		</div>";
-	$("#sidepanels").append(propsWindowHtml);
+	$(".left-panel").append(propsWindowHtml);
 
 	// Define dynamic animation of the view box.
 	var updateViewBox = function(){

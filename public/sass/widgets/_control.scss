@@ -22,7 +22,7 @@
 .ui-control-unit-input {
     background: #FFF;
     border: 0;
-    color: #999;
+    color: #888;
     font-size: 1.2rem;
     height: 48px;
     padding: 2px 5px;
@@ -35,7 +35,7 @@
 
 .ui-dialog-menu {
     $fontSize: 1.7rem;
-    $primaryColor: #999;
+    $primaryColor: #888;
     $backgroundColor: #E0E0DF;
 
     list-style: none;
@@ -120,7 +120,7 @@
         }
 
         .arrow {
-            background: #999;
+            background: $primaryColor;
             transform: translateX(1px);
             align-self: center;
         }

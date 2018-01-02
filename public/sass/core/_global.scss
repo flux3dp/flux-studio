@@ -3,7 +3,7 @@
  */
 html,
 body {
-    background-color: #E0E0E0;
+    background-color: $backgroundColor;
     font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", 'Open Sans', Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
     font-size: 12px;
     height: 100%;
@@ -15,7 +15,6 @@ body {
 }
 
 body {
-    background-color: #E0E0E0;
     cursor: default;
     font-size: 16px;
     position: relative;
@@ -70,7 +69,6 @@ img {
 
 .content {
     @include flexbox();
-    background-color: #E0E0E0;
     height: 100%;
     overflow: hidden;
     width: 100%;
@@ -526,8 +524,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background: #fff;
     min-height: 10px;
     min-width: 14px;
-    height: 20px;
-    width: 28px;
+    height: 28px;
+    width: 20px;
 }
 
 .arrow,
