@@ -460,6 +460,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         right: 20px;
         width: 87px;
         pointer-events: auto;
+        z-index: 4;
 
         .btn.btn-disabled {
             background: #999;
@@ -590,4 +591,8 @@ hr {
     border-left: 0;
     border-top: 2px solid #F0F0F0;
     border-bottom: 0;
+}
+
+.vague-round-corner {
+    border-radius: 2px;
 }

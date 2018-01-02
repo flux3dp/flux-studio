@@ -7,8 +7,8 @@ define([
 ){
 
     const _defaultConfig = {
-        speed: 100,
-        strength: 50,
+        speed: 50,
+        strength: 30,
     }
 
     const _getLayer = function(name) {

@@ -34,7 +34,8 @@
     }
     .object-panels {
         display: absolute;
-        box-shadow: 1px 1px 5px #333;
+        box-shadow: 0px 3px 5px rgba(0,0,0,0.15);
+        border-radius: 2px;
         transition: left .1s ease, top .1s ease, opacity .1s ease;
         &.unselectable {
             opacity: 0.5;
@@ -179,7 +180,8 @@
                 background-color: $backgroundColor;
                 display: block;
                 overflow: initial;
-                border: 1px #333 solid;
+                border: 1px #444 solid;
+                border-radius: 2px;
                 // box-shadow: 4px 5px 14px #444;
             
                 #layerbuttons {
@@ -243,10 +245,11 @@
             background-color: $backgroundColor;
             min-height: 180px;
             margin-top: 20px;
-            border: 1px #333 solid;
+            border: 1px #444 solid;
+            border-radius: 2px;
             .layername {
                 margin-bottom: 10px;
-                border-bottom: 1px #333 solid;                
+                border-bottom: 1px #444 solid;                
                 padding: 2px;
                 text-align: center;
             }
