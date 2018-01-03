@@ -70,7 +70,7 @@ define([
                                     <span className="text-center header">X</span>
                                     <UnitInput
                                         min={0}
-                                        max={4000}
+                                        max={Constant.dimension.width/Constant.dpmm}
                                         unit="mm"
                                         defaultValue={this.state.rx * 2}
                                         getValue={this._update_rx_handler}
@@ -80,7 +80,7 @@ define([
                                     <span className="text-center header">Y</span>
                                     <UnitInput
                                         min={0}
-                                        max={4000}
+                                        max={Constant.dimension.height/Constant.dpmm}
                                         unit="mm"
                                         defaultValue={this.state.ry * 2}
                                         getValue={this._update_ry_handler}

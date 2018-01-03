@@ -90,7 +90,7 @@ define([
                                 <span className="text-center header">{LANG.width}</span>
                                 <UnitInput
                                     min={0}
-                                    max={4000}
+                                    max={Constant.dimension.width/Constant.dpmm}
                                     unit="mm"
                                     defaultValue={this.state.width}
                                     getValue={this._update_width_handler}
@@ -100,7 +100,7 @@ define([
                                 <span className="text-center header">{LANG.height}</span>
                                 <UnitInput
                                     min={0}
-                                    max={4000}
+                                    max={Constant.dimension.height/Constant.dpmm}
                                     unit="mm"
                                     defaultValue={this.state.height}
                                     getValue={this._update_height_handler}

@@ -60,6 +60,7 @@ define([
                 this.storedPrinter = selectedPrinter;
                 this.errorCallback = errCallback;
                 this.isPreviewModeOn = true;
+                //this._drawBoundary();
                 this._initCameraStream();
             } catch (error) {
                 throw error;
@@ -69,6 +70,7 @@ define([
         }
 
         async end() {
+            //this._clearBoundary();
             const storedPrinter = this.storedPrinter;
             await this._reset();
             await DeviceMaster.select(storedPrinter);
@@ -147,7 +149,7 @@ define([
             this.cameraStream.subscribe(
                 ()=>{},
                 (err)=>{
-                    this._reset();
+                    this.end();
                     this.errorCallback('Camera Error: ' + err.error);
                 }
             );
@@ -248,6 +250,82 @@ define([
                     window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
                 });
             };
+        }
+
+        _clearBoundary() {
+            const canvasBackground = svgedit.utilities.getElem('canvasBackground');
+            const previewBoundary = svgedit.utilities.getElem('previewBoundary');
+            canvasBackground.removeChild(previewBoundary);
+        }
+        _drawBoundary() {
+            const canvasBackground = svgedit.utilities.getElem('canvasBackground');
+            const previewBoundary = this._getPreviewBoundary();
+			canvasBackground.appendChild(previewBoundary);
+        }
+        _getPreviewBoundary() {
+            const previewBoundaryId = 'previewBoundary';
+            const color = 'rgba(200,200,200,0.8)';
+
+            const boundaryGroup = svgCanvas.addSvgElementFromJson({
+                'element': 'g',
+                'attr': {
+                    'id': previewBoundaryId,
+                    'width': '100%',
+                    'height': '100%',
+                    'x': 0,
+                    'y': 0,
+                    'style': 'pointer-events:none'
+                }
+            });
+            const borderTop = svgCanvas.addSvgElementFromJson({
+                'element': 'rect',
+                'attr': {
+                    'width': '100%',
+                    'height': '2.597%',
+                    'x': 0,
+                    'y': 0,
+                    'fill': color,
+                    'style': 'pointer-events:none'
+                }
+            });
+            const borderBottom = svgCanvas.addSvgElementFromJson({
+                'element': 'rect',
+                'attr': {
+                    'width': '100%',
+                    'height': '2.597%',
+                    'x': 0,
+                    'y': '97.403%',
+                    'fill': color,
+                    'style': 'pointer-events:none'
+                }
+            });
+            const borderLeft = svgCanvas.addSvgElementFromJson({
+                'element': 'rect',
+                'attr': {
+                    'width': '2.381%',
+                    'height': '100%',
+                    'x': 0,
+                    'y': 0,
+                    'fill': color,
+                    'style': 'pointer-events:none'
+                }
+            });
+            const borderRight = svgCanvas.addSvgElementFromJson({
+                'element': 'rect',
+                'attr': {
+                    'width': '2.381%',
+                    'height': '100%',
+                    'x': '97.619%',
+                    'y': 0,
+                    'fill': color,
+                    'style': 'pointer-events:none'
+                }
+            });
+            boundaryGroup.appendChild(borderTop);
+            boundaryGroup.appendChild(borderBottom);
+            boundaryGroup.appendChild(borderLeft);
+            boundaryGroup.appendChild(borderRight);
+            return boundaryGroup;
         }
     }
 
