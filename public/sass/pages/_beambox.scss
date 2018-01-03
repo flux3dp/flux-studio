@@ -164,13 +164,13 @@
         #sidepanels {
             border: none;
             position: absolute;
-            width: 151px;
+            width: 153px;
             padding-left: 10px;
             padding-right: 10px;
             opacity: 0.8;
             z-index: 2;
             top: calc(50% - 220px);
-            right: 0;
+            right: 9px;
             transition: opacity 0.3s;
             &:hover {
                 opacity: 1;
