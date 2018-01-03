@@ -86,7 +86,7 @@ define([
             })[0];
 
             this.setState({ device }, ()=>{
-                if(device.model === 'fbb1b' || device.model === 'fbb1p') {
+                if((['fbb1b', 'fbb1p', 'laser-b1'].includes(device.model))) {
                     
                 } else {
                     this._getDeviceConfig();
