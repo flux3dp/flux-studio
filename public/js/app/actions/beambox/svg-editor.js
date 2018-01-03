@@ -3732,6 +3732,8 @@ define([
 					populateLayers();
 				}
 			};
+			window.svgeditorClickUndo = clickUndo;
+			//hack QQ. to let svgeditor-function-wrapper get this function
 
 			var clickRedo = function() {
 				if (undoMgr.getRedoStackSize() > 0) {
@@ -4603,13 +4605,13 @@ define([
 						Shortcuts.on(['fnkey', 'c'], copySelected);
 						Shortcuts.on(['fnkey', 'v'], pasteInCenter);
 						Shortcuts.on(['fnkey', 'shift', 'v'], ()=>{svgCanvas.pasteElements('in_place')});
-						Shortcuts.on(['fnkey', 'z'], clickUndo);
+						//Shortcuts.on(['fnkey', 'z'], clickUndo);
 						if(process.platform === 'darwin') {
 							Shortcuts.on(['cmd', 'shift', 'z'], clickRedo);
 						} else {
 							Shortcuts.on(['ctrl', 'y'], clickRedo);
 						}
-						Shortcuts.on(['fnkey', 'd'], clickClone);
+						//Shortcuts.on(['fnkey', 'd'], clickClone);
 						Shortcuts.on(['fnkey', 'a'], (e)=>{
 							e.preventDefault();
 							e.stopPropagation();
@@ -4993,7 +4995,8 @@ define([
 				});
 				$('#tool_open').show().prepend(open);
 
-				var imgImport = $('<input type="file">').change(importImage);
+				// enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
+				var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
 				$('#tool_import').show().prepend(imgImport);
 			}
 

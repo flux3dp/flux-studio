@@ -2,12 +2,14 @@ define([
     'react',
     'jsx!views/beambox/Object-Panels/Object-Panels',
     'app/actions/beambox/svgeditor-function-wrapper',
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
+    'app/actions/beambox/beambox-global-interaction',
 ], function(
     React,
     ObjectPanels,
     FnWrapper,
-    Constant
+    Constant,
+    BeamboxGlobalInteraction
 ){
     let _pixel2mm = function(pixel_input) {
         const dpmm = Constant.dpmm;
@@ -65,6 +67,11 @@ define([
 
         setVisibility(isVisible) {
             this.isVisible = isVisible;
+            if(isVisible) {
+                BeamboxGlobalInteraction.onObjectFocus();
+            } else {
+                BeamboxGlobalInteraction.onObjectBlur();
+            }
         }
 
         setEditable(isEditable) {

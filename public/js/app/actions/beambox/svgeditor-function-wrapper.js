@@ -20,6 +20,13 @@ define([
     };
 
     const funcs =  {
+        cloneSelectedElement: function() {
+            window.svgCanvas.cloneSelectedElements(20, 20);
+        },
+        undo: function() {
+            window.svgeditorClickUndo();
+        },
+
         //main panel
         importImage: function() {
             $('#tool_import input').click();

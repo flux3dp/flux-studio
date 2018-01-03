@@ -13,7 +13,7 @@ define([
     'app/actions/alert-actions',
     'jsx!views/beambox/Object-Panels-Controller',
     'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
-    'app/actions/global-interaction', //need to include to run this
+    'app/actions/beambox/beambox-global-interaction',
 ], function (
     React,
     beamboxEvents,
@@ -28,7 +28,8 @@ define([
     PrinterSelector,
     AlertActions,
     ObjectPanelsController,
-    LaserPanelController
+    LaserPanelController,
+    BeamboxGlobalInteraction
 ) {
         'use strict';
 
@@ -47,7 +48,7 @@ define([
 
         ObjectPanelsController.init("object-panels-placeholder");
         LaserPanelController.init("layer-laser-panel-placeholder");
-
+        
 
         if (!Config.read('beambox-preference')['mouse-input-device']) {
             function chooseIsTouchpad() {
@@ -81,6 +82,12 @@ define([
                     this.state = {
                         openPrinterSelectorWindow: false
                     };
+                }
+                componentDidMount() {
+                    BeamboxGlobalInteraction.attach();
+                }
+                componentWillUnmount() {
+                    BeamboxGlobalInteraction.detach();
                 }
 
                 _fetchFormalSettings(holder) {

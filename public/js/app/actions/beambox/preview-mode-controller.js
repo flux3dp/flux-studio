@@ -9,7 +9,6 @@ define([
     'helpers/api/fcode-reader',
     'app/actions/alert-actions',
     'app/actions/global-actions',
-    'app/actions/beambox/svgeditor-function-wrapper',
     'helpers/sprintf',    
     'helpers/check-device-status',
     'app/actions/beambox/constant'
@@ -24,7 +23,6 @@ define([
     fcodeReader,
     AlertActions,
     GlobalActions,
-    svgeditorFunction,
     sprintf,
     checkDeviceStatus,
     Constant
