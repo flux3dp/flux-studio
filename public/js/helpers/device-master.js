@@ -71,13 +71,15 @@ define([
     // Better select device
     function select(device, opts) {
         let d = $.Deferred();
-        selectDevice(device).then((result) => {
-            if (result == DeviceConstants.CONNECTED) {
-                d.resolve();
-            } else {
-                d.reject();
-            }
-        });
+            selectDevice(device).then((result) => {
+                if (result == DeviceConstants.CONNECTED) {
+                    d.resolve();
+                } else {
+                    d.reject(lang.message.connectionTimeout);
+                }
+            },
+            (errmsg)=>{console.log('Device Master Select Error. Should handle errMsg here', errmsg)}
+        );
 
         return d.promise();
     }
@@ -232,6 +234,7 @@ define([
             SocketMaster.onTimeout(handleSMTimeout);
 
         //*******************************************************************
+        // just for backup, can be delete if everything is fine
             // if usb not detected but device us using usb
             if(
                 typeof self !== 'undefined' &&
@@ -292,6 +295,10 @@ define([
             SocketMaster.setWebSocket(_device.actions);
         };
 
+<<<<<<< HEAD
+=======
+        //***************************************************
+>>>>>>> feature/beambox
         if (
             _selectedDevice &&
             _selectedDevice.serial === device.serial &&
@@ -301,10 +308,10 @@ define([
             ProgressActions.close();
             d.resolve(DeviceConstants.CONNECTED);
             //d.resolve(DeviceConstants.TIMEOUT);
-            
             console.log('has have connected')
             return d.promise();
         }
+        //***************************************************
 
         // match the device from the newest received device list
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
@@ -487,8 +494,6 @@ define([
         let d = $.Deferred(),
             statusChanged = false;
 
-        ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
-
         let t = setInterval(() => {
             SocketMaster.addTask('report')
             .then(r => {
@@ -497,9 +502,12 @@ define([
                 if (st_id === 64) {
                     clearInterval(t);
                     setTimeout(() => {
-                        quit();
-                        d.resolve();
-                    }, 300);
+                        quit().then(() => {
+                            d.resolve();
+                        }).fail(() => {
+                            d.reject("Quit failed");
+                        });
+                    }, 2000);
                 } else if (( st_id === 128 || st_id === 48 || st_id === 36 ) && error && error.length > 0) { // Error occured
                     clearInterval(t);
                     d.reject(error);
@@ -528,13 +536,41 @@ define([
             go(blob).fail(() => {
                 // Error while uploading task
                 d.reject(["UPLOAD_FAILED"]);
-            }).then(waitTillCompleted).fail((error) => {
-                // Error while running test
-                d.reject(error);
-            }).then(() => {
-                // Completed
-                d.resolve();
-            });
+            })
+            .then(()=>{
+                ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);                
+                waitTillCompleted().fail((error) => {
+                    // Error while running test
+                    d.reject(error);
+                }).then(() => {
+                    // Completed
+                    d.resolve();
+                });
+            })
+        });
+
+        return d.promise();
+    }
+
+    function runBeamboxCameraTest() {
+        let d = $.Deferred();
+
+        fetch(DeviceConstants.BEAMBOX_CAMERA_TEST).then(res => res.blob()).then(blob => {
+            go(blob)
+            .fail(() => {
+                d.reject("UPLOAD_FAILED"); // Error while uploading task
+            })
+            .then(()=>{
+                ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);                
+                waitTillCompleted()
+                .fail((err) => {
+                    d.reject(err); // Error while running test
+                })
+                .then(()=>{
+                    d.resolve();
+                });
+                
+            })
         });
 
         return d.promise();
@@ -779,6 +815,17 @@ define([
         return d.promise();
     }
 
+    function maintainMove(args) {
+        let d = $.Deferred();
+        SocketMaster.addTask('maintainMove', args)
+            .then((result) => {
+                if (result.status === 'ok') {
+                    return d.resolve();
+                }
+            });
+        return d.promise();
+    }
+
     function enterMaintainMode() {
         return SocketMaster.addTask('enterMaintainMode');
     }
@@ -955,7 +1002,10 @@ define([
 
         opts = {
             availableUsbChannel: _device.source === 'h2h' ? parseInt(_device.uuid) : -1,
-            onError: function(message) { console.log('error from camera ws', message); }
+            onError: function(message) {
+                console.log('error from camera ws', message);
+                cameraStream.onError(message);
+            }
         };
 
         const initCamera = () => {
@@ -1304,6 +1354,10 @@ define([
         return _availableDevices;
     }
 
+    function getDeviceSetting(name) {
+        return SocketMaster.addTask('getDeviceSetting', name);
+    }
+
     function getDeviceSettings(withBacklash, withUpgradeKit, withM666R_MMTest) {
         let d = $.Deferred(),
             settings = {},
@@ -1339,7 +1393,7 @@ define([
                     let { key, value } = r;
                     settings[key] = value;
                     go(w.next());
-                });
+                }).fail((err)=>{console.log(err)});
             }
             else {
                 d.resolve(settings);
@@ -1592,6 +1646,7 @@ define([
             this.endMaintainMode                = endMaintainMode;
             this.getDeviceList                  = getDeviceList;
             this.getDeviceSettings              = getDeviceSettings;
+            this.getDeviceSetting               = getDeviceSetting;
             this.setDeviceSetting               = setDeviceSetting;
             this.getCloudValidationCode         = getCloudValidationCode;
             this.enableCloud                    = enableCloud;
@@ -1611,11 +1666,13 @@ define([
             this.endLoadingDuringPause          = endLoadingDuringPause;
             this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
             this.runMovementTests               = runMovementTests;
+            this.runBeamboxCameraTest          = runBeamboxCameraTest;
             this.getDeviceBySerial              = getDeviceBySerial;
             this.getAvailableDevices            = getAvailableDevices;
             this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
             this.stopChangingFilament           = stopChangingFilament;
             this.existDevice                    = existDevice;
+            this.maintainMove                   = maintainMove;
 
             Discover(
                 'device-master',

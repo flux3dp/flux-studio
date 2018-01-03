@@ -3,7 +3,7 @@
  */
 html,
 body {
-    background-color: #E0E0E0;
+    background-color: $backgroundColor;
     font-family: "Helvetica Neue", "HelveticaNeue-Light", "Helvetica Neue Light", 'Open Sans', Helvetica, Arial, "Lucida Grande", sans-serif, "Microsoft JhengHei", "微軟正黑體";
     font-size: 12px;
     height: 100%;
@@ -15,7 +15,6 @@ body {
 }
 
 body {
-    background-color: #E0E0E0;
     cursor: default;
     font-size: 16px;
     position: relative;
@@ -70,7 +69,6 @@ img {
 
 .content {
     @include flexbox();
-    background-color: #E0E0E0;
     height: 100%;
     overflow: hidden;
     width: 100%;
@@ -222,7 +220,7 @@ img {
 // controls
 select {
     background-color: transparent;
-    background-image: url('img/icon-3d-arrow-down.png');
+    background-image: url('../img/icon-3d-arrow-down.png');
     background-position: calc(100% - 4px) center;
     background-repeat: no-repeat;
     background-size: 8px 8px;
@@ -462,6 +460,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
         right: 20px;
         width: 87px;
         pointer-events: auto;
+        z-index: 4;
 
         .btn.btn-disabled {
             background: #999;
@@ -526,8 +525,8 @@ input[type=range]:focus::-webkit-slider-runnable-track {
     background: #fff;
     min-height: 10px;
     min-width: 14px;
-    height: 20px;
-    width: 28px;
+    height: 28px;
+    width: 20px;
 }
 
 .arrow,
@@ -592,4 +591,8 @@ hr {
     border-left: 0;
     border-top: 2px solid #F0F0F0;
     border-bottom: 0;
+}
+
+.vague-round-corner {
+    border-radius: 2px;
 }

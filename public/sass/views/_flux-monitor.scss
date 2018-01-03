@@ -8,6 +8,7 @@
     }
     .main {
         background-color: white;
+        border-radius: 2px;
         height: 40rem;
         width: $panelWidth;
         position: relative;
@@ -291,6 +292,7 @@
     }
     .sub {
         background-color: white;
+        border-radius: 2px;
         height: 6rem;
         width: $panelWidth;
         position: relative;

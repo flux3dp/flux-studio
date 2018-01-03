@@ -3,13 +3,15 @@ requirejs.config({
     urlArgs: 'v=' + (Boolean(localStorage.dev) ? '' : window.FLUX.timestamp),
     baseUrl: 'js/',
     paths: {
-        jquery: 'lib/jquery-1.11.0.min',
+        //jquery: 'lib/jquery-1.11.0.min',
+        jquery: 'lib/svgeditor/jquery',
         backbone: 'lib/backbone',
         underscore: 'lib/underscore',
-        react: 'lib/react/react-with-addons.min',
+        react: (Boolean(localStorage.dev) ? 'lib/react/react-with-addons' : 'lib/react/react-with-addons.min'),
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',
+        svgeditor: 'lib/svgeditor',
         threeTransformControls: 'lib/three/controls/TransformControls',
         threeOrbitControls: 'lib/three/controls/OrbitControls',
         threeTrackballControls: 'lib/three/controls/TrackballControls',
@@ -99,10 +101,7 @@ requirejs([
 ], function($, Backbone, Router, globalEvents, Raven) {
     'use strict';
 
-    if (true === window.FLUX.isNW) {
-        window.$ = window.jQuery = $;
-        console.log(`Flux-Studio: ${window.FLUX.version}`);
-    }
+    console.log(`Flux-Studio: ${window.FLUX.version}`);
 
     if(window.FLUX.allowTracking) {
         // google analytics

@@ -1,0 +1,355 @@
+.beambox-studio {
+    svg:not(:root) {
+        overflow: visible;
+    }
+    user-select: none;
+    padding: 5px;
+    .left-panel {
+        margin: 0 0 0 30px;
+        z-index: 1;
+        position: relative;
+        top: calc(50% - 120px);
+        pointer-events: none;
+        .ui-dialog-menu-item {
+            .dialog-label {
+                transition: all .1s ease;
+                min-width: auto;
+                div {
+                    pointer-events: visible;
+                }
+                &.preview-mode-on {
+                    background: #444;
+                    color: #E0E0DF;
+                }
+            }
+            .dialog-window {
+                pointer-events: visible;
+                .slider {
+                    width: 110px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                }
+            }
+        }
+    }
+    .object-panels {
+        display: absolute;
+        box-shadow: 0px 3px 5px rgba(0,0,0,0.15);
+        border-radius: 2px;
+        transition: left .1s ease, top .1s ease, opacity .1s ease;
+        &.unselectable {
+            opacity: 0.5;
+            user-select: none;
+            pointer-events: none;
+        }
+        .object-panel {
+            @include flexbox();
+            font-size: 20px;
+            transition: all .1s ease;
+            z-index: 1;
+            will-change: top, left, transform;
+            .accordion-body {
+                overflow: visible;
+                position: relative;
+                .ui.ui-control-unit-input-v2 {
+                    .unit {
+                        font-size: 10px;
+                        margin-left: -30px;
+                    }
+                    input[disabled] {
+                        background-color: #f2f2f2;
+                        cursor: not-allowed;
+                    }
+                }
+                &.with-lock {
+                    display: flex;
+                    >div {
+                        display: inline-block;
+                    }
+                    .lock {
+                        padding-bottom: 7px;
+                        color: #999;
+                        margin-left: 10px;
+                        label {
+                            font-size: 27px;
+                            cursor: pointer;
+                            &:hover {
+                                color: black;
+                            }
+                            i {
+                                margin-left: 5px;
+                                transform: scale(-1, 1);
+                                &.locked {
+                                    color: #444;
+                                }
+                                &.unlocked {
+                                    color: #dddddd;
+                                }
+                            }
+                        }
+                    }
+                    .ui.ui-control-unit-input-v2 {
+                        input {
+                            width: 100px;
+                        }
+                    }
+                }
+                .shading-checkbox {
+                    color: #666;
+                    margin-left: 17px;
+                    font-size: 22px;
+                    cursor: pointer;
+                }
+            }
+            .caption {
+                margin: 0;
+            }
+            .accordion .caption .value {
+                color: #999;
+            }
+            .controls {
+                background: #FFFFFF;
+                display: block;
+                margin: 0;
+                padding: 0 20px;
+                width: 240px;
+                border: 1px #ddd solid;
+                .control {
+                    .text-center.header {
+                        color: #999;
+                    }
+                    font-size: 20px;
+                    margin: 0 0 10px 0;
+                    .input-fullsize {
+                        margin: 0;
+                        width: 100%;
+                    }
+                    .input-halfsize {
+                        display: inline-block;
+                        width: 45%;
+                        input {
+                            width: 80%;
+                        }
+                    }
+                    >div {
+                        margin-right: unset;
+                    }
+                    input[type=range] {
+                        border: unset;
+                        cursor: pointer;
+                    }
+                }
+            }
+            .caption {
+                @include flexbox();
+                color: $primaryColor;
+                font-size: 12px;
+                line-height: 30px;
+                justify-content: space-between;
+            }
+        }
+    }
+    #svg_editor {
+        color: #000;
+        #workarea {
+            border: none;
+            top: 0px;
+            left: 0px;
+            right: 0px;
+            bottom: 0px;
+            #svgcanvas {
+                background: $backgroundColor;
+            }
+        }
+        #sidepanels {
+            border: none;
+            position: absolute;
+            width: 153px;
+            padding-left: 10px;
+            padding-right: 10px;
+            opacity: 0.8;
+            z-index: 2;
+            top: calc(50% - 220px);
+            right: 9px;
+            transition: opacity 0.3s;
+            &:hover {
+                opacity: 1;
+                z-index: 4;
+            }
+            #layerpanel {
+                background-color: $backgroundColor;
+                display: block;
+                overflow: initial;
+                border: 1px #444 solid;
+                border-radius: 2px;
+                // box-shadow: 4px 5px 14px #444;
+            
+                #layerbuttons {
+                    padding: 0;
+                    width: 100%;
+                    border: none;
+                    .layer_button {
+                        padding: 3px 0;
+                        &:hover {
+                            background-color: #808080;
+                            color: white;
+                            cursor: pointer;
+                        }
+                    }
+                }
+                #layerlist {
+                    width: 100%;
+                    .layervis {
+                        text-align: center;
+                    }
+                    tr.layer {
+                        .layername {
+                            padding: 3px 0px;
+                        }
+                        &.layersel, &.layersel:hover {
+                            color: white;
+                            background-color: #444;
+                            font-weight: normal;
+                        }
+                        &:hover {
+                            color: black;
+                            background-color: #ddd;
+                            
+                        }
+                        &:not(.layersel):first-child {
+                            &:hover {
+                                border-top: 1px #999 solid;
+                            }
+                            border-top: 1px white solid;
+                        }
+                    }
+                }
+                
+            }
+            #sidepanel_handle {
+                @include force-hide();
+            }
+        }
+        .selLayerBlock {
+            margin-top: 18px;
+            margin-bottom: 15px;
+            #selLayerNames {
+                width: 100%;
+                background-color: #444;
+                color: #ddd;
+                padding: 3px 3px 3px 13px;
+                cursor: pointer;
+            }
+        }
+        #layer-laser-panel-placeholder {
+            background-color: $backgroundColor;
+            min-height: 180px;
+            margin-top: 20px;
+            border: 1px #444 solid;
+            border-radius: 2px;
+            .layername {
+                margin-bottom: 10px;
+                border-bottom: 1px #444 solid;                
+                padding: 2px;
+                text-align: center;
+            }
+            .panel {
+                padding-left: 10px;
+            }
+            .ui.ui-control-unit-input-v2 {
+                margin-bottom: 7px;
+                .unit {
+                    margin-left: -40px;
+                    font-size: 10px;
+                }
+                input {
+                    outline: none;
+                    border: 1px #333 solid;
+                    width: 90%;
+                    padding: 3px 0px 3px 12px;
+                }
+            }
+        }
+        #ruler_unit_shower {
+            top: 89px;
+            right: 153px;
+            padding-left: 10px;
+            padding-right: 8px;
+            color: #333;
+            font-size: 12px;
+            font-weight: 300;
+        }
+        #main_button,
+        #tools_top,
+        #tools_left,
+        #tools_bottom {
+            @include force-hide();
+        }
+    }
+    #dialog_box {
+        .overlay {
+            opacity: 0.1;
+        }
+        #dialog_container {
+            color: #626262;
+            border-radius: 0;
+            border:none;
+            background-color: #f8f8f8;
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 18px;
+            height: initial;
+            width: 400px;
+            margin-left: -200px;
+            #dialog_content {
+                font-size: 18px;
+                margin: 0;
+                margin-bottom: 10px;
+                background-color: unset;
+                border: none;
+                height: initial;
+            }
+            #dialog_buttons {
+                input[type=text] {
+                    font-size: 16px;
+                    padding-left: 10px;
+                }
+                input[type=button] {
+                    font-size: 1.3rem;
+                    padding: 6px 12px;                
+                    margin-top: 10px;
+                    background-color: unset;
+                    color: #C0C0C0;
+                    border: 2px solid #C0C0C0;
+                    &:hover {
+                        border: 2px solid #424242;
+                        color: #424242;
+                    }
+                    &:focus {
+                        outline: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    #svg_source_editor,
+    #docprops,
+    #svg_prefs,
+    #cmenu_canvas {
+        @include force-hide();
+    }
+
+    #tools_top {
+        z-index: 91;
+    }
+    
+    #grid_mask {
+        z-index: 5;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: #E0E0E0;
+        width: 100%;
+        height: 90px;
+    }
+}

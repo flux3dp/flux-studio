@@ -16,6 +16,7 @@ define([
         CLOSE_POPUP             = 'closePopup',
         UPDATE_EVENT            = 'update',
         CHANGE_FILAMENT_EVENT   = 'change_filament',
+        CAMERA_CALIBRATION_EVENT= 'camera_calibration',
         EDIT_HEAD_TEMPERATURE   = 'edit_head_temperature',
         NOTIFY_RETRY            = 'retry',
         NOTIFY_ABORT            = 'abort',
@@ -23,6 +24,7 @@ define([
         NOTIFY_NO               = 'no',
         NOTIFY_CANCEL           = 'cancel', // including the "no", "cancel", "ok" button fired
         NOTIFY_CUSTOM           = 'custom',
+        NOTIFY_CUSTOM_GROUP     = 'customGroup',
         NOTIFY_ANSWER           = 'answer',
         AlertStore;
 
@@ -34,6 +36,10 @@ define([
 
         onShowHeadTemperature(callback) {
             this.on(EDIT_HEAD_TEMPERATURE, callback);
+        },
+
+        onCameraCalibration(callback) {
+            this.on(CAMERA_CALIBRATION_EVENT, callback);
         },
 
         onUpdate(callback) {
@@ -70,6 +76,10 @@ define([
 
         onCustom(callback, oneTime) {
             oneTime === true ? this.once(NOTIFY_CUSTOM, callback) : this.on(NOTIFY_CUSTOM, callback);
+        },
+
+        onCustomGroup(callback, oneTime) {
+            oneTime === true ? this.once(NOTIFY_CUSTOM_GROUP, callback) : this.on(NOTIFY_CUSTOM_GROUP, callback);
         },
 
         onAnswer(callback) {
@@ -172,6 +182,10 @@ define([
                     AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM, payload.id, payload.caption, payload.message, payload.customText, payload.args);
                 },
 
+                'SHOW_POPUP_CUSTOM_GROUP': function() {
+                    AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_GROUP, payload.id, payload.caption, payload.message, payload.customText, payload.args, payload.callback);
+                },
+
                 'SHOW_POPUP_CUSTOM_CANCEL': function() {
                     AlertStore.emit(POPUP_EVENT, AlertConstants.CUSTOM_CANCEL, payload.id, payload.caption, payload.message, payload.customText);
                 },
@@ -208,6 +222,10 @@ define([
                     AlertStore.emit(NOTIFY_CUSTOM, payload.id);
                 },
 
+                'NOTIFY_CUSTOM_GROUP': function() {
+                    AlertStore.emit(NOTIFY_CUSTOM_GROUP, payload.id);
+                },
+
                 'NOTIFY_ANSWER': function() {
                     AlertStore.emit(NOTIFY_ANSWER, payload.id, payload.isYes);
                 },
@@ -226,6 +244,10 @@ define([
 
                 'SHOW_POPUP_CHANGE_FILAMENT': function() {
                     AlertStore.emit(CHANGE_FILAMENT_EVENT, payload);
+                },
+
+                'SHOW_POPUP_CAMERA_CALIBRATION': function() {
+                    AlertStore.emit(CAMERA_CALIBRATION_EVENT, payload);
                 }
 
             };

@@ -81,7 +81,7 @@
 
 .invert {
     &:before {
-        background: #E0E0E0 !important;
+        background: #E2E1E0 !important;
     }
     &:after {
         background: #FFFFFF !important;
@@ -89,7 +89,7 @@
 }
 
 .spinner-roller-reverse {
-    background: linear-gradient(to right, #E0E0E0 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, #E2E1E0 10%, rgba(255, 255, 255, 0) 42%);
 
     &::before {
         left: -1px;

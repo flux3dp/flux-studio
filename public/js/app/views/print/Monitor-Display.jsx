@@ -97,7 +97,7 @@ define([
 
         _showPreview: function() {
             let divStyle = {
-                backgroundColor: '#E0E0E0',
+                backgroundColor: '#E2E1E0',
                 backgroundImage: this._getPreviewUrl(),
                 backgroundSize: 'cover',
                 backgroundPosition: '50% 50%',

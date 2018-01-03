@@ -9,6 +9,7 @@ define(function(){
         RETRY_CANCEL                : 'RETRY_CANCEL',
         RETRY_ABORT_CANCEL          : 'RETRY_ABORT_CANCEL',
         CUSTOM                      : 'CUSTOM',
+        CUSTOM_GROUP                : 'CUSTOM_GROUP',
         CUSTOM_CANCEL               : 'CUSTOM_CANCEL',
         SHOW_INFO                   : 'SHOW_INFO',
         SHOW_WARNING                : 'SHOW_WARNING',
@@ -20,6 +21,7 @@ define(function(){
         SHOW_POPUP_RETRY_ABORT      : 'SHOW_POPUP_RETRY_ABORT',
         SHOW_POPUP_YES_NO           : 'SHOW_POPUP_YES_NO',
         SHOW_POPUP_CUSTOM           : 'SHOW_POPUP_CUSTOM',
+        SHOW_POPUP_CUSTOM_GROUP     : 'SHOW_POPUP_CUSTOM_GROUP',
         SHOW_POPUP_CUSTOM_CANCEL    : 'SHOW_POPUP_CUSTOM_CANCEL',
         SHOW_POPUP_QUESTION         : 'SHOW_POPUP_QUESTION',
         SHOW_POPUP_UPDATE           : 'SHOW_POPUP_UPDATE',
@@ -33,6 +35,7 @@ define(function(){
         QUESTION                    : 'QUESTION',
         CLOSE_NOTIFICATION          : 'CLOSE_NOTIFICATION',
         CLOSE_POPUP                 : 'CLOSE_POPUP',
-        SHOW_POPUP_CHANGE_FILAMENT  : 'SHOW_POPUP_CHANGE_FILAMENT'
+        SHOW_POPUP_CHANGE_FILAMENT  : 'SHOW_POPUP_CHANGE_FILAMENT',
+        SHOW_POPUP_CAMERA_CALIBRATION  : 'SHOW_POPUP_CAMERA_CALIBRATION'
     };
 });

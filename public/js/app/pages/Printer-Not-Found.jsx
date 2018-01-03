@@ -30,8 +30,12 @@ define([
 
             // Lifecycle
             getInitialState: function() {
+                // get machine type from url
+                const re = /\?machine_type=([\w\d]+)/;
+                const machine_type = re.exec(location.hash)?re.exec(location.hash)[1]:false;
                 return {
-                    lang: args.state.lang
+                    lang: args.state.lang,
+                    machine_type: machine_type
                 };
             },
 
@@ -71,17 +75,28 @@ define([
             },
 
             render : function() {
-                var lang = this.state.lang,
-                    localLang = lang.initialize.notice_from_device,
-                    wrapperClassName = {
+                const lang = this.state.lang;
+                const localLang = lang.initialize.notice_from_device;
+                const wrapperClassName = {
                         'initialization': true
-                    },
-                    imgSrc = (
-                        'en' === i18n.getActiveLang() ?
-                        'img/wifi-error-notify-en.png' :
-                        'img/wifi-error-notify-zh.png'
-                    ),
-                    content = (
+                    };
+                const imgSrcs = {
+                        en: {
+                            delta: 'img/wifi-error-notify-delta-en.png',
+                            beambox: 'img/wifi-error-notify-beambox-en.png'
+                        },
+                        zh: {
+                            delta: 'img/wifi-error-notify-delta-zh.png',
+                            beambox: 'img/wifi-error-notify-beambox-zh.png'
+                        }
+                    };
+                const machineType = (this.state.machine_type === 'beambox')?'beambox':'delta';
+                console.log('this.state.machine_type: ', this.state.machine_type);
+                    
+                const imgLang = 'en' === i18n.getActiveLang() ? 'en' : 'zh';
+                console.log('imgLang: ', imgLang);
+                const imgSrc = imgSrcs[imgLang][machineType];
+                const content = (
                         <div className="device-not-found text-center">
                             <img className="brand-image" src="img/menu/main_logo.svg"/>
                             <div>

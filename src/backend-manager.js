@@ -107,7 +107,7 @@ class BackendManager extends EventEmitter {
                         if (devInfo.status === 'pong') {
                             return
                         }
-                        
+
                     } catch(err) {
                         console.error('Can not parse backend stout: %s', err);
                     }

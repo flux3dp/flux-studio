@@ -177,6 +177,7 @@ define(function() {
             connect_flux: 'Connect the Machine',
             via_usb: 'Using USB Cable',
             via_wifi: 'Using Wi-Fi',
+            select_machine_type: 'Please select the machine',
             name_your_flux: 'Name Your Machine',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',
@@ -237,7 +238,8 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.'
+                    content_delta: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.',
+                    content_beambox: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n2. Try replug it and wait for 10 sec.',
                 },
 
                 wifi_connection: {
@@ -293,6 +295,7 @@ define(function() {
             setting: 'SETTING',
             draw: 'DRAW',
             cut: 'CUT',
+            beambox: 'BEAMBOX',
             mill: 'MILL'
         },
         settings: {
@@ -313,12 +316,16 @@ define(function() {
             default_machine_button: 'Empty',
             remove_default_machine_button: 'Remove',
             confirm_remove_default: 'Default machine is going to be removed.',
-            reset: 'Reset FS',
-            reset_now: 'Reset FS',
-            confirm_reset: 'Confirm reset FS?',
+            reset: 'Reset FLUX Studio',
+            reset_now: 'Reset FLUX Studio',
+            confirm_reset: 'Confirm reset FLUX Studio?',
             language: 'Language',
             notifications: 'Notifications',
+            default_app: 'Default app',
+            delta_series: 'Delta Series',
+            beambox_series: 'Beambox Series',
             default_model: 'Default Model<br />(For Print Settings)',
+            default_beambox_model: 'Default Model',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: 'None',
@@ -963,6 +970,58 @@ define(function() {
                 }
             }
         },
+        beambox: {
+            popup: {
+                select_favor_input_device: 'Better user experience has been optimized<br/>Please select your favorite input device.',
+                touchpad: 'TouchPad',
+                mouse: 'Mouse'
+            },
+            left_panel: {
+                insert_object: 'Insert Object',
+                preview: 'Preview',
+                rectangle: 'Rectangle',
+                ellipse: 'Ellipse',
+                line: 'Line',
+                image: 'Image',
+                text: 'Text',
+                insert_object_submenu: {
+                    rectangle: 'Rectangle',
+                    ellipse: 'Ellipse',
+                    line: 'Line',
+                    image: 'Image',
+                    text: 'Text'
+                }
+            },
+            right_panel: {
+                layer_panel: {
+                    layer1: 'Default Layer'
+                },
+                laser_panel: {
+                    strength: 'Power',
+                    speed: 'Speed',
+                    cut: 'Cut',
+                    engrave: 'Engrave'
+                },
+            },
+            object_panels: {
+                position: 'Position',
+                rotation: 'Rotation',
+                size: 'Size',
+                width: 'Width',
+                height: 'Height',
+                center: 'Center',
+                ellipse_radius: 'Size',
+                points: 'Points',
+                laser_config: 'Laser Config',
+                shading: 'Shading',
+                threshold: 'Threshold',
+                lock_desc: 'Preserve the ratio of width and height (SHIFT)'
+            },
+            units: {
+                walt: 'W',
+                mm: 'mm'
+            }
+        },
         select_printer: {
             choose_printer: 'Choose a machine',
             notification: '"%s" requires a password',
@@ -1063,7 +1122,8 @@ define(function() {
             movement_test: 'Movement Test Before Print',
             machine_radius: 'Delta Radius',
             disable: 'Disable',
-            enable: 'Enable'
+            enable: 'Enable',
+            beambox_should_use_touch_panel_to_adjust: 'Beambox settings should be adjusted from Beambox touch panel.'            
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1295,6 +1355,21 @@ define(function() {
             set: 'set',
             incorrect_toolhead: 'Incorrect toolhead, please use printing toolhead',
             attach_toolhead: 'Please connect the printing toolhead'
+        },
+        camera_calibration: {
+            camera_calibration: 'Camera Calibration',            
+            next: 'NEXT',
+            cancel: 'CANCEL',
+            back: 'BACK',
+            finish: 'DONE',
+            please_place_paper: 'Please place an A4 white paper at left-top corner of workarea',
+            please_refocus: 'Please focus the platform properly',
+            taking_picture: 'Taking Picture...',
+            start_engrave: 'START ENGRAVE',
+            analyze_result_fail: 'Fail to analyze captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            drawing_calibration_image: 'Drawing calibration image...',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            calibrate_done: 'Calibration done. Better camera accurency is given when focus precisely.'
         },
         input_machine_password: {
             require_password: '"%s" requires a password',

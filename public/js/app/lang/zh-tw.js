@@ -177,6 +177,7 @@ define(function() {
             connect_flux: '連接機器',
             via_usb: '使用 USB',
             via_wifi: '使用 WiFi',
+            select_machine_type: '請選擇您的機種',            
             name_your_flux: '為你的機器取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -232,12 +233,13 @@ define(function() {
             errors: {
                 error: '錯誤',
                 close: '關閉',
-                not_found: '無法找到 FLUX Delta',
+                not_found: '無法找到機器',
                 not_support: '請透過隨身碟更新 Delta 韌體到 v1.6 以上',
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content: '別擔心！請確認 1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮 2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a> 3. 重新插拔線並稍等 10 秒鐘'
+                    content_delta: '別擔心！請確認\n1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮\n2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n3. 重新插拔線並稍等 10 秒鐘',
+                    content_beambox: '別擔心！請確認\n1. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n2. 重新插拔線並稍等 10 秒鐘'
                 },
 
                 wifi_connection: {
@@ -293,6 +295,8 @@ define(function() {
             setting: '設定',
             draw: '繪圖',
             cut: '切割',
+            beambox: 'BEAMBOX',
+            mill: 'MILL'
         },
         settings: {
             on: '開',
@@ -317,7 +321,11 @@ define(function() {
             confirm_reset: '確認要重置 FLUX Studio?',
             language: '語言',
             notifications: '通知',
+            default_app: '預設功能',
+            delta_series: 'Delta 系列',
+            beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',
+            default_beambox_model: '預設型號',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: '無',
@@ -959,6 +967,58 @@ define(function() {
                 }
             }
         },
+        beambox: {
+            popup: {
+                select_favor_input_device: '為了提供更好的使用者體驗<br/>請選擇你喜愛的輸入裝置',
+                touchpad: '觸控板',
+                mouse: '滑鼠'
+            },
+            left_panel: {
+                insert_object: '插入物件',
+                preview: '預覽路徑',
+                rectangle: '長方形',
+                ellipse: '橢圓形',
+                line: '線段',
+                image: '圖片',
+                text: '文字',
+                insert_object_submenu: {
+                    rectangle: '矩形',
+                    ellipse: '橢圓形',
+                    line: '線段',
+                    image: '圖片',
+                    text: '文字'
+                }
+            },
+            right_panel: {
+                layer_panel: {
+                    layer1: '預設圖層'
+                },
+                laser_panel: {
+                    strength: '功率',
+                    speed: '速度',
+                    cut: '切割',
+                    engrave: '雕刻'
+                },
+            },
+            object_panels: {
+                position: '位置',
+                rotation: '旋轉',
+                size: '大小',
+                width: '寬',
+                height: '長',
+                center: '圓心',
+                ellipse_radius: '大小',
+                points: '端點',
+                laser_config: '雷射設定',
+                shading: '漸層',
+                threshold: '曝光閾值',
+                lock_desc: '縮放時固定比例 (SHIFT)'
+            },
+            units: {
+                walt: 'W',
+                mm: 'mm'
+            }
+        },
         select_printer: {
             choose_printer: '請選擇要設定的機器',
             notification: '"%s" 需要密碼',
@@ -1059,7 +1119,8 @@ define(function() {
             machine_radius: 'Delta機構半徑',
             postback_url: '狀態回傳URL',
             disable: '關閉',
-            enable: '開啟'
+            enable: '開啟',
+            beambox_should_use_touch_panel_to_adjust: '請至 Beambox 觸控面板調整設定。'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -1290,6 +1351,21 @@ define(function() {
             set: '設定',
             incorrect_toolhead: '錯誤工具頭，請使用列印工具頭',
             attach_toolhead: '請插上列印工具頭'
+        },
+        camera_calibration: {
+            camera_calibration: '相機校正',
+            next: '下一步',
+            cancel: '取消',
+            back: '上一步',
+            finish: '完成',
+            please_place_paper: '請將乾淨 A4 白紙放在工作區域的左上角',
+            please_refocus: '請將工作平台對焦',
+            taking_picture: '擷取圖片中...',
+            start_engrave: '開始繪製校正圖片',
+            analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
+            drawing_calibration_image: '繪製校正圖片中...',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
+            calibrate_done: '校正相機完成<br/>使用時請正確對焦已取得良好的預覽效果。'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',

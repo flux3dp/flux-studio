@@ -158,7 +158,7 @@ define([
                 is_ready = ('true' === is_ready);
 
                 if (true === is_ready && ('' === hash || hash.startsWith('#initialize'))) {
-                    location.hash = '#studio/print';
+                    location.hash = '#studio/' + (config().read('default-app')||'print');
                 }
                 else if (false === is_ready && false === hash.startsWith('#initialize')) {
                     location.hash = '#';

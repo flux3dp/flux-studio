@@ -1,0 +1,16 @@
+// force-hide
+
+@mixin force-hide() {
+   display: none;
+   visibility: hidden;
+   width: 0;
+   height: 0;
+   margin: 0;
+   padding: 0;
+   border: none;
+   opacity: 0;
+   -webkit-user-select: none;
+   -moz-user-select: none;
+   -ms-user-select: none;
+   user-select: none;
+}

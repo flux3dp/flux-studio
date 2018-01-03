@@ -70,11 +70,12 @@ gulp.task('webserver', ['sass:watch'], function() {
         .pipe(webserver({
             livereload: true,
             open: false,
+            host: '0.0.0.0',
             port: 8111
         }));
 });
 
-gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'electron', 'webserver']);
+gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'sass', 'electron', 'webserver']);
 
 gulp.task('unit-test', function() {
     return gulp.

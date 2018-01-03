@@ -7,6 +7,7 @@
 // mixins
 @import "mixins/flexbox";
 @import "mixins/absolute-center";
+@import "mixins/force-hide";
 
 // global style
 @import "core/global";
@@ -35,3 +36,4 @@
 @import "pages/scan";
 @import "pages/device";
 @import "pages/cloud";
+@import "pages/beambox";

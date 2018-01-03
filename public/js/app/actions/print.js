@@ -254,7 +254,7 @@ define([
 
         let geometry = new THREE.PlaneBufferGeometry( 250, 250, 0, 0 ),
             material = new THREE.MeshBasicMaterial({
-                color: 0xE0E0E0,
+                color: 0xE2E1E0,
                 wireframe: true
             }),
             refMesh = new THREE.Mesh(geometry, material);
@@ -282,7 +282,7 @@ define([
 
         // renderer
         renderer.autoClear = false;
-        renderer.setClearColor(0xE0E0E0, 1);
+        renderer.setClearColor(0xE2E1E0, 1);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(container.offsetWidth, container.offsetHeight);
         renderer.sortObjects = false;

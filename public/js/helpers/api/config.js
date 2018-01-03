@@ -34,6 +34,13 @@ define([
                 opts.onFinished(value);
 
                 return value;
+            },
+
+            update: function(key, item_key, item_value) {
+                let configs = this.read(key);
+                if(configs === '') configs = {};
+                configs[item_key] = item_value;
+                this.write(key, configs);
             }
         };
 

@@ -140,11 +140,31 @@ function getDeviceMenuId(uuid, data) {
 function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
     let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`;
-    return new MenuItem({
-        label: menuLabel,
-        id: getDeviceMenuId(uuid, data),
-        visible: true,
-        submenu: [
+    const modelType = (['fbb1b', 'fbb1p', 'laser-b1'].includes(data.model))?'beambox-series':'delta-series';
+    let submenu = [];
+    if(modelType === 'beambox-series') {
+        submenu = [
+            { id: 'DASHBOARD', uuid, serial, source, label: r.dashboard, click: callback },
+            { id: 'MACHINE_INFO', uuid, serial, source, label: r.machine_info, click: callback },
+            { type: 'separator' },
+            { id: 'CALIBRATE_BEAMBOX_CAMERA', uuid, serial, source, label: r.calibrate_beambox_camera, click: callback },
+            { type: 'separator' },
+            { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [
+            ]},
+            { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [
+                { id: 'LOG_NETWORK', label: r.log.network, uuid, serial, source, click: callback },
+                { id: 'LOG_HARDWARE', label: r.log.hardware, uuid, serial, source, click: callback },
+                { id: 'LOG_DISCOVER', label: r.log.discover, uuid, serial, source, click: callback },
+                { id: 'LOG_USB', label: r.log.usb, uuid, serial, source, click: callback },
+                { id: 'LOG_CAMERA', label: r.log.camera, uuid, serial, source, click: callback },
+                { id: 'LOG_CLOUD', label: r.log.cloud, uuid, serial, source, click: callback },
+                { id: 'LOG_PLAYER', label: r.log.player, uuid, serial, source, click: callback },
+                { id: 'LOG_ROBOT', label: r.log.robot, uuid, serial, source, click: callback }
+            ]},
+            { id: 'SET_AS_DEFAULT', label: r.set_as_default, uuid, serial, source, click: callback, type:'checkbox'}
+        ];
+    } else {
+        submenu = [
             { id: 'DASHBOARD', uuid, serial, source, label: r.dashboard, click: callback },
             { id: 'MACHINE_INFO', uuid, serial, source, label: r.machine_info, click: callback },
             { id: 'TOOLHEAD_INFO', uuid, serial, source, label: r.toolhead_info, click: callback },
@@ -174,7 +194,14 @@ function buildDeviceMenu(callback, uuid, data) {
                 { id: 'LOG_ROBOT', label: r.log.robot, uuid, serial, source, click: callback }
             ]},
             { id: 'SET_AS_DEFAULT', label: r.set_as_default, uuid, serial, source, click: callback, type:'checkbox'}
-        ]
+        ];
+    }
+
+    return new MenuItem({
+        label: menuLabel,
+        id: getDeviceMenuId(uuid, data),
+        visible: true,
+        submenu: submenu
     });
 }
 

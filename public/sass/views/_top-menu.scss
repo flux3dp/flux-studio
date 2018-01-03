@@ -23,7 +23,7 @@
         }
 
         .func-name {
-            color: #999;
+            color: $primaryColor;
             font-size: 40px;
             font-weight: lighter;
             line-height: 55px;
@@ -35,9 +35,11 @@
             background: #fff;
             display: none;
             left: 5.05rem;
-            padding: .65rem 2.6rem;
+            padding: 2rem .65rem;
             position: relative;
             top: 27px;
+            border-radius: 2px;
+            border-top-left-radius: 0;
 
             .arrow-top-left-flat {
                 box-shadow: -1px -1px 5px rgba(0,0,0,0.1);
@@ -52,6 +54,10 @@
                 list-style: none;
                 margin: 0;
                 padding: 0;
+                flex-wrap: wrap;
+                align-content: space-between;
+                width: 450px;
+                height: 128px;
             }
         }
 
@@ -71,13 +77,12 @@
     }
 
     .item {
-        color: #b3b3b3;
+        color: $primaryColor;
         font-size: 1rem;
-        margin: 0 3.3rem 0 0;
         padding: 0;
         text-align: center;
-        flex: 1;
         cursor: pointer;
+        width: 90px;
 
         img {
             height: 3.2rem;
@@ -88,12 +93,12 @@
         }
 
         &:hover{
-            filter: brightness(70%);
-            -webkit-filter: brightness(70%);
+            filter: brightness(80%);
+            -webkit-filter: brightness(80%);
         }
 
-        p,
-        &:last-child {
+        p {
+            text-align: center;
             margin: 0;
         }
     }
@@ -141,8 +146,9 @@
             background: #fff;
             display: none;
             position: relative;
-            right: 100px;
+            right: 80px;
             top: 11px;
+            border-radius: 2px;
 
             .arrow {
                 left: 100%;
@@ -164,6 +170,7 @@
 
                 ul {
                     border: 1px solid $primaryColor;
+                    border-radius: 2px;
                     color: $primaryColor;
                     font-family: Helvetica Neue;
                     font-size: 12px;

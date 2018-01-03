@@ -28,6 +28,7 @@ define([
 
         var apiMethod = {
                 laser: 'svg-laser-parser',
+                svgeditor: 'svgeditor-laser-parser',
                 draw: 'pen-svg-parser',
                 cut: 'svg-vinyl-parser',
                 mill: 'svg-vinyl-parser'
@@ -35,15 +36,13 @@ define([
             ws = new Websocket({
                 method: apiMethod,
                 onMessage: function(data) {
-
                     events.onMessage(data);
-
                 },
+
                 onError: function(data) {
-
                     events.onError(data);
-
                 },
+
                 onFatal: opts.onFatal
             }),
             uploaded_svg = [],
@@ -245,6 +244,7 @@ define([
                 lastOrder = 'compute';
 
                 args.forEach(function(obj) {
+                    console.log('args obj', obj)
                     requestHeader = [
                         lastOrder,
                         obj.name,
@@ -330,6 +330,82 @@ define([
 
                 ws.send(args.join(' '));
             },
+
+            uploadToSvgeditorAPI: function(files) {
+                var self = this,
+                    $deferred = $.Deferred(),
+                    length = files.length,
+                    currIndex = 0,
+                    order_name = 'svgeditor_upload',
+                    setMessages = function(file, isBroken, warningCollection) {
+                        file.status = (0 < warningCollection.length ? 'bad' : 'good');
+                        file.messages = warningCollection;
+                        file.isBroken = isBroken;
+                        return file;
+                    },
+
+                    sendFile = function(file, isEnd) {
+                        var warningCollection = [];
+
+                        events.onMessage = function(data) {
+                            switch (data.status) {
+                            case 'continue':
+                                ws.send(file.data);
+                                break;
+                            case 'ok':
+                                $deferred.resolve();
+                                break;
+                            case 'warning':
+                                warningCollection.push(data.message);
+                                break;
+                            }
+                        };
+
+                        events.onError = function(data) {
+                            warningCollection.push(data.error);
+                            file = setMessages(file, true, warningCollection);
+                            $deferred.notify('next');
+                        };
+
+                        ws.send([
+                            order_name,
+                            file.uploadName,
+                            file.size,
+                            file.thumbnailSize
+                        ].join(' '));
+                    };
+
+                $deferred.progress(function(action) {
+                    var file,
+                        hasBadFiles = false;
+
+                    if ('next' === action) {
+                        file = files[currIndex];
+
+                        if ('undefined' === typeof file) {
+                            hasBadFiles = files.some(function(file) {
+                                return 'bad' === file.status;
+                            });
+                            $deferred.resolve({files: files, hasBadFiles: hasBadFiles });
+                        }
+                        else if (file.extension && 'svg' === file.extension.toLowerCase()) {
+                            sendFile(file);
+                            currIndex += 1;
+                            console.log('currIndex', currIndex)
+                        }
+                        else {
+                            setMessages(file, true, ['NOT_SUPPORT']);
+                            currIndex += 1;
+                            $deferred.notify('next');
+                        }
+                    }
+                });
+
+                $deferred.notify('next');
+
+                return $deferred.promise();
+            },
+
             params: setParams(ws, events),
             computePreviewImageSize: computePreviewImageSize
         };

@@ -8,7 +8,8 @@ define([
     'helpers/display',
     'plugins/classnames/index',
     'app/app-settings',
-    'helpers/force-reload'
+    'helpers/force-reload',
+    'helpers/api/config',
 ], function(
     $,
     React,
@@ -19,7 +20,8 @@ define([
     Display,
     ClassNames,
     settings,
-    forceReload
+    forceReload,
+    config
 ) {
     'use strict';
 
@@ -36,7 +38,7 @@ define([
             },
 
             _handleDone: function() {
-                location.hash = 'studio/print';
+                location.hash = 'studio/' + (config().read('default-app')||'print');
                 location.reload();
             },
 

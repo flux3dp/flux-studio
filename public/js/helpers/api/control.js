@@ -649,6 +649,23 @@ define([
               return useDefaultResponse(`laser show_outline ${object_height} ${frames}`);
             },
 
+            maintainMove: (args) => {
+                var command = '';
+                args.f = args.f || '6000';
+                command += ' f:' + args.f;
+                if (typeof args.x !== 'undefined') {
+                    command += ' x:' + args.x;
+                };
+                if (typeof args.y !== 'undefined') {
+                    command += ' y:' + args.y;
+                };
+                if (typeof args.z !== 'undefined') {
+                    command += ' z:' + args.z;
+                };
+                console.log('maintainMove', command);
+                return useDefaultResponse(`maintain move${command}`);
+            },
+
             endMaintainMode: () => {
                 ctrl.mode = '';
                 return useDefaultResponse('task quit');

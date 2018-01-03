@@ -108,6 +108,13 @@ define([
                     label: lang.menu.cut,
                     imgSrc: 'img/menu/icon-cut.svg'
                 },
+                {
+                    name: 'beambox',
+                    displayName: 'BEAMBOX',
+                    className: genericClassName,
+                    label: lang.menu.beambox,
+                    imgSrc: 'img/menu/icon-draw.svg'
+                },
             ],
 
             getLog = async function(printer, log) {
@@ -378,6 +385,19 @@ define([
                                 });
                             });
                         }
+                    });
+                };
+
+                _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
+                    DeviceMaster.select(device)
+                    .done(() => {
+                        ProgressActions.close();                        
+                        AlertActions.showCameraCalibration(device);
+                    })
+                    .fail(() => {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                     });
                 };
 
@@ -704,6 +724,7 @@ define([
             },
 
             _handleNavigation: function(address) {
+
                 if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
                     AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
                 }

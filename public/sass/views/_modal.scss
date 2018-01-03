@@ -372,7 +372,7 @@
     }
 }
 
-.modal-change-filament {
+.modal-change-filament, .modal-camera-calibration {
     .guide-image {
         border: 2px solid #000;
         display: block;
@@ -485,6 +485,24 @@
             position: absolute;
             right: 19px;
             min-width: 60px;
+        }
+    }
+}
+
+.modal-camera-calibration {
+    .button-group {
+        .btn {
+            
+            &.btn-alone-right-1 {
+                position: absolute;            
+                width: 80px;
+                right: 19px;
+            }
+            &.btn-alone-right-2 {
+                position: absolute;            
+                width: 80px;
+                right: 110px;
+            }
         }
     }
 }

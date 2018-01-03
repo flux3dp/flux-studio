@@ -103,6 +103,38 @@
         .btn-action:first-child {
             margin: 0 85px 0 0;
         }
+
+        .select-machine-type {
+            .main-title {
+                margin-bottom: 50px;
+            }
+            .btn-action,
+            .btn-action:hover {
+                background: #333;
+                height: 176px;
+                width: 300px;
+                transition: all .3s ease;                                
+    
+                .headline,
+                .subtitle {
+                    transition: all .3s ease;                
+                    color: white;
+                }
+    
+                .subtitle {
+                    margin: 0 0 10px 0;
+                }
+            }
+    
+            .btn-action:hover {
+                box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+                background-color: #ddd;
+                .headline,
+                .subtitle {
+                    color: #333;
+                }
+            }
+        }
     }
 
     .select-wifi {
@@ -334,6 +366,7 @@
     .device-not-found {
         .not-found-img {
             width: 60%;
+            margin-bottom: 50px;
         }
     }
 
