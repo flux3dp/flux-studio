@@ -295,24 +295,6 @@ define([
             SocketMaster.setWebSocket(_device.actions);
         };
 
-<<<<<<< HEAD
-=======
-        //***************************************************
->>>>>>> feature/beambox
-        if (
-            _selectedDevice &&
-            _selectedDevice.serial === device.serial &&
-            _selectedDevice.source === device.source
-        ) {
-            let d = $.Deferred();
-            ProgressActions.close();
-            d.resolve(DeviceConstants.CONNECTED);
-            //d.resolve(DeviceConstants.TIMEOUT);
-            console.log('has have connected')
-            return d.promise();
-        }
-        //***************************************************
-
         // match the device from the newest received device list
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
             self = this;
