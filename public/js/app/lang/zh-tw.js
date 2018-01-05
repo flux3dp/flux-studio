@@ -30,7 +30,7 @@ define(function() {
             firmware: {
                 caption: '有新的機器韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
-                message_pattern_2: 'FLUX 韌體 v%s 可使用 - 你的版本為 v%s.',
+                message_pattern_2: '%s 韌體 v%s 可使用 - 你的版本為 v%s.',
                 latest_firmware: {
                     caption: '韌體更新',
                     message: '韌體已經是最新版本',
@@ -1156,6 +1156,9 @@ define(function() {
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 子系統沒有回應。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SENSOR_ERROR         : '溫度偵測器發生問題。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SENSOR_ERROR_FSR     : '壓力感測晶片讀數錯誤',
+            HARDWARE_ERROR_PUMP_ERROR           : '#900 水冷未開，請聯繫客服 (02) 2651-3171',
+            HARDWARE_ERROR_DOOR_OPENED          : '#901 門蓋開啟，將門蓋關上以繼續',
+            HARDWARE_ERROR_OVER_TEMPERATURE     : '#902 水溫過高，請稍後再繼續',
             WRONG_HEAD                          : '請更換成列印工具頭',
             USER_OPERATION                      : '別的使用者正在佔用機器',
             RESOURCE_BUSY                       : '機器忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',

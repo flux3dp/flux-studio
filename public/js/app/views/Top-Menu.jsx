@@ -566,7 +566,7 @@ define([
                     });
                 };
 
-                _action['UPDATE_DELTA'] = (device) => {
+                _action['UPDATE_FIRMWARE'] = (device) => {
                     checkDeviceStatus(device).then(() => {
                       executeFirmwareUpdate(device, 'firmware');
                     })

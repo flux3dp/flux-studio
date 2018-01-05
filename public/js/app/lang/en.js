@@ -30,7 +30,7 @@ define(function() {
             firmware: {
                 caption: 'A Firmware Update to the machine is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'Machine Firmware v%s is now available - You have v%s.',
+                message_pattern_2: '%s Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Machine firmware Update',
                     message: 'You have the latest Machine firmware',

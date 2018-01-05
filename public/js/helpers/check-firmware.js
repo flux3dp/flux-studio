@@ -11,30 +11,32 @@ define(['jquery', 'helpers/version-compare'], function($, versionCompare) {
      */
 
     return function(printer, type) {
+        printer = printer || {};
+        
         var deferred = $.Deferred(),
-            typeMap = {
+            TYPE_MAP = {
                 firmware: 'pi',
                 toolhead: 'toolhead'
             },
-            keyMap = {
+            KEY_MAP = {
                 firmware: 'fluxmonitor',
                 toolhead: 'toolhead'
             },
-            downloadMap = {
-              firmware: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw',
+            DOWNLOAD_MAP = {
+              firmware: {
+                  'delta-1': 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw',
+                  'delta-1p': 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw',
+                  'laser-b1': 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw',
+                  'bb-1b': 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw',
+                  'bb-1p': 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw'
+              },
               toolhead: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxhead_v[version].bin'
             },
-            data = {},
-            key = keyMap[type] || '',
-            downloadUrl = downloadMap[type] || '';
-
-        type = typeMap[type] || 'pi';
-        printer = printer || {};
-        data = {
-          feature: 'check_update',
-          key: key
-        };
-
+            key = KEY_MAP[type] || '',
+            downloadUrl = (DOWNLOAD_MAP[type].indexOf ? DOWNLOAD_MAP[type] : DOWNLOAD_MAP[type][printer.model]) || '';
+        
+        type = TYPE_MAP[type] || 'pi';
+        
         // return deferred.reject if network is unavailable.
         if (!navigator.onLine) {
           deferred.reject({
@@ -45,7 +47,11 @@ define(['jquery', 'helpers/version-compare'], function($, versionCompare) {
 
         $.ajax({
             url: 'http://flux3dp.com/api_entry/',
-            data: data
+            data: {
+                feature: 'check_update',
+                key: key,
+                model: printer.model
+            }
         })
         .done(function(response) {
             response.needUpdate =  versionCompare(printer.version, response.latest_version );
