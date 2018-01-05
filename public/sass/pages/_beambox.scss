@@ -31,6 +31,14 @@
                 }
             }
         }
+        #overview_window_content {
+            border-radius: 2px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+            &:hover {
+                opacity: 1;
+            }
+        }
     }
     .object-panels {
         display: absolute;
@@ -272,7 +280,7 @@
         }
         #ruler_unit_shower {
             top: 89px;
-            right: 153px;
+            right: 0px;
             padding-left: 10px;
             padding-right: 8px;
             color: #333;

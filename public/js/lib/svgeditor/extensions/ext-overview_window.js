@@ -17,7 +17,7 @@ svgEditor.addExtension("overview_window", function(S) {
 	var propsWindowHtml= "\
 		<div id=\"overview_window_content_pane\" style=\" width:100%; word-wrap:break-word;  display:inline-block; margin-top:20px;\">\
 			<div id=\"overview_window_content\" style=\"position:relative; top:0px;\">\
-				<div style=\"background-color:#A0A0A0; display:inline-block; overflow:visible; pointer-events: auto;\">\
+				<div style=\"background-color:#A0A0A0; display:inline-block; overflow:visible; pointer-events:auto;\">\
 					<svg id=\"overviewMiniView\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" viewBox=\"0 0 4800 3600\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\
 						<use x=\"0\" y=\"0\" xlink:href=\"#svgroot\"> </use>\
 					 </svg>\
