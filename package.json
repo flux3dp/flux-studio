@@ -28,7 +28,7 @@
     "chai": "3.5.0",
     "electron": "~1.6.2",
     "electron-builder": "19.52.1",
-    "electron-publisher-s3": "19.52.1",
+    "electron-publisher-s3": "19.53.1",
     "electron-reload": "~1.1.0",
     "expect": "^1.14.0",
     "gulp": "^3.9.0",
