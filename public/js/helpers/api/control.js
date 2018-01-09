@@ -702,11 +702,12 @@ define([
              *
              * @return {Promise}
              */
-            changeFilament: (type) => {
+            changeFilament: (type, flexible) => {
                 let d = $.Deferred(),
                     timeout;
-
+                
                 const getType = (t) => {
+                    if (flexible) return 'load_flexible_filament';
                     return t === DeviceConstants.LOAD_FILAMENT ? 'load_filament' : 'unload_filament';
                 };
 

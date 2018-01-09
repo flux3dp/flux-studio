@@ -92,7 +92,7 @@
         text-align: center;
         align-items: center;
         justify-content: space-between;
-        width: 32.2rem;
+        width: 38.2rem;
 
         .caption {
             margin: 0 0 1.6rem 0;
@@ -428,7 +428,7 @@
         .btn {
             width: 100%;
 
-            &:first-child {
+            &:first-child, &:nth-child(2) {
                 margin: 0 0 24px 0;
             }
         }

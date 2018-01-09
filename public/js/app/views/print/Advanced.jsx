@@ -465,6 +465,7 @@ define([
                             step={1}
                             default={advancedSetting.temperature}
                             onChange={this._handleControlValueChange} />
+
                         <SliderControl
                             id="first_layer_temperature"
                             key="first_layer_temperature"
@@ -474,6 +475,14 @@ define([
                             step={1}
                             default={advancedSetting.first_layer_temperature}
                             onChange={this._handleControlValueChange} />
+                        
+                        <SwitchControl
+                            id="flexible_material"
+                            name="flexible_material"
+                            label={lang.flexibleMaterial}
+                            default={advancedSetting.flexible_material}
+                            onChange={this._handleControlValueChange} />
+
                         {/* <SwitchControl
                             id="detect_filament_runout"
                             label={lang.detect_filament_runout}

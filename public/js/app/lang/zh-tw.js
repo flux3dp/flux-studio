@@ -30,7 +30,7 @@ define(function() {
             firmware: {
                 caption: '有新的機器韌體更新',
                 message_pattern_1: '"%s" 有新的韌體更新。',
-                message_pattern_2: 'FLUX 韌體 v%s 可使用 - 你的版本為 v%s.',
+                message_pattern_2: '%s 韌體 v%s 可使用 - 你的版本為 v%s.',
                 latest_firmware: {
                     caption: '韌體更新',
                     message: '韌體已經是最新版本',
@@ -479,9 +479,9 @@ define(function() {
                 blackMagic: '黑魔法',
                 spiral: '螺旋',
                 generalSupport: '支撐',
-                spacing: '支撐間隙',
+                spacing: '線段間隔',
                 overhang: '懸空角度',
-                zDistance: 'Z 軸間隙',
+                zDistance: 'Z軸間隔',
                 raft: '底座',
                 raftLayers: '底座層數',
                 brim: '底部延伸圈數 (Brim)',
@@ -507,7 +507,8 @@ define(function() {
                 savePreset: '儲存參數',
                 reloadPreset: '重置參數',
                 printing: '列印溫度',
-                firstLayerTemperature: '首層溫度'
+                firstLayerTemperature: '首層溫度',
+                flexibleMaterial: '軟性材料'
             },
             mode: [
                 {
@@ -1155,6 +1156,9 @@ define(function() {
             HARDWARE_ERROR_SUBSYSTEM_ERROR      : '#402 子系統沒有回應。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SENSOR_ERROR         : '溫度偵測器發生問題。請聯繫 FLUX 客服。',
             HARDWARE_ERROR_SENSOR_ERROR_FSR     : '壓力感測晶片讀數錯誤',
+            HARDWARE_ERROR_PUMP_ERROR           : '#900 水冷未開，請聯繫客服 (02) 2651-3171',
+            HARDWARE_ERROR_DOOR_OPENED          : '#901 門蓋開啟，將門蓋關上以繼續',
+            HARDWARE_ERROR_OVER_TEMPERATURE     : '#902 水溫過高，請稍後再繼續',
             WRONG_HEAD                          : '請更換成列印工具頭',
             USER_OPERATION                      : '別的使用者正在佔用機器',
             RESOURCE_BUSY                       : '機器忙碌中\n如果機器沒有在進行動作， 請重新啟動機器',
@@ -1321,11 +1325,13 @@ define(function() {
         },
         change_filament: {
             home_caption: '更換線料',
-            load_filament_caption: '自動進料',
-            unload_filament_caption: '自動退料',
+            load_filament_caption: '進料',
+            load_flexible_filament_caption: '進軟料',
+            unload_filament_caption: '退料',
             cancel: '取消',
-            load_filament: '自動進料',
-            unload_filament: '自動退料',
+            load_filament: '進料',
+            load_flexible_filament: '進軟料',
+            unload_filament: '退料',
             next: '下一步',
             heating_nozzle: '列印工具頭加熱中',
             unloading: '自動退料中',
@@ -1387,7 +1393,10 @@ define(function() {
             startPrintDeltaPlus: '確認將磁鐵列印版放上平台',
             runningMovementTests: '進行運動測試',
             connectingMachine: '連接機器中',
-            movementTestFailed: { caption: '無法通過運動測試',  message: '1. 請確認工具頭連接線不會造成過大阻力<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a><br/>再試一次？' }
+            movementTestFailed: { caption: '無法通過運動測試',  message: '1. 請確認工具頭連接線不會造成過大阻力<br/>2. 上蓋工具頭連接線接頭沒入約一半<br/>3. 可嘗試將工具頭連接線順時針或逆時針旋轉 180 度再插入<br/>4. 參考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a><br/>再試一次？' },
+            befaultTutorialWelcome: '非常感謝您購買 FLUX Delta+！<br/><br/>以下內容能幫助您快速瞭解並使用您的 FLUX Delta+<br/>期待 FLUX Delta+ 能陪伴您度過美好的時光<br/><br/>＊請務必先觀看教學影片！請打開中文字幕',
+            openBrowser: '開啟網頁',
+            welcome: '歡迎使用'
         },
         slicer: {
             computing: '計算中',

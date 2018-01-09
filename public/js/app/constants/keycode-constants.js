@@ -15,7 +15,7 @@ define(function() {
         KEY_SHIFT    : 16,
         KEY_CTRL     : 17,
         KEY_ALT      : 18,
-        KEY_DEL      : ('win' === window.FLUX.osType ? 46 : 8),   // windows: (46), osx: (8)
+        KEY_DEL      : (navigator.platform === 'Win32' ? 46 : 8),   // windows: (46), osx: (8)
         KEY_BACK     : 8,
         KEY_TAB      : 9,
         KEY_ESC      : 27,

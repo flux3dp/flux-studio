@@ -220,9 +220,9 @@ define([
                 // checking firmware of default printer that is going to popup
                 // update dialog if newest firmware has been released.
                 defaultPrinter = config().read('default-printer');
-                // settimeout 3 secs for make sure discover has been done.
+                // settimeout 15 secs for make sure discover has been done.
                 if (defaultPrinter) {
-                  setTimeout(_checkFirmwareOfDefaultPrinter, 3000);
+                  setTimeout(_checkFirmwareOfDefaultPrinter, 15000);
                 }
 
                 // add information for Raven, to be removed when root.js is implemented

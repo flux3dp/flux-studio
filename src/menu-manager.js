@@ -65,7 +65,7 @@ function buildMenu(callback) {
             { 'id': 'RESET', label: r.reset || 'Reset', enabled: false, click: callback },
             { 'id': 'ALIGN_CENTER', label: r.align_center || 'Align Center', enabled: false, click: callback },
             { type: 'separator' },
-            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Sift+X` },
+            { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Shift+X` },
         ]
     });
 
@@ -149,7 +149,7 @@ function buildDeviceMenu(callback, uuid, data) {
             { type: 'separator' },
             { id: 'CALIBRATE_BEAMBOX_CAMERA', uuid, serial, source, label: r.calibrate_beambox_camera, click: callback },
             { type: 'separator' },
-            { id: 'UPDATE_BEAMBOX_FIRMWARE', uuid, serial, source, label: r.update_firmware, click: callback },
+            { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, click: callback},
             { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [
                 { id: 'LOG_NETWORK', label: r.log.network, uuid, serial, source, click: callback },
                 { id: 'LOG_HARDWARE', label: r.log.hardware, uuid, serial, source, click: callback },
@@ -178,8 +178,8 @@ function buildDeviceMenu(callback, uuid, data) {
                 { id: 'SET_TOOLHEAD_TEMPERATURE', label: r.set_toolhead_temperature, uuid, serial, source, click: callback }
             ]},
             { type: 'separator' },
-            { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [
-                { id: 'UPDATE_DELTA_FIRMWARE', label: r.update_delta, uuid, serial, source, click: callback },
+            { id: 'UPDATE_FIRMWARE_PARENT', uuid, serial, source, label: r.update_firmware, submenu: [
+                { id: 'UPDATE_FIRMWARE', label: r.update_delta, uuid, serial, source, click: callback },
                 { id: 'UPDATE_TOOLHEAD', label: r.update_toolhead, uuid, serial, source, click: callback }
             ]},
             { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [

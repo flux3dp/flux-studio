@@ -326,85 +326,75 @@ define([
                 },
 
                 _handleYes: function(answer, args) {
+                    console.log('answer', answer);
                     if(answer === 'tour') {
                         let activeLang = i18n.getActiveLang();
+                        console.log('activeLang', activeLang);
 
                         if(this.state.hasObject) {
                             director.clearScene();
-                        }
+                        };
 
                         const startTutorial = () => {
                             this.setState({ tutorialOn: true });
                             tutorialMode = true;
                         };
-                        /* ====== leave code for backup, but not be used =========
 
-                        const tryMovementTest = () => {
-                            let device = this._getDevice();
-                            if (device) {
-                                this.showSpinner(lang.tutorial.connectingMachine);
-                                let addr = parseInt(device.addr || '-1');
-                                DeviceMaster.getDeviceBySerial(device.serial, false, {
-                                    timeout: 20000,
-                                    onSuccess: (printer)  => {
-                                        DeviceMaster.selectDevice(printer).then(() => {
-                                            return CheckDeviceStatus(printer, false, true);
-                                        })
-                                        .then(() => {
-                                            this.showSpinner(lang.tutorial.runningMovementTests);
-                                            return DeviceMaster.runMovementTests();
-                                        })
-                                        .then(() => {
-                                            this.hideSpinner();
-                                            startTutorial();
-                                        }).fail(() => {
-                                            this.hideSpinner();
-                                            AlertActions.showPopupYesNo('movement-try-again', lang.tutorial.movementTestFailed.message, lang.tutorial.movementTestFailed.caption, null, {
-                                                yes: function() {
-                                                    tryMovementTest();
-                                                },
-                                                no: function() {
-                                                    // TODO
-                                                    this.hideSpinner();
-                                                }
-                                            });
-                                        });
-                                    },
-                                    onTimeout: () => {
-                                        this.hideSpinner();
-                                        setTimeout(function() {
-                                            AlertActions.showWarning(lang.message.unable_to_find_machine + device.name);
-                                        }, 100);
-                                    }
-                                });
-                            }
-                        };
-                        */
-
-                        setTimeout(() => {
-                            const callback = () => { startTutorial(); }
-                            const imageObject = {
-                                images: [
-                                    'img/tutorial/' + activeLang + '/n01.png',
-                                    'img/tutorial/' + activeLang + '/n02.png',
-                                    'img/tutorial/' + activeLang + '/n03.png',
-                                    'img/tutorial/' + activeLang + '/n04.png',
-                                    'img/tutorial/' + activeLang + '/n05.png',
-                                    'img/tutorial/' + activeLang + '/n06.png'
-                                ],
-                                imgClass: 'img640x480'
+                        const befaultTutorial = () => {
+                            let d = $.Deferred();
+                            const callback = () => {
+                                var shell = require('electron').shell;
+                                var href = activeLang === 'en'?
+                                 'https://flux3dp.zendesk.com/hc/en-us/articles/115003538848-FLUX-Delta-Unboxing-Guide':
+                                 'https://flux3dp.zendesk.com/hc/zh-tw/articles/115003538848-FLUX-Delta-開箱導引';
+                                shell.openExternal( href );
+                                d.resolve()
                             };
 
                             AlertActions.showPopupCustom(
-                                'tutorial-images',
-                                'Test Message',
-                                'custom_text',
+                                'tutorial-welcome',
+                                lang.tutorial.befaultTutorialWelcome,
+                                lang.tutorial.openBrowser,
+                                'WELCOME',
                                 null,
-                                imageObject ,
                                 callback
                             );
 
-                        }, 0);
+                            return d.promise();
+                        };
+
+                        const showTutorialImage = () => {
+                            let d = $.Deferred();
+                            const callback = () => { d.resolve() };
+                            const imageObject = {
+                              images: [
+                                  'img/tutorial/' + activeLang + '/n01.png',
+                                  'img/tutorial/' + activeLang + '/n02.png',
+                                  'img/tutorial/' + activeLang + '/n03.png',
+                                  'img/tutorial/' + activeLang + '/n04.png',
+                                  'img/tutorial/' + activeLang + '/n05.png',
+                                  'img/tutorial/' + activeLang + '/n06.png'
+                                ],
+                                imgClass: 'img640x480'
+                              };
+
+                            setTimeout(() => {
+                                AlertActions.showPopupCustom(
+                                    'tutorial-images',
+                                    'Test Message',
+                                    'custom_text',
+                                    null,
+                                    imageObject ,
+                                    callback
+                                );
+                            }, 1);
+
+                            return d.promise();
+                        };
+
+                        befaultTutorial()
+                          .done(showTutorialImage)
+                          .done(startTutorial);
                     }
                     else if(answer === 'set_default') {
                         Config().write('default-model', Config().read('configured-model'));
@@ -862,6 +852,7 @@ define([
 
                 _handleDefaultCancel: function(ans) {
                     //Use setTimeout to avoid multiple modal display conflict
+                    console.log('ans', ans);
                     if(ans === 'set_default') {
                         AlertStore.removeYesListener(this._handleYes);
 

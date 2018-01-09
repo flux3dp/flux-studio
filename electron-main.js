@@ -1,6 +1,7 @@
 'use strict';
 
 const {app, ipcMain, BrowserWindow} = require('electron');
+app.commandLine.appendSwitch("ignore-gpu-blacklist")
 
 const BackendManager = require('./src/backend-manager.js');
 const MenuManager = require('./src/menu-manager.js');

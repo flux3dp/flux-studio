@@ -295,22 +295,6 @@ define([
             SocketMaster.setWebSocket(_device.actions);
         };
 
-        //***************************************************
-        if (
-            _selectedDevice &&
-            _selectedDevice.serial === device.serial &&
-            _selectedDevice.source === device.source
-        ) {
-            let d = $.Deferred();
-            ProgressActions.close();
-            d.resolve(DeviceConstants.CONNECTED);
-            //d.resolve(DeviceConstants.TIMEOUT);
-//
-            console.log('has have connected')
-            return d.promise();
-        }
-        //***************************************************
-
         // match the device from the newest received device list
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
             self = this;
@@ -653,7 +637,7 @@ define([
         return d.promise();
     }
 
-    function changeFilament(type) {
+    function changeFilament(type, flexible) {
         _stopChangingFilament = false;
         let d = $.Deferred();
         SocketMaster.addTask('enterMaintainMode').then(() => {
@@ -663,7 +647,7 @@ define([
         })
         .then(() => {
             if(!_stopChangingFilament) {
-                return SocketMaster.addTask('changeFilament', type);
+                return SocketMaster.addTask('changeFilament', type, flexible);
             }
         })
         .then(() => {

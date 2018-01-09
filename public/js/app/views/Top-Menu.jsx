@@ -566,14 +566,7 @@ define([
                     });
                 };
 
-                _action['UPDATE_DELTA_FIRMWARE'] = (device) => {
-                    checkDeviceStatus(device).then(() => {
-                      executeFirmwareUpdate(device, 'firmware');
-                    })
-                };
-
-                _action['UPDATE_BEAMBOX_FIRMWARE'] = (device) => {
-                    console.log('UPDATE_BEAMBOX_FIRMWARE');
+                _action['UPDATE_FIRMWARE'] = (device) => {
                     checkDeviceStatus(device).then(() => {
                       executeFirmwareUpdate(device, 'firmware');
                     })

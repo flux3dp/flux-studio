@@ -60,7 +60,8 @@ define([
                 return {
                     type: this.props.src === 'TUTORIAL' ? DeviceConstants.LOAD_FILAMENT : '',
                     currentStep: this.props.src === 'TUTORIAL' ? steps.GUIDE : steps.HOME,
-                    temperature: '-'
+                    temperature: '-',
+                    flexible: false
                 };
             },
 
@@ -230,8 +231,8 @@ define([
                     }
                     // regular change filament
                     else {
-                        console.log('changing filament');
-                        DeviceMaster.changeFilament(type)
+                        console.log('Changing Filament', this.state.flexible == true);
+                        DeviceMaster.changeFilament(type, this.state.flexible)
                         .progress(progress)
                         .done(done)
                         .fail(function(response) {
@@ -287,11 +288,18 @@ define([
             },
 
             _next: function(nextStep, type) {
+                let flexible = false;
+                if (type == DeviceConstants.LOAD_FLEXIBLE_FILAMENT) {
+                    flexible = true;
+                    type = DeviceConstants.LOAD_FILAMENT;
+                }
                 if(nextStep !== this.state.currentStep) {
-                    this.setState({
+                    let newState = {
                         type: type || this.state.type,
                         currentStep: nextStep
-                    });
+                    };
+                    if (type) newState.flexible = flexible;
+                    this.setState(newState);
                 }
             },
 
@@ -325,6 +333,13 @@ define([
                                 onClick={this._next.bind(null, steps.GUIDE, DeviceConstants.LOAD_FILAMENT)}
                             >
                                 {lang.change_filament.load_filament_caption}
+                            </button>
+                            <button
+                                className="btn btn-default"
+                                data-ga-event="load-filament"
+                                onClick={this._next.bind(null, steps.GUIDE, DeviceConstants.LOAD_FLEXIBLE_FILAMENT)}
+                            >
+                                {lang.change_filament.load_flexible_filament_caption}
                             </button>
                             <button
                                 className="btn btn-default"

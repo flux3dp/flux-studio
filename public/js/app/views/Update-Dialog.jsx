@@ -112,8 +112,9 @@ define([
 
             var lang = i18n.get(),
                 caption = lang.update[this.props.type].caption,
+                deviceModel = this.props.device.model,
                 message1 = sprintf(lang.update[this.props.type].message_pattern_1, this.props.device.name),
-                message2 = sprintf(lang.update[this.props.type].message_pattern_2, this.props.latestVersion, this.props.currentVersion),
+                message2 = sprintf(lang.update[this.props.type].message_pattern_2, deviceModel, this.props.latestVersion, this.props.currentVersion),
                 buttons = this._getButtons(lang),
                 skipButton = (
                     'software' === this.props.type ?

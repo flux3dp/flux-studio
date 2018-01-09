@@ -30,7 +30,7 @@ define(function() {
             firmware: {
                 caption: 'A Firmware Update to the machine is available',
                 message_pattern_1: '"%s" is now ready for firmware update.',
-                message_pattern_2: 'Machine Firmware v%s is now available - You have v%s.',
+                message_pattern_2: '%s Firmware v%s is now available - You have v%s.',
                 latest_firmware: {
                     caption: 'Machine firmware Update',
                     message: 'You have the latest Machine firmware',
@@ -465,7 +465,7 @@ define(function() {
                 blackMagic: 'Black Magic',
                 spiral: 'Spiral',
                 generalSupport: 'General Support',
-                spacing: 'Spacing',
+                spacing: 'Line Distance',
                 overhang: 'Overhang',
                 zDistance: 'Z Distance',
                 raft: 'Raft',
@@ -493,7 +493,8 @@ define(function() {
                 savePreset: 'Save Config',
                 reloadPreset: 'Reset Config',
                 printing: 'Printing',
-                firstLayerTemperature: 'First Layer'
+                firstLayerTemperature: 'First Layer',
+                flexibleMaterial: 'Flexible Material'
             },
             mode: [
                 {
@@ -1324,10 +1325,12 @@ define(function() {
         },
         change_filament: {
             home_caption: 'Change Filament',
-            load_filament_caption: 'LOAD FILAMENT',
-            unload_filament_caption: 'UNLOAD FILAMENT',
+            load_filament_caption: 'LOAD',
+            load_flexible_filament_caption: 'LOAD FLEXIBLE',
+            unload_filament_caption: 'UNLOAD',
             cancel: 'CANCEL',
             load_filament: 'Load Filament',
+            load_flexible_filament: 'Load Flexible Filament',
             unload_filament: 'Unload Filament',
             next: 'NEXT',
             heating_nozzle: 'Heating nozzle',
@@ -1391,7 +1394,10 @@ define(function() {
             startPrintDeltaPlus: 'Make sure you put on the magnetic print plate.',
             runningMovementTests: 'Running movement tests',
             connectingMachine: 'Connecting to the machine',
-            movementTestFailed: { caption: 'Unable to pass movement tests',  message: '1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.<br/> Try again?' }
+            movementTestFailed: { caption: 'Unable to pass movement tests',  message: '1. Make sure the toolhead cable is stretched correctly.<br/>2. Make sure the connector of toolhead cable to the machine has inserted about half into the machine.<br/>3. Try to turn the connector on the printing toolhead 180 degrees.<br/>4. Check <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/115003674128">this article</a>.<br/> Try again?' },
+            befaultTutorialWelcome: 'Thank you for ordering FLUX Delta+!<br/><br/> This guide will help you take you through the basic settings of the machine and help you set up.<br/><br/> Let’s watch the tutorial! Please turn on the subtitles.<br/><br/>',
+            openBrowser: 'openBrowser',
+            welcome: 'WELCOME'
         },
         slicer: {
             computing: 'Computing',
