@@ -2105,6 +2105,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 			case 'line':
 				attrs = $(element).attr(['x1', 'x2', 'y1', 'y2']);
 				keep = (attrs.x1 != attrs.x2 || attrs.y1 != attrs.y2);
+				current_mode = 'select';
 				break;
 			case 'foreignObject':
 			case 'square':
@@ -2114,6 +2115,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				attrs = $(element).attr(['width', 'height']);
 				// Image should be kept regardless of size (use inherit dimensions later)
 				keep = (attrs.width != 0 || attrs.height != 0) || current_mode === 'image';
+				current_mode = 'select';
 				break;
 			case 'circle':
 				keep = (element.getAttribute('r') != 0);

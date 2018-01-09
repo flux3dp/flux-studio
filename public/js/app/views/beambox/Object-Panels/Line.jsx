@@ -4,7 +4,8 @@ define([
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, i18n) {
+    'app/actions/beambox/constant',
+], function($, React, FnWrapper, UnitInput, i18n, Constant) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
