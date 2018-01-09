@@ -2,8 +2,8 @@ define([], function(){
     return {
         dpmm: 10, //seem not to be used by all people QQ
         dimension: {
-            width: 4000,
-            height: 3800
+            width: 4200,
+            height: 3850
         },
         camera: {
             movementSpeed: (300 * 60), // mm/minutes

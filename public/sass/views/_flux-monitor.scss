@@ -143,6 +143,10 @@
                     &.hd {
                         transform: rotate(270deg);
                     }
+                    &.beambox-camera {
+                        transform: rotate(0);
+                        object-fit: contain;
+                    }
                 }
                 .status-info {
                     position: absolute;

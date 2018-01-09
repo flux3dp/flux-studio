@@ -4,7 +4,8 @@ define([
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, i18n) {
+    'app/actions/beambox/constant',
+], function($, React, FnWrapper, UnitInput, i18n, Constant) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
@@ -66,7 +67,7 @@ define([
                             <span>
                                 <UnitInput
                                     min={0}
-                                    max={4000}
+                                    max={Constant.dimension.width/Constant.dpmm}
                                     unit=""
                                     defaultValue={this.state.x1}
                                     getValue={this._update_x1_handler}
@@ -74,7 +75,7 @@ define([
                                 />
                                 <UnitInput
                                     min={0}
-                                    max={4000}
+                                    max={Constant.dimension.height/Constant.dpmm}
                                     unit=""
                                     defaultValue={this.state.y1}
                                     getValue={this._update_y1_handler}
@@ -87,7 +88,7 @@ define([
                             <span>
                                 <UnitInput
                                     min={0}
-                                    max={4000}
+                                    max={Constant.dimension.width/Constant.dpmm}
                                     unit=""
                                     defaultValue={this.state.x2}
                                     getValue={this._update_x2_handler}
@@ -95,7 +96,7 @@ define([
                                 />
                                 <UnitInput
                                     min={0}
-                                    max={4000}
+                                    max={Constant.dimension.height/Constant.dpmm}
                                     unit=""
                                     defaultValue={this.state.y2}
                                     getValue={this._update_y2_handler}

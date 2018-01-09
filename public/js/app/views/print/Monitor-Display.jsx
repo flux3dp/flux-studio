@@ -188,7 +188,8 @@ define([
 
             let cameraClass = ClassNames(
                 'camera-image',
-                {'hd': this.state.isHd}
+                {'hd': this.state.isHd},
+                {'beambox-camera': (['fbb1b', 'fbb1p', 'laser-b1'].includes(this.props.selectedDevice.model))}
             );
             return(
                 <img className={cameraClass} />

@@ -23,7 +23,7 @@ define([
     fcodeReader,
     AlertActions,
     GlobalActions,
-    svgeditorFunction,
+    FnWrapper,
     Constant
 ) {
         'use strict';
@@ -70,8 +70,6 @@ define([
             );
         };
 
-        
-
         var getToolpath = function (settings, callback, progressType, fileMode) {
             fileMode = fileMode || '-f';
             progressType = progressType || ProgressConstants.NONSTOP;
@@ -79,7 +77,7 @@ define([
                 doLaser = function (settings) {
                     var uploadFiles = [];
                     var data = svgCanvas.getSvgString();
-                    svgeditorFunction.fetchThumbnailDataurl().done((thumbnail, thumbnailBlobURL) => {
+                    FnWrapper.fetchThumbnailDataurl().done((thumbnail, thumbnailBlobURL) => {
                         var blob = new Blob([thumbnail, data], { type: 'image/svg+xml' });
                         var reader = new FileReader();
 
@@ -117,21 +115,6 @@ define([
 
             
             return {
-                connectDevice: function () {
-                    var d = $.Deferred();
-                    DeviceMaster.selectDevice(self.state.selectedPrinter).then(function (status) {
-                        if (status === DeviceConstants.CONNECTED) {
-                            return d.resolve(status)
-                        } else {
-                            return d.reject(status)
-                        }
-                    });
-                    return d.promise()
-                },
-
-
-                
-
                 uploadFcode: function (settings) {
                     getToolpath(settings,
                         (blob, thumbnailDataURL) => {
@@ -157,7 +140,7 @@ define([
                         var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
                             // split by . and get unless the last then join as string
                             //fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
-                            fileName = 'test',
+                            fileName = 'untitled',
                             fullName = fileName + '.' + extension
                         ProgressActions.close();
                         saveAs(blob, fullName);

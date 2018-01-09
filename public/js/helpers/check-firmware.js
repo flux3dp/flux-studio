@@ -1,5 +1,46 @@
-define(['jquery', 'helpers/version-compare'], function($, versionCompare) {
+define([
+    'jquery',
+    'helpers/version-compare'
+], function(
+    $,
+    versionCompare
+) {
     'use strict';
+
+    const infoMap = {
+        delta: {
+            firmware: {
+                api_key: 'fluxmonitor',
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw'
+            },
+            toolhead: {
+                api_key: 'toolhead',
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxhead_v[version].bin'
+            }
+        },
+        beambox: {
+            firmware: {
+                api_key: 'beambox-firmware',
+                //TODO:
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw'
+            },
+        }
+
+    };
+    function checkMachineSeries(model) {
+        switch (model) {
+            case 'fbb1b':
+            case 'fbb1p':
+            case 'laser-b1':
+                return 'beambox';
+                break;
+            case 'delta-1':
+            case 'delta-1p':
+                return 'delta';
+            default:
+                throw new Error('unknown model name' + model);
+        }
+    }
 
     /**
      * check firmware update that has to be pass the printer information here
@@ -11,54 +52,32 @@ define(['jquery', 'helpers/version-compare'], function($, versionCompare) {
      */
 
     return function(printer, type) {
-        printer = printer || {};
-        
-        var deferred = $.Deferred(),
-            TYPE_MAP = {
-                firmware: 'pi',
-                toolhead: 'toolhead'
-            },
-            KEY_MAP = {
-                firmware: 'fluxmonitor',
-                toolhead: 'toolhead'
-            },
-            DOWNLOAD_MAP = {
-              firmware: {
-                  'delta-1': 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw',
-                  'delta-1p': 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw',
-                  'laser-b1': 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw',
-                  'bb-1b': 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw',
-                  'bb-1p': 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw'
-              },
-              toolhead: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxhead_v[version].bin'
-            },
-            key = KEY_MAP[type] || '',
-            downloadUrl = (DOWNLOAD_MAP[type].indexOf ? DOWNLOAD_MAP[type] : DOWNLOAD_MAP[type][printer.model]) || '';
-        
-        type = TYPE_MAP[type] || 'pi';
-        
+        const deferred = $.Deferred();
         // return deferred.reject if network is unavailable.
         if (!navigator.onLine) {
-          deferred.reject({
-              needUpdate: true
-          });
-          return deferred.promise();
-        }
+            deferred.reject({
+                needUpdate: true
+            });
+            return deferred.promise();
+          }
+
+        const series = checkMachineSeries(printer.model);
+        const info = infoMap[series][type];
+        const request_data = {
+          feature: 'check_update',
+          key: info['api_key']
+        };
 
         $.ajax({
-            url: 'http://flux3dp.com/api_entry/',
-            data: {
-                feature: 'check_update',
-                key: key,
-                model: printer.model
-            }
+            url: 'https://flux3dp.com/api_entry/',
+            data: request_data
         })
         .done(function(response) {
             response.needUpdate =  versionCompare(printer.version, response.latest_version );
             response.latestVersion = response.latest_version;
             response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
             response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');
-            response.downloadUrl = downloadUrl.replace('[version]', response.latest_version);
+            response.downloadUrl = info['downloadUrl'].replace('[version]', response.latest_version);
 
             deferred.resolve(response);
         })

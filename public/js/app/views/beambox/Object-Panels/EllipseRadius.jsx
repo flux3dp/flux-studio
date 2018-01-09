@@ -4,7 +4,8 @@ define([
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, FnWrapper, UnitInput, i18n) {
+    'app/actions/beambox/constant',
+], function($, React, FnWrapper, UnitInput, i18n, Constant) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
@@ -70,7 +71,7 @@ define([
                                     <span className="text-center header">X</span>
                                     <UnitInput
                                         min={0}
-                                        max={4000}
+                                        max={Constant.dimension.width/Constant.dpmm}
                                         unit="mm"
                                         defaultValue={this.state.rx * 2}
                                         getValue={this._update_rx_handler}
@@ -80,7 +81,7 @@ define([
                                     <span className="text-center header">Y</span>
                                     <UnitInput
                                         min={0}
-                                        max={4000}
+                                        max={Constant.dimension.height/Constant.dpmm}
                                         unit="mm"
                                         defaultValue={this.state.ry * 2}
                                         getValue={this._update_ry_handler}
