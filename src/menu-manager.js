@@ -149,8 +149,7 @@ function buildDeviceMenu(callback, uuid, data) {
             { type: 'separator' },
             { id: 'CALIBRATE_BEAMBOX_CAMERA', uuid, serial, source, label: r.calibrate_beambox_camera, click: callback },
             { type: 'separator' },
-            { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [
-            ]},
+            { id: 'UPDATE_BEAMBOX_FIRMWARE', uuid, serial, source, label: r.update_firmware, click: callback },
             { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [
                 { id: 'LOG_NETWORK', label: r.log.network, uuid, serial, source, click: callback },
                 { id: 'LOG_HARDWARE', label: r.log.hardware, uuid, serial, source, click: callback },
@@ -180,7 +179,7 @@ function buildDeviceMenu(callback, uuid, data) {
             ]},
             { type: 'separator' },
             { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, submenu: [
-                { id: 'UPDATE_DELTA', label: r.update_delta, uuid, serial, source, click: callback },
+                { id: 'UPDATE_DELTA_FIRMWARE', label: r.update_delta, uuid, serial, source, click: callback },
                 { id: 'UPDATE_TOOLHEAD', label: r.update_toolhead, uuid, serial, source, click: callback }
             ]},
             { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [

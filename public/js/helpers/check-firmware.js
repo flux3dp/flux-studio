@@ -8,15 +8,39 @@ define([
     'use strict';
 
     const infoMap = {
-        firmware: {
-            api_key: 'fluxmonitor',
-            downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw'
+        delta: {
+            firmware: {
+                api_key: 'fluxmonitor',
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw'
+            },
+            toolhead: {
+                api_key: 'toolhead',
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxhead_v[version].bin'
+            }
         },
-        toolhead: {
-            api_key: 'toolhead',
-            downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxhead_v[version].bin'
+        beambox: {
+            firmware: {
+                api_key: 'beambox-firmware',
+                //TODO:
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/fluxfirmware-[version].fxfw'
+            },
         }
+
     };
+    function checkMachineSeries(model) {
+        switch (model) {
+            case 'fbb1b':
+            case 'fbb1p':
+            case 'laser-b1':
+                return 'beambox';
+                break;
+            case 'delta-1':
+            case 'delta-1p':
+                return 'delta';
+            default:
+                throw new Error('unknown model name' + model);
+        }
+    }
 
     /**
      * check firmware update that has to be pass the printer information here
@@ -36,14 +60,16 @@ define([
             });
             return deferred.promise();
           }
-        
+
+        const series = checkMachineSeries(printer.model);
+        const info = infoMap[series][type];
         const request_data = {
           feature: 'check_update',
-          key: infoMap[type]['api_key']
+          key: info['api_key']
         };
 
         $.ajax({
-            url: 'http://flux3dp.com/api_entry/',
+            url: 'https://flux3dp.com/api_entry/',
             data: request_data
         })
         .done(function(response) {
@@ -51,7 +77,7 @@ define([
             response.latestVersion = response.latest_version;
             response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
             response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');
-            response.downloadUrl = infoMap[type]['downloadUrl'].replace('[version]', response.latest_version);
+            response.downloadUrl = info['downloadUrl'].replace('[version]', response.latest_version);
 
             deferred.resolve(response);
         })
