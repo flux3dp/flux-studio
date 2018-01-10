@@ -166,12 +166,25 @@ define([
 
             const d = $.Deferred();
 
-            const strWithoutFilter = str.replace('filter="url(#greyscaleFilter)"', '');
             // This is a bit hack.
             // canvg cannot read this filter because it is defined outside of str.
             // so we remove it, and grayscale it again when it transfers into canvas.
             
-            canvg(c, strWithoutFilter, {
+            // And due to unknown reason (maybe the parsing method of canvg)
+            // style with css selector such as  "#svg_2 .st0" will not work, while ".st0" can
+            // so I use this hacky method to solve it. Hope you can find better way to solve it.
+            
+            // some svg file specify inline attribute, so we have to overwrite them.
+            const modifiedStr = str.replace('filter="url(#greyscaleFilter)"', '')
+                .replace(/(THIS_IS_MY_INDICATOR,#\S*\s)/, '')
+                .replace(/fill="[#rgb(,\.)\w\d]+"/g,"fill=\"none\"")
+                .replace(/stroke="[#rgb(,\.)\w\d]+"/g,"stroke=\"#000\"")
+                .replace(/stroke-width=["'\w\d]+/g,"stroke-width=\"1\"")
+                .replace(/fill:\s{0,1}["'#rgb(,\.)\w\d]+/g, "fill:none")
+                .replace(/stroke:\s{0,1}["'#rgb(,\.)\w\d]+/g, "stroke:#000")
+                .replace(/stroke-width:\s{0,1}["'\w\d]+/g,"stroke-width:1");
+
+            canvg(c, modifiedStr, {
                 scaleWidth: 800,
                 scaleHeight: 800,
                 renderCallback: function () {

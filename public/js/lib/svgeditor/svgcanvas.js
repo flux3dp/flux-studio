@@ -4880,19 +4880,22 @@ this.makeSymbol = function(elem, attrs, batchCmd) {
 	}
 	symbol.id = getNextId();
 	symbol.setAttribute('data-id', elem.id);
+	symbol.setAttribute('fill', 'none');
+	symbol.setAttribute('stroke', '#000');
+	symbol.setAttribute('stroke-width', '1');
 
 	svgedit.utilities.findDefs().appendChild(symbol);
 	
 	//remove invisible nodes (such as invisible layer in Illustrator)
-	$(symbol).find('*').filter(function(){
+	$(symbol).find("*").filter(function(){
 		return ($(this).css('display') === 'none');
 	}).remove();
 
-	//add prefix(which constrain css selector to symbol's id) to prevent 
+	//add prefix(which constrain css selector to symbol's id) to prevent class style pollution
 	const origionStyle = $(symbol).find('style').text();
-	//the regrex indicate the css selector, but the selector may contain comma, so we replace it again.
+	//the regex indicate the css selector, but the selector may contain comma, so we replace it again.
 	let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
-		const prefix = '#' + symbol.id + ' ';
+		const prefix = 'THIS_IS_MY_INDICATOR,#' + symbol.id + ' ';
 		match = match.replace(',', ',' + prefix);
 		return prefix + match;
 	});
