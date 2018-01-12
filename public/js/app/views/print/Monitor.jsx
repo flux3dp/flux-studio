@@ -644,7 +644,12 @@ define([
             this.reporter = setInterval(() => {
                 // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
-                    clearInterval(this.reporter);
+                    
+                    //Maybe we should handle SUBSYSTEM_ERROR rather than doing this.
+                    if(error.error && error[0] === "SUBSYSTEM_ERROR") {
+                    } else {
+                        clearInterval(this.reporter);
+                    }
                     this._processReport(error);
                 }).then((result) => {
                     store.dispatch(DeviceActionCreator.updateDeviceStatus(result));
@@ -672,6 +677,7 @@ define([
         },
 
         _processReport: function(report) {
+            console.log('_processReport', report);
             if(!report.error) {
                 if(this._isAbortedOrCompleted() && openedFrom !== GlobalConstants.DEVICE_LIST) {
                     DeviceMaster.quit();
