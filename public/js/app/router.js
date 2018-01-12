@@ -30,13 +30,13 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
                     [/^.*$/, 'e404', this.e404],
                     // initialize Flux Printer
                     [
-                        /^initialize\/wifi\/?(connect-machine|select|not-found|notice-from-device|set-printer|set-password|setup-complete)\/?(.*)?/,
+                        /^initialize\/wifi\/?(select-machine-type|connect-beambox|connect-machine|select|not-found|notice-from-device|set-printer|set-password|setup-complete)\/?(.*)?/,
                         'initial',
                         this.initial
                     ],
                     // go to studio
                     [
-                        /^studio\/?(print|beambox|svg-edit|laser|scan|usb|settings|draw|cut|mill|cloud)\/?(.*)?/,
+                        /^studio\/?(print|beambox|laser|scan|usb|settings|draw|cut|mill|cloud)\/?(.*)?/,
                         'studio',
                         this.studio
                     ],
@@ -67,6 +67,8 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
 
         initial: function(step, other) {
             var map = {
+                    'select-machine-type': 'Select-Machine-Type',
+                    'connect-beambox': 'Connect-Beambox',
                     'connect-machine': 'Connect-Machine',
                     'not-found': 'Printer-Not-Found',
                     'notice-from-device': 'Notice-From-Device',

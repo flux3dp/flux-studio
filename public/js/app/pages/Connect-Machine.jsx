@@ -31,8 +31,21 @@ define([
         args = args || {};
 
         return React.createClass({
-
+            // Lifecycle
+            
             componentWillMount: function() {
+            },
+
+            getInitialState: function() {
+                var self = this;
+                setInterval(function() {
+                    self.setState({usbConnected: (DeviceMaster.getAvailableUsbChannel() >= 0)});
+                }, 1000);
+                return {
+                    lang: args.state.lang,
+                    showPrinters: false,
+                    usbConnected: false
+                };
             },
 
             componentWillUnmount: () => {
@@ -42,12 +55,6 @@ define([
             },
 
             // UI events
-            _selectMachineType: function(type) {
-                this.setState({
-                    machine_type: type
-                });
-            },
-
             _setSettingPrinter: function(printer) {
                 // temporary store for setup
                 initializeMachine.settingPrinter.set(printer);
@@ -70,17 +77,10 @@ define([
                     },
                     onError: function(response) {
                         self._toggleBlocker(false);
-                        if(self.state.machine_type === 'beambox') {
-                            AlertActions.showPopupError('connection-fail',
-                                lang.initialize.errors.keep_connect.content_beambox,
-                                lang.initialize.errors.keep_connect.caption
-                            );
-                        } else {
-                            AlertActions.showPopupError('connection-fail',
-                                lang.initialize.errors.keep_connect.content_delta,
-                                lang.initialize.errors.keep_connect.caption
-                            );
-                        }
+                        AlertActions.showPopupError('connection-fail',
+                            lang.initialize.errors.keep_connect.content,
+                            lang.initialize.errors.keep_connect.caption
+                        );
                     }
                 });
             },
@@ -110,8 +110,7 @@ define([
                 timer = setTimeout(function() {
                     clearTimeout(timer);
                     self._toggleBlocker(false);
-                    const machine_type = self.state.machine_type;
-                    location.hash = '#initialize/wifi/not-found' + '/?machine_type=' + machine_type;
+                    location.hash = '#initialize/wifi/not-found';
                 }, 1000);
 
                 self._toggleBlocker(true);
@@ -169,23 +168,6 @@ define([
                 });
             },
 
-            // Lifecycle
-            getInitialState: function() {
-                var self = this;
-                setInterval(function() {
-                    self.setState({usbConnected: (DeviceMaster.getAvailableUsbChannel() >= 0)});
-                }, 1000);
-                // get machine type from url
-                const re = /\?machine_type=([\w\d]+)/;
-                const machine_type = re.exec(location.hash)?re.exec(location.hash)[1]:false;
-                console.log('machine_type: ', machine_type);
-                return {
-                    lang: args.state.lang,
-                    showPrinters: false,
-                    usbConnected: false,
-                    machine_type: machine_type // beambox or delta
-                };
-            },
 
             _renderPrinters: function(lang) {
                 var content = (
@@ -207,29 +189,6 @@ define([
                 );
             },
 
-            _renderSelectMachineStep: function() {
-                const lang = this.state.lang;                
-                return (
-                    <div className="select-machine-type">
-                        <h1 className="main-title">{lang.initialize.select_machine_type}</h1>
-                        <div className="btn-h-group">
-                            <button
-                                className="btn btn-action btn-large"
-                                onClick={()=>this._selectMachineType("beambox")}
-                            >
-                                <p className="subtitle">Beambox</p>
-                            </button>
-                            <button
-                                className="btn btn-action btn-large"
-                                onClick={()=>this._selectMachineType("delta")}
-                            >
-                                <p className="subtitle">FLUX Delta</p>
-                            </button>
-                        </div>
-                    </div>
-                );
-            },
-            
             _renderConnectionStep : function() {
                 const lang = this.state.lang;
                 const usbButtonClass = React.addons.classSet({
@@ -238,26 +197,32 @@ define([
                     'btn-large': true,
                     'usb-disabled': !this.state.usbConnected
                 });
+                const useWifi = (
+                    <button
+                        className="btn btn-action btn-large"
+                        data-ga-event="next-via-wifi"
+                        onClick={this._onWifiStartingSetUp}
+                    >
+                        <h1 className="headline">{lang.initialize.connect_flux}</h1>
+                        <p className="subtitle">{lang.initialize.via_wifi}</p>
+                        <img className="scene" src="img/via-wifi.png"/>
+                    </button>
+                );
+                const useUsb = (
+                    <button
+                        className={usbButtonClass}
+                        data-ga-event="next-via-usb"
+                        onClick={this._onUsbStartingSetUp}
+                    >
+                        <h1 className="headline">{lang.initialize.connect_flux}</h1>
+                        <p className="subtitle">{lang.initialize.via_usb}</p>
+                        <img className="scene" src="img/wifi-plug-01.png"/>
+                    </button>
+                );
                 return (
                     <div className="btn-h-group">
-                        <button
-                            className="btn btn-action btn-large"
-                            data-ga-event="next-via-wifi"
-                            onClick={this._onWifiStartingSetUp}
-                        >
-                            <h1 className="headline">{lang.initialize.connect_flux}</h1>
-                            <p className="subtitle">{lang.initialize.via_wifi}</p>
-                            <img className="scene" src="img/via-wifi.png"/>
-                        </button>
-                        <button
-                            className={usbButtonClass}
-                            data-ga-event="next-via-usb"
-                            onClick={this._onUsbStartingSetUp}
-                        >
-                            <h1 className="headline">{lang.initialize.connect_flux}</h1>
-                            <p className="subtitle">{lang.initialize.via_usb}</p>
-                            <img className="scene" src="img/wifi-plug-02.png"/>
-                        </button>
+                        {useWifi}
+                        {useUsb}
                     </div>
                 );
             },
@@ -268,7 +233,7 @@ define([
                     'initialization': true
                 };
                 const printersSelection = this._renderPrinters(lang);
-                const innerContent = (!this.state.machine_type)?this._renderSelectMachineStep():this._renderConnectionStep();
+                const innerContent = this._renderConnectionStep();
                 const content = (
                     <div className="connect-machine text-center">
                         <img className="brand-image" src="img/menu/main_logo.svg"/>

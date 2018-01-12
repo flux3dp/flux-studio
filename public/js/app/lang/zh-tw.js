@@ -185,6 +185,14 @@ define(function() {
             connecting: '連接中',
 
             // page specific
+            connect_beambox: {
+                set_beambox_connection: '設定 Beambox 連線',
+                please_goto_touchpad: '請使用 Beambox 觸控面板進行 WiFi 連線綁定',
+                tutorial: '1. 點選觸控面板 "設定" > "網際網路" > "設定"\n2. 選取欲綁定的 WiFi 名稱並輸入密碼\n3. 稍待10秒，若於 "設定" > "網際網路" 成功顯示無線網路 IP，即代表綁定成功',
+                please_see_tutorial_video: '教學影片',
+                tutorial_url: 'https://tw.flux3dp.com/beambox-tutorial/'
+            },
+
             set_machine_generic: {
                 printer_name: '機器名稱*',
                 printer_name_placeholder: '例如：霹靂五號',
@@ -238,8 +246,7 @@ define(function() {
 
                 keep_connect: {
                     caption: '無法透過 USB 連接',
-                    content_delta: '別擔心！請確認\n1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮\n2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n3. 重新插拔線並稍等 10 秒鐘',
-                    content_beambox: '別擔心！請確認\n1. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n2. 重新插拔線並稍等 10 秒鐘'
+                    content: '別擔心！請確認\n1. WiFi 指示燈（綠燈）呼吸、閃爍或恆亮\n2. 裝置管理員有 FLUX Link Cable，可查看 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215327328">說明</a>\n3. 重新插拔線並稍等 10 秒鐘'
                 },
 
                 wifi_connection: {

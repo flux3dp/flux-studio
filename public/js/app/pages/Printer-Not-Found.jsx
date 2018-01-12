@@ -30,12 +30,8 @@ define([
 
             // Lifecycle
             getInitialState: function() {
-                // get machine type from url
-                const re = /\?machine_type=([\w\d]+)/;
-                const machine_type = re.exec(location.hash)?re.exec(location.hash)[1]:false;
                 return {
-                    lang: args.state.lang,
-                    machine_type: machine_type
+                    lang: args.state.lang
                 };
             },
 
@@ -80,22 +76,9 @@ define([
                 const wrapperClassName = {
                         'initialization': true
                     };
-                const imgSrcs = {
-                        en: {
-                            delta: 'img/wifi-error-notify-delta-en.png',
-                            beambox: 'img/wifi-error-notify-beambox-en.png'
-                        },
-                        zh: {
-                            delta: 'img/wifi-error-notify-delta-zh.png',
-                            beambox: 'img/wifi-error-notify-beambox-zh.png'
-                        }
-                    };
-                const machineType = (this.state.machine_type === 'beambox')?'beambox':'delta';
-                console.log('this.state.machine_type: ', this.state.machine_type);
                     
                 const imgLang = 'en' === i18n.getActiveLang() ? 'en' : 'zh';
-                console.log('imgLang: ', imgLang);
-                const imgSrc = imgSrcs[imgLang][machineType];
+                const imgSrc = `img/wifi-error-notify-delta-${imgLang}.png`;
                 const content = (
                         <div className="device-not-found text-center">
                             <img className="brand-image" src="img/menu/main_logo.svg"/>

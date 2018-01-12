@@ -185,6 +185,14 @@ define(function() {
             connecting: 'Connecting...',
 
             // page specific
+            connect_beambox: {
+                set_beambox_connection: 'Set Beambox Connection',
+                please_goto_touchpad: 'Please go to Beambox touchpad',
+                tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".',
+                please_see_tutorial_video: 'Tutorial Video',
+                tutorial_url: 'https://flux3dp.com/beambox-tutorial/'             
+            },
+
             set_machine_generic: {
                 printer_name: 'Name*',
                 printer_name_placeholder: 'Give your machine an unique name',
@@ -238,8 +246,7 @@ define(function() {
 
                 keep_connect: {
                     caption: 'USB Connection not found',
-                    content_delta: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.',
-                    content_beambox: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n2. Try replug it and wait for 10 sec.',
+                    content: 'Oops! Don\'t worry. We\'re here for you.\nMake sure\n1. The Wi-Fi Indicator (green led) is flashing, breathing or being steady on.\n2. The driver is correctly installed. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215327328">(More Info)</a>\n3. Try replug it and wait for 10 sec.'
                 },
 
                 wifi_connection: {

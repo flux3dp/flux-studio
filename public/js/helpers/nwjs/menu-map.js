@@ -50,7 +50,7 @@ define([
             label: lang.device.new,
             enabled: true,
             onClick: function() {
-                location.hash = '#initialize/wifi/connect-machine';
+                location.hash = '#initialize/wifi/select-machine-type';
             },
             key: 'n',
             modifiers: 'cmd'

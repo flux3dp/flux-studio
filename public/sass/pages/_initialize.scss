@@ -137,6 +137,34 @@
         }
     }
 
+    .connect-beambox {
+        .main-title {
+            margin-bottom: 50px;
+        }
+        .tutorial {
+            white-space: pre;
+            border: 1px solid #19b7ef;
+            background-color: #fff;
+            padding: 7px 36px;
+            line-height: 2em;
+            text-align: left;
+            margin-top: 20px;
+            margin-bottom: 0px;
+        }
+        .tutorial-video {
+            a {
+                font-size: 20px;
+                &:hover {
+                    color: #666;
+                    cursor: pointer;
+                }
+            }
+        }
+        .start {
+            margin-top: 35px;
+        }
+    }
+
     .select-wifi {
         .notice {
             margin: 0 0 34px 0;

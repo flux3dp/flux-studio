@@ -14,7 +14,7 @@ define([
             PREFERENCE: () => {
                 location.hash = '#studio/settings'; },
             ADD_NEW_MACHINE: () => {
-                location.hash = '#initialize/wifi/connect-machine'; },
+                location.hash = '#initialize/wifi/select-machine-type'; },
         }
 
         ipc.on(events.MENU_CLICK, (event, menuItem, ...args) => {

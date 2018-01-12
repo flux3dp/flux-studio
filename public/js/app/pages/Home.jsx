@@ -54,7 +54,7 @@ define([
                                     <SelectView id="select-lang" options={options} onChange={this._changeActiveLang}/>
                                 </div>
                                 <div>
-                                    <a href="#initialize/wifi/connect-machine" className="btn btn-action btn-large">{lang.initialize.next}</a>
+                                    <a href="#initialize/wifi/select-machine-type" className="btn btn-action btn-large">{lang.initialize.next}</a>
                                 </div>
                             </div>
                         </div>
