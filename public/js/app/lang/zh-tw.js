@@ -975,7 +975,7 @@ define(function() {
             },
             left_panel: {
                 insert_object: '插入物件',
-                preview: '預覽路徑',
+                preview: '相機預覽',
                 rectangle: '長方形',
                 ellipse: '橢圓形',
                 line: '線段',

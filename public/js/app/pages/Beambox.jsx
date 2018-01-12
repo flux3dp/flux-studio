@@ -51,24 +51,29 @@ define([
         
 
         if (!Config.read('beambox-preference')['mouse-input-device']) {
-            function chooseIsTouchpad() {
-                AlertActions.showPopupCustomGroup(
-                    'confirm_mouse_input_device',
-                    lang.beambox.popup.select_favor_input_device,
-                    [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
-                    '',
-                    '',
-                    [
-                        () => {
-                            Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
-                        },
-                        () => {
-                            Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
-                        },
-                    ]
-                );
+            if (process.platform === 'darwin') {
+                Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
+            } else {
+                Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
             }
-            chooseIsTouchpad();
+            // function chooseIsTouchpad() {
+            //     AlertActions.showPopupCustomGroup(
+            //         'confirm_mouse_input_device',
+            //         lang.beambox.popup.select_favor_input_device,
+            //         [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
+            //         '',
+            //         '',
+            //         [
+            //             () => {
+            //                 Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
+            //             },
+            //             () => {
+            //                 Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
+            //             },
+            //         ]
+            //     );
+            // }
+            // chooseIsTouchpad();
         }
 
         return function (args = {}) {
