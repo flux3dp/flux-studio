@@ -644,9 +644,9 @@ define([
             this.reporter = setInterval(() => {
                 // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
-                    
+
                     //Maybe we should handle SUBSYSTEM_ERROR rather than doing this.
-                    if(error.error && error[0] === "SUBSYSTEM_ERROR") {
+                    if(error.error && error.error[0] === "SUBSYSTEM_ERROR") {
                     } else {
                         clearInterval(this.reporter);
                     }
