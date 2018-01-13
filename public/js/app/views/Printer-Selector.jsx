@@ -217,6 +217,8 @@ define([
             if(this.props.onUnmount) {
                 this.props.onUnmount();
             }
+
+            clearTimeout(this._noPrinterAlertTimeout);
         },
 
         _onCancel: function(id) {
@@ -381,7 +383,7 @@ define([
         },
 
         _waitForPrinters: function() {
-            setTimeout(this._openAlertWithnoPrinters, 5000);
+            this._noPrinterAlertTimeout = setTimeout(this._openAlertWithnoPrinters, 5000);
         },
 
         _openAlertWithnoPrinters: function() {
@@ -390,7 +392,7 @@ define([
 
             AlertStore.removeRetryListener(self._waitForPrinters);
 
-            if (0 === self.state.printOptions.length && false === self.state.hasDefaultPrinter) {
+            if (self.state.printOptions.length === 0 && !self.state.hasDefaultPrinter) {
                 AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
                 AlertStore.onRetry(self._waitForPrinters);
             }
