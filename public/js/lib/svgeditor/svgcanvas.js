@@ -2353,7 +2353,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 				targetZoom = svgCanvas.getZoom();
 			}
 
-			const mouseInputDevice = Config.read('beambox-preference')['mouse-input-device'];
+			const mouseInputDevice = Config.read('beambox-preference')['mouse_input_device'];
 			const isTouchpad = (mouseInputDevice==='TOUCHPAD');
 
 			if(isTouchpad) {

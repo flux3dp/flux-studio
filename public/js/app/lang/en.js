@@ -986,6 +986,7 @@ define(function() {
             left_panel: {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
+                suggest_calibrate_camera_first: 'Please calibrate the camera. (Menu > Machine > [Your Machine] > Calibrate Camera)\nRefocus platform properly everytime using it to perform better preview result.',
                 rectangle: 'Rectangle',
                 ellipse: 'Ellipse',
                 line: 'Line',
@@ -1023,6 +1024,10 @@ define(function() {
                 shading: 'Shading',
                 threshold: 'Threshold',
                 lock_desc: 'Preserve the ratio of width and height (SHIFT)'
+            },
+            svg_editor: {
+                unnsupported_file_type: 'The file type is not directly supported. Please convert the file into SVG or bitmap',
+                unnsupport_ai_file_directly: 'Please convert your AI file into SVG or Bitmap first.'
             },
             units: {
                 walt: 'W',

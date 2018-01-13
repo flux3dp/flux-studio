@@ -58,7 +58,13 @@ define([
             }
 
             if(!this.state.isPreviewMode) {
-                __tooglePrinterSelector();
+                //remind to caibrate and do nothing.
+                if(Config.read('beambox-preference')['should_remind_calibrate_camera']) {
+                    AlertActions.showPopupInfo('what-is-this-parameter-for?', LANG.suggest_calibrate_camera_first);
+                    Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
+                } else {
+                    __tooglePrinterSelector();
+                }
             }
             else {
                 __endPreviewMode();

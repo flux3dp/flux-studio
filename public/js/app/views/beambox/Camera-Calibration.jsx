@@ -2,6 +2,7 @@ define([
     'jquery',
     'react',
     'helpers/i18n',
+    'helpers/api/config',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'helpers/device-master',
@@ -18,6 +19,7 @@ define([
     $,
     React,
     i18n,
+    ConfigHelper,
     Modal,
     Alert,
     DeviceMaster,
@@ -35,15 +37,17 @@ define([
 
     const lang = i18n.get();
     const LANG = lang.camera_calibration;
-
-    const STEP_REFOCUS = Symbol();
-    const STEP_BEFORE_CUT = Symbol();
-    const STEP_BEFORE_ANALYZE_PICTURE = Symbol();
-    const STEP_FINISH = Symbol();
+    const Config = ConfigHelper();
 
     const cameraCalibrationWebSocket = CameraCalibration();    
     
     let imgBlobUrl = '';
+
+    //View render the following steps
+    const STEP_REFOCUS = Symbol();
+    const STEP_BEFORE_CUT = Symbol();
+    const STEP_BEFORE_ANALYZE_PICTURE = Symbol();
+    const STEP_FINISH = Symbol();
 
     class View extends React.Component {
         constructor(props) {
@@ -58,6 +62,9 @@ define([
             this.state = {
                 currentStep: STEP_REFOCUS
             };
+
+            this.changeCurrentStep = this.changeCurrentStep.bind(this);
+            this.onClose = this.onClose.bind(this);
         }
 
         changeCurrentStep(nextStep) {
@@ -72,8 +79,8 @@ define([
             const currentStep = this.state.currentStep;
             const TheStep = this.stepsMap.get(currentStep);
             const content = (<TheStep 
-                gotoNextStep={this.changeCurrentStep.bind(this)}
-                onClose={this.onClose.bind(this)}
+                gotoNextStep={this.changeCurrentStep}
+                onClose={this.onClose}
                 device={this.props.device}
             />);
             return (
@@ -183,7 +190,7 @@ define([
             await this._doSetConfigTask(result.X, result.Y, result.R, result.S);
         }
 
-        _doSendPictureTask() {
+        async _doSendPictureTask() {
             const d = $.Deferred();
             fetch(imgBlobUrl)
             .then(res => res.blob())
@@ -203,7 +210,7 @@ define([
             .catch((err) => {
                 d.reject(err);
             });
-            return d.promise();
+            await d.promise();
         }
 
         _doAnalyzeResult(x, y, angle, size) {
@@ -286,7 +293,10 @@ define([
                         [{
                             label: LANG.finish,
                             className: 'btn-default btn-alone-right',
-                            onClick: this.props.onClose
+                            onClick: () => {
+                                Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
+                                this.props.onClose();
+                            }
                         }]
                     }
                 />

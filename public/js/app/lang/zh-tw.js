@@ -983,6 +983,7 @@ define(function() {
             left_panel: {
                 insert_object: '插入物件',
                 preview: '相機預覽',
+                suggest_calibrate_camera_first: '提醒您：\n第一次使用相機，請先進行相機校正。並在每次使用時將平台對焦，以取得最好的效果。',
                 rectangle: '長方形',
                 ellipse: '橢圓形',
                 line: '線段',
@@ -1020,6 +1021,10 @@ define(function() {
                 shading: '漸層',
                 threshold: '曝光閾值',
                 lock_desc: '縮放時固定比例 (SHIFT)'
+            },
+            svg_editor: {
+                unnsupported_file_type: 'FLUX Studio 不直接支援此檔案格式。請先輸出成圖片檔或 SVG 格式',
+                unnsupport_ai_file_directly: '請先將您的 AI 檔輸出成 SVG 或 圖片檔，再匯入至 FLUX Studio'
             },
             units: {
                 walt: 'W',

@@ -39,6 +39,7 @@ define([
 	i18n,
 	Constant
 ){
+	const LANG = i18n.lang.beambox.svg_editor;
 	if (window.svgEditor) {
 		return;
 	}
@@ -4888,7 +4889,7 @@ define([
 						return;
 					}
 					/* if (file.type === 'application/pdf') { // Todo: Handle PDF imports
-
+						
 					}
 					else */
 					if (file.type.indexOf('image') != -1) {
@@ -4968,6 +4969,12 @@ define([
 								};
 							};
 							reader.readAsDataURL(file);
+						}
+					} else {
+						if(file.name.endsWith('.ai') || file.path.endsWith('.ai')) {
+							$.alert(LANG.unnsupport_ai_file_directly);
+						} else {
+							$.alert(LANG.unnsupported_file_type);
 						}
 					}
 				};

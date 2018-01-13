@@ -50,31 +50,22 @@ define([
         LaserPanelController.init("layer-laser-panel-placeholder");
         
 
-        if (!Config.read('beambox-preference')['mouse-input-device']) {
-            if (process.platform === 'darwin') {
-                Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
-            } else {
-                Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
-            }
-            // function chooseIsTouchpad() {
-            //     AlertActions.showPopupCustomGroup(
-            //         'confirm_mouse_input_device',
-            //         lang.beambox.popup.select_favor_input_device,
-            //         [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
-            //         '',
-            //         '',
-            //         [
-            //             () => {
-            //                 Config.update('beambox-preference', 'mouse-input-device', 'TOUCHPAD');
-            //             },
-            //             () => {
-            //                 Config.update('beambox-preference', 'mouse-input-device', 'MOUSE');
-            //             },
-            //         ]
-            //     );
-            // }
-            // chooseIsTouchpad();
-        }
+        // if (!Config.read('beambox-preference')['mouse_input_device']) {
+        //     function chooseIsTouchpad() {
+        //         AlertActions.showPopupCustomGroup(
+        //             'confirm_mouse_input_device',
+        //             lang.beambox.popup.select_favor_input_device,
+        //             [lang.beambox.popup.touchpad, lang.beambox.popup.mouse],
+        //             '',
+        //             '',
+        //             [
+        //                 () => Config.update('beambox-preference', 'mouse_input_device', 'TOUCHPAD'),
+        //                 () => Config.update('beambox-preference', 'mouse_input_device', 'MOUSE')
+        //             ]
+        //         );
+        //     }
+        //     chooseIsTouchpad();
+        // }
 
         return function (args = {}) {
             let Svg = SvgGenerator(args);

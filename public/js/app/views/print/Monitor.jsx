@@ -645,12 +645,15 @@ define([
                 // if(window.stopReport === true) { return; }
                 DeviceMaster.getReport().fail((error) => {
 
-                    //Maybe we should handle SUBSYSTEM_ERROR rather than doing this.
+                    //Maybe we should handle SUBSYSTEM_ERROR rather than doing this. 2018/1/12
+                    //It was said that SUBSYSTEM_ERROR will not appear anymore 2018/1/13
+                    //so the following 2 lines can be deleted
                     if(error.error && error.error[0] === "SUBSYSTEM_ERROR") {
+                        this._processReport(error);
                     } else {
                         clearInterval(this.reporter);
+                        this._processReport(error);
                     }
-                    this._processReport(error);
                 }).then((result) => {
                     store.dispatch(DeviceActionCreator.updateDeviceStatus(result));
                     this._processReport(result);
