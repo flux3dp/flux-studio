@@ -78,42 +78,48 @@ define([
                     displayName: 'PRINT',
                     className: genericClassName,
                     label: lang.menu.print,
-                    imgSrc: 'img/menu/icon_print.svg'
+                    imgSrc: 'img/menu/icon_print.svg',
+                    group: 'delta'
                 },
                 {
                     name: 'laser',
                     displayName: 'ENGRAVE',
                     className: genericClassName,
                     label: lang.menu.laser,
-                    imgSrc: 'img/menu/icon_laser.svg'
+                    imgSrc: 'img/menu/icon_laser.svg',
+                    group: 'delta'
                 },
                 {
                     name: 'scan',
                     displayName: 'SCAN',
                     className: genericClassName,
                     label: lang.menu.scan,
-                    imgSrc: 'img/menu/icon_scan.svg'
+                    imgSrc: 'img/menu/icon_scan.svg',
+                    group: 'delta'
                 },
                 {
                     name: 'draw',
                     displayName: 'DRAW',
                     className: genericClassName,
                     label: lang.menu.draw,
-                    imgSrc: 'img/menu/icon-draw.svg'
+                    imgSrc: 'img/menu/icon-draw.svg',
+                    group: 'delta'
                 },
                 {
                     name: 'cut',
                     displayName: 'CUT',
                     className: genericClassName,
                     label: lang.menu.cut,
-                    imgSrc: 'img/menu/icon-cut.svg'
+                    imgSrc: 'img/menu/icon-cut.svg',
+                    group: 'delta'
                 },
                 {
                     name: 'beambox',
-                    displayName: 'BEAMBOX',
+                    displayName: 'ENGRAVE',
                     className: genericClassName,
-                    label: lang.menu.beambox,
-                    imgSrc: 'img/menu/icon-draw.svg'
+                    label: lang.menu.laser,
+                    imgSrc: 'img/menu/icon_laser.svg',
+                    group: 'beambox'
                 },
             ],
 
@@ -783,13 +789,13 @@ define([
             _handleContextMenu: function(event) {
                 electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY});
             },
-            _renderStudioFunctions: function() {
+            _renderStudioFunctions: function(groupName = 'delta') {
                 var itemClass = '',
                     label = '',
                     isActiveItem,
                     menuItems;
 
-                menuItems = options.map(function(opt, i) {
+                menuItems = options.filter((v) => { return v.group == groupName }).map(function(opt, i) {
                     isActiveItem = -1 < location.hash.indexOf(opt.name);
                     itemClass = '';
                     label = '';
@@ -868,7 +874,8 @@ define([
             },
 
             render : function() {
-                var menuItems  = this._renderStudioFunctions(),
+                var deltaMenuItems  = this._renderStudioFunctions('delta'),
+                    beamboxMenuItems  = this._renderStudioFunctions('beambox'),
                     deviceList = this._renderDeviceList(),
                     currentWorkingFunction,
                     menuClass,
@@ -890,8 +897,17 @@ define([
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">
                                 <div className="arrow arrow-left arrow-top-left-flat"/>
-                                <ul className="inner-menu">
-                                    {menuItems}
+                                <div className="product-group-title">
+                                    Delta Family
+                                </div>
+                                <ul className="inner-menu delta">
+                                    {deltaMenuItems}
+                                </ul>
+                                <div className="product-group-title">
+                                    Beambox Family
+                                </div>
+                                <ul className="inner-menu beambox">
+                                    {beamboxMenuItems}
                                 </ul>
                             </div>
                         </div>

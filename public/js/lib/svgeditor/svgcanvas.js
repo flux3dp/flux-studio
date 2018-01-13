@@ -2398,7 +2398,7 @@ var getMouseTarget = this.getMouseTarget = function(evt) {
 					}
 
 					// Calculate next animation zoom level
-					var nextZoom = currentZoom + (targetZoom - currentZoom)/5;
+					var nextZoom = currentZoom + (targetZoom - currentZoom)/3;
 
 					if (Math.abs(targetZoom - currentZoom) < 0.01) {
 						nextZoom = targetZoom;

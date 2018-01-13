@@ -35,7 +35,7 @@
             background: #fff;
             display: none;
             left: 5.05rem;
-            padding: 2rem .65rem;
+            padding: 1.8rem .65rem 1.5rem .65rem;
             position: relative;
             top: 27px;
             border-radius: 2px;
@@ -57,7 +57,13 @@
                 flex-wrap: wrap;
                 align-content: space-between;
                 width: 450px;
-                height: 128px;
+                height: 65px;
+            }
+
+            .product-group-title {
+                font-size: 12px;
+                color: #999;
+                margin: 5px 0 8px 20px;
             }
         }
 
