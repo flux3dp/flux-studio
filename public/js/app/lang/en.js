@@ -987,6 +987,7 @@ define(function() {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
                 suggest_calibrate_camera_first: 'Please calibrate the camera. (Menu > Machine > [Your Machine] > Calibrate Camera)\nRefocus platform properly everytime using it to perform better preview result.',
+                end_preview: 'End Preview Mode',
                 unpreviewable_area: 'The area is not allowed to preview',
                 rectangle: 'Rectangle',
                 ellipse: 'Ellipse',

@@ -88,7 +88,7 @@ define([
             return {
                 label: (
                     <div onClick={this._handlePreviewClick}>
-                        <span>{LANG.preview}</span>
+                        <span>{this.state.isPreviewMode?LANG.end_preview:LANG.preview}</span>
                     </div>
                 ),
                 disable: false,
