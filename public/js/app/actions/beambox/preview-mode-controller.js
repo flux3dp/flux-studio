@@ -28,7 +28,7 @@ define([
     Constant
 ) {
     'use strict';
-
+    const LANG = i18n.lang.beambox.left_panel;
     class PreviewModeController {
         constructor() {
             this.storedPrinter = null;
@@ -60,7 +60,7 @@ define([
                 this.storedPrinter = selectedPrinter;
                 this.errorCallback = errCallback;
                 this.isPreviewModeOn = true;
-                //this._drawBoundary();
+                this._drawBoundary();
                 this._initCameraStream();
             } catch (error) {
                 throw error;
@@ -70,7 +70,7 @@ define([
         }
 
         async end() {
-            //this._clearBoundary();
+            this._clearBoundary();
             const storedPrinter = this.storedPrinter;
             await this._reset();
             await DeviceMaster.select(storedPrinter);
@@ -123,6 +123,14 @@ define([
                 y:          Number(/Y:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
                 angle:      Number(/R:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
                 scaleRatio: Number(/S:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1])
+            }
+            if ((this.cameraOffset.x === 0) && (this.cameraOffset.y === 0)) {
+                this.cameraOffset = {
+                    x: Constant.camera.offsetX_ideal,
+                    y: Constant.camera.offsetY_ideal,
+                    angle: 0,
+                    scaleRatio: Constant.camera.scaleRatio_ideal,
+                }
             }
         }
 
@@ -277,54 +285,70 @@ define([
                     'style': 'pointer-events:none'
                 }
             });
+            const uncapturabledHeight = (this._getCameraOffset().y * Constant.dpmm) - (Constant.camera.imgHeight * this._getCameraOffset().scaleRatio / 2);
+            const uncapturabledHeightRatio = uncapturabledHeight / Constant.dimension.height;
+            
+            const descText = svgCanvas.addSvgElementFromJson({
+                'element': 'text',
+                'attr': {
+                    'font-size': '14px',
+                    'x': 10,
+                    'y': 15,
+                    'fill': '#fff',
+                    'style': 'pointer-events:none'
+                }
+            });
+            const textNode = document.createTextNode(LANG.unpreviewable_area);
+            descText.appendChild(textNode);
             const borderTop = svgCanvas.addSvgElementFromJson({
                 'element': 'rect',
                 'attr': {
                     'width': '100%',
-                    'height': '2.597%',
+                    'height': `${uncapturabledHeightRatio*100}%`,
                     'x': 0,
                     'y': 0,
                     'fill': color,
                     'style': 'pointer-events:none'
                 }
             });
-            const borderBottom = svgCanvas.addSvgElementFromJson({
-                'element': 'rect',
-                'attr': {
-                    'width': '100%',
-                    'height': '2.597%',
-                    'x': 0,
-                    'y': '97.403%',
-                    'fill': color,
-                    'style': 'pointer-events:none'
-                }
-            });
-            const borderLeft = svgCanvas.addSvgElementFromJson({
-                'element': 'rect',
-                'attr': {
-                    'width': '2.381%',
-                    'height': '100%',
-                    'x': 0,
-                    'y': 0,
-                    'fill': color,
-                    'style': 'pointer-events:none'
-                }
-            });
-            const borderRight = svgCanvas.addSvgElementFromJson({
-                'element': 'rect',
-                'attr': {
-                    'width': '2.381%',
-                    'height': '100%',
-                    'x': '97.619%',
-                    'y': 0,
-                    'fill': color,
-                    'style': 'pointer-events:none'
-                }
-            });
+            // const borderBottom = svgCanvas.addSvgElementFromJson({
+            //     'element': 'rect',
+            //     'attr': {
+            //         'width': '100%',
+            //         'height': '2.597%',
+            //         'x': 0,
+            //         'y': '97.403%',
+            //         'fill': color,
+            //         'style': 'pointer-events:none'
+            //     }
+            // });
+            // const borderLeft = svgCanvas.addSvgElementFromJson({
+            //     'element': 'rect',
+            //     'attr': {
+            //         'width': '2.381%',
+            //         'height': '100%',
+            //         'x': 0,
+            //         'y': 0,
+            //         'fill': color,
+            //         'style': 'pointer-events:none'
+            //     }
+            // });
+            // const borderRight = svgCanvas.addSvgElementFromJson({
+            //     'element': 'rect',
+            //     'attr': {
+            //         'width': '2.381%',
+            //         'height': '100%',
+            //         'x': '97.619%',
+            //         'y': 0,
+            //         'fill': color,
+            //         'style': 'pointer-events:none'
+            //     }
+            // });
             boundaryGroup.appendChild(borderTop);
-            boundaryGroup.appendChild(borderBottom);
-            boundaryGroup.appendChild(borderLeft);
-            boundaryGroup.appendChild(borderRight);
+            boundaryGroup.appendChild(descText);
+            // boundaryGroup.appendChild(borderBottom);
+            // boundaryGroup.appendChild(borderLeft);
+            // boundaryGroup.appendChild(borderRight);
             return boundaryGroup;
         }
     }
