@@ -5379,22 +5379,27 @@ define([
 							reader.readAsDataURL(file);
 						}
 					} else if (file.name.toLowerCase().indexOf('.dxf') > 0) {
-						console.log("Load DXF");
+						console.log('Load DXF');
 						reader = new FileReader();
-						reader.onloadend = function (e) {
-							let svg = dxfToSvg(e.target.result, {
-								divideLayer: true
-							});
-							console.log('transferred svg: ', svg);
+						let divideLayer = false;
+						reader.onloadend = function (evt) {
+							var parsed = dxfToSvg.parseString(evt.target.result);
+							console.log("Parsed DXF", parsed);
+							let svg = dxfToSvg.toSVG(parsed);
 							let newElement;
 
-							// Seperate layers
-							Object.keys(svg).map((key) => {
-								if (svg[key] == "") return;
-								svgCanvas.createLayer(key);
-								newElement = svgCanvas.importSvgString(svg[key], true);
-							});
-
+							if (divideLayer) {
+								// Seperate layers
+								Object.keys(svg).map((key) => {
+									if (svg[key] === '') { 
+										return;
+									}
+									svgCanvas.createLayer(key);
+									newElement = svgCanvas.importSvgString(svg[key], true);
+								});
+							} else {
+								svgCanvas.importSvgString(svg, true);
+							}
 
 							svgCanvas.ungroupSelectedElement();
 							svgCanvas.ungroupSelectedElement();
@@ -5402,7 +5407,11 @@ define([
 							svgCanvas.alignSelectedElements('m', 'page');
 							svgCanvas.alignSelectedElements('c', 'page');
 							// highlight imported element, otherwise we get strange empty selectbox
-							svgCanvas.selectOnly([newElement]);
+							try {
+								svgCanvas.selectOnly([newElement]);
+							} catch (e) {
+
+							}
 							// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
 							$('#dialog_box').hide();
 						};
