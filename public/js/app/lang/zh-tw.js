@@ -189,7 +189,7 @@ define(function() {
                 set_beambox_connection: '設定 Beambox 連線',
                 please_goto_touchpad: '請使用 Beambox 觸控面板進行 WiFi 連線綁定',
                 tutorial: '1. 點選觸控面板 "設定" > "網際網路" > "設定"\n2. 選取欲綁定的 WiFi 名稱並輸入密碼\n3. 稍待10秒，若於 "設定" > "網際網路" 成功顯示無線網路 IP，即代表綁定成功',
-                please_see_tutorial_video: '教學影片',
+                please_see_tutorial_video: '觀看教學影片',
                 tutorial_url: 'https://tw.flux3dp.com/beambox-tutorial/'
             },
 
@@ -977,8 +977,12 @@ define(function() {
         beambox: {
             popup: {
                 select_favor_input_device: '為了提供更好的使用者體驗<br/>請選擇你喜愛的輸入裝置',
+                select_import_method: '選擇分層方式:',
                 touchpad: '觸控板',
-                mouse: '滑鼠'
+                mouse: '滑鼠',
+                layer_by_layer: '依圖層分層',
+                layer_by_color: '依顏色分層',
+                nolayer: '不分層'
             },
             left_panel: {
                 insert_object: '插入物件',

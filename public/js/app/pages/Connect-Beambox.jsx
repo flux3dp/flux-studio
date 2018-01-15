@@ -1,12 +1,14 @@
 define([
     'react',
     'jsx!widgets/Modal',
+    'jsx!widgets/Button-Group',
     'app/actions/initialize-machine',
     'helpers/api/config',
-    'helpers/i18n',
+    'helpers/i18n'
 ], function (
     React,
     Modal,
+    ButtonGroup,
     initializeMachine,
     config,
     i18n
@@ -25,21 +27,26 @@ define([
                 window.open(url);
             },
             _renderSelectMachineStep: function () {
+                var buttons = [
+                    {
+                        label: LANG.please_see_tutorial_video,
+                        className: 'btn btn-link btn-large',
+                        type: 'link',
+                        onClick: this.onOpenTutorialLink
+                    },
+                    {
+                        label: i18n.lang.initialize.setting_completed.start,
+                        className: 'btn btn-action btn-large start',
+                        onClick: this.onStart,
+                        href: '#initialize/wifi/setup-complete/with-usb'
+                    }
+                ];
                 return (
                     <div>
                         <h1 className="main-title">{LANG.set_beambox_connection}</h1>
                         <div>{LANG.please_goto_touchpad}</div>
-                        <div className="tutorial">
-                            {LANG.tutorial}
-                        </div>
-                        <div className="tutorial-video">
-                            <a onClick={this.onOpenTutorialLink}>
-                                {LANG.please_see_tutorial_video}
-                            </a>
-                        </div>
-                        <button className="btn btn-action btn-large start" data-ga-event="start" onClick={this.onStart}>
-                            {i18n.lang.initialize.setting_completed.start}
-                        </button>
+                        <div className="tutorial">{LANG.tutorial}</div>
+                        <ButtonGroup className="btn-v-group" buttons={buttons}/>
                     </div>
                 );
             },

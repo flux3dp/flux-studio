@@ -980,8 +980,12 @@ define(function() {
         beambox: {
             popup: {
                 select_favor_input_device: 'Better user experience has been optimized<br/>Please select your favorite input device.',
+                select_import_method: 'Select layering method:',
                 touchpad: 'TouchPad',
-                mouse: 'Mouse'
+                mouse: 'Mouse',
+                layer_by_layer: 'By Layer',
+                layer_by_color: 'By Color',
+                nolayer: 'No Layer'
             },
             left_panel: {
                 insert_object: 'Insert Object',

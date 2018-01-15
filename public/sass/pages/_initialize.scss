@@ -143,13 +143,12 @@
         }
         .tutorial {
             white-space: pre;
-            border: 1px solid #19b7ef;
-            background-color: #fff;
-            padding: 7px 36px;
+            border: 2px solid #333;
+            background-color: #FAFAFA;
+            padding: 20px;
             line-height: 2em;
             text-align: left;
-            margin-top: 20px;
-            margin-bottom: 0px;
+            margin: 20px 0;
         }
         .tutorial-video {
             a {
@@ -159,9 +158,6 @@
                     cursor: pointer;
                 }
             }
-        }
-        .start {
-            margin-top: 35px;
         }
     }
 
