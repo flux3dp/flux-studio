@@ -5302,25 +5302,45 @@ define([
 						
 					}
 					else */
-					if (file.type.indexOf('image') != -1) {
+					if (file.type.indexOf('image') > -1) {
 						// Detected an image
 						// svg handling
 						var reader;
-						if (file.type.indexOf('svg') != -1) {
+						if (file.type.indexOf('svg') > -1) {
 							reader = new FileReader();
-							reader.onloadend = function (e) {
-								var newElement = svgCanvas.importSvgString(e.target.result, true);
-								svgCanvas.ungroupSelectedElement();
-								svgCanvas.ungroupSelectedElement();
-								svgCanvas.groupSelectedElements();
-								svgCanvas.alignSelectedElements('m', 'page');
-								svgCanvas.alignSelectedElements('c', 'page');
-								// highlight imported element, otherwise we get strange empty selectbox
-								svgCanvas.selectOnly([newElement]);
-								// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-								$('#dialog_box').hide();
-							};
-							reader.readAsText(file);
+							
+							function importAs(type) {
+								reader.onloadend = function (e) {
+									var newElement = svgCanvas.importSvgString(e.target.result, type);
+									svgCanvas.ungroupSelectedElement();
+									svgCanvas.ungroupSelectedElement();
+									svgCanvas.groupSelectedElements();
+									svgCanvas.alignSelectedElements('m', 'page');
+									svgCanvas.alignSelectedElements('c', 'page');
+									// highlight imported element, otherwise we get strange empty selectbox
+									svgCanvas.selectOnly([newElement]);
+									// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+									$('#dialog_box').hide();
+								};
+								reader.readAsText(file);
+							}
+
+							window.GUI.showPopupCustomGroup(
+								'confirm_mouse_input_device',
+								window.GUI.lang.beambox.popup.select_import_method,
+								[window.GUI.lang.beambox.popup.layer_by_layer, window.GUI.lang.beambox.popup.nolayer],
+								'',
+								'',
+								[
+									() => {
+										importAs('layer');
+									},
+									() => {
+										importAs('nolayer');
+									}
+								]
+							);
+							
 						} else {
 							//bitmap handling
 							reader = new FileReader();

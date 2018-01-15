@@ -5034,7 +5034,7 @@ define([
 		// arbitrary transform lists, but makes some assumptions about how the transform list
 		// was obtained
 		// * import should happen in top-left of current zoomed viewport
-		this.importSvgString = function (xmlString) {
+		this.importSvgString = function (xmlString, type) {
 			var j, rootTransform = '';
 			var symbols = [],
 				use_el;
@@ -5071,22 +5071,28 @@ define([
 						svg = svgdoc.importNode(newDoc.documentElement, true);
 					}
 
-					var layeredSvg = true,
-						groups = [];
-					for (var i = 0; i < svg.childNodes.length; i++) {
-						var child = svg.childNodes[i];
-						console.log('child', child);
-						if (['defs', 'title'].indexOf(child.tagName) >= 0) continue;
-						if (child.tagName != 'g' || child.id == null) {
-							layeredSvg = false;
-							break;
-						} else {
-							groups.push(child);
+					var groups = [];
+					if ( type === 'layer' ) {
+						for (var i = 0; i < svg.childNodes.length; i++) {
+							var child = svg.childNodes[i];
+							console.log('child', child);
+							if (['defs', 'title'].indexOf(child.tagName) >= 0) continue;
+							if (child.tagName != 'g' || child.id == null) {
+								type = 'nolayer';
+								break;
+							} else {
+								groups.push(child);
+							}
 						}
 					}
-
-					if (!layeredSvg) {
-
+					console.log(type);
+					if (type === 'layer') {
+						for (var i in groups) {
+							symbols.push(this.makeSymbol(groups[i], [], batchCmd));
+						}
+					} else if (type === 'color') {
+						// TODO: Use  Cairosvg / Beamify to parse it
+					} else if (type === 'nolayer') {
 						uniquifyElems(svg);
 
 						var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
@@ -5115,9 +5121,6 @@ define([
 						symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
 
 					} else {
-						for (var i in groups) {
-							symbols.push(this.makeSymbol(groups[i], [], batchCmd));
-						}
 					}
 					// Store data
 					//		import_ids[uid] = {
@@ -5132,7 +5135,7 @@ define([
 					use_el.id = getNextId();
 					setHref(use_el, '#' + symbol.id);
 
-					if (symbol.getAttribute('data-id') != null) {
+					if (symbol.getAttribute('data-id') != null && type === 'layer') {
 						svgCanvas.createLayer(symbol.getAttribute('data-id'));
 					}
 

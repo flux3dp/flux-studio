@@ -141,7 +141,7 @@ define([
                             // split by . and get unless the last then join as string
                             //fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
                             fileName = 'untitled',
-                            fullName = fileName + '.' + extension
+                            fullName = fileName + '.' + extension;
                         ProgressActions.close();
                         saveAs(blob, fullName);
                     };
