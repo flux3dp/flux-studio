@@ -5418,7 +5418,7 @@ define([
 									newElement = svgCanvas.importSvgString(svg[key], true);
 								});
 							} else {
-								svgCanvas.importSvgString(svg, true);
+								svgCanvas.importSvgString(svg, 'layer');
 							}
 
 							svgCanvas.ungroupSelectedElement();
