@@ -44,7 +44,7 @@ define([
                 <div className='panel'>
                     <span className='title'>{LANG.strength}</span>
                     <UnitInput
-                        min={15}
+                        min={1}
                         max={100}
                         unit="%"
                         defaultValue={this.state.strength}
