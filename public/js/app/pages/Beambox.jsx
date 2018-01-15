@@ -13,6 +13,7 @@ define([
     'app/actions/alert-actions',
     'jsx!views/beambox/Object-Panels-Controller',
     'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
+    'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-global-interaction',
 ], function (
     React,
@@ -29,6 +30,7 @@ define([
     AlertActions,
     ObjectPanelsController,
     LaserPanelController,
+    BeamboxVersionMaster,
     BeamboxGlobalInteraction
 ) {
         'use strict';
@@ -156,10 +158,19 @@ define([
                 _renderPrinterSelectorWindow() {
                     if (!this.state.openPrinterSelectorWindow) { return ''; }
                     var self = this,
-                        onGettingPrinter = function (auth_printer) {
+                        onGettingPrinter = async function (auth_printer) {
+                            
+                            if(await BeamboxVersionMaster.isUnusableVersion(auth_printer)) {
+                                console.log('not valid version');
+                                AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
+                                self.setState({
+                                    openPrinterSelectorWindow: false
+                                });
+                                return;
+                            }
                             self.setState({
-                                selectedPrinter: auth_printer,
-                                openPrinterSelectorWindow: false
+                                openPrinterSelectorWindow: false,
+                                selectedPrinter: auth_printer
                             });
 
                             if (self.state.machineCommand === machineCommand.START) {

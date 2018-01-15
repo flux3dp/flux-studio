@@ -112,7 +112,6 @@ define([
 
             if(notifyChange) {
                notifyChange = false;
-               console.log('Change ', response, CHANNELS);
                callback(CHANNELS);
             }
         };
