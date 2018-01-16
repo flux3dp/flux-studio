@@ -5198,9 +5198,6 @@ define([
 			}
 			symbol.id = getNextId();
 			symbol.setAttribute('data-id', elem.id);
-			symbol.setAttribute('fill', 'none');
-			symbol.setAttribute('stroke', '#000');
-			symbol.setAttribute('stroke-width', '1');
 
 			svgedit.utilities.findDefs().appendChild(symbol);
 
@@ -5213,7 +5210,7 @@ define([
 			const origionStyle = $(symbol).find('style').text();
 			//the regex indicate the css selector, but the selector may contain comma, so we replace it again.
 			let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
-				const prefix = 'THIS_IS_MY_INDICATOR,#' + symbol.id + ' ';
+				const prefix = '#' + symbol.id + ' ';
 				match = match.replace(',', ',' + prefix);
 				return prefix + match;
 			});

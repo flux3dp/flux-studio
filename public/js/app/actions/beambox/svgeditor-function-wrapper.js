@@ -106,97 +106,65 @@ define([
             elem.attr('data-threshold', val);
         },
 
-        fetchThumbnailDataurl: function() {
-            const svgCanvas = window.svgCanvas;
+        fetchThumbnail: async function() {
+            function cloneAndModifySvg($svg) {
+                const $clonedSvg = $svg.clone(false);
 
-            const str = svgCanvas.getSvgString();
-            if (!$('#export_canvas').length) {
-                $('<canvas>', {id: 'export_canvas'}).appendTo('body');
-            }
-            const c = $('#export_canvas')[0];
-
-            function drawBoard(canvas){
-                const context = canvas.getContext("2d");
-                const gridW = 20;
-                const gridH = 20;
-
-                // context.globalCompositeOperation='destination-over';
-
-                for (var x = 0; x <= canvas.width; x += gridW) {
-                    context.moveTo(x, 0);
-                    context.lineTo(x, canvas.height);
-                }
-
-                for (var x = 0; x <= canvas.height; x += gridH) {
-                    context.moveTo(0, x);
-                    context.lineTo(canvas.width, x);
-                }
-
-                //context.strokeStyle = "#E0E0DF";
-                context.strokeStyle = "#AAA";
-                context.lineWidth = 1;
-                context.stroke();
-            }
-
-            function grayscale (input) {
-                var inputContext = input.getContext("2d");
-                var imageData = inputContext.getImageData(0, 0, input.width, input.height);
-                var data = imageData.data;
-             
-                var arraylength = input.width * input.height * 4;
-             
-                for (var i=arraylength-1; i>0;i-=4)
-                {
-                    //R= i-3, G = i-2 and B = i-1
-                    var gray = 0.299 * data[i-3] + 0.587 * data[i-2] + 0.114 * data[i-1];
-                    data[i-3] = gray;
-                    data[i-2] = gray;
-                    data[i-1] = gray;
-             
-                }
-
-                var output = document.createElement('canvas');
-                output.width = 800;
-                output.height = 800;
-                var outputContext = output.getContext("2d");
-             
-                outputContext.putImageData(imageData, 0, 0);
-                return output;
-            }
-
-            const d = $.Deferred();
-
-            // This is a bit hack.
-            // canvg cannot read this filter because it is defined outside of str.
-            // so we remove it, and grayscale it again when it transfers into canvas.
-            
-            // And due to unknown reason (maybe the parsing method of canvg)
-            // style with css selector such as  "#svg_2 .st0" will not work, while ".st0" can
-            // so I use this hacky method to solve it. Hope you can find better way to solve it.
-            
-            // some svg file specify inline attribute, so we have to overwrite them.
-            const modifiedStr = str.replace('filter="url(#greyscaleFilter)"', '')
-                .replace(/(THIS_IS_MY_INDICATOR,#\S*\s)/, '')
-                .replace(/fill="[#rgb(,\.)\w\d]+"/g,"fill=\"none\"")
-                .replace(/stroke="[#rgb(,\.)\w\d]+"/g,"stroke=\"#000\"")
-                .replace(/stroke-width=["'\w\d]+/g,"stroke-width=\"3\"")
-                .replace(/fill:\s{0,1}["'#rgb(,\.)\w\d]+/g, "fill:none")
-                .replace(/stroke:\s{0,1}["'#rgb(,\.)\w\d]+/g, "stroke:#000")
-                .replace(/stroke-width:\s{0,1}["'\w\d]+/g,"stroke-width:3");
-
-            canvg(c, modifiedStr, {
-                scaleWidth: 800,
-                scaleHeight: 800,
-                renderCallback: function () {
-                    let grayscaleCanvas = grayscale(c);
-                    //drawBoard(grayscaleCanvas);
-                    grayscaleCanvas.toBlob(function (blob) {
-                        d.resolve(grayscaleCanvas.toDataURL(), URL.createObjectURL(blob));
+                $clonedSvg.find('text').remove();
+                $clonedSvg.find('#selectorParentGroup').remove();
+                $clonedSvg.find('#canvasBackground image#background_image').remove();
+                $clonedSvg.find('#canvasBackground #previewBoundary').remove();
+                $clonedSvg.find('#svgcontent *').css({
+                    "fill": '#ffffff',
+                    "fill-opacity": "0",
+                    "stroke": "#000",
+                    "stroke-width": "3px",
+                    "stroke-opacity": "1.0",
+                    "stroke-dasharray": "0"
                 });
-                //window.open().document.write('<img src="'+ grayscaleCanvas.toDataURL() + '"/>');
+                return $clonedSvg;
+            }
 
-            }});
-            return d.promise();
+            async function DOM2Image($svg){
+                return await new Promise((resolve, reject)=>{
+                    const img  = new Image();
+                    img.onload = () => resolve(img);
+
+                    const $modifiedSvg = cloneAndModifySvg($svg);
+                    const svgString = new XMLSerializer().serializeToString($modifiedSvg.get(0));
+                    img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgString);
+                });
+            }
+
+            function cropAndDrawOnCanvas(img) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                //cropping
+                const ratio = img.width / $('#svgroot').width();
+                const W = ratio * $('#svgroot').width();
+                const H = ratio * $('#svgroot').height();
+                const w = ratio * $('#canvasBackground').attr('width');
+                const h = ratio * $('#canvasBackground').attr('height');
+                const x = - (W - w) / 2;
+                const y = - (H - h) / 2;
+
+                canvas.width = w;
+                canvas.height = h;
+
+                ctx.drawImage(img, x, y, img.width, img.height);
+                return canvas;
+            }
+
+            const $svg = cloneAndModifySvg($('#svgroot'));
+            const img = await DOM2Image($svg);
+            const canvas = cropAndDrawOnCanvas(img);
+
+            return await new Promise((resolve, reject)=>{
+                canvas.toBlob(function (blob) {
+                    resolve([canvas.toDataURL(), URL.createObjectURL(blob)]);
+                });
+            });
         }
     };
 

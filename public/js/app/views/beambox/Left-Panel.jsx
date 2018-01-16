@@ -9,6 +9,7 @@ define([
     'app/actions/alert-actions',
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/actions/beambox/preview-mode-controller',
+    'app/actions/beambox/beambox-version-master',
     'helpers/api/config',
     'helpers/i18n',
 ], function(
@@ -22,6 +23,7 @@ define([
     AlertActions,
     FnWrapper,
     PreviewModeController,
+    BeamboxVersionMaster,
     ConfigHelper,
     i18n
 ) {
@@ -56,12 +58,15 @@ define([
                     this.setState({isPreviewMode: false});
                 }
             }
+            const __remindCalibrateOnce = () => {
+                AlertActions.showPopupInfo('what-is-this-parameter-for?', LANG.suggest_calibrate_camera_first);
+                Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
+            };
 
             if(!this.state.isPreviewMode) {
                 //remind to caibrate and do nothing.
                 if(Config.read('beambox-preference')['should_remind_calibrate_camera']) {
-                    AlertActions.showPopupInfo('what-is-this-parameter-for?', LANG.suggest_calibrate_camera_first);
-                    Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
+                    __remindCalibrateOnce();
                 } else {
                     __tooglePrinterSelector();
                 }
@@ -120,9 +125,14 @@ define([
         },
 
         _renderPrinterSelecter: function() {
-            const __onGettingPrinter = (auth_printer) => {
-                __closePrinterSelector();
-                this._startPreviewMode(auth_printer);
+            const __onGettingPrinter = async (auth_printer) => {
+                if(await BeamboxVersionMaster.isUnusableVersion(auth_printer)) {
+                    AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
+                    __closePrinterSelector();
+                } else {
+                    __closePrinterSelector();
+                    this._startPreviewMode(auth_printer);
+                }
             }
             const __onClose = () => {
                 __closePrinterSelector();

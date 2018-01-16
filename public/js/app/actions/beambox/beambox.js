@@ -77,7 +77,9 @@ define([
                 doLaser = function (settings) {
                     var uploadFiles = [];
                     var data = svgCanvas.getSvgString();
-                    FnWrapper.fetchThumbnailDataurl().done((thumbnail, thumbnailBlobURL) => {
+                    FnWrapper.fetchThumbnail().then((res) => {
+                        const thumbnail = res[0];
+                        const thumbnailBlobURL = res[1];
                         var blob = new Blob([thumbnail, data], { type: 'image/svg+xml' });
                         var reader = new FileReader();
 
