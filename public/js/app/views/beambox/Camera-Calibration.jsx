@@ -49,7 +49,7 @@ define([
     const STEP_BEFORE_ANALYZE_PICTURE = Symbol();
     const STEP_FINISH = Symbol();
 
-    class View extends React.Component {
+    class CameraCalibrationStateMachine extends React.Component {
         constructor(props) {
             super(props);
             this.stepsMap = new Map([
@@ -90,7 +90,7 @@ define([
             );
         }
     };
-    View.propTypes = {
+    CameraCalibrationStateMachine.propTypes = {
         device  : React.PropTypes.object,
         onClose : React.PropTypes.func
     };
@@ -182,8 +182,7 @@ define([
     class StepBeforeAnalyzePicture extends React.Component {
         async sendPictureThenSetConfig() {
             const resp = await this._doSendPictureTask();
-            console.log('sendPicture done', resp);
-            const result = this._doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
+
             if(!result) {
                 throw new Error(LANG.analyze_result_fail);
             }
@@ -210,7 +209,7 @@ define([
             .catch((err) => {
                 d.reject(err);
             });
-            await d.promise();
+            return await d.promise();
         }
 
         _doAnalyzeResult(x, y, angle, size) {
@@ -304,5 +303,5 @@ define([
         }
     };
 
-    return View;
+    return CameraCalibrationStateMachine;
 });
