@@ -282,53 +282,48 @@ define([
 
             window.menuEventRegistered = true;
 
-            const showPopup = (currentPrinter, type) => {
+            const showPopup = async (currentPrinter, type) => {
 
-                FirmwareVersionChecker.check(currentPrinter, 'OPERATE_DURING_PAUSE')
-                .then((allowPause) => {
-                    return checkDeviceStatus(currentPrinter, allowPause);
-                })
-                .done((status) => {
-                    switch (status) {
-                    case 'ok':
-                        if(type === 'SET_TEMPERATURE') {
-                            AlertActions.showHeadTemperature(currentPrinter);
-                        }
-                        else {
-                            AlertActions.showChangeFilament(currentPrinter);
-                        }
-                        break;
-                    case 'auth':
-                        let callback = {
-                            onSuccess: function() {
-                                AlertActions.showChangeFilament(currentPrinter);
-                            },
-                            onError: function() {
-                                InputLightboxActions.open('auth-device', {
-                                    type         : InputLightboxConstants.TYPE_PASSWORD,
-                                    caption      : lang.select_printer.notification,
-                                    inputHeader  : lang.select_printer.please_enter_password,
-                                    confirmText  : lang.select_printer.submit,
-                                    onSubmit     : function(password) {
-                                        _auth(printer.uuid, password, {
-                                            onError: function(response) {
-                                                var message = (
-                                                    false === response.reachable ?
-                                                    lang.select_printer.unable_to_connect :
-                                                    lang.select_printer.auth_failure
-                                                );
-                                                AlertActions.showPopupError('device-auth-fail', message);
-                                            }
-                                        });
-                                    }
-                                });
-                            }
-                        };
-                        _auth(currentPrinter.uuid, '', callback);
-                        break;
+                const allowPause = await FirmwareVersionChecker.check(currentPrinter, 'OPERATE_DURING_PAUSE');
+                const status = await checkDeviceStatus(currentPrinter, allowPause);
+                switch (status) {
+                case 'ok':
+                    if(type === 'SET_TEMPERATURE') {
+                        AlertActions.showHeadTemperature(currentPrinter);
                     }
-                });
-
+                    else {
+                        AlertActions.showChangeFilament(currentPrinter);
+                    }
+                    break;
+                case 'auth':
+                    let callback = {
+                        onSuccess: function() {
+                            AlertActions.showChangeFilament(currentPrinter);
+                        },
+                        onError: function() {
+                            InputLightboxActions.open('auth-device', {
+                                type         : InputLightboxConstants.TYPE_PASSWORD,
+                                caption      : lang.select_printer.notification,
+                                inputHeader  : lang.select_printer.please_enter_password,
+                                confirmText  : lang.select_printer.submit,
+                                onSubmit     : function(password) {
+                                    _auth(printer.uuid, password, {
+                                        onError: function(response) {
+                                            var message = (
+                                                false === response.reachable ?
+                                                lang.select_printer.unable_to_connect :
+                                                lang.select_printer.auth_failure
+                                            );
+                                            AlertActions.showPopupError('device-auth-fail', message);
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    };
+                    _auth(currentPrinter.uuid, '', callback);
+                    break;
+                }
             };
 
             ipc.on(events.MENU_CLICK, (e, menuItem) => {
