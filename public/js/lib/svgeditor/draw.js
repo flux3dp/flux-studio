@@ -329,7 +329,7 @@ svgedit.draw.Drawing.prototype.setCurrentLayerPosition = function (newpos) {
 
 	var oldpos;
 	for (oldpos = 0; oldpos < layer_count; ++oldpos) {
-		if (this.all_layers[oldpos] == this.current_layer) {break;}
+		if (this.all_layers[oldpos] === this.current_layer) {break;}
 	}
 	// some unknown error condition (current_layer not in all_layers)
 	if (oldpos == layer_count) { return null; }
@@ -594,6 +594,20 @@ svgedit.draw.Drawing.prototype.cloneLayer = function(name, hrService) {
 	this.layer_map[name] = layer;
 	this.current_layer = layer;
 	return group;
+};
+
+/**
+ * Returns whether the layer is visible.  If the layer name is not valid,
+ * then this function returns false.
+ * @param {string} layername - The name of the layer which you want to query.
+ * @returns {boolean} The visibility state of the layer, or false if the layer name was invalid.
+*/
+svgedit.draw.Drawing.prototype.getLayerColor = function(layername) {
+	var layer = this.layer_map[layername];
+	if (layer && !layer.color) {
+		layer.color = layername;
+	}
+	return layer ? layer.color : false;
 };
 
 /**

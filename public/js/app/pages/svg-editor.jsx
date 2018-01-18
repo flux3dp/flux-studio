@@ -495,7 +495,7 @@ define([
                         </div>
                         <div id="xy_panel" className="toolset">
                           <label>
-                            x:{" "}
+                            x:{' '}
                             <input
                               id="selected_x"
                               className="attr_changer"
@@ -505,7 +505,7 @@ define([
                               />
                           </label>
                           <label>
-                            y:{" "}
+                            y:{' '}
                             <input
                               id="selected_y"
                               className="attr_changer"
@@ -967,7 +967,7 @@ define([
                               title="Add sub-path"
                               />
                           </div>
-                        </div>{" "}
+                        </div>{' '}
                         {}
                         <div id="cur_context_panel" />
                         <div id="tools_left" className="tools_panel">
@@ -1008,7 +1008,7 @@ define([
                             <div id="tool_circle" title="Circle" />
                             <div id="tool_fhellipse" title="Free-Hand Ellipse" />
                           </div>
-                        </div>{" "}
+                        </div>{' '}
                         {}
                         <div id="tools_bottom" className="tools_panel">
                           {}
@@ -1206,7 +1206,7 @@ define([
                         </div>
                         {}
                         <div id="color_picker" />
-                      </div>{" "}
+                      </div>{' '}
                       {}
                       <div id="svg_source_editor">
                         <div className="overlay" />
@@ -1247,11 +1247,11 @@ define([
                             <fieldset id="change_resolution">
                               <legend id="svginfo_dim">Canvas Dimensions</legend>
                               <label>
-                                <span id="svginfo_width">width:</span>{" "}
+                                <span id="svginfo_width">width:</span>{' '}
                                   <input type="text" id="canvas_width" size={6} />
                                 </label>
                                 <label>
-                                  <span id="svginfo_height">height:</span>{" "}
+                                  <span id="svginfo_height">height:</span>{' '}
                                     <input type="text" id="canvas_height" size={6} />
                                   </label>
                                   <label>
@@ -1278,18 +1278,18 @@ define([
                                       name="image_opt"
                                       defaultValue="embed"
                                       defaultChecked="checked"
-                                      />{" "}
+                                      />{' '}
                                       <span id="image_opt_embed">
                                         Embed data (local files)
-                                      </span>{" "}
+                                      </span>{' '}
                                     </label>
                                     <label>
                                       <input
                                         type="radio"
                                         name="image_opt"
                                         defaultValue="ref"
-                                        />{" "}
-                                        <span id="image_opt_ref">Use file reference</span>{" "}
+                                        />{' '}
+                                        <span id="image_opt_ref">Use file reference</span>{' '}
                                         </label>
                                       </fieldset>
                                     </fieldset>
@@ -1339,7 +1339,7 @@ define([
                                         </legend>
                                         <div id="bg_blocks" />
                                         <label>
-                                          <span id="svginfo_bg_url">URL:</span>{" "}
+                                          <span id="svginfo_bg_url">URL:</span>{' '}
                                             <input type="text" id="canvas_bg_url" />
                                           </label>
                                           <p id="svginfo_bg_note">
@@ -1357,7 +1357,7 @@ define([
                                               />
                                           </label>
                                           <label>
-                                            <span id="svginfo_snap_step">Snapping Step-Size:</span>{" "}
+                                            <span id="svginfo_snap_step">Snapping Step-Size:</span>{' '}
                                               <input
                                                 type="text"
                                                 id="grid_snapping_step"
@@ -1366,7 +1366,7 @@ define([
                                                 />
                                             </label>
                                             <label>
-                                              <span id="svginfo_grid_color">Grid color:</span>{" "}
+                                              <span id="svginfo_grid_color">Grid color:</span>{' '}
                                                 <input
                                                   type="text"
                                                   id="grid_color"

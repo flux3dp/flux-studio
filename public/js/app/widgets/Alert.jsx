@@ -72,7 +72,7 @@ define(['react', 'jsx!widgets/Button-Group', 'helpers/i18n'], function(React, Bu
                 className = 'modal-alert';
 
                 if (this.props.displayImages) {
-                    className += " " + this.props.imgClass;
+                    className += ' ' + this.props.imgClass;
                 }
 
             return (

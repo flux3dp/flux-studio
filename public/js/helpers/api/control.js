@@ -643,7 +643,7 @@ define([
                              position.second,
                              position.third,
                              position.fourth];
-                frames += JSON.stringify(frame) + " ";
+                frames += JSON.stringify(frame) + ' ';
               });
 
               return useDefaultResponse(`laser show_outline ${object_height} ${frames}`);
