@@ -31,7 +31,7 @@ define([
 	'app/actions/beambox/beambox',
 	'helpers/i18n',
 	'helpers/api/config',
-	'jsx!views/beambox/Object-Panels-Controller',
+	'jsx!app/actions/beambox/Object-Panels-Controller',
 	'app/actions/beambox/preview-mode-controller',
 
 ], function (

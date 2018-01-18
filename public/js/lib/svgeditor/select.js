@@ -16,7 +16,7 @@
 // 4) math.js
 // 5) svgutils.js
 define([
-	'jsx!views/beambox/Object-Panels-Controller'
+	'jsx!app/actions/beambox/Object-Panels-Controller'
 ], function(
 	ObjectPanelsController
 ){

@@ -182,7 +182,7 @@ define([
     class StepBeforeAnalyzePicture extends React.Component {
         async sendPictureThenSetConfig() {
             const resp = await this._doSendPictureTask();
-
+            const result = this._doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
             if(!result) {
                 throw new Error(LANG.analyze_result_fail);
             }
