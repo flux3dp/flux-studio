@@ -5090,9 +5090,7 @@ define([
 						for (var i in groups) {
 							symbols.push(this.makeSymbol(groups[i], [], batchCmd));
 						}
-					} else if (type === 'color') {
-						// TODO: Use  Cairosvg / Beamify to parse it
-					} else if (type === 'nolayer') {
+					} else if (type === 'color' || type === 'nolayer') {
 						uniquifyElems(svg);
 
 						var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
@@ -5120,7 +5118,6 @@ define([
 
 						symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
 
-					} else {
 					}
 					// Store data
 					//		import_ids[uid] = {

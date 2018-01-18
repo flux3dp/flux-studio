@@ -5287,6 +5287,84 @@ define([
 			// and provide a file input to click. When that change event fires, it will
 			// get the text contents of the file and send it to the canvas
 			if (window.FileReader) {
+				function readImage(file, scale = 1) {
+					return new Promise((resolve, reject) =>{
+						reader = new FileReader();
+						reader.onloadend = function (e) {
+							// let's insert the new image until we know its dimensions
+							var insertNewImage = function (width, height) {
+								var newImage = svgCanvas.addSvgElementFromJson({
+									element: 'image',
+									attr: {
+										x: 0,
+										y: 0,
+										width: width * scale,
+										height: height * scale,
+										id: svgCanvas.getNextId(),
+										style: 'pointer-events:inherit',
+										preserveAspectRatio: 'none',
+										"data-threshold": 100,
+										"data-shading": true,
+										origImage: e.target.result
+									}
+								});
+								ImageData(
+									newImage.getAttribute('origImage'), {
+										height: height,
+										width: width,
+										grayscale: {
+											is_rgba: true,
+											is_shading: Boolean(newImage.getAttribute('data-shading')),
+											threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
+											is_svg: false
+										},
+										onComplete: function (result) {
+											svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
+										}
+									}
+								);
+
+								svgCanvas.selectOnly([newImage]);
+								svgCanvas.alignSelectedElements('l', 'page');
+								svgCanvas.alignSelectedElements('t', 'page');
+								resolve();
+								updateContextPanel();
+								$('#dialog_box').hide();
+							};
+							// create dummy img so we know the default dimensions
+							var imgWidth = 100;
+							var imgHeight = 100;
+							var img = new Image();
+							img.src = e.target.result;
+							img.style.opacity = 0;
+							img.onload = function () {
+								imgWidth = img.width;
+								imgHeight = img.height;
+								insertNewImage(imgWidth, imgHeight);
+							};
+						};
+						reader.readAsDataURL(file);
+					});
+				}
+				function readSVG(blob, type) {
+					return new Promise((resolve, reject) =>{
+						var reader = new FileReader();
+						reader.onloadend = function (e) {
+							var newElement = svgCanvas.importSvgString(e.target.result, type);
+							svgCanvas.ungroupSelectedElement();
+							svgCanvas.ungroupSelectedElement();
+							svgCanvas.groupSelectedElements();
+							svgCanvas.alignSelectedElements('m', 'page');
+							svgCanvas.alignSelectedElements('c', 'page');
+							// highlight imported element, otherwise we get strange empty selectbox
+							svgCanvas.selectOnly([newElement]);
+							// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+							$('#dialog_box').hide();
+							resolve();
+						};
+						reader.readAsText(blob);
+					});
+				}
 				var importImage = function (e) {
 					$.process_cancel(uiStrings.notification.loadingImage);
 					e.stopPropagation();
@@ -5305,35 +5383,39 @@ define([
 					if (file.type.indexOf('image') > -1) {
 						// Detected an image
 						// svg handling
-						var reader;
 						if (file.type.indexOf('svg') > -1) {
-							reader = new FileReader();
-							
 							function importAs(type) {
-								reader.onloadend = function (e) {
-									var newElement = svgCanvas.importSvgString(e.target.result, type);
-									svgCanvas.ungroupSelectedElement();
-									svgCanvas.ungroupSelectedElement();
-									svgCanvas.groupSelectedElements();
-									svgCanvas.alignSelectedElements('m', 'page');
-									svgCanvas.alignSelectedElements('c', 'page');
-									// highlight imported element, otherwise we get strange empty selectbox
-									svgCanvas.selectOnly([newElement]);
-									// svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-									$('#dialog_box').hide();
-								};
-								reader.readAsText(file);
+								if (type === 'color') {
+									window.svgWebSocket.uploadPlainSVG(file).done(() => {
+										window.svgWebSocket.divideSVG().done((outputs) => {
+											async function readAll() {
+												svgCanvas.createLayer('切割圖層');
+												await readSVG(outputs['strokes'], type);
+												svgCanvas.createLayer('色塊圖層');
+												await readImage(outputs['colors'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+												svgCanvas.createLayer('點陣圖層');
+												await readImage(outputs['bitmap'], 3.5277777);
+											}
+											readAll();
+										});
+									});
+								} else {
+									readSVG(file, type);
+								}
 							}
 
 							window.GUI.showPopupCustomGroup(
 								'confirm_mouse_input_device',
 								window.GUI.lang.beambox.popup.select_import_method,
-								[window.GUI.lang.beambox.popup.layer_by_layer, window.GUI.lang.beambox.popup.nolayer],
+								[window.GUI.lang.beambox.popup.layer_by_layer, window.GUI.lang.beambox.popup.layer_by_color, window.GUI.lang.beambox.popup.nolayer],
 								'',
 								'',
 								[
 									() => {
 										importAs('layer');
+									},
+									() => {
+										importAs('color');
 									},
 									() => {
 										importAs('nolayer');
@@ -5342,61 +5424,8 @@ define([
 							);
 							
 						} else {
-							//bitmap handling
-							reader = new FileReader();
-							reader.onloadend = function (e) {
-								// let's insert the new image until we know its dimensions
-								var insertNewImage = function (width, height) {
-									var newImage = svgCanvas.addSvgElementFromJson({
-										element: 'image',
-										attr: {
-											x: 0,
-											y: 0,
-											width: width,
-											height: height,
-											id: svgCanvas.getNextId(),
-											style: 'pointer-events:inherit',
-											preserveAspectRatio: 'none',
-											"data-threshold": 100,
-											"data-shading": true,
-											origImage: e.target.result
-										}
-									});
-									ImageData(
-										newImage.getAttribute('origImage'), {
-											height: height,
-											width: width,
-											grayscale: {
-												is_rgba: true,
-												is_shading: Boolean(newImage.getAttribute('data-shading')),
-												threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
-												is_svg: false
-											},
-											onComplete: function (result) {
-												svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
-											}
-										}
-									);
-
-									svgCanvas.selectOnly([newImage]);
-									svgCanvas.alignSelectedElements('l', 'page');
-									svgCanvas.alignSelectedElements('t', 'page');
-									updateContextPanel();
-									$('#dialog_box').hide();
-								};
-								// create dummy img so we know the default dimensions
-								var imgWidth = 100;
-								var imgHeight = 100;
-								var img = new Image();
-								img.src = e.target.result;
-								img.style.opacity = 0;
-								img.onload = function () {
-									imgWidth = img.width;
-									imgHeight = img.height;
-									insertNewImage(imgWidth, imgHeight);
-								};
-							};
-							reader.readAsDataURL(file);
+							//handle bitmap
+							readImage(file);
 						}
 					} else if (file.name.toLowerCase().indexOf('.dxf') > 0) {
 						console.log('Load DXF');

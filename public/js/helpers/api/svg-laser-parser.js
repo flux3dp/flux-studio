@@ -329,12 +329,74 @@ define([
                 };
 
                 ws.send(args.join(' '));
-            },
+            }, 
+            divideSVG: function() {
+                var $deferred = $.Deferred();
+                opts = opts || {};
+                opts.onProgressing = opts.onProgressing || function() {};
+                opts.onFinished = opts.onFinished || function() {};
+                lastOrder = 'divideSVG';
 
+                var args = ['divide_svg'],
+                    blobs = [],
+                    duration,
+                    currentLength = 0,
+                    finalBlobs = {},
+                    currentName = '';
+
+                events.onMessage = function(data) {
+                    if (data.name) {
+                        currentName = data.name;
+                        currentLength = data.length;
+                    } else if (data instanceof Blob) {
+                        blobs.push(data);
+                        var blob = new Blob(blobs);
+
+                        if (currentLength === blob.size) {
+                            blobs = [];
+                            finalBlobs[currentName] = blob;
+                        }
+                    } else if (data.status === 'ok') {
+                        $deferred.resolve(finalBlobs);
+                    }
+
+                };
+
+                ws.send(args.join(' '));
+                return $deferred.promise();
+            },
+            uploadPlainSVG: function(file) {
+                var $deferred = $.Deferred();
+
+                events.onMessage = function(data) {
+                    switch (data.status) {
+                    case 'continue':
+                        console.log("uploading file", file);
+                        ws.send(file);
+                        break;
+                    case 'ok':
+                        $deferred.resolve();
+                        break;
+                    case 'warning':
+                        warningCollection.push(data.message);
+                        break;
+                    }
+                };
+
+                events.onError = function(data) {
+                    alert(data);
+                };
+
+                ws.send([
+                    'upload_plain_svg',
+                    file.name,
+                    file.size
+                ].join(' '));
+
+                return $deferred.promise();
+            },
             uploadToSvgeditorAPI: function(files) {
-                var self = this,
-                    $deferred = $.Deferred(),
-                    length = files.length,
+                var $deferred = $.Deferred(),
                     currIndex = 0,
                     order_name = 'svgeditor_upload',
                     setMessages = function(file, isBroken, warningCollection) {

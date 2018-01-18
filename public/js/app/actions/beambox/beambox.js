@@ -29,6 +29,7 @@ define([
         'use strict';
         const lang = i18n.get();
         var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
+        window.svgWebSocket = svgWebSocket;
 
         var ExportGCodeProgressing = function (data) {
             ProgressActions.open(ProgressConstants.STEPPING);
@@ -137,11 +138,12 @@ define([
 
                 exportTaskCode: function (settings, fileMode) {
                     var getToolpathCallback = (blob, fileMode) => {
-                        var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
+                        const extension = 'fc';
+                        // var extension = ('-f' === fileMode ? 'fc' : 'gcode'),
                             // split by . and get unless the last then join as string
                             //fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
-                            fileName = 'untitled',
-                            fullName = fileName + '.' + extension;
+                        const fileName = 'untitled';
+                        const fullName = fileName + '.' + extension;
                         ProgressActions.close();
                         saveAs(blob, fullName);
                     };
