@@ -1031,8 +1031,9 @@ define([
 					var name = drawing.getLayerName(layer);
 					var layerTr = $('<tr class="layer">').toggleClass('layersel', name === currentLayerName);
 					var layerVis = $('<td class="layervis">').toggleClass('layerinvis', !drawing.getLayerVisibility(name));
+					var layerColor = $('<td class="layercolor"><div style="background:' + drawing.getLayerColor(name) + '"></div></td>');
 					var layerName = $('<td class="layername">' + name + '</td>');
-					layerlist.append(layerTr.append(layerVis, layerName));
+					layerlist.append(layerTr.append(layerVis, layerColor, layerName));
 					selLayerNames.append('<option value="' + name + '">' + name + '</option>');
 					layer += 1;
 				}

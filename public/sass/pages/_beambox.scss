@@ -207,6 +207,16 @@
                 }
                 #layerlist {
                     width: 100%;
+                    .layercolor div{
+                        position: relative;
+                        top: 2px;
+                        border: 1px solid black;
+                        background: black;
+                        width: 14px;
+                        height: 14px;
+                        margin-left: 5px;
+                        display: inline-block;
+                    }
                     .layervis {
                         text-align: center;
                     }

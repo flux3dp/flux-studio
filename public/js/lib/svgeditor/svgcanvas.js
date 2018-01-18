@@ -5085,10 +5085,42 @@ define([
 							}
 						}
 					}
+					if ( type === 'color' ) {
+						var groupColorMap = {};
+						for (var i = 0; i < svg.childNodes.length; i++) {
+							var child = svg.childNodes[i];
+							console.log('child', child);
+							if (['defs', 'title'].indexOf(child.tagName) >= 0) continue;
+							if (child.tagName === 'g') {
+								// Child = first group
+								var nodes = [];
+								for (var j = 0; j < child.childNodes.length; j++) {
+									nodes.push(child.childNodes[j]);
+								}
+								for (var j = 0; j < nodes.length; j++) {
+									var node = nodes[j];
+									var stroke = node.getAttribute('stroke');
+									if (!groupColorMap[stroke]) {
+										groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
+										groupColorMap[stroke].setAttribute('data-color', stroke);
+									}
+									node.parentElement.removeChild(node);
+									groupColorMap[stroke].appendChild(node);
+								}
+							}
+						}
+						for(var k in groupColorMap) {
+							groups.push(groupColorMap[k]);
+						}
+						console.log(groupColorMap);
+						type = 'layer';
+					}
 					console.log(type);
 					if (type === 'layer') {
 						for (var i in groups) {
-							symbols.push(this.makeSymbol(groups[i], [], batchCmd));
+							let sym = this.makeSymbol(groups[i], [], batchCmd);
+							sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
+							symbols.push(sym);
 						}
 					} else if (type === 'color' || type === 'nolayer') {
 						uniquifyElems(svg);
@@ -5133,7 +5165,16 @@ define([
 					setHref(use_el, '#' + symbol.id);
 
 					if (symbol.getAttribute('data-id') != null && type === 'layer') {
-						svgCanvas.createLayer(symbol.getAttribute('data-id'));
+						function rgbToHex(str) {
+							var rgb = str.substring(4).split(',');
+							var hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
+							while (hex.length < 6) {
+								hex = '0' + hex;
+							}
+							return '#' + hex.toUpperCase();	
+						}
+						var layer = svgCanvas.createLayer(symbol.getAttribute('data-id') || rgbToHex(symbol.getAttribute('data-color')));
+						layer.color = symbol.getAttribute('data-color');
 					}
 
 					(current_group || getCurrentDrawing().getCurrentLayer()).appendChild(use_el);
@@ -5244,6 +5285,7 @@ define([
 			var new_layer = getCurrentDrawing().createLayer(name, historyRecordingService(hrService));
 			clearSelection();
 			call('changed', [new_layer]);
+			return new_layer;
 		};
 
 		/**
