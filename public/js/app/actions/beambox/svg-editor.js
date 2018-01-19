@@ -26,6 +26,7 @@ define([
 	'jsx!app/actions/beambox/Object-Panels-Controller',
 	'jsx!app/actions/beambox/Laser-Panel-Controller',
 	'app/actions/beambox/preview-mode-controller',
+	'app/actions/alert-actions',
 	'helpers/image-data',
 	'helpers/shortcuts',
 	'helpers/i18n',
@@ -35,13 +36,14 @@ define([
 	ObjectPanelsController,
 	LaserPanelController,
 	PreviewModeController,
+	AlertActions,
 	ImageData,
 	Shortcuts,
 	i18n,
 	Constant,
 	dxfToSvg
 ) {
-	const LANG = i18n.lang.beambox.svg_editor;
+	const LANG = i18n.lang.beambox;
 	if (window.svgEditor) {
 		return;
 	}
@@ -5325,10 +5327,10 @@ define([
 								reader.readAsText(file);
 							}
 
-							window.GUI.showPopupCustomGroup(
+							AlertActions.showPopupCustomGroup(
 								'confirm_mouse_input_device',
-								window.GUI.lang.beambox.popup.select_import_method,
-								[window.GUI.lang.beambox.popup.layer_by_layer, window.GUI.lang.beambox.popup.nolayer],
+								LANG.popup.select_import_method,
+								[LANG.popup.layer_by_layer, LANG.popup.nolayer],
 								'',
 								'',
 								[
@@ -5438,9 +5440,9 @@ define([
 						reader.readAsText(file);
 					} else {
 						if (file.name.endsWith('.ai') || file.path.endsWith('.ai')) {
-							$.alert(LANG.unnsupport_ai_file_directly);
+							$.alert(LANG.svg_editor.unnsupport_ai_file_directly);
 						} else {
-							$.alert(LANG.unnsupported_file_type);
+							$.alert(LANG.svg_editor.unnsupported_file_type);
 						}
 					}
 				};

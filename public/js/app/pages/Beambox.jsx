@@ -48,9 +48,6 @@ define([
             Config.write('beambox-preference', updatedConfig);
         })();
 
-        // TODO: Fix svg-editor for requirejs scope
-        window.GUI = {showPopupCustomGroup: AlertActions.showPopupCustomGroup, lang: lang};
-
         ObjectPanelsController.init("object-panels-placeholder");
         LaserPanelController.init("layer-laser-panel-placeholder");
         
