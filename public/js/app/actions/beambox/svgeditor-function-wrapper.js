@@ -104,67 +104,6 @@ define([
         },
         write_image_data_threshold: function(elem, val) {
             elem.attr('data-threshold', val);
-        },
-
-        fetchThumbnail: async function() {
-            function cloneAndModifySvg($svg) {
-                const $clonedSvg = $svg.clone(false);
-
-                $clonedSvg.find('text').remove();
-                $clonedSvg.find('#selectorParentGroup').remove();
-                $clonedSvg.find('#canvasBackground image#background_image').remove();
-                $clonedSvg.find('#canvasBackground #previewBoundary').remove();
-                $clonedSvg.find('#svgcontent *').css({
-                    "fill": '#ffffff',
-                    "fill-opacity": "0",
-                    "stroke": "#000",
-                    "stroke-width": "3px",
-                    "stroke-opacity": "1.0",
-                    "stroke-dasharray": "0"
-                });
-                return $clonedSvg;
-            }
-
-            async function DOM2Image($svg){
-                return await new Promise((resolve, reject)=>{
-                    const img  = new Image();
-                    img.onload = () => resolve(img);
-
-                    const $modifiedSvg = cloneAndModifySvg($svg);
-                    const svgString = new XMLSerializer().serializeToString($modifiedSvg.get(0));
-                    img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgString);
-                });
-            }
-
-            function cropAndDrawOnCanvas(img) {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-
-                //cropping
-                const ratio = img.width / $('#svgroot').width();
-                const W = ratio * $('#svgroot').width();
-                const H = ratio * $('#svgroot').height();
-                const w = ratio * $('#canvasBackground').attr('width');
-                const h = ratio * $('#canvasBackground').attr('height');
-                const x = - (W - w) / 2;
-                const y = - (H - h) / 2;
-
-                canvas.width = w;
-                canvas.height = h;
-
-                ctx.drawImage(img, x, y, img.width, img.height);
-                return canvas;
-            }
-
-            const $svg = cloneAndModifySvg($('#svgroot'));
-            const img = await DOM2Image($svg);
-            const canvas = cropAndDrawOnCanvas(img);
-
-            return await new Promise((resolve, reject)=>{
-                canvas.toBlob(function (blob) {
-                    resolve([canvas.toDataURL(), URL.createObjectURL(blob)]);
-                });
-            });
         }
     };
 

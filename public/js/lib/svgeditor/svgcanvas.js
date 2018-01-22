@@ -28,14 +28,12 @@
 // 14) recalculate.js
 
 define([
-	'app/actions/beambox/beambox',
 	'helpers/i18n',
 	'helpers/api/config',
 	'jsx!app/actions/beambox/Object-Panels-Controller',
 	'app/actions/beambox/preview-mode-controller',
 
 ], function (
-	BeamboxEvents,
 	i18n,
 	ConfigHelper,
 	ObjectPanelsController,
