@@ -22,7 +22,7 @@ define([
             firmware: {
                 api_key: 'beambox-firmware',
                 //TODO:
-                downloadUrl: 'https://s3-us-west-1.amazonaws.com/firmware/beambox/beamboxfirmware-[version].fxfw'
+                downloadUrl: 'https://s3-us-west-1.amazonaws.com/fluxstudio/firmware/beambox/beamboxfirmware-[version].fxfw'
             },
         }
 

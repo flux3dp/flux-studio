@@ -985,7 +985,8 @@ define(function() {
                 mouse: 'Mouse',
                 layer_by_layer: 'By Layer',
                 layer_by_color: 'By Color',
-                nolayer: 'No Layer'
+                nolayer: 'No Layer',
+                should_update_firmware_to_continue: 'Please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
             },
             left_panel: {
                 insert_object: 'Insert Object',

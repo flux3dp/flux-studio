@@ -23,8 +23,8 @@ TODOS
 1. JSDoc
 */
 define([
-	'jsx!views/beambox/Object-Panels-Controller',
-	'jsx!views/beambox/Right-Panels/Laser-Panel-Controller',
+	'jsx!app/actions/beambox/Object-Panels-Controller',
+	'jsx!app/actions/beambox/Laser-Panel-Controller',
 	'app/actions/beambox/preview-mode-controller',
 	'helpers/image-data',
 	'helpers/shortcuts',

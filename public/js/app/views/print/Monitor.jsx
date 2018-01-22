@@ -680,7 +680,6 @@ define([
         },
 
         _processReport: function(report) {
-            console.log('_processReport', report);
             if(!report.error) {
                 if(this._isAbortedOrCompleted() && openedFrom !== GlobalConstants.DEVICE_LIST) {
                     DeviceMaster.quit();

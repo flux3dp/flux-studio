@@ -1488,7 +1488,6 @@ define([
                 }
             });
 
-            console.log("Connected Channels", connectedUsbChannels);
             if (connectedUsbChannels.length == 0) {
                 self.availableUsbChannel = -1;
             }
