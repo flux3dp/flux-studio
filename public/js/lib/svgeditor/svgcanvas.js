@@ -660,7 +660,7 @@ define([
 
 				if (!curBBoxes.length) {
 					// Cache all bboxes
-					curBBoxes = getVisibleElementsAndBBoxes(parent);
+					curBBoxes = getVisibleElementsAndBBoxes();
 				}
 				var i = curBBoxes.length;
 				while (i--) {
@@ -1156,9 +1156,11 @@ define([
 					// Select layer of mouse_target
 					var title = $(mouse_target.parentNode).find('title')[0];
 					if (title) {
-						svgCanvas.setCurrentLayer(title.innerHTML);
-						window.populateLayers();
-						selectOnly([mouse_target], true);
+						if (selectedElements.indexOf(mouse_target) == -1) {
+							svgCanvas.setCurrentLayer(title.innerHTML);
+							window.populateLayers();
+							selectOnly([mouse_target], true);
+						}
 						return mouse_target;
 					}
 				}
@@ -1339,6 +1341,7 @@ define([
 				startTransform = mouse_target.getAttribute('transform');
 				var i, stroke_w,
 					tlist = svgedit.transformlist.getTransformList(mouse_target);
+				console.log("Mode = " + current_mode);
 				switch (current_mode) {
 					case 'select':
 						started = true;
@@ -1350,9 +1353,12 @@ define([
 							justClearSelection = true;
 						}
 
+						console.log("MT", mouse_target, "SE", selectedElements)
+
 						if (mouse_target != svgroot) {
 							// if this element is not yet selected, clear selection and select it
 							if (selectedElements.indexOf(mouse_target) == -1) {
+								console.log("Reselect");
 								// only clear selection if shift is not pressed (otherwise, add
 								// element to selection)
 								if (!evt.shiftKey) {
@@ -1406,6 +1412,7 @@ define([
 								'display': 'inline'
 							}, 100);
 						}
+						console.log("End MouseDown", selectedElements);
 						break;
 					case 'zoom':
 						started = true;

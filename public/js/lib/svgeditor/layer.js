@@ -94,14 +94,14 @@ Layer.prototype.getGroup = function() {
  * Active this layer so it takes pointer events.
  */
 Layer.prototype.activate = function() {
-	this.group_.setAttribute("style", "pointer-events:all");
+	// this.group_.setAttribute("style", "pointer-events:all");
 };
 
 /**
  * Deactive this layer so it does NOT take pointer events.
  */
 Layer.prototype.deactivate = function() {
-	this.group_.setAttribute("style", "pointer-events:none");
+	// this.group_.setAttribute("style", "pointer-events:none");
 };
 
 /**
