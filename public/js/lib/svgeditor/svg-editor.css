@@ -500,7 +500,7 @@ div.palette_item:first-child {
 	z-index: 4;
 }
 
-#workarea.wireframe #svgcontent * {
+#workarea.wireframe #svgcontent *:not(.poly) {
 	fill: #FFFFFF;
 	fill-opacity: 0;
 	stroke: #000;

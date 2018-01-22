@@ -5100,6 +5100,10 @@ define([
 								for (var j = 0; j < nodes.length; j++) {
 									var node = nodes[j];
 									var stroke = node.getAttribute('stroke');
+									if (stroke === 'none') {
+										stroke = node.getAttribute('fill');
+									}
+									node.setAttribute('class', 'poly');
 									if (!groupColorMap[stroke]) {
 										groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
 										groupColorMap[stroke].setAttribute('data-color', stroke);
@@ -5173,8 +5177,11 @@ define([
 							}
 							return '#' + hex.toUpperCase();	
 						}
-						var layer = svgCanvas.createLayer(symbol.getAttribute('data-id') || rgbToHex(symbol.getAttribute('data-color')));
-						layer.color = symbol.getAttribute('data-color');
+						var layerName = symbol.getAttribute('data-id') || rgbToHex(symbol.getAttribute('data-color'));
+						if (!svgCanvas.setCurrentLayer(layerName)) {
+							var layer = svgCanvas.createLayer(layerName);
+							layer.color = symbol.getAttribute('data-color');
+						}
 					}
 
 					(current_group || getCurrentDrawing().getCurrentLayer()).appendChild(use_el);

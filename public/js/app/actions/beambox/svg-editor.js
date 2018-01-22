@@ -5351,6 +5351,7 @@ define([
 					return new Promise((resolve, reject) =>{
 						var reader = new FileReader();
 						reader.onloadend = function (e) {
+							console.log(e.target.result);
 							var newElement = svgCanvas.importSvgString(e.target.result, type);
 							svgCanvas.ungroupSelectedElement();
 							svgCanvas.ungroupSelectedElement();
@@ -5392,8 +5393,7 @@ define([
 											async function readAll() {
 												svgCanvas.createLayer('切割圖層');
 												await readSVG(outputs['strokes'], type);
-												svgCanvas.createLayer('色塊圖層');
-												await readImage(outputs['colors'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+												await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
 												svgCanvas.createLayer('點陣圖層');
 												await readImage(outputs['bitmap'], 3.5277777);
 											}
