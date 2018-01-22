@@ -7,12 +7,16 @@
         "mocha": true,
         "builtin": true
     },
+    "parser": "babel-eslint",
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
         },
         "sourceType": "module"
     },
+    "plugins": [
+        "react"
+    ],
     "globals": {
         "$": false,
         "moment": false,
@@ -23,6 +27,7 @@
         "_": false
     },
     "rules": {
+        "indent": ["error", 4],
         "no-dupe-keys": 2,
         "block-scoped-var": 0,
         "camelcase": 0,
@@ -86,7 +91,7 @@
                 "render"
             ]
         }],
-        "react/wrap-multilines": 2,
+        "react/jsx-wrap-multilines": 2,
         "semi": [2, "always"],
         "strict": 2,
         "space-unary-ops": 0,
