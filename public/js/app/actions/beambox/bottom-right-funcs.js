@@ -6,7 +6,6 @@ define([
     'helpers/api/svg-laser-parser',
     'app/actions/alert-actions',
     'app/actions/global-actions',
-    'app/actions/beambox/svgeditor-function-wrapper',
 ], function (
     DeviceMaster,
     i18n,
@@ -14,8 +13,7 @@ define([
     ProgressConstants,
     svgLaserParser,
     AlertActions,
-    GlobalActions,
-    FnWrapper
+    GlobalActions
 ) {
     const lang = i18n.lang;
     const svgeditorParser = svgLaserParser({ type: 'svgeditor' });
@@ -29,18 +27,18 @@ define([
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
             $clonedSvg.find('#svgcontent *').css({
-                "fill": '#ffffff',
-                "fill-opacity": "0",
-                "stroke": "#000",
-                "stroke-width": "3px",
-                "stroke-opacity": "1.0",
-                "stroke-dasharray": "0"
+                'fill': '#ffffff',
+                'fill-opacity': '0',
+                'stroke': '#000',
+                'stroke-width': '3px',
+                'stroke-opacity': '1.0',
+                'stroke-dasharray': '0'
             });
             return $clonedSvg;
         }
 
         async function DOM2Image($svg){
-            return await new Promise((resolve, reject)=>{
+            return await new Promise((resolve)=>{
                 const img  = new Image();
                 img.onload = () => resolve(img);
 
@@ -74,12 +72,12 @@ define([
         const img = await DOM2Image($svg);
         const canvas = cropAndDrawOnCanvas(img);
 
-        return await new Promise((resolve, reject)=>{
+        return await new Promise((resolve)=>{
             canvas.toBlob(function (blob) {
                 resolve([canvas.toDataURL(), URL.createObjectURL(blob)]);
             });
         });
-    }
+    };
 
     //return {uploadFile, thumbnailBlobURL}
     const prepareFileWrappedFromSvgStringAndThumbnail = async () => {
@@ -89,10 +87,10 @@ define([
         const blob = new Blob([thumbnail, svgString], { type: 'image/svg+xml' });
 
         const reader = new FileReader();
-        const uploadFile = await new Promise((resolve, reject) => {
+        const uploadFile = await new Promise((resolve) => {
             reader.onload = function () {
                 //not sure whether all para is needed
-                const uploadFile = {
+                const file = {
                     data: reader.result,
                     name: 'svgeditor.svg',
                     uploadName: thumbnailBlobURL.split('/').pop(),
@@ -103,7 +101,7 @@ define([
                     index: 0,
                     totalFiles: 1
                 };
-                resolve(uploadFile);
+                resolve(file);
             };
             reader.readAsArrayBuffer(blob);
         });
@@ -112,12 +110,12 @@ define([
             uploadFile: uploadFile,
             thumbnailBlobURL: thumbnailBlobURL
         };
-    }
+    };
 
     const fetchFcode = async () => {
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
         await svgeditorParser.uploadToSvgeditorAPI([uploadFile]);
-        const fcodeBlob = await new Promise((resolve, reject) => {
+        const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for
             svgeditorParser.getTaskCode(
                 names,
@@ -126,9 +124,9 @@ define([
                         ProgressActions.open(ProgressConstants.STEPPING);
                         ProgressActions.updating(data.message, data.percentage * 100);
                     },
-                    onFinished: function (fcodeBlob) {
+                    onFinished: function (blob) {
                         ProgressActions.updating(lang.message.uploading_fcode, 100);
-                        resolve(fcodeBlob);
+                        resolve(blob);
                     },
                     fileMode: '-f'
                 }
@@ -161,4 +159,4 @@ define([
             ProgressActions.close();
         },
     };
-})
+});

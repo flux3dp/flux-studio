@@ -3,17 +3,15 @@ define([
 ], function(
     Constant
 ){
-    'use strict';
-
     let _mm2pixel = function(mm_input) {
         const dpmm = Constant.dpmm;
         return mm_input*dpmm;
     };
 
     let _update_attr_changer = function(name, val) {
-            $('#'+name).val(val);
-            $('#'+name).change();
-        };
+        $('#'+name).val(val);
+        $('#'+name).change();
+    };
 
     let _setCrosshairCursor = function() {
         $('#workarea').css('cursor', 'crosshair');
