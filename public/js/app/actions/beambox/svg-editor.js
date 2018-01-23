@@ -1052,6 +1052,7 @@ define([
                         $(this.parentNode).addClass('layersel');
                         svgCanvas.setCurrentLayer(this.textContent);
                         renderLayerLaserConfigs();
+                        svgCanvas.selectAllInCurrentLayer();
                         evt.preventDefault();
                     })
                     .mouseover(function () {
