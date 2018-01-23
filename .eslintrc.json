@@ -27,7 +27,7 @@
         "_": false
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
         "no-dupe-keys": 2,
         "block-scoped-var": 0,
         "camelcase": 0,
