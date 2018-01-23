@@ -5044,127 +5044,101 @@ define([
             var symbols = [],
                 use_el;
             try {
-                // Get unique ID
-                var uid = svgedit.utilities.encode64(xmlString.length + xmlString).substr(0, 32);
-
-                var useExisting = false;
-
-                // Look for symbol and make sure symbol exists in image
-                if (import_ids[uid]) {
-                    if ($(import_ids[uid].symbol).parents('#svgroot').length) {
-                        useExisting = true;
-                    }
-                }
-
                 var batchCmd = new svgedit.history.BatchCommand('Import Image');
                 var symbol;
-                if (useExisting) {
-                    symbols.push(import_ids[uid].symbol);
-                    rootTransform = import_ids[uid].xform;
-                } else {
-                    // convert string into XML document
-                    var newDoc = svgedit.utilities.text2xml(xmlString);
-                    rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
-                    this.prepareSvg(newDoc);
 
-                    // import new svg document into our document
-                    var svg;
-                    // If DOM3 adoptNode() available, use it. Otherwise fall back to DOM2 importNode()
-                    if (svgdoc.adoptNode) {
-                        svg = svgdoc.adoptNode(newDoc.documentElement);
-                    } else {
-                        svg = svgdoc.importNode(newDoc.documentElement, true);
+                // convert string into XML document
+                var newDoc = svgedit.utilities.text2xml(xmlString);
+                rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
+                this.prepareSvg(newDoc);
+
+                // import new svg document into our document
+                const svg = svgdoc.adoptNode(newDoc.documentElement);
+
+
+                var groups = [];
+                if (type === 'layer') {
+                    for (var i = 0; i < svg.childNodes.length; i++) {
+                        var child = svg.childNodes[i];
+                        console.log('child', child);
+                        if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
+                        if (child.tagName !== 'g' || child.id == null) {
+                            type = 'nolayer';
+                            break;
+                        } else {
+                            groups.push(child);
+                        }
                     }
-
-                    var groups = [];
-                    if (type === 'layer') {
-                        for (var i = 0; i < svg.childNodes.length; i++) {
-                            var child = svg.childNodes[i];
-                            console.log('child', child);
-                            if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
-                            if (child.tagName !== 'g' || child.id == null) {
-                                type = 'nolayer';
-                                break;
-                            } else {
-                                groups.push(child);
+                }
+                if (type === 'color') {
+                    var groupColorMap = {};
+                    for (var i = 0; i < svg.childNodes.length; i++) {
+                        var child = svg.childNodes[i];
+                        console.log('child', child);
+                        if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
+                        if (child.tagName === 'g') {
+                            // Child = first group
+                            var nodes = [];
+                            for (var j = 0; j < child.childNodes.length; j++) {
+                                nodes.push(child.childNodes[j]);
+                            }
+                            for (var j = 0; j < nodes.length; j++) {
+                                var node = nodes[j];
+                                var stroke = node.getAttribute('stroke');
+                                if (stroke === 'none') {
+                                    stroke = node.getAttribute('fill');
+                                }
+                                node.setAttribute('class', 'poly');
+                                if (!groupColorMap[stroke]) {
+                                    groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
+                                    groupColorMap[stroke].setAttribute('data-color', stroke);
+                                }
+                                node.parentElement.removeChild(node);
+                                groupColorMap[stroke].appendChild(node);
                             }
                         }
                     }
-                    if (type === 'color') {
-                        var groupColorMap = {};
-                        for (var i = 0; i < svg.childNodes.length; i++) {
-                            var child = svg.childNodes[i];
-                            console.log('child', child);
-                            if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
-                            if (child.tagName === 'g') {
-                                // Child = first group
-                                var nodes = [];
-                                for (var j = 0; j < child.childNodes.length; j++) {
-                                    nodes.push(child.childNodes[j]);
-                                }
-                                for (var j = 0; j < nodes.length; j++) {
-                                    var node = nodes[j];
-                                    var stroke = node.getAttribute('stroke');
-                                    if (stroke === 'none') {
-                                        stroke = node.getAttribute('fill');
-                                    }
-                                    node.setAttribute('class', 'poly');
-                                    if (!groupColorMap[stroke]) {
-                                        groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
-                                        groupColorMap[stroke].setAttribute('data-color', stroke);
-                                    }
-                                    node.parentElement.removeChild(node);
-                                    groupColorMap[stroke].appendChild(node);
-                                }
-                            }
-                        }
-                        for (var k in groupColorMap) {
-                            groups.push(groupColorMap[k]);
-                        }
-                        console.log(groupColorMap);
-                        type = 'layer';
+                    for (var k in groupColorMap) {
+                        groups.push(groupColorMap[k]);
                     }
-                    console.log(type);
-                    if (type === 'layer') {
-                        for (var i in groups) {
-                            let sym = this.makeSymbol(groups[i], [], batchCmd);
-                            sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
-                            symbols.push(sym);
-                        }
-                    } else if (type === 'color' || type === 'nolayer') {
-                        uniquifyElems(svg);
-
-                        var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
-                            innerh = svgedit.units.convertToNum('height', svg.getAttribute('height')),
-                            innervb = svg.getAttribute('viewBox'),
-                            // if no explicit viewbox, create one out of the width and height
-                            vb = innervb ? innervb.split(' ') : [0, 0, innerw, innerh];
-
-                        svg.removeAttribute('viewBox');
-
-                        for (j = 0; j < 4; ++j) {
-                            vb[j] = +(vb[j]);
-                        }
-
-                        // TODO: properly handle preserveAspectRatio
-                        var canvasw = +svgcontent.getAttribute('width'),
-                            canvash = +svgcontent.getAttribute('height');
-                        // imported content should be 1/3 of the canvas on its largest dimension
-
-                        if (svgedit.browser.isGecko()) {
-                            // Move all gradients into root for Firefox, workaround for this bug: https://bugzilla.mozilla.org/show_bug.cgi?id=353575
-                            // TODO: Make this properly undo-able.
-                            $(svg).find('linearGradient, radialGradient, pattern').appendTo(defs);
-                        }
-
-                        symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
-
+                    console.log(groupColorMap);
+                    type = 'layer';
+                }
+                console.log(type);
+                if (type === 'layer') {
+                    for (var i in groups) {
+                        let sym = this.makeSymbol(groups[i], [], batchCmd);
+                        sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
+                        symbols.push(sym);
                     }
-                    // Store data
-                    //		import_ids[uid] = {
-                    //			symbol: symbol,
-                    //			xform: ts
-                    //		};
+                } else if (type === 'color' || type === 'nolayer') {
+                    uniquifyElems(svg);
+
+                    var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
+                        innerh = svgedit.units.convertToNum('height', svg.getAttribute('height')),
+                        innervb = svg.getAttribute('viewBox'),
+                        // if no explicit viewbox, create one out of the width and height
+                        vb = innervb ? innervb.split(' ') : [0, 0, innerw, innerh];
+
+                    svg.removeAttribute('viewBox');
+
+                    for (j = 0; j < 4; ++j) {
+                        vb[j] = +(vb[j]);
+                    }
+
+                    // TODO: properly handle preserveAspectRatio
+                    var canvasw = +svgcontent.getAttribute('width'),
+                        canvash = +svgcontent.getAttribute('height');
+                    // imported content should be 1/3 of the canvas on its largest dimension
+
+                    if (svgedit.browser.isGecko()) {
+                        // Move all gradients into root for Firefox, workaround for this bug: https://bugzilla.mozilla.org/show_bug.cgi?id=353575
+                        // TODO: Make this properly undo-able.
+                        $(svg).find('linearGradient, radialGradient, pattern').appendTo(defs);
+                    }
+
+                    symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
+
                 }
 
                 for (var i = 0; i < symbols.length; i++) {
