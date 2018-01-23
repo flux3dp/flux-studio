@@ -1,5 +1,3 @@
-'use strict';
-
 var gulp = require('gulp'),
     sass = require('gulp-sass'),
     webserver = require('gulp-webserver'),
@@ -9,7 +7,6 @@ var gulp = require('gulp'),
     pump = require('pump'),
     babel = require('gulp-babel'),
     sourcemaps = require('gulp-sourcemaps'),
-    fs = require('fs'),
     cleanCSS = require('gulp-clean-css'),
     mocha = require('gulp-mocha');
 

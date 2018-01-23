@@ -42,7 +42,7 @@ define([
     DeviceList
 ) {
     'use strict';
-
+    const lang = i18n.lang;
     var View = React.createClass({
         displayName: 'PrinterSelection',
         selected_printer: null,
@@ -55,7 +55,6 @@ define([
         getDefaultProps: function() {
             return {
                 uniqleId: '',
-                lang: i18n.get(),
                 className: '',
                 forceAuth: false,
                 onGettingPrinter: function() {},
@@ -86,7 +85,6 @@ define([
             var selectedPrinter = initializeMachine.defaultPrinter.get(),
                 self = this,
                 currentPrinter,
-                lang = self.props.lang,
                 _options = [],
                 refreshOption = function(options) {
                     _options = [];
@@ -236,7 +234,6 @@ define([
         _selectPrinter: function(printer, e) {
             this.setState({ processing: true });
             var self = this,
-                lang = self.props.lang,
                 onError;
 
             ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
@@ -325,7 +322,6 @@ define([
         },
 
         _auth: function(uuid, password, opts) {
-            var lang = this.props.lang;
             ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
             opts = opts || {};
             opts.onError = opts.onError || function() {};
@@ -387,8 +383,7 @@ define([
         },
 
         _openAlertWithnoPrinters: function() {
-            var self = this,
-                lang = self.props.lang;
+            var self = this;
 
             AlertStore.removeRetryListener(self._waitForPrinters);
 
@@ -400,7 +395,6 @@ define([
 
         _renderPrinterItem: function(printer) {
             var meta,
-                lang = this.props.lang,
                 status = lang.machine_status,
                 headModule = lang.head_module,
                 statusId = 'st' + printer.st_id,
@@ -434,7 +428,6 @@ define([
 
         render: function() {
             var self = this,
-                lang = self.props.lang,
                 showPassword = self.state.showPassword,
                 cx = React.addons.classSet,
                 wrapperClass = ['select-printer'],

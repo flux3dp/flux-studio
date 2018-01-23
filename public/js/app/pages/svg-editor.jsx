@@ -190,7 +190,6 @@ define([
 
     'use strict';
 
-    return function(args = {}) {
 
       class view extends React.Component {
           componentDidMount(node) {
@@ -1476,5 +1475,4 @@ define([
         }
 
         return view;
-    };
 });

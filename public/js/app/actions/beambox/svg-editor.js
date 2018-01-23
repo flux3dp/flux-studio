@@ -23,23 +23,25 @@ TODOS
 1. JSDoc
 */
 define([
-	'jsx!app/actions/beambox/Object-Panels-Controller',
-	'jsx!app/actions/beambox/Laser-Panel-Controller',
-	'app/actions/beambox/preview-mode-controller',
-	'helpers/image-data',
-	'helpers/shortcuts',
-	'helpers/i18n',
-	'app/actions/beambox/constant',
-	'helpers/dxf2svg'
+    'jsx!app/actions/beambox/Object-Panels-Controller',
+    'jsx!app/actions/beambox/Laser-Panel-Controller',
+    'app/actions/beambox/preview-mode-controller',
+    'app/actions/alert-actions',
+    'helpers/image-data',
+    'helpers/shortcuts',
+    'helpers/i18n',
+    'app/actions/beambox/constant',
+    'helpers/dxf2svg'
 ], function (
-	ObjectPanelsController,
-	LaserPanelController,
-	PreviewModeController,
-	ImageData,
-	Shortcuts,
-	i18n,
-	Constant,
-	dxfToSvg
+    ObjectPanelsController,
+    LaserPanelController,
+    PreviewModeController,
+    AlertActions,
+    ImageData,
+    Shortcuts,
+    i18n,
+    Constant,
+    dxfToSvg
 ) {
 	const LANG = i18n.lang.beambox.svg_editor;
 	if (window.svgEditor) {

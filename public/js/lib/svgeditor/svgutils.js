@@ -1186,7 +1186,7 @@ svgedit.utilities.copyElem = function(el, getNextId) {
 		var ref = $(el).data('symbol');
 		$(new_el).data('ref', ref).data('symbol', ref);
 	} else if (new_el.tagName == 'image') {
-		preventClickDefault(new_el);
+		svgedit.utilities.preventClickDefault(new_el);
 	}
 	return new_el;
 };
@@ -1383,7 +1383,7 @@ svgedit.utilities.convertPath = function(path, toRel) {
 svgedit.utilities.getMatrixFromTransformAttr = function(str) {
 
 	matrix = svgroot.createSVGMatrix();
-			
+
 	// Parse SVG root element transform attribute
 	for (var i in str = str.match(/(\w+\((\-?\d+\.?\d*e?\-?\d*,?)+\))+/g)) {
 		var c = str[i].match(/[\w\.\-]+/g);
