@@ -500,6 +500,16 @@ div.palette_item:first-child {
 	z-index: 4;
 }
 
+#workarea.wireframe #svgcontent .poly {
+	fill-opacity: 1;
+	/* TODO:
+	Better way to do object selection:
+		Duplicate the origina object, and use invisible outline with stroke width: 5px,
+		so that object can be selected with some error tolerance.
+	*/
+	/* pointer-events: stroke; */
+}
+
 #workarea.wireframe #svgcontent *:not(.poly) {
 	fill: #FFFFFF;
 	fill-opacity: 0;
