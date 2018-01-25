@@ -5353,19 +5353,19 @@ define([
                     return new Promise((resolve, reject) => {
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
-                            console.log("Reading SVG");
+                            console.log('Reading SVG');
                             var newElement = svgCanvas.importSvgString(e.target.result, type);
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
                             svgCanvas.alignSelectedElements('m', 'page');
                             svgCanvas.alignSelectedElements('c', 'page');
-							// highlight imported element, otherwise we get strange empty selectbox
-							try {
-								svgCanvas.selectOnly([newElement]);
-							} catch(e) {
-								console.warn("Reading empty SVG")
-							}
+                            // highlight imported element, otherwise we get strange empty selectbox
+                            try {
+                                svgCanvas.selectOnly([newElement]);
+                            } catch(e) {
+                                console.warn('Reading empty SVG');
+                            }
                             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
                             $('#dialog_box').hide();
                             resolve();
@@ -5397,14 +5397,14 @@ define([
                                     await svgWebSocket.uploadPlainSVG(file);
                                     const outputs = svgWebSocket.divideSVG();
                                     await readSVG(outputs['strokes'], type);
-                                    console.log("Loading colors");
+                                    console.log('Loading colors');
                                     await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
-                                    console.log("Loading bitmap", outputs['bitmap'])
+                                    console.log('Loading bitmap', outputs['bitmap']);
                                     if (outputs['bitmap'].size > 0) {
                                         svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
                                         await readImage(outputs['bitmap'], 3.5277777);
                                     }
-                                    console.log("Load complete")
+                                    console.log('Load complete');
                                 } else {
                                     readSVG(file, type);
                                 }
@@ -5507,10 +5507,10 @@ define([
 
                 // enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
                 var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
-				$('#tool_import').show().prepend(imgImport);
+                $('#tool_import').show().prepend(imgImport);
 
-				window.populateLayers = populateLayers;
-				window.updateContextPanel = updateContextPanel;
+                window.populateLayers = populateLayers;
+                window.updateContextPanel = updateContextPanel;
             }
 
             //			$(function() {
