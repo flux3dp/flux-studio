@@ -26,6 +26,7 @@ define([
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
     'app/actions/beambox/preview-mode-controller',
+    'helpers/api/svg-laser-parser',
     'app/actions/alert-actions',
     'helpers/image-data',
     'helpers/shortcuts',
@@ -36,6 +37,7 @@ define([
     ObjectPanelsController,
     LaserPanelController,
     PreviewModeController,
+    SvgLaserParser,
     AlertActions,
     ImageData,
     Shortcuts,
@@ -44,6 +46,7 @@ define([
     dxfToSvg
 ) {
     const LANG = i18n.lang.beambox;
+    var svgWebSocket = SvgLaserParser({ type: 'svgeditor' });
     if (window.svgEditor) {
         return;
     }
@@ -4458,6 +4461,8 @@ define([
                     // layer is selected from the canvas and then select that one in the UI)
                     $('#layerlist tr.layer').removeClass('layersel');
                     $('#layerlist tr.layer:first').addClass('layersel');
+                    svgCanvas.setCurrentLayer($('#layerlist tr.layer:first .layername').text());
+                    svgCanvas.selectAllInCurrentLayer();
                 }
             }
 
@@ -4481,7 +4486,7 @@ define([
             }
 
             function mergeLayer() {
-                if ($('#layerlist tr.layersel').index() === svgCanvas.getCurrentDrawing().getNumLayers() - 1) {
+                if ($('#layerlist tr.layersel').index() === 0) {
                     return;
                 }
                 svgCanvas.mergeLayer();
@@ -5385,20 +5390,15 @@ define([
                         // Detected an image
                         // svg handling
                         if (file.type.indexOf('svg') > -1) {
-                            function importAs(type) {
+                            async function importAs(type) {
                                 if (type === 'color') {
-                                    window.svgWebSocket.uploadPlainSVG(file).done(() => {
-                                        window.svgWebSocket.divideSVG().done((outputs) => {
-                                            async function readAll() {
-                                                svgCanvas.createLayer('切割圖層');
-                                                await readSVG(outputs['strokes'], type);
-                                                await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
-                                                svgCanvas.createLayer('點陣圖層');
-                                                await readImage(outputs['bitmap'], 3.5277777);
-                                            }
-                                            readAll();
-                                        });
-                                    });
+                                    await svgWebSocket.uploadPlainSVG(file);
+                                    const outputs = await svgWebSocket.divideSVG();
+                                    svgCanvas.createLayer('切割圖層');
+                                    await readSVG(outputs['strokes'], type);
+                                    await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
+                                    svgCanvas.createLayer('點陣圖層');
+                                    await readImage(outputs['bitmap'], 3.5277777);
                                 } else {
                                     readSVG(file, type);
                                 }

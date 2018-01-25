@@ -30,9 +30,10 @@ define([
                 'fill': '#ffffff',
                 'fill-opacity': '0',
                 'stroke': '#000',
-                'stroke-width': '3px',
+                'stroke-width': '1px',
                 'stroke-opacity': '1.0',
-                'stroke-dasharray': '0'
+                'stroke-dasharray': '0',
+                'vector-effect': 'non-scaling-stroke'
             });
             return $clonedSvg;
         }
