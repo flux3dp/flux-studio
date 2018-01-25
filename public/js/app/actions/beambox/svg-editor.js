@@ -31,8 +31,8 @@ define([
     'helpers/shortcuts',
     'helpers/i18n',
     'app/actions/beambox/constant',
-	'helpers/dxf2svg',
-	'helpers/api/svg-laser-parser'
+    'helpers/dxf2svg',
+    'helpers/api/svg-laser-parser'
 ], function (
     ObjectPanelsController,
     LaserPanelController,
@@ -42,11 +42,11 @@ define([
     Shortcuts,
     i18n,
     Constant,
-	Dxf2Svg,
-	SvgLaserParser
+    Dxf2Svg,
+    SvgLaserParser
 ) {
-	const LANG = i18n.lang.beambox;
-	const svgWebSocket = SvgLaserParser({ type: 'svgeditor' });
+    const LANG = i18n.lang.beambox;
+    const svgWebSocket = SvgLaserParser({ type: 'svgeditor' });
     if (window.svgEditor) {
         return;
     }
@@ -4453,6 +4453,14 @@ define([
             function deleteLayer() {
                 if (svgCanvas.deleteCurrentLayer()) {
                     updateContextPanel();
+                    populateLayers();
+                    // This matches what SvgCanvas does
+                    // TODO: make this behavior less brittle (svg-editor should get which
+                    // layer is selected from the canvas and then select that one in the UI)
+                    $('#layerlist tr.layer').removeClass('layersel');
+                    $('#layerlist tr.layer:first').addClass('layersel');
+                    svgCanvas.setCurrentLayer($('#layerlist tr.layer:first .layername').text());
+                    svgCanvas.selectAllInCurrentLayer();
                 }
             }
 
@@ -4476,7 +4484,7 @@ define([
             }
 
             function mergeLayer() {
-                if ($('#layerlist tr.layersel').index() === svgCanvas.getCurrentDrawing().getNumLayers() - 1) {
+                if ($('#layerlist tr.layersel').index() === 0) {
                     return;
                 }
                 svgCanvas.mergeLayer();
@@ -5345,19 +5353,19 @@ define([
                     return new Promise((resolve, reject) => {
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
-                            console.log("Reading SVG");
+                            console.log('Reading SVG');
                             var newElement = svgCanvas.importSvgString(e.target.result, type);
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
                             svgCanvas.alignSelectedElements('m', 'page');
                             svgCanvas.alignSelectedElements('c', 'page');
-							// highlight imported element, otherwise we get strange empty selectbox
-							try {
-								svgCanvas.selectOnly([newElement]);
-							} catch(e) {
-								console.warn("Reading empty SVG")
-							}
+                            // highlight imported element, otherwise we get strange empty selectbox
+                            try {
+                                svgCanvas.selectOnly([newElement]);
+                            } catch(e) {
+                                console.warn('Reading empty SVG');
+                            }
                             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
                             $('#dialog_box').hide();
                             resolve();
@@ -5384,25 +5392,24 @@ define([
                         // Detected an image
                         // svg handling
                         if (file.type.indexOf('svg') > -1) {
+<<<<<<< HEAD
                             svgCanvas.setLatestImportFileName(file.name.split('.')[0])
                             function importAs(type) {
+=======
+                            async function importAs(type) {
+>>>>>>> origin/dev
                                 if (type === 'color') {
-                                    svgWebSocket.uploadPlainSVG(file).done(() => {
-                                        svgWebSocket.divideSVG().done((outputs) => {
-                                            async function readAll() {
-												await readSVG(outputs['strokes'], type);
-												console.log("Loading colors");
-												await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
-												console.log("Loading bitmap", outputs['bitmap'])
-												if (outputs['bitmap'].size > 0) {
-                                                	svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-													await readImage(outputs['bitmap'], 3.5277777);
-												}
-												console.log("Load complete")
-                                            }
-                                            readAll();
-                                        });
-                                    });
+                                    await svgWebSocket.uploadPlainSVG(file);
+                                    const outputs = svgWebSocket.divideSVG();
+                                    await readSVG(outputs['strokes'], type);
+                                    console.log('Loading colors');
+                                    await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
+                                    console.log('Loading bitmap', outputs['bitmap']);
+                                    if (outputs['bitmap'].size > 0) {
+                                        svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                                        await readImage(outputs['bitmap'], 3.5277777);
+                                    }
+                                    console.log('Load complete');
                                 } else {
                                     readSVG(file, type);
                                 }
@@ -5506,10 +5513,10 @@ define([
 
                 // enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
                 var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
-				$('#tool_import').show().prepend(imgImport);
-				
-				window.populateLayers = populateLayers;
-				window.updateContextPanel = updateContextPanel;
+                $('#tool_import').show().prepend(imgImport);
+
+                window.populateLayers = populateLayers;
+                window.updateContextPanel = updateContextPanel;
             }
 
             //			$(function() {
@@ -5710,7 +5717,7 @@ define([
                 }
             });
         };
-		
+
         return editor;
     })(jQuery);
 

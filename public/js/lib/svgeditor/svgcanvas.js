@@ -488,16 +488,6 @@ define([
             }
         };
 
-        (function () {
-            // TODO For Issue 208: this is a start on a thumbnail
-            //	var svgthumb = svgdoc.createElementNS(NS.SVG, 'use');
-            //	svgthumb.setAttribute('width', '100');
-            //	svgthumb.setAttribute('height', '100');
-            //	svgedit.utilities.setHref(svgthumb, '#svgcontent');
-            //	svgroot.appendChild(svgthumb);
-
-        })();
-
         // Object to contain image data for raster images that were found encodable
         var encodableImages = {},
 
@@ -1098,10 +1088,12 @@ define([
             var current_layer = getCurrentDrawing().getCurrentLayer();
             if (current_layer) {
                 current_mode = 'select';
-                try {
-                    selectOnly($(current_group || current_layer).children());
-                } catch (e) {
-                    console.warn("Selecting empty layer in \"selectAllInCurrentLayer\"");
+                const elemsToAdd = $(current_group || current_layer).children();
+                if((elemsToAdd.length === 1) && (elemsToAdd[0].tagName === 'title')){
+                    console.warn('Selecting empty layer in "selectAllInCurrentLayer"');
+                    return;
+                } else {
+                    selectOnly(elemsToAdd);
                 }
             }
         };
@@ -8061,7 +8053,7 @@ define([
             selectorManager.requestSelector(selected).showGrips(true);
             recalculateAllSelectedDimensions();
         };
-
     };
+
 
 });
