@@ -721,6 +721,7 @@ define(function() {
             button_advanced: '進階',
             confirm: '確認',
             get_fcode: '儲存<br/>工作',
+            export_fcode: '儲存成工作檔案 ...',
             name: '名稱',
             go: 'GO',
             showOutline: '顯示<br/>輪廓',

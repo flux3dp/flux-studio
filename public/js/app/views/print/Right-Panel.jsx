@@ -75,21 +75,7 @@ define([
         _renderActionButtons: function(lang) {
             let { hasObject, hasOutOfBoundsObject, disableGoButtons } = this.props,
                 cx = React.addons.classSet,
-                buttons = [
-                    {
-                        label: lang.laser.get_fcode,
-                        className: cx({
-                            'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
-                            'btn-default': true,
-                            'btn-hexagon': true,
-                            'btn-get-fcode': true
-                        }),
-                        title: lang.print.getFcodeTitle,
-                        dataAttrs: {
-                            'ga-event': 'get-print-fcode'
-                        },
-                        onClick: this._handleGetFCode
-                    }, {
+                buttons = [{
                         label: lang.monitor.start,
                         className: cx({
                             'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,

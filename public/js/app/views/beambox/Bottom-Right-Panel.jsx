@@ -39,8 +39,15 @@ define([
             });
         }
         _renderPrinterSelectorWindow() {
-            const onGettingPrinter = async (auth_printer) => {
-                if(await BeamboxVersionMaster.isUnusableVersion(auth_printer)) {
+            const onGettingPrinter = async (selected_item) => {
+                if (selected_item == "export_fcode") {
+                    BottomRightFuncs.exportFcode();
+                    this.setState({
+                        isPrinterSelectorOpen: false
+                    });
+                    return;
+                }
+                if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
                     console.log('not valid version');
                     AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
                     this.setState({
@@ -52,7 +59,7 @@ define([
                     isPrinterSelectorOpen: false,
                 });
 
-                BottomRightFuncs.uploadFcode(auth_printer);
+                BottomRightFuncs.uploadFcode(selected_item);
             };
             const onClose = () => {
                 this.setState({
@@ -63,6 +70,7 @@ define([
                 <PrinterSelector
                     uniqleId="laser"
                     className="laser-device-selection-popup"
+                    showExport={true}
                     onClose={onClose}
                     onGettingPrinter={onGettingPrinter}
                 />
@@ -74,18 +82,6 @@ define([
         _renderActionButtons() {
             const cx = React.addons.classSet;
             const buttons = [{
-                    label: lang.laser.get_fcode,
-                    className: cx({
-                        'btn-disabled': false,
-                        'btn-default': true,
-                        'btn-hexagon': true,
-                        'btn-get-fcode': true
-                    }),
-                    dataAttrs: {
-                        'ga-event': 'get-laser-fcode'
-                    },
-                    onClick: this._handleExportClick
-                }, {
                     label: lang.monitor.start,
                     className: cx({
                         'btn-disabled': false,

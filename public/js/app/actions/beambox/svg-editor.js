@@ -4454,14 +4454,6 @@ define([
             function deleteLayer() {
                 if (svgCanvas.deleteCurrentLayer()) {
                     updateContextPanel();
-                    populateLayers();
-                    // This matches what SvgCanvas does
-                    // TODO: make this behavior less brittle (svg-editor should get which
-                    // layer is selected from the canvas and then select that one in the UI)
-                    $('#layerlist tr.layer').removeClass('layersel');
-                    $('#layerlist tr.layer:first').addClass('layersel');
-                    svgCanvas.setCurrentLayer($('#layerlist tr.layer:first .layername').text());
-                    svgCanvas.selectAllInCurrentLayer();
                 }
             }
 
@@ -5393,6 +5385,7 @@ define([
                         // Detected an image
                         // svg handling
                         if (file.type.indexOf('svg') > -1) {
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
                             async function importAs(type) {
                                 if (type === 'color') {
                                     await svgWebSocket.uploadPlainSVG(file);
@@ -5432,6 +5425,7 @@ define([
 
                         } else {
                             //handle bitmap
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
                             readImage(file);
                         }
                     } else if (file.name.toLowerCase().indexOf('.dxf') > 0) {
