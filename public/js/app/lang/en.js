@@ -1009,7 +1009,8 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: 'Default Layer'
+                    layer1: 'Default',
+                    layer_bitmap: 'Bitmap'
                 },
                 laser_panel: {
                     strength: 'Power',

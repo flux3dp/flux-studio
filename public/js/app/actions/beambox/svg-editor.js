@@ -26,27 +26,27 @@ define([
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
     'app/actions/beambox/preview-mode-controller',
-    'helpers/api/svg-laser-parser',
     'app/actions/alert-actions',
     'helpers/image-data',
     'helpers/shortcuts',
     'helpers/i18n',
     'app/actions/beambox/constant',
-    'helpers/dxf2svg'
+    'helpers/dxf2svg',
+    'helpers/api/svg-laser-parser'
 ], function (
     ObjectPanelsController,
     LaserPanelController,
     PreviewModeController,
-    SvgLaserParser,
     AlertActions,
     ImageData,
     Shortcuts,
     i18n,
     Constant,
-    dxfToSvg
+    Dxf2Svg,
+    SvgLaserParser
 ) {
     const LANG = i18n.lang.beambox;
-    var svgWebSocket = SvgLaserParser({ type: 'svgeditor' });
+    const svgWebSocket = SvgLaserParser({ type: 'svgeditor' });
     if (window.svgEditor) {
         return;
     }
@@ -1080,8 +1080,6 @@ define([
                     layerlist.append('<tr><td style="color:white">_</td><td/></tr>');
                 }
             };
-
-            window.populateLayers = populateLayers;
 
             var addLayerLaserConfig = function (layername) {
                 LaserPanelController.initConfig(layername);
@@ -5355,15 +5353,19 @@ define([
                     return new Promise((resolve, reject) => {
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
-                            console.log(e.target.result);
+                            console.log("Reading SVG");
                             var newElement = svgCanvas.importSvgString(e.target.result, type);
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
                             svgCanvas.alignSelectedElements('m', 'page');
                             svgCanvas.alignSelectedElements('c', 'page');
-                            // highlight imported element, otherwise we get strange empty selectbox
-                            svgCanvas.selectOnly([newElement]);
+							// highlight imported element, otherwise we get strange empty selectbox
+							try {
+								svgCanvas.selectOnly([newElement]);
+							} catch(e) {
+								console.warn("Reading empty SVG")
+							}
                             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
                             $('#dialog_box').hide();
                             resolve();
@@ -5393,12 +5395,16 @@ define([
                             async function importAs(type) {
                                 if (type === 'color') {
                                     await svgWebSocket.uploadPlainSVG(file);
-                                    const outputs = await svgWebSocket.divideSVG();
-                                    svgCanvas.createLayer('切割圖層');
+                                    const outputs = svgWebSocket.divideSVG();
                                     await readSVG(outputs['strokes'], type);
+                                    console.log("Loading colors");
                                     await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
-                                    svgCanvas.createLayer('點陣圖層');
-                                    await readImage(outputs['bitmap'], 3.5277777);
+                                    console.log("Loading bitmap", outputs['bitmap'])
+                                    if (outputs['bitmap'].size > 0) {
+                                        svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                                        await readImage(outputs['bitmap'], 3.5277777);
+                                    }
+                                    console.log("Load complete")
                                 } else {
                                     readSVG(file, type);
                                 }
@@ -5432,9 +5438,9 @@ define([
                         reader = new FileReader();
                         let divideLayer = false;
                         reader.onloadend = function (evt) {
-                            var parsed = dxfToSvg.parseString(evt.target.result);
+                            var parsed = Dxf2Svg.parseString(evt.target.result);
                             console.log('Parsed DXF', parsed);
-                            let svg = dxfToSvg.toSVG(parsed);
+                            let svg = Dxf2Svg.toSVG(parsed);
                             let newElement;
 
                             if (divideLayer) {
@@ -5501,7 +5507,10 @@ define([
 
                 // enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
                 var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
-                $('#tool_import').show().prepend(imgImport);
+				$('#tool_import').show().prepend(imgImport);
+
+				window.populateLayers = populateLayers;
+				window.updateContextPanel = updateContextPanel;
             }
 
             //			$(function() {

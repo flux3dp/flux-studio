@@ -1090,6 +1090,7 @@ define([
                 current_mode = 'select';
                 const elemsToAdd = $(current_group || current_layer).children();
                 if((elemsToAdd.length === 1) && (elemsToAdd[0].tagName === 'title')){
+                    console.warn('Selecting empty layer in "selectAllInCurrentLayer"');
                     return;
                 } else {
                     selectOnly(elemsToAdd);
@@ -1334,7 +1335,6 @@ define([
                 startTransform = mouse_target.getAttribute('transform');
                 var i, stroke_w,
                     tlist = svgedit.transformlist.getTransformList(mouse_target);
-                console.log('Mode = ' + current_mode);
                 switch (current_mode) {
                     case 'select':
                         started = true;
@@ -1345,8 +1345,6 @@ define([
                         if ($('#selectorGroup0').css('display') === 'inline') {
                             justClearSelection = true;
                         }
-
-                        console.log('MT', mouse_target, 'SE', selectedElements);
 
                         if (mouse_target !== svgroot) {
                             // if this element is not yet selected, clear selection and select it
@@ -1405,7 +1403,6 @@ define([
                                 'display': 'inline'
                             }, 100);
                         }
-                        console.log('End MouseDown', selectedElements);
                         break;
                     case 'zoom':
                         started = true;
@@ -5091,7 +5088,7 @@ define([
                                 node.parentElement.removeChild(node);
                                 groupColorMap[stroke].appendChild(node);
                             }
-                        }
+						}
                     }
                     for (var k in groupColorMap) {
                         groups.push(groupColorMap[k]);
@@ -5187,6 +5184,16 @@ define([
                         dataXform += key + '=' + value + ' ';
                     });
                     use_el.setAttribute('data-xform', dataXform);
+                }
+
+                if ((type == 'color' || type == 'layer')) {
+                    const defaultLayerName = LANG.right_panel.layer_panel.layer1;
+                    if ($('svg title')[0].innerHTML == defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length == 0)) {
+                        this.setCurrentLayer(defaultLayerName);
+                        this.deleteCurrentLayer();
+                        window.updateContextPanel();
+                        window.populateLayers();
+                    }
                 }
             } catch (e) {
                 console.log(e);
@@ -8034,7 +8041,7 @@ define([
             selectorManager.requestSelector(selected).showGrips(true);
             recalculateAllSelectedDimensions();
         };
-
     };
+
 
 });
