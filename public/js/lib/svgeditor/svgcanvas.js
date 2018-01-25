@@ -5096,7 +5096,7 @@ define([
                                 node.parentElement.removeChild(node);
                                 groupColorMap[stroke].appendChild(node);
                             }
-                        }
+						}
                     }
                     for (var k in groupColorMap) {
                         groups.push(groupColorMap[k]);
@@ -5192,6 +5192,16 @@ define([
                         dataXform += key + '=' + value + ' ';
                     });
                     use_el.setAttribute('data-xform', dataXform);
+                }
+
+                if ((type == 'color' || type == 'layer')) {
+                    const defaultLayerName = LANG.right_panel.layer_panel.layer1;
+                    if ($('svg title')[0].innerHTML == defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length == 0)) {
+                        this.setCurrentLayer(defaultLayerName);
+                        this.deleteCurrentLayer();
+                        window.updateContextPanel();
+                        window.populateLayers();
+                    }
                 }
             } catch (e) {
                 console.log(e);

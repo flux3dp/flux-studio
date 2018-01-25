@@ -276,14 +276,16 @@ define([
                                         <i className="fa fa-bars" />
                                     </div>
                                 </fieldset>
-                                <table id="layerlist">
-                                    <tbody>
-                                        <tr className="layer">
-                                            <td className="layervis" />
-                                            <td className="layername">Layer 1</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div id="layerlist_container">
+                                    <table id="layerlist">
+                                        <tbody>
+                                            <tr className="layer">
+                                                <td className="layervis" />
+                                                <td className="layername">Layer 1</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
 
                             </div>
                             <div className='selLayerBlock'>

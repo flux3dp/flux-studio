@@ -29,7 +29,6 @@ define([
         'use strict';
         const lang = i18n.get();
         var svgWebSocket = svgLaserParser({ type: 'svgeditor' });
-        window.svgWebSocket = svgWebSocket;
 
         var ExportGCodeProgressing = function (data) {
             ProgressActions.open(ProgressConstants.STEPPING);

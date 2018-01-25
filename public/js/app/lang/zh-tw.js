@@ -1006,7 +1006,8 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: '預設圖層'
+                    layer1: '預設圖層',
+                    layer_bitmap: '點陣圖層'
                 },
                 laser_panel: {
                     strength: '功率',
