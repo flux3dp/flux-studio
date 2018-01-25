@@ -1098,7 +1098,11 @@ define([
             var current_layer = getCurrentDrawing().getCurrentLayer();
             if (current_layer) {
                 current_mode = 'select';
-                selectOnly($(current_group || current_layer).children());
+                try {
+                    selectOnly($(current_group || current_layer).children());
+                } catch (e) {
+                    console.warn("Selecting empty layer in \"selectAllInCurrentLayer\"");
+                }
             }
         };
 
@@ -1339,7 +1343,6 @@ define([
                 startTransform = mouse_target.getAttribute('transform');
                 var i, stroke_w,
                     tlist = svgedit.transformlist.getTransformList(mouse_target);
-                console.log('Mode = ' + current_mode);
                 switch (current_mode) {
                     case 'select':
                         started = true;
@@ -1350,8 +1353,6 @@ define([
                         if ($('#selectorGroup0').css('display') === 'inline') {
                             justClearSelection = true;
                         }
-
-                        console.log('MT', mouse_target, 'SE', selectedElements);
 
                         if (mouse_target !== svgroot) {
                             // if this element is not yet selected, clear selection and select it
@@ -1410,7 +1411,6 @@ define([
                                 'display': 'inline'
                             }, 100);
                         }
-                        console.log('End MouseDown', selectedElements);
                         break;
                     case 'zoom':
                         started = true;

@@ -4453,12 +4453,6 @@ define([
             function deleteLayer() {
                 if (svgCanvas.deleteCurrentLayer()) {
                     updateContextPanel();
-                    populateLayers();
-                    // This matches what SvgCanvas does
-                    // TODO: make this behavior less brittle (svg-editor should get which
-                    // layer is selected from the canvas and then select that one in the UI)
-                    $('#layerlist tr.layer').removeClass('layersel');
-                    $('#layerlist tr.layer:first').addClass('layersel');
                 }
             }
 
