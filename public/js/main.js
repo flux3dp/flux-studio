@@ -83,10 +83,10 @@ requirejs.config({
         },
         Redux: {
             exports: 'Redux'
-        },
-        Raven: {
-            exports: 'Raven'
         }
+        // Raven: {
+        //     exports: 'Raven'
+        // }
     }
 });
 
