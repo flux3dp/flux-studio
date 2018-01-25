@@ -963,14 +963,6 @@ define([
             var preferences = false;
             var cur_context = '';
             var origTitle = $('title:first').text();
-            // Make [1,2,5] array
-            var r_intervals = [];
-            var i;
-            for (i = 0.1; i < 1E5; i *= 10) {
-                r_intervals.push(i);
-                r_intervals.push(2 * i);
-                r_intervals.push(5 * i);
-            }
 
             const displayChangeLayerBlock = function (maybeVisible) {
                 const block = $('.selLayerBlock');
@@ -1283,196 +1275,205 @@ define([
                 $(elem).width(w);
             };
 
-            function updateRulers(scanvas, zoom) {
-                if (!zoom) {
-                    zoom = svgCanvas.getZoom();
-                }
-                if (!scanvas) {
-                    scanvas = $('#svgcanvas');
-                }
+            function updateRulers() {
 
-                var d, i;
-                var limit = 30000;
-                var contentElem = svgCanvas.getContentElem();
-                var units = svgedit.units.getTypeMap();
-                var unit = units[curConfig.baseUnit]; // 1 = 1px
+
 
                 // draw x ruler then y ruler
                 /* 這裡code很亂 值得注意的點有：
-                        1. ruler的位置由css下 如top和margin
-                        2. 當超過limit時 會畫很多個canvas (參見"if (ruler_len >= limit)"段)
-                        3. 上述這些canvas根據css margin排列 因某種神秘原因ruler_y的canvas要加上margin-top:-3px
-                    */
-                for (d = 0; d < 2; d++) {
-                    var isX = (d === 0);
-                    var dim = isX ? 'x' : 'y';
-                    var lentype = isX ? 'width' : 'height';
-                    var contentDim = Number(contentElem.getAttribute(dim));
+                    1. ruler的位置由css下 如top和margin
+                    2. 當超過limit時 會畫很多個canvas 因瀏覽器canvas不能畫太長 (大約30000px) 第一個canvas畫不下時就比第二個canvas拿出來繼續畫
+                    3. 上述這些canvas根據css margin排列 因某種神秘原因ruler_y的canvas要加上margin-top:-3px
+                */
+                function updateRuler(axis) {
+                    // axis = x or y
+                    const isX = (axis === 'x');
+                    const side = isX ? 'width' : 'height';
+                    const otherSide = isX ? 'height' : 'width';
 
-                    var $hcanv_orig = $('#ruler_' + dim + ' canvas:first');
-
-                    // Bit of a hack to fully clear the canvas in Safari & IE9
-                    var hcanv = $hcanv_orig[0],
-                        $hcanv = $hcanv_orig;
-
-                        // Set the canvas size to the width of the container
-                    var ruler_len = scanvas[lentype]();
-                    var total_len = ruler_len;
-                    hcanv.parentNode.style[lentype] = total_len + 'px';
-                    var ctx_num = 0;
-                    var ctx = hcanv.getContext('2d');
+                    const $rulersWrapper = $('#ruler_' + axis + ' > div');
+                    const total_len = $('#svgcanvas')[side]();
+                    const limit = 30000;
+                    const rulersCount = parseInt(total_len / limit, 10) + 1;
 
 
-                    hcanv[lentype] = ruler_len;
+                    $rulersWrapper.empty();
+                    $rulersWrapper[side](total_len + 'px');
 
-                    // Retina support
-                    var ratio = window.devicePixelRatio;
-                    if (ratio > 1) {
-                        if (isX) {
-                            hcanv.style.width = total_len + 'px';
-                            hcanv.width = total_len * ratio;
-                            hcanv.style.height = 15 + 'px';
-                            hcanv.height = 15 * ratio;
-                        } else {
-                            hcanv.style.width = 15 + 'px';
-                            hcanv.width = 15 * ratio;
-                            hcanv.style.height = total_len + 'px';
-                            hcanv.height = total_len * ratio;
-                        }
-                        ctx.scale(ratio, ratio);
-                    }
-
-                    var ctx_arr, num, ctx_arr_num;
-                    ctx.fillStyle = '#333';
-
-                    // Remove any existing canvasses
-                    $hcanv.siblings().remove();
-
-                    // Create multiple canvases when necessary (due to browser limits)
-                    if (ruler_len >= limit) {
-                        ctx_arr_num = parseInt(ruler_len / limit, 10) + 1;
-                        ctx_arr = [];
-                        ctx_arr[0] = ctx;
-                        var copy;
-                        for (i = 1; i < ctx_arr_num; i++) {
-                            hcanv[lentype] = limit;
-                            copy = hcanv.cloneNode(true);
-                            if (isX) {
-                                $(copy).css('margin-left', 0);
+                    const rulers = (new Array(rulersCount))
+                        .fill(null)
+                        .map(x => document.createElement('canvas'));
+                    (function generateEmptyCanvas() {
+                        const devicePixelRatio = window.devicePixelRatio; // Retina support
+                        rulers.map((ruler, index) => {
+                            if(index > 0) {
+                                if (isX) {
+                                    $(ruler).css('margin-left', 0);
+                                } else {
+                                    $(ruler).css('margin-top', -3); //magic number
+                                }
+                            }
+                            return ruler;
+                        }).map((ruler, index) => {
+                            const lastIndex = rulersCount -1;
+                            if(index < lastIndex) {
+                                ruler[side] = limit;
                             } else {
-                                $(copy).css('margin-top', -3);
+                                ruler[side] = total_len % limit;
                             }
-                            hcanv.parentNode.appendChild(copy);
-                            ctx_arr[i] = copy.getContext('2d');
-                        }
+                            return ruler;
+                        }).map((ruler) => {
+                            //support retina
+                            const isRetina = (devicePixelRatio > 1);
+                            if(isRetina) {
+                                const ruler_len = ruler[side];
 
-                        copy[lentype] = ruler_len % limit;
+                                ruler.style[side] = ruler_len + 'px';
+                                ruler[side] = ruler_len * devicePixelRatio;
 
-                        // set copy width to last
-                        ruler_len = limit;
-                    }
+                                ruler.style[otherSide] = 15 + 'px';
+                                ruler[otherSide] = 15 * devicePixelRatio;
 
-                    var u_multi = unit * zoom;
-
-                    // Calculate the main number interval
-                    var raw_m = 100 / u_multi;
-                    var multi = 1;
-                    for (i = 0; i < r_intervals.length; i++) {
-                        num = r_intervals[i];
-                        multi = num;
-                        if (raw_m <= num) {
-                            break;
-                        }
-                    }
-
-                    var big_int = multi * u_multi;
-
-                    ctx.font = '12px sans-serif';
-                    if (!isX) {
-                        ctx.textAlign = 'center';
-                    }
-                    var ruler_d = ((contentDim / u_multi) % multi) * u_multi;
-                    var label_pos = ruler_d - big_int;
-                    // draw big intervals
-                    while (ruler_d < total_len) {
-                        label_pos += big_int;
-
-                        var cur_d = Math.round(ruler_d) + 0.5;
-                        if (isX) {
-                            ctx.moveTo(cur_d, 15);
-                            ctx.lineTo(cur_d, 0);
-                        } else {
-                            ctx.moveTo(15, cur_d);
-                            ctx.lineTo(0, cur_d);
-                        }
-
-                        num = (label_pos - contentDim) / u_multi / 10;
-                        var label;
-                        if (multi >= 10) {
-                            label = Math.round(num);
-                        } else {
-                            var decs = String(multi / 10).split('.')[1].length;
-                            label = num.toFixed(decs);
-                        }
-
-                        // Change 1000s to Ks
-                        if (label !== 0 && label !== 1000 && label % 1000 === 0) {
-                            label = (label / 1000) + 'K';
-                        }
-
-                        if (isX) {
-                            ctx.fillText(label, ruler_d + 2, 10);
-                        } else {
-                            // draw label vertically
-                            var str = String(label).split('');
-                            let isDecimal = false;
-                            for (i = 0; i < str.length; i++) {
-                                if (str[i] === '.') {isDecimal = true;}
-                                let posY = isDecimal ? i * 12 - 8 : i * 12;
-                                if (str[i] === '.') {ctx.textAlign = 'left';}
-                                ctx.fillText(str[i], 5, (ruler_d + 12) + posY);
-                                if (str[i] === '.') {ctx.textAlign = 'center';}
+                                ruler.getContext('2d').scale(devicePixelRatio, devicePixelRatio);
                             }
-                        }
+                            return ruler;
+                        }).map((ruler) => {
+                            $rulersWrapper.append(ruler);
+                            return ruler;
+                        });
+                    })();
 
-                        var part = big_int / 10;
-                        // draw the small intervals
-                        for (i = 1; i < 10; i++) {
-                            var sub_d = Math.round(ruler_d + part * i) + 0.5;
-                            if (ctx_arr && sub_d > ruler_len) {
-                                ctx_num++;
-                                ctx.stroke();
-                                if (ctx_num >= ctx_arr_num) {
-                                    i = 10;
-                                    ruler_d = total_len;
-                                    continue;
-                                }
-                                ctx = ctx_arr[ctx_num];
-                                if (!isX) {
-                                    ctx.textAlign = 'center';
-                                }
+                    (function drawRules(){
+                        const contentPosition = Number($('#svgcontent').attr(axis));
+                        const zoom = svgCanvas.getZoom();
+
+                        const ctxs = rulers
+                            .map(ruler => ruler.getContext('2d'))
+                            .map(ctx => {
+                                ctx.fillStyle = '#333';
+                                ctx.strokeStyle = '#000';
                                 ctx.font = '12px sans-serif';
+                                return ctx;
+                            });
 
-                                ruler_d -= limit;
-                                sub_d = Math.round(ruler_d + part * i) + 0.5;
+                        // Calculate the main number calibration in pixel
+                        const calibration = (function(){
+                            const size = 100 / zoom;
+                            const digit = Math.ceil(Math.log10(size));
+                            const intervals = [2, 5, 10].map(x => x*10**(digit-1));
+                            const interval = intervals.find(x => x >= size);
+                            return interval;
+                        })();
+
+                        const big_interval = calibration * zoom;
+                        const small_interval = big_interval / 10;
+
+                        let currentCtxIndex = 0;
+                        let ctx = ctxs[currentCtxIndex];
+
+                        // position correspond to root
+                        let label_pos = ((contentPosition / zoom) % calibration) * zoom;
+                        // position correspond to ruler
+                        let ruler_pos = label_pos;
+
+                        drawAll:
+                        while (label_pos < total_len) {
+
+                            //draw the big intervals
+                            {
+                                //draw line
+                                {
+                                    const cur_d = Math.round(ruler_pos) + 0.5;
+                                    if (isX) {
+                                        ctx.moveTo(cur_d, 15);
+                                        ctx.lineTo(cur_d, 0);
+                                    } else {
+                                        ctx.moveTo(15, cur_d);
+                                        ctx.lineTo(0, cur_d);
+                                    }
+                                }
+                                //draw big label
+                                {
+                                    let label;
+                                    const labelNum = (label_pos - contentPosition) / zoom / 10;
+                                    if (calibration >= 10) {
+                                        label = Math.round(labelNum);
+                                    } else {
+                                        var decimalPlace = String(calibration / 10).split('.')[1].length;
+                                        label = labelNum.toFixed(decimalPlace);
+                                    }
+
+                                    // Change 1000s to Ks
+                                    if (label !== 0 && label !== 1000 && label % 1000 === 0) {
+                                        label = (label / 1000) + 'K';
+                                    }
+
+                                    if (isX) {
+                                        ctx.fillText(label, ruler_pos + 2, 10);
+                                    } else {
+                                        // draw label vertically
+                                        const str = String(label).split('');
+                                        let i;
+                                        for(i=0; i < str.length; i++) {
+                                            if (str[i] === '.') {
+                                                break;
+                                            }
+                                            ctx.textAlign = 'center';
+                                            ctx.fillText(str[i], 5, (ruler_pos + 12) + i * 12);
+                                        }
+                                        if(i < str.length) {
+                                            ctx.textAlign = 'left';
+                                            ctx.fillText('.', 5, ruler_pos + 12 + i * 12 - 8);
+                                            i++;
+                                            for(; i < str.length; i++) {
+                                                ctx.textAlign = 'center';
+                                                ctx.fillText(str[i], 5, ruler_pos + 12 + i * 12 - 8);
+                                            }
+                                        }
+                                    }
+                                }
                             }
 
-                            // odd lines are slighly longer
-                            var line_num = (i % 2) ? 12 : 10;
-                            if (isX) {
-                                ctx.moveTo(sub_d, 15);
-                                ctx.lineTo(sub_d, line_num);
-                            } else {
-                                ctx.moveTo(15, sub_d);
-                                ctx.lineTo(line_num, sub_d);
+                            // draw the small intervals
+                            {
+                                for (let i = 1; i < 10; i++) {
+                                    let sub_d = Math.round(ruler_pos + small_interval * i) + 0.5;
+
+                                    // maybe switch to next canvas to continue drawing
+                                    if (sub_d > limit) {
+                                        if (currentCtxIndex === rulersCount - 1) {
+                                            // end of all drawing
+                                            break drawAll;
+                                        }
+                                        ctx.stroke();
+                                        currentCtxIndex++;
+                                        ctx = ctxs[currentCtxIndex];
+                                        ruler_pos -= limit;
+                                        sub_d -= limit;
+                                    }
+
+                                    // odd lines are slighly longer
+                                    const line_size = (i % 2) ? 12 : 10;
+                                    if (isX) {
+                                        ctx.moveTo(sub_d, 15);
+                                        ctx.lineTo(sub_d, line_size);
+                                    } else {
+                                        ctx.moveTo(15, sub_d);
+                                        ctx.lineTo(line_size, sub_d);
+                                    }
+                                }
+                                label_pos += big_interval;
+                                ruler_pos += big_interval;
                             }
                         }
-                        ruler_d += big_int;
-                    }
-                    ctx.strokeStyle = '#000';
-                    ctx.stroke();
+                        ctx.stroke();
+
+                    })();
                 }
+                updateRuler('x');
+                updateRuler('y');
             }
+
 
             var updateCanvas = editor.updateCanvas = function (zoomData) {
                 let autoCenter = zoomData ? zoomData.autoCenter : undefined;
@@ -1531,7 +1532,7 @@ define([
                 }
 
                 if (curConfig.showRulers) {
-                    updateRulers(cnvs, zoom);
+                    updateRulers();
                     workarea.scroll();
                 }
                 if (urldata.storagePrompt !== true && !editor.storagePromptClosed) {
