@@ -123,8 +123,8 @@ define([
                         if (errorStr === 'NOT_EXIST_BAD_NODE') { skipError = true; }
 
                         if (window.FLUX.allowTracking && !skipError) {
-                            window.Raven.captureException(data);
-                            console.log('ws error', errorStr);
+                            // window.Raven.captureException(data);
+                            console.error("WS_ERROR", errorStr);
                         }
                         socketOptions.onError(data);
                         break;
@@ -147,8 +147,8 @@ define([
                         }
 
                         if (window.FLUX.allowTracking && !skipError) {
-                            window.Raven.captureException(data);
-                            console.log('ws fatal', errorStr);
+                            // window.Raven.captureException(data);
+                            console.error("WS_FATAL", errorStr);
                         }
 
                         socketOptions.onFatal(data);

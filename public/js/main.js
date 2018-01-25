@@ -27,7 +27,6 @@ requirejs.config({
         localStorage: 'app/local-storage',
         Rx: 'lib/rx.lite.min',
         Redux: 'lib/redux.min',
-        Raven: 'helpers/raven.min',
         threejs: 'lib/three/three.min'
     },
 
@@ -95,10 +94,8 @@ requirejs([
     'jquery',
     'backbone',
     'app/router',
-    'app/actions/global',
-    'Raven',
-    'helpers/tracker'
-], function($, Backbone, Router, globalEvents, Raven) {
+    'app/actions/global'
+], function($, Backbone, Router, globalEvents) {
     'use strict';
 
     console.log(`Flux-Studio: ${window.FLUX.version}`);
@@ -108,13 +105,13 @@ requirejs([
         $.getScript('/js/helpers/analytics.js');
 
         // sentry
-        Raven.config('http://6113878f548846998899855e8e83c477@sentry.io/124829', {
-            ignoreUrls: [/cloudserv1\.flux3dp\.com:3000/]
-        });
-        Raven.debug = false;
-        try { window.Raven.setRelease(window.FLUX.version); } catch (e) { }
-        Raven.install();
-        window.Raven = Raven;
+        // Raven.config('http://6113878f548846998899855e8e83c477@sentry.io/124829', {
+        //     ignoreUrls: [/cloudserv1\.flux3dp\.com:3000/]
+        // });
+        // Raven.debug = false;
+        // try { window.Raven.setRelease(window.FLUX.version); } catch (e) { }
+        // Raven.install();
+        // window.Raven = Raven;
     }
 
     globalEvents(function() {

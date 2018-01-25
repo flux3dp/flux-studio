@@ -11,7 +11,6 @@ function(React, $, Backbone, display, config, appSettings, detectWebgl) {
     'use strict';
 
     var _display = function(view, args, el) {
-        console.log('_display', args)
         args = args || {};
         el = el || $('.content')[0];
 
