@@ -640,6 +640,7 @@ input.switch:checked ~ label:after {
         z-index: 1;
 
         .arrowBox {
+            border-radius: 2px;
             background: #fff;
             color: $primaryColor;
             cursor: pointer;
@@ -786,6 +787,7 @@ input.switch:checked ~ label:after {
             margin: 0 0 3px 0;
             padding: 0 20px;
             width: 260px;
+            border-radius: 2px;
         }
 
         .control {

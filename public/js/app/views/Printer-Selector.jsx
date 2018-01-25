@@ -48,6 +48,7 @@ define([
         selected_printer: null,
 
         propTypes: {
+            showExport: React.PropTypes.bool,
             onClose: React.PropTypes.func,
             onGettingPrinter: React.PropTypes.func
         },
@@ -107,6 +108,12 @@ define([
                             });
                         }
                     });
+
+                    if (self.props.showExport) {
+                        _options.push({
+                            label: self._renderExportItem()
+                        });
+                    }
 
                     self.setState({
                         printOptions: _options,
@@ -387,10 +394,10 @@ define([
 
             AlertStore.removeRetryListener(self._waitForPrinters);
 
-            if (self.state.printOptions.length === 0 && !self.state.hasDefaultPrinter) {
-                AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
-                AlertStore.onRetry(self._waitForPrinters);
-            }
+            // if (self.state.printOptions.length === 0 && !self.state.hasDefaultPrinter) {
+            //     AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+            //     AlertStore.onRetry(self._waitForPrinters);
+            // }
         },
 
         _renderPrinterItem: function(printer) {
@@ -421,6 +428,19 @@ define([
                     <div className="col status">{statusText}</div>
                     <div className="col connection-type">
                         <img src={img} />
+                    </div>
+                </div>
+            );
+        },
+
+        _renderExportItem: function(printer) {
+
+            return (
+                <div className="device printer-item" id={"export-item"} data-status={0} data-meta={0} onClick={() => {this.props.onGettingPrinter("export_fcode")} }>
+                    <div className="col device-name" id={"export-item-name"}><i className="fa fa-save"></i>&nbsp;&nbsp;{lang.laser.export_fcode}</div>
+                    <div className="col module"></div>
+                    <div className="col status"></div>
+                    <div className="col connection-type">
                     </div>
                 </div>
             );

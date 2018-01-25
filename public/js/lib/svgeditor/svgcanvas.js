@@ -7033,6 +7033,18 @@ define([
             call('changed', pasted);
         };
 
+        // Function: getLatestImportFileName
+        // Get latest imported file name
+        this.setLatestImportFileName = function(fileName) {
+            this.latestImportFileName = fileName;
+        }
+
+        // Function: getLatestImportFileName
+        // Get latest imported file name
+        this.getLatestImportFileName = function() {
+            return this.latestImportFileName;
+        }
+
         // Function: groupSelectedElements
         // Wraps all the selected elements in a group (g) element
 

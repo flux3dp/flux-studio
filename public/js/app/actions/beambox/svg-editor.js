@@ -5384,6 +5384,7 @@ define([
                         // Detected an image
                         // svg handling
                         if (file.type.indexOf('svg') > -1) {
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
                             function importAs(type) {
                                 if (type === 'color') {
                                     svgWebSocket.uploadPlainSVG(file).done(() => {
@@ -5428,6 +5429,7 @@ define([
 
                         } else {
                             //handle bitmap
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
                             readImage(file);
                         }
                     } else if (file.name.toLowerCase().indexOf('.dxf') > 0) {

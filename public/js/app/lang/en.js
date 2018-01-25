@@ -724,6 +724,7 @@ define(function() {
             button_advanced: 'ADVANCED',
             confirm: 'Confirm',
             get_fcode: 'Save<br/>Task',
+            export_fcode: 'Save as File ...',
             name: 'Name',
             go: 'GO',
             showOutline: 'View\nFrame',

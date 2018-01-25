@@ -33,7 +33,6 @@ define([
     'helpers/firmware-updater',
     'helpers/device-list',
     'helpers/device-master',
-    'Raven',
 ], function(
     $,
     React,
@@ -68,8 +67,7 @@ define([
     checkFirmware,
     firmwareUpdater,
     DeviceList,
-    DeviceMaster,
-    Raven
+    DeviceMaster
 ) {
     'use strict';
 
@@ -227,7 +225,7 @@ define([
 
                 // add information for Raven, to be removed when root.js is implemented
                 if(!window.FLUX.dev) {
-                    Raven.setUserContext({ extra: { version: window.FLUX.version } });
+                    // Raven.setUserContext({ extra: { version: window.FLUX.version } });
                 }
 
                 this._checkOsxRequirement();
