@@ -125,7 +125,9 @@ define([
                         ProgressActions.open(ProgressConstants.STEPPING);
                         ProgressActions.updating(data.message, data.percentage * 100);
                     },
-                    onFinished: function (blob) {
+                    onFinished: function (blob, fileName, fileTimeCost) {
+                        console.log("I received", fileTimeCost)
+                        GlobalActions.sliceComplete({ time: fileTimeCost });
                         ProgressActions.updating(lang.message.uploading_fcode, 100);
                         resolve(blob);
                     },
@@ -145,7 +147,7 @@ define([
             const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
             await DeviceMaster.select(device)
                 .done(() => {
-                    GlobalActions.showMonitor(device, fcodeBlob, thumbnailBlobURL, 'engrave');
+                    GlobalActions.showMonitor(device, fcodeBlob, thumbnailBlobURL, 'LASER');
                 })
                 .fail((errMsg) => {
                     AlertActions.showPopupError('menu-item', errMsg);
