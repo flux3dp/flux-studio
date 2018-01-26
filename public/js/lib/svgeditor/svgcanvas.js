@@ -5090,7 +5090,7 @@ define([
                                         stroke = grandchild.getAttribute('fill');
                                     }
                                     if (stroke != filter) {
-                                        node.removeChild(grandchlid);
+                                        node.removeChild(grandchild);
                                     } else {
                                         node.setAttribute('data-color', stroke);
                                     }
