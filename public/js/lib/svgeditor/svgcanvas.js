@@ -4573,6 +4573,7 @@ define([
             // in ids, we now have a map of ids, elements and attributes, let's re-identify
             var oldid;
             for (oldid in ids) {
+                break;
                 if (!oldid) {
                     continue;
                 }
@@ -5049,61 +5050,101 @@ define([
 
 
                 var groups = [];
+                var svgDefs = [];
                 if (type === 'layer') {
                     for (var i = 0; i < svg.childNodes.length; i++) {
                         var child = svg.childNodes[i];
-                        console.log('child', child);
-                        if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
-                        if (child.tagName !== 'g' || child.id == null) {
+                        console.log('Getting child(layer)', child);
+                        if (['title'].indexOf(child.tagName) >= 0) {continue;}
+                        if (child.tagName == 'defs') {
+                            for (var j = 0; j < child.childNodes.length; j++) {
+                                svgDefs.push(child.childNodes[j]);
+                            }
+                        } else if (child.tagName !== 'g' || child.id == null) {
                             type = 'nolayer';
                             break;
                         } else {
-                            groups.push(child);
+                            groups.push({el: child, defs: svgDefs});
                         }
                     }
                 }
                 if (type === 'color') {
                     var groupColorMap = {};
+                    
                     for (var i = 0; i < svg.childNodes.length; i++) {
                         var child = svg.childNodes[i];
-                        console.log('child', child);
-                        if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
-                        if (child.tagName === 'g') {
-                            // Child = first group
-                            var nodes = [];
-                            for (var j = 0; j < child.childNodes.length; j++) {
-                                nodes.push(child.childNodes[j]);
+                        console.log('Getting child(color)', child);
+                        function getGroupColorMap(stroke) {
+                            if (!groupColorMap[stroke]) {
+                                groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
+                                groupColorMap[stroke].setAttribute('data-color', stroke);
                             }
-                            for (var j = 0; j < nodes.length; j++) {
-                                var node = nodes[j];
-                                var stroke = node.getAttribute('stroke');
-                                if (stroke === 'none') {
-                                    stroke = node.getAttribute('fill');
+                            return groupColorMap[stroke];
+                        } 
+                        function filterColor(filter, node) {
+                            for (var i = 0; i < node.childNodes.length; i++) {
+                                var grandchild = node.childNodes[i];
+                                if (['polygon', 'path', 'line'].indexOf(grandchild.tagName) >=0 ) {
+                                    var stroke = grandchild.getAttribute('stroke');
+                                    if (stroke === 'none') {
+                                        stroke = grandchild.getAttribute('fill');
+                                    }
+                                    if (stroke != filter) {
+                                        node.removeChild(grandchlid);
+                                    } else {
+                                        node.setAttribute('data-color', stroke);
+                                    }
+                                } else if (grandchild.tagName == 'g') {
+                                    grandchild.setAttribute('data-color', stroke);                                    
+                                    filterColor(filter, grandchild)
                                 }
-                                node.setAttribute('class', 'poly');
-                                if (!groupColorMap[stroke]) {
-                                    groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
-                                    groupColorMap[stroke].setAttribute('data-color', stroke);
-                                }
-                                node.parentElement.removeChild(node);
-                                groupColorMap[stroke].appendChild(node);
                             }
+                        }
+                        function traverseForColors(colors, node) {
+                            for (var i = 0; i < node.childNodes.length; i++) {
+                                var grandchild = node.childNodes[i];
+                                if (['polygon', 'path', 'line'].indexOf(grandchild.tagName) >=0 ) {
+                                    var stroke = grandchild.getAttribute('stroke');
+                                    if (stroke === 'none') {
+                                        stroke = grandchild.getAttribute('fill');
+                                    }
+                                    colors[stroke] = 1;
+                                } else if (grandchild.tagName == 'g') {
+                                    traverseForColors(colors, grandchild)
+                                }
+                            }
+                        }
+                        switch (child.tagName) {
+                            case 'g':
+                                var colors = {};
+                                traverseForColors(colors, child);
+                                for (var strokeColor in colors) {
+                                    var deepClone = child.cloneNode(true);
+                                    filterColor(strokeColor, deepClone);
+                                    getGroupColorMap(strokeColor).appendChild(deepClone);
+                                }
+                                break;
+                            case 'defs':
+                                for (var j = 0; j < child.childNodes.length; j++) {
+                                    svgDefs.push(child.childNodes[j]);
+                                }
+                                break;
+                            default:
+                                break;
 						}
                     }
                     for (var k in groupColorMap) {
                         groups.push(groupColorMap[k]);
                     }
-                    console.log(groupColorMap);
                     type = 'layer';
                 }
-                console.log(type);
                 if (type === 'layer') {
                     for (var i in groups) {
-                        let sym = this.makeSymbol(groups[i], [], batchCmd);
+                        let sym = this.makeSymbol(groups[i], [], batchCmd, svgDefs);
                         sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
                         symbols.push(sym);
                     }
-                } else if (type === 'color' || type === 'nolayer') {
+                } else if (type === 'nolayer') {
                     uniquifyElems(svg);
 
                     var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
@@ -5143,6 +5184,9 @@ define([
                         function rgbToHex(str) {
                             var rgb = str.substring(4).split(',');
                             var hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
+                            if (hex == "NaN") {
+                                hex = '0';
+                            }
                             while (hex.length < 6) {
                                 hex = '0' + hex;
                             }
@@ -5187,6 +5231,7 @@ define([
                 }
 
                 if ((type == 'color' || type == 'layer')) {
+                    // Remove unnecessary default empty layer
                     const defaultLayerName = LANG.right_panel.layer_panel.layer1;
                     if ($('svg title')[0].innerHTML == defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length == 0)) {
                         this.setCurrentLayer(defaultLayerName);
@@ -5205,8 +5250,19 @@ define([
             return use_el;
         };
 
-        this.makeSymbol = function (elem, attrs, batchCmd) {
-            var symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
+        this.makeSymbol = function (elem, attrs, batchCmd, defs) {
+            var symbol = svgdoc.createElementNS(NS.SVG, 'symbol'),
+                symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
+
+            if (defs) {
+                // this is a group color object, copy defs into symbol;
+                for (var i in defs) {
+                    symbol_defs.appendChild(defs[i]);
+                }
+            }
+
+            symbol.appendChild(symbol_defs);
+
             if (elem.tagName !== 'g') {
                 while (elem.firstChild) {
                     var first = elem.firstChild;
@@ -5215,8 +5271,6 @@ define([
             } else {
                 symbol.appendChild(elem);
             }
-            var defs = svgedit.utilities.findDefs();
-            symbol.append(elem);
 
             for (var i = 0; i < attrs.length; i++) {
                 var attr = attrs[i];

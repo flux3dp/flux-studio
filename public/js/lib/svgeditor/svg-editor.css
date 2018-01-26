@@ -524,7 +524,8 @@ div.palette_item:first-child {
 	z-index: 4;
 }
 
-#workarea.wireframe #svgcontent .poly {
+#workarea.wireframe #svgcontent path[stroke=none],
+#workarea.wireframe #svgcontent polygon[stroke=none] {
 	fill-opacity: 1;
 	/* TODO:
 	Better way to do object selection:
@@ -534,8 +535,7 @@ div.palette_item:first-child {
 	/* pointer-events: stroke; */
 }
 
-#workarea.wireframe #svgcontent *:not(.poly) {
-	fill: #FFFFFF;
+#workarea.wireframe #svgcontent * {
 	fill-opacity: 0;
 	stroke: #000;
 	stroke-width: 1px;

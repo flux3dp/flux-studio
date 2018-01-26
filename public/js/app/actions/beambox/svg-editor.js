@@ -5388,14 +5388,14 @@ define([
                             async function importAs(type) {
                                 if (type === 'color') {
                                     await svgWebSocket.uploadPlainSVG(file);
-                                    const outputs = svgWebSocket.divideSVG();
+                                    const outputs = await svgWebSocket.divideSVG();
                                     await readSVG(outputs['strokes'], type);
                                     console.log('Loading colors');
-                                    await readSVG(outputs['colors'], type); // Magic number 72dpi / 25.4 inch per mm
+                                    await readSVG(outputs['colors'], type); 
                                     console.log('Loading bitmap', outputs['bitmap']);
                                     if (outputs['bitmap'].size > 0) {
                                         svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                        await readImage(outputs['bitmap'], 3.5277777);
+                                        await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
                                     }
                                     console.log('Load complete');
                                 } else {
