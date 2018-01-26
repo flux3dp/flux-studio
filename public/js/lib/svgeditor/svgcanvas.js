@@ -5064,7 +5064,7 @@ define([
                             type = 'nolayer';
                             break;
                         } else {
-                            groups.push({el: child, defs: svgDefs});
+                            groups.push(child);
                         }
                     }
                 }
@@ -5141,6 +5141,7 @@ define([
                 if (type === 'layer') {
                     for (var i in groups) {
                         let sym = this.makeSymbol(groups[i], [], batchCmd, svgDefs);
+                        console.log("Symbol", groups[i])
                         sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
                         symbols.push(sym);
                     }

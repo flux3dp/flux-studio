@@ -527,6 +527,7 @@ div.palette_item:first-child {
 #workarea.wireframe #svgcontent path[stroke=none],
 #workarea.wireframe #svgcontent polygon[stroke=none] {
 	fill-opacity: 1;
+	stroke-width: 0;
 	/* TODO:
 	Better way to do object selection:
 		Duplicate the origina object, and use invisible outline with stroke width: 5px,
