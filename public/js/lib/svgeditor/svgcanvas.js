@@ -2505,8 +2505,6 @@ define([
                 let targetZoom;
                 let timer;
                 let trigger = Date.now();
-                const DURATION = 10;
-                let durationCounter = 0;
 
                 return function (e) {
                     e.stopImmediatePropagation();
@@ -2536,28 +2534,29 @@ define([
                     function _zoomAsIllustrator() {
                         const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 
-                        targetZoom *= (1 + delta / 2000.0);
+                        targetZoom *= (1 + delta * targetZoom**1.1 / 2000.0  * (isTouchpad?5:1));
 
-                        targetZoom = Math.min(100, targetZoom);
+                        targetZoom = Math.min(20, targetZoom);
                         targetZoom = Math.max(0.1, targetZoom);
+                        if((targetZoom > 19 ) && (delta > 0)) {
+                            return;
+                        }
 
-                        durationCounter = 0;
                         if (!timer) {
-                            const interval = 2;
+                            const interval = 20;
                             timer = setInterval(_zoomProcess, interval);
                         }
 
                         // due to wheel event bug (which zoom gesture will sometimes block all other processes), we trigger the zoomProcess about every few miliseconds
-                        if (Date.now() - trigger > 10) {
+                        if (Date.now() - trigger > 20) {
                             _zoomProcess();
                             trigger = Date.now();
                         }
 
                         function _zoomProcess() {
-                            durationCounter++;
                             // End of animation
                             const currentZoom = svgCanvas.getZoom();
-                            if ((currentZoom === targetZoom) || (durationCounter >= DURATION)) {
+                            if ((currentZoom === targetZoom) || (Date.now() - trigger > 500)) {
                                 clearInterval(timer);
                                 timer = undefined;
                                 return;
@@ -2566,7 +2565,7 @@ define([
                             // Calculate next animation zoom level
                             var nextZoom = currentZoom + (targetZoom - currentZoom) / 5;
 
-                            if (Math.abs(targetZoom - currentZoom) < 0.01) {
+                            if (Math.abs(targetZoom - currentZoom) < 0.005) {
                                 nextZoom = targetZoom;
                             }
 
