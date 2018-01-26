@@ -135,7 +135,7 @@ define([
                     opacity: 0
                 },
                 initStroke: {
-                    width: 5,
+                    width: 1,
                     color: '000000', // solid black
                     opacity: 1
                 },
