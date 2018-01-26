@@ -99,8 +99,9 @@ define([
             let divStyle = {
                 backgroundColor: '#E2E1E0',
                 backgroundImage: this._getPreviewUrl(),
-                backgroundSize: 'cover',
+                backgroundSize: '100% auto',
                 backgroundPosition: '50% 50%',
+                backgroundRepeatY: 'no-repeat',
                 width: '100%',
                 height: '100%'
             };
