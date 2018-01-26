@@ -40,13 +40,16 @@ define([
         }
         _renderPrinterSelectorWindow() {
             const onGettingPrinter = async (selected_item) => {
-                if (selected_item == "export_fcode") {
+                //export fcode
+                if (selected_item == 'export_fcode') {
                     BottomRightFuncs.exportFcode();
                     this.setState({
                         isPrinterSelectorOpen: false
                     });
                     return;
                 }
+
+                //check firmware
                 if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
                     console.log('not valid version');
                     AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
@@ -55,10 +58,11 @@ define([
                     });
                     return;
                 }
+
+                // start task
                 this.setState({
                     isPrinterSelectorOpen: false,
                 });
-
                 BottomRightFuncs.uploadFcode(selected_item);
             };
             const onClose = () => {
@@ -81,7 +85,8 @@ define([
         }
         _renderActionButtons() {
             const cx = React.addons.classSet;
-            const buttons = [{
+            const buttons = [
+                {
                     label: lang.monitor.start,
                     className: cx({
                         'btn-disabled': false,
@@ -93,7 +98,8 @@ define([
                         'ga-event': 'laser-goto-monitor'
                     },
                     onClick: this._handleStartClick
-                }];
+                }
+            ];
 
             return (
                 <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons" />
