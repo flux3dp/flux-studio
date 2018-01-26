@@ -5030,178 +5030,182 @@ define([
         // arbitrary transform lists, but makes some assumptions about how the transform list
         // was obtained
         // * import should happen in top-left of current zoomed viewport
-        this.importSvgString = function (xmlString, type) {
-            var j, rootTransform = '';
-            var symbols = [],
-                use_el;
-            try {
-                var batchCmd = new svgedit.history.BatchCommand('Import Image');
-                var symbol;
+        this.importSvgString = function (xmlString, _type) {
+            const batchCmd = new svgedit.history.BatchCommand('Import Image');
+            const newDoc = svgedit.utilities.text2xml(xmlString);
+            const rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
+            svgCanvas.prepareSvg(newDoc);
 
-                // convert string into XML document
-                var newDoc = svgedit.utilities.text2xml(xmlString);
-                rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
-                this.prepareSvg(newDoc);
+            function parseSvg(svg, type) {
+                function _parseSvgByLayer(svg) {
+                    debugger;
+                    const layerNodes = Object.values(svg.childNodes).filter(node => !['defs', 'title'].includes(node.tagName));
 
-                // import new svg document into our document
-                const svg = svgdoc.adoptNode(newDoc.documentElement);
+                    const isUnvalidLayeredSvg = layerNodes.some(node => (node.tagName !== 'g' || node.id == null));
+                    if(!isUnvalidLayeredSvg) {
+                        return false;
+                    }
 
+                    const symbols = layerNodes.map(node => {
+                        const symbol = svgCanvas.makeSymbol(node, [], batchCmd);
+                        return symbol;
+                    });
 
-                var groups = [];
-                if (type === 'layer') {
-                    for (var i = 0; i < svg.childNodes.length; i++) {
-                        var child = svg.childNodes[i];
-                        console.log('child', child);
-                        if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
-                        if (child.tagName !== 'g' || child.id == null) {
-                            type = 'nolayer';
-                            break;
-                        } else {
-                            groups.push(child);
+                    return symbols;
+                }
+                function _parseSvgByColor(svg) {
+                    function _getColor(node) {
+                        let color = node.getAttribute('stroke');
+                        if (color === 'none') {
+                            color = node.getAttribute('fill');
                         }
+                        return color;
                     }
-                }
-                if (type === 'color') {
-                    var groupColorMap = {};
-                    for (var i = 0; i < svg.childNodes.length; i++) {
-                        var child = svg.childNodes[i];
-                        console.log('child', child);
-                        if (['defs', 'title'].indexOf(child.tagName) >= 0) {continue;}
-                        if (child.tagName === 'g') {
-                            // Child = first group
-                            var nodes = [];
-                            for (var j = 0; j < child.childNodes.length; j++) {
-                                nodes.push(child.childNodes[j]);
+
+                    const originLayerNodes = Object.values(svg.childNodes).filter(child => child.tagName === 'g');
+
+                    // re-classify elements by their color
+                    const groupColorMap = {};
+                    originLayerNodes.map(child => {
+                        child.map(grandChild => {
+                            const color = _getColor(grandChild);
+                            grandChild.setAttribute('class', 'poly');
+                            if(!groupColorMap[color]) {
+                                groupColorMap[color] = svgdoc.createElementNS(NS.SVG, 'g').setAttribute('data-color', stroke);
                             }
-                            for (var j = 0; j < nodes.length; j++) {
-                                var node = nodes[j];
-                                var stroke = node.getAttribute('stroke');
-                                if (stroke === 'none') {
-                                    stroke = node.getAttribute('fill');
-                                }
-                                node.setAttribute('class', 'poly');
-                                if (!groupColorMap[stroke]) {
-                                    groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
-                                    groupColorMap[stroke].setAttribute('data-color', stroke);
-                                }
-                                node.parentElement.removeChild(node);
-                                groupColorMap[stroke].appendChild(node);
-                            }
-						}
-                    }
-                    for (var k in groupColorMap) {
-                        groups.push(groupColorMap[k]);
-                    }
-                    console.log(groupColorMap);
-                    type = 'layer';
+                            groupColorMap[color].appendChild(grandChild);
+                        });
+                    });
+
+                    const coloredLayerNodes = Object.values(groupColorMap);
+
+                    const symbols = coloredLayerNodes.map(node => {
+                        const symbol = svgCanvas.makeSymbol(node, [], batchCmd);
+                        symbol.setAttribute('data-color', node.getAttribute('data-color'));
+                        return symbol;
+                    });
+                    return symbols;
                 }
-                console.log(type);
-                if (type === 'layer') {
-                    for (var i in groups) {
-                        let sym = this.makeSymbol(groups[i], [], batchCmd);
-                        sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
-                        symbols.push(sym);
-                    }
-                } else if (type === 'color' || type === 'nolayer') {
+                function _parseSvgByNolayer(svg) {
                     uniquifyElems(svg);
 
-                    var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
-                        innerh = svgedit.units.convertToNum('height', svg.getAttribute('height')),
-                        innervb = svg.getAttribute('viewBox'),
-                        // if no explicit viewbox, create one out of the width and height
-                        vb = innervb ? innervb.split(' ') : [0, 0, innerw, innerh];
-
+                    // TODO: may have something wrong. use clone to preserve origin viewbox attribute.
                     svg.removeAttribute('viewBox');
 
-                    for (j = 0; j < 4; ++j) {
-                        vb[j] = +(vb[j]);
-                    }
-
-                    // TODO: properly handle preserveAspectRatio
-                    var canvasw = +svgcontent.getAttribute('width'),
-                        canvash = +svgcontent.getAttribute('height');
-                    // imported content should be 1/3 of the canvas on its largest dimension
-
-                    if (svgedit.browser.isGecko()) {
-                        // Move all gradients into root for Firefox, workaround for this bug: https://bugzilla.mozilla.org/show_bug.cgi?id=353575
-                        // TODO: Make this properly undo-able.
-                        $(svg).find('linearGradient, radialGradient, pattern').appendTo(defs);
-                    }
-
-                    symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
-
+                    symbols = [svgCanvas.makeSymbol(svg, svg.attributes, batchCmd)];
+                    return symbols;
                 }
+                // return symbols
+                switch (type) {
+                    case 'color':
+                        return {
+                            symbols: _parseSvgByColor(svg),
+                            validatedType: 'color'
+                        };
 
-                for (var i = 0; i < symbols.length; i++) {
-                    var symbol = symbols[i];
-                    use_el = svgdoc.createElementNS(NS.SVG, 'use');
-                    use_el.id = getNextId();
-                    setHref(use_el, '#' + symbol.id);
+                    case 'nolayer':
+                        return {
+                            symbols: _parseSvgByNolayer(svg),
+                            validatedType: 'nolayer'
+                        };
 
-                    if (symbol.getAttribute('data-id') != null && type === 'layer') {
-                        function rgbToHex(str) {
-                            var rgb = str.substring(4).split(',');
-                            var hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
-                            while (hex.length < 6) {
-                                hex = '0' + hex;
-                            }
-                            return '#' + hex.toUpperCase();
+                    case 'layer':
+                        let symbols = _parseSvgByLayer(svg);
+                        if(symbols) {
+                            return {
+                                symbols: symbols,
+                                validatedType: 'layer'
+                            };
+                        } else {
+                            console.log('Not valid layer. Use nolayer parsing option instead');
+                            return {
+                                symbols: _parseSvgByNolayer(svg),
+                                validatedType: 'nolayer'
+                            };
                         }
-                        var layerName = symbol.getAttribute('data-id') || rgbToHex(symbol.getAttribute('data-color'));
-                        if (!svgCanvas.setCurrentLayer(layerName)) {
-                            var layer = svgCanvas.createLayer(layerName);
-                            layer.color = symbol.getAttribute('data-color');
-                        }
-                    }
-
-                    (current_group || getCurrentDrawing().getCurrentLayer()).appendChild(use_el);
-                    batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
-                    clearSelection();
-
-                    var bb = svgedit.utilities.getBBox(use_el);
-                    // Scale
-                    var dpi = 72, //72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
-                        svgUnitScaling = 25.4 / dpi * 10, // inch to mm
-                        mt = rootTransform.scale(svgUnitScaling),
-                        matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
-
-                    use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
-
-                    svgedit.recalculate.recalculateDimensions(use_el);
-
-                    $(use_el).data('symbol', symbol).data('ref', symbol);
-                    addToSelection([use_el]);
-
-                    // TODO: Find way to add this in a recalculateDimensions-parsable way
-                    //				if (vb[0] != 0 || vb[1] != 0)
-                    //					ts = 'translate(' + (-vb[0]) + ',' + (-vb[1]) + ') ' + ts;
-                    addCommandToHistory(batchCmd);
-                    call('changed', [svgcontent]);
-
-                    var dataXform = '';
-                    $.each(bb, function (key, value) {
-                        dataXform += key + '=' + value + ' ';
-                    });
-                    use_el.setAttribute('data-xform', dataXform);
                 }
+            }
+            function setAndAppendUseElement(symbol, type) {
+                // create a use element
+                const use_el = svgdoc.createElementNS(NS.SVG, 'use');
+                use_el.id = getNextId();
+                setHref(use_el, '#' + symbol.id);
 
-                if ((type == 'color' || type == 'layer')) {
-                    const defaultLayerName = LANG.right_panel.layer_panel.layer1;
-                    if ($('svg title')[0].innerHTML == defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length == 0)) {
-                        this.setCurrentLayer(defaultLayerName);
-                        this.deleteCurrentLayer();
-                        window.updateContextPanel();
-                        window.populateLayers();
+                //switch currentLayer, and create layer if necessary
+                if(['color', 'layer'].includes(type) && symbol.getAttribute('data-id') != null) {
+                    const color = symbol.getAttribute('data-color');
+                    const layerName = symbol.getAttribute('data-id') || rgbToHex(color);
+
+                    const isLayerExist = svgCanvas.setCurrentLayer(layerName);
+                    if(!isLayerExist) {
+                        const layer = svgCanvas.createLayer(layerName);
+                        layer.color = color;
                     }
                 }
+
+                // append ~~~~~ ya
+                getCurrentDrawing().getCurrentLayer().appendChild(use_el);
+
+                batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
+
+                const bb = svgedit.utilities.getBBox(use_el);
+
+                // Scale
+                const dpi = 72, //72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
+                    svgUnitScaling = 25.4 / dpi * 10, // inch to mm
+                    mt = rootTransform.scale(svgUnitScaling),
+                    matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+
+                console.log('rootTransform: ', rootTransform);
+                use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+
+                svgedit.recalculate.recalculateDimensions(use_el);
+
+                $(use_el).data('symbol', symbol).data('ref', symbol);
+
+                // set data-xform
+                let dataXform = '';
+                $.each(bb, function (key, value) {
+                    dataXform += key + '=' + value + ' ';
+                });
+                use_el.setAttribute('data-xform', dataXform);
+
+                return use_el;
+            }
+            function removeDefaultLayerIfEmpty() {
+                const defaultLayerName = LANG.right_panel.layer_panel.layer1;
+                if ($('svg title')[0].innerHTML === defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length === 0)) {
+                    svgCanvas.setCurrentLayer(defaultLayerName);
+                    svgCanvas.deleteCurrentLayer();
+                    window.updateContextPanel();
+                    window.populateLayers();
+                }
+            }
+            function rgbToHex(rgbStr) {
+                const rgb = rgbStr.substring(4).split(',');
+                const hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
+                hex.padStart(6, '0'); // pad zero
+                return '#' + hex.toUpperCase(); // ex: #0A23C5
+            }
+            try {
+                // import new svg document into our document
+                const svg = svgdoc.adoptNode(newDoc.documentElement);
+                const {symbols, confirmedType} = parseSvg(svg, _type);
+
+                const use_elements = symbols.map(symbol => setAndAppendUseElement(symbol, confirmedType));
+
+                removeDefaultLayerIfEmpty();
+
+                addCommandToHistory(batchCmd);
+                call('changed', [svgcontent]);
+
+                // we want to return the element so we can automatically select it
+                return use_elements[use_elements.length - 1];
             } catch (e) {
                 console.log(e);
                 return null;
             }
 
-
-            // we want to return the element so we can automatically select it
-            return use_el;
         };
 
         this.makeSymbol = function (elem, attrs, batchCmd) {
