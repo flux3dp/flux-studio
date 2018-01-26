@@ -97,6 +97,7 @@ define([
 
         _showPreview: function() {
             let divStyle = {
+                borderRadius: '2px',
                 backgroundColor: '#E2E1E0',
                 backgroundImage: this._getPreviewUrl(),
                 backgroundSize: '100% auto',
@@ -227,9 +228,11 @@ define([
             taskProp = findObjectContainsProperty(jobInfo, 'TASK_TYPE');
 
             if(headProp.length === 0) {
+                // From Bottom Right Start Button
                 let operatingFunction = location.hash.split('/')[1];
                 return lang.monitor.task[operatingFunction.toUpperCase()];
             } else if (taskProp.length > 0) {
+                // Selected Task in File Browser
                 return lang.monitor.task[taskProp[0].TASK_TYPE.toUpperCase()];
             }
             return lang.monitor.task[headProp[0].HEAD_TYPE.toUpperCase()];

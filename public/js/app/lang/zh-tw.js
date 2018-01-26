@@ -1209,13 +1209,14 @@ define(function() {
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
-                EXTRUDER                        : '列印工作',
-                PRINT                           : '列印工作',
-                LASER                           : '雕刻工作',
-                DRAW                            : '繪製工作',
-                CUT                             : '切割工作',
-                VINYL                           : '切割工作',
-                'N/A'                           : '繪製工作'
+                EXTRUDER                        : '列印',
+                PRINT                           : '列印',
+                LASER                           : '雷射雕刻',
+                DRAW                            : '數位繪圖',
+                CUT                             : '貼紙切割',
+                VINYL                           : '貼紙切割',
+                BEAMBOX                         : '雷射雕刻',
+                'N/A'                           : '自由模式'
             },
             device: {
                 EXTRUDER                        : '列印工具頭',
