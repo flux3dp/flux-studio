@@ -5082,15 +5082,21 @@ define([
                             return groupColorMap[stroke];
                         } 
                         function filterColor(filter, node) {
+                            console.log("Filtering", node);
+                            var children = [];
                             for (var i = 0; i < node.childNodes.length; i++) {
-                                var grandchild = node.childNodes[i];
-                                if (['polygon', 'path', 'line'].indexOf(grandchild.tagName) >=0 ) {
+                                children.push(node.childNodes[i]);
+                            }
+                            for (var i = 0; i < children.length; i++) {
+                                var grandchild = children[i];
+                                if (['polygon', 'path', 'line', 'rect', 'circle', 'ellipse'].indexOf(grandchild.tagName) >=0 ) {
                                     var stroke = grandchild.getAttribute('stroke');
                                     if (stroke === 'none') {
                                         stroke = grandchild.getAttribute('fill');
                                     }
+                                    console.log("Comparing", stroke, filter)
                                     if (stroke != filter) {
-                                        node.removeChild(grandchild);
+                                        grandchild.parentElement.removeChild(grandchild);
                                     } else {
                                         node.setAttribute('data-color', stroke);
                                     }
