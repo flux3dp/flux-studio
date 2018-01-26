@@ -1154,7 +1154,7 @@ define(function() {
             pause                               : '暫停',
             stop                                : '停止',
             record                              : 'RECORD',
-            camera                              : '監控',
+            camera                              : '相機',
             connecting                          : '連線中，請稍候',
             HEAD_OFFLINE                        : '#110 沒有偵測到工具頭\n請確認工具頭傳輸線完整插入 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183157">暸解更多</a>',
             HEAD_ERROR_CALIBRATING              : '#112 工具頭校正失誤\n請重新裝載工具頭，並確認磁鐵關節的附著',
