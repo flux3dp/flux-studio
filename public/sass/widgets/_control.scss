@@ -72,6 +72,7 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         word-break: break-all;
+        border-radius: 1px;
 
         &:hover .btn,
         &:hover {
@@ -109,6 +110,7 @@
         .dialog-window-content {
             background: $primaryColor;
             padding: 8px;
+            border-radius: 2px;
 
             li {
                 padding: 0 15px;

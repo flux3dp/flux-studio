@@ -53,6 +53,7 @@
                 padding: 0 20px;
                 overflow-y: auto;
                 height: 100%;
+                border-radius: 2px;
                 img {
                     width: 100%;
                 }
@@ -180,6 +181,7 @@
                 }
                 .status-info.running {
                     background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.5));
+                    border-radius: 2px;
                 }
 
                 .btn-snap {
