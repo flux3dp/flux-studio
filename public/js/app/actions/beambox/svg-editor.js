@@ -1031,8 +1031,8 @@ define([
                 var currentLayerName = drawing.getCurrentLayerName();
                 const layerCount = svgCanvas.getCurrentDrawing().getNumLayers();
 
-                let layer = 0;
-                while (layer < layerCount) {
+                let layer = layerCount - 1;
+                while (layer >= 0) {
                     var name = drawing.getLayerName(layer);
                     var layerTr = $('<tr class="layer">').toggleClass('layersel', name === currentLayerName);
                     var layerVis = $('<td class="layervis">').toggleClass('layerinvis', !drawing.getLayerVisibility(name));
@@ -1040,7 +1040,7 @@ define([
                     var layerName = $('<td class="layername">' + name + '</td>');
                     layerlist.append(layerTr.append(layerVis, layerColor, layerName));
                     selLayerNames.append('<option value="' + name + '">' + name + '</option>');
-                    layer += 1;
+                    layer--;
                 }
 
                 displayChangeLayerBlock(true);
@@ -1920,7 +1920,7 @@ define([
                 if (supportsNonSS) {
                     return;
                 }
-
+                // console.warn("Wireframe disabled by FLUX Studio")
                 var rule = '#workarea.wireframe #svgcontent * { stroke-width: ' + 1 / svgCanvas.getZoom() + 'px; }';
                 $('#wireframe_rules').text(workarea.hasClass('wireframe') ? rule : '');
             };
@@ -4485,8 +4485,8 @@ define([
             }
 
             function moveLayer(pos) {
-                var curIndex = $('#layerlist tr.layersel').index();
                 var total = svgCanvas.getCurrentDrawing().getNumLayers();
+                var curIndex = total - 1 - $('#layerlist tr.layersel').index();
                 if (curIndex > 0 || curIndex < total - 1) {
                     curIndex += pos;
                     svgCanvas.setCurrentLayerPosition(curIndex);
@@ -4497,11 +4497,11 @@ define([
             $('#layer_delete').click(deleteLayer);
 
             $('#layer_up').click(function () {
-                moveLayer(-1);
+                moveLayer(1);
             });
 
             $('#layer_down').click(function () {
-                moveLayer(1);
+                moveLayer(-1);
             });
 
             $('#layer_rename').click(function () {

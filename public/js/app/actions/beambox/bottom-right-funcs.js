@@ -26,15 +26,15 @@ define([
             $clonedSvg.find('#selectorParentGroup').remove();
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
-            $clonedSvg.find('#svgcontent *').css({
-                'fill': '#ffffff',
-                'fill-opacity': '0',
-                'stroke': '#000',
-                'stroke-width': '1px',
-                'stroke-opacity': '1.0',
-                'stroke-dasharray': '0',
-                'vector-effect': 'non-scaling-stroke'
-            });
+            // $clonedSvg.find('#svgcontent *').css({
+            //     'fill': '#ffffff',
+            //     'fill-opacity': '0',
+            //     'stroke': '#000',
+            //     'stroke-width': '1px',
+            //     'stroke-opacity': '1.0',
+            //     'stroke-dasharray': '0',
+            //     'vector-effect': 'non-scaling-stroke'
+            // });
             return $clonedSvg;
         }
 
@@ -85,8 +85,7 @@ define([
         const [thumbnail, thumbnailBlobURL] = await fetchThumbnail();
         const svgString = svgCanvas.getSvgString();
 
-        const blob = new Blob([thumbnail, svgString], { type: 'image/svg+xml' });
-
+        const blob = new Blob([thumbnail, svgString], { type: 'application/octet-stream' });
         const reader = new FileReader();
         const uploadFile = await new Promise((resolve) => {
             reader.onload = function () {
@@ -96,7 +95,7 @@ define([
                     name: 'svgeditor.svg',
                     uploadName: thumbnailBlobURL.split('/').pop(),
                     extension: 'svg',
-                    type: 'image/svg+xml',
+                    type: 'application/octet-stream',
                     size: blob.size,
                     thumbnailSize: thumbnail.length,
                     index: 0,
@@ -126,7 +125,6 @@ define([
                         ProgressActions.updating(data.message, data.percentage * 100);
                     },
                     onFinished: function (blob, fileName, fileTimeCost) {
-                        console.log("I received", fileTimeCost)
                         GlobalActions.sliceComplete({ time: fileTimeCost });
                         ProgressActions.updating(lang.message.uploading_fcode, 100);
                         resolve(blob);

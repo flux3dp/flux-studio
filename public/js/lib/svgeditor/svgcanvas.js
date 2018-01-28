@@ -5070,56 +5070,55 @@ define([
                 }
                 if (type === 'color') {
                     var groupColorMap = {};
+                    function getGroupColorMap(stroke) {
+                        if (!groupColorMap[stroke]) {
+                            groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
+                            groupColorMap[stroke].setAttribute('data-color', stroke);
+                        }
+                        return groupColorMap[stroke];
+                    } 
+                    function filterColor(filter, node) {
+                        var children = [];
+                        for (var i = 0; i < node.childNodes.length; i++) {
+                            children.push(node.childNodes[i]);
+                        }
+                        for (var i = 0; i < children.length; i++) {
+                            var grandchild = children[i];
+                            if (['polygon', 'path', 'line', 'rect', 'circle', 'ellipse'].indexOf(grandchild.tagName) >=0 ) {
+                                var stroke = grandchild.getAttribute('stroke');
+                                if (stroke === 'none') {
+                                    stroke = grandchild.getAttribute('fill');
+                                }
+                                if (stroke != filter) {
+                                    grandchild.parentElement.removeChild(grandchild);
+                                } else {
+                                    node.setAttribute('data-color', stroke);
+                                }
+                            } else if (grandchild.tagName == 'g') {
+                                grandchild.setAttribute('data-color', stroke);                                    
+                                filterColor(filter, grandchild)
+                            }
+                        }
+                    }
+                    function traverseForColors(colors, node) {
+                        for (var i = 0; i < node.childNodes.length; i++) {
+                            var grandchild = node.childNodes[i];
+                            if (['polygon', 'path', 'line'].indexOf(grandchild.tagName) >=0 ) {
+                                var stroke = grandchild.getAttribute('stroke');
+                                if (stroke === 'none') {
+                                    stroke = grandchild.getAttribute('fill');
+                                }
+                                colors[stroke] = 1;
+                            } else if (grandchild.tagName == 'g') {
+                                traverseForColors(colors, grandchild)
+                            }
+                        }
+                    }
                     
                     for (var i = 0; i < svg.childNodes.length; i++) {
                         var child = svg.childNodes[i];
                         console.log('Getting child(color)', child);
-                        function getGroupColorMap(stroke) {
-                            if (!groupColorMap[stroke]) {
-                                groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
-                                groupColorMap[stroke].setAttribute('data-color', stroke);
-                            }
-                            return groupColorMap[stroke];
-                        } 
-                        function filterColor(filter, node) {
-                            console.log("Filtering", node);
-                            var children = [];
-                            for (var i = 0; i < node.childNodes.length; i++) {
-                                children.push(node.childNodes[i]);
-                            }
-                            for (var i = 0; i < children.length; i++) {
-                                var grandchild = children[i];
-                                if (['polygon', 'path', 'line', 'rect', 'circle', 'ellipse'].indexOf(grandchild.tagName) >=0 ) {
-                                    var stroke = grandchild.getAttribute('stroke');
-                                    if (stroke === 'none') {
-                                        stroke = grandchild.getAttribute('fill');
-                                    }
-                                    console.log("Comparing", stroke, filter)
-                                    if (stroke != filter) {
-                                        grandchild.parentElement.removeChild(grandchild);
-                                    } else {
-                                        node.setAttribute('data-color', stroke);
-                                    }
-                                } else if (grandchild.tagName == 'g') {
-                                    grandchild.setAttribute('data-color', stroke);                                    
-                                    filterColor(filter, grandchild)
-                                }
-                            }
-                        }
-                        function traverseForColors(colors, node) {
-                            for (var i = 0; i < node.childNodes.length; i++) {
-                                var grandchild = node.childNodes[i];
-                                if (['polygon', 'path', 'line'].indexOf(grandchild.tagName) >=0 ) {
-                                    var stroke = grandchild.getAttribute('stroke');
-                                    if (stroke === 'none') {
-                                        stroke = grandchild.getAttribute('fill');
-                                    }
-                                    colors[stroke] = 1;
-                                } else if (grandchild.tagName == 'g') {
-                                    traverseForColors(colors, grandchild)
-                                }
-                            }
-                        }
+                        
                         switch (child.tagName) {
                             case 'g':
                                 var colors = {};
@@ -5136,13 +5135,16 @@ define([
                                 }
                                 break;
                             default:
+                                console.log("Ignoring tag", child.tagName)
                                 break;
 						}
                     }
                     for (var k in groupColorMap) {
+                        console.log("Adding Color Group", k);
                         groups.push(groupColorMap[k]);
                     }
                     type = 'layer';
+                    console.log("Final Defs", svgDefs)
                 }
                 if (type === 'layer') {
                     for (var i in groups) {
@@ -5261,10 +5263,16 @@ define([
             var symbol = svgdoc.createElementNS(NS.SVG, 'symbol'),
                 symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
 
+            var oldLinkMap = {}
             if (defs) {
                 // this is a group color object, copy defs into symbol;
                 for (var i in defs) {
-                    symbol_defs.appendChild(defs[i]);
+                    this.clipCount = this.clipCount || 1;
+                    const def = defs[i].cloneNode(true),
+                          newId = 'def' + (this.clipCount++);
+                    oldLinkMap[def.id] = newId;
+                    def.id = newId;
+                    symbol_defs.appendChild(def);
                 }
             }
 
@@ -5278,6 +5286,25 @@ define([
             } else {
                 symbol.appendChild(elem);
             }
+
+            function traverseForRemappingId(node) {
+                for (var i = 0; i < node.attributes.length; i++) {
+                    var attr = node.attributes[i];
+                    var re = /url\(#([^)]+)\)/g;
+                    var urlMatch = re.exec(attr.value);
+                    if (urlMatch) {
+                        var oldId = urlMatch[1];
+                        if (oldLinkMap[oldId]) {
+                            node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap[oldId]));
+                        }
+                    }
+                }
+                if (!node.childNodes) return;
+                for(var i = 0; i < node.childNodes.length; i++) {
+                    traverseForRemappingId(node.childNodes[i]);
+                }
+            }
+            traverseForRemappingId(symbol);
 
             for (var i = 0; i < attrs.length; i++) {
                 var attr = attrs[i];
