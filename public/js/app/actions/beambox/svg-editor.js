@@ -31,7 +31,8 @@ define([
     'helpers/shortcuts',
     'helpers/i18n',
     'app/actions/beambox/constant',
-    'helpers/dxf2svg'
+    'helpers/dxf2svg',
+    'helpers/api/svg-laser-parser'
 ], function (
     ObjectPanelsController,
     LaserPanelController,
@@ -41,9 +42,11 @@ define([
     Shortcuts,
     i18n,
     Constant,
-    dxfToSvg
+    Dxf2Svg,
+    SvgLaserParser
 ) {
     const LANG = i18n.lang.beambox;
+    const svgWebSocket = SvgLaserParser({ type: 'svgeditor' });
     if (window.svgEditor) {
         return;
     }
@@ -67,8 +70,8 @@ define([
             customExportPDF = false,
             callbacks = [],
             /**
-             * PREFS AND CONFIG
-             */
+                 * PREFS AND CONFIG
+                 */
             // The iteration algorithm for defaultPrefs does not currently support array/objects
             defaultPrefs = {
                 // EDITOR OPTIONS (DIALOG)
@@ -92,19 +95,19 @@ define([
                 //   procedures (we obtain instead from defaultExtensions)
                 extensions: [],
                 /**
-                 * Can use window.location.origin to indicate the current
-                 * origin. Can contain a '*' to allow all domains or 'null' (as
-                 * a string) to support all file:// URLs. Cannot be set by
-                 * URL for security reasons (not safe, at least for
-                 * privacy or data integrity of SVG content).
-                 * Might have been fairly safe to allow
-                 *   `new URL(window.location.href).origin` by default but
-                 *   avoiding it ensures some more security that even third
-                 *   party apps on the same domain also cannot communicate
-                 *   with this app by default.
-                 * For use with ext-xdomain-messaging.js
-                 * @todo We might instead make as a user-facing preference.
-                 */
+                     * Can use window.location.origin to indicate the current
+                     * origin. Can contain a '*' to allow all domains or 'null' (as
+                     * a string) to support all file:// URLs. Cannot be set by
+                     * URL for security reasons (not safe, at least for
+                     * privacy or data integrity of SVG content).
+                     * Might have been fairly safe to allow
+                     *   `new URL(window.location.href).origin` by default but
+                     *   avoiding it ensures some more security that even third
+                     *   party apps on the same domain also cannot communicate
+                     *   with this app by default.
+                     * For use with ext-xdomain-messaging.js
+                     * @todo We might instead make as a user-facing preference.
+                     */
                 allowedOrigins: []
             },
             defaultExtensions = [
@@ -132,7 +135,7 @@ define([
                     opacity: 0
                 },
                 initStroke: {
-                    width: 5,
+                    width: 1,
                     color: '000000', // solid black
                     opacity: 1
                 },
@@ -178,9 +181,9 @@ define([
                 emptyStorageOnDecline: false // Used by ext-storage.js; empty any prior storage if the user declines to store
             },
             /**
-             * LOCALE
-             * @todo Can we remove now that we are always loading even English? (unless locale is set to null)
-             */
+                 * LOCALE
+                 * @todo Can we remove now that we are always loading even English? (unless locale is set to null)
+                 */
             uiStrings = editor.uiStrings = {
                 common: {
                     ok: 'OK',
@@ -233,21 +236,21 @@ define([
         };
 
         /**
-         * EXPORTS
-         */
+             * EXPORTS
+             */
 
         /**
-         * Store and retrieve preferences
-         * @param {string} key The preference name to be retrieved or set
-         * @param {string} [val] The value. If the value supplied is missing or falsey, no change to the preference will be made.
-         * @returns {string} If val is missing or falsey, the value of the previously stored preference will be returned.
-         * @todo Can we change setting on the jQuery namespace (onto editor) to avoid conflicts?
-         * @todo Review whether any remaining existing direct references to
-         *	getting curPrefs can be changed to use $.pref() getting to ensure
-            *	defaultPrefs fallback (also for sake of allowInitialUserOverride); specifically, bkgd_color could be changed so that
-            *	the pref dialog has a button to auto-calculate background, but otherwise uses $.pref() to be able to get default prefs
-            *	or overridable settings
-            */
+             * Store and retrieve preferences
+             * @param {string} key The preference name to be retrieved or set
+             * @param {string} [val] The value. If the value supplied is missing or falsey, no change to the preference will be made.
+             * @returns {string} If val is missing or falsey, the value of the previously stored preference will be returned.
+             * @todo Can we change setting on the jQuery namespace (onto editor) to avoid conflicts?
+             * @todo Review whether any remaining existing direct references to
+             *	getting curPrefs can be changed to use $.pref() getting to ensure
+             *	defaultPrefs fallback (also for sake of allowInitialUserOverride); specifically, bkgd_color could be changed so that
+             *	the pref dialog has a button to auto-calculate background, but otherwise uses $.pref() to be able to get default prefs
+             *	or overridable settings
+             */
         $.pref = function (key, val) {
             if (val) {
                 curPrefs[key] = val;
@@ -258,24 +261,24 @@ define([
         };
 
         /**
-         * EDITOR PUBLIC METHODS
-         * locale.js also adds "putLang" and "readLang" as editor methods
-         * @todo Sort these methods per invocation order, ideally with init at the end
-         * @todo Prevent execution until init executes if dependent on it?
-         */
+             * EDITOR PUBLIC METHODS
+             * locale.js also adds "putLang" and "readLang" as editor methods
+             * @todo Sort these methods per invocation order, ideally with init at the end
+             * @todo Prevent execution until init executes if dependent on it?
+             */
 
         /**
-         * Where permitted, sets canvas and/or defaultPrefs based on previous
-         *	storage. This will override URL settings (for security reasons) but
-            *	not config.js configuration (unless initial user overriding is explicitly
-            *	permitted there via allowInitialUserOverride).
-            * @todo Split allowInitialUserOverride into allowOverrideByURL and
-            *	allowOverrideByUserStorage so config.js can disallow some
-            *	individual items for URL setting but allow for user storage AND/OR
-            *	change URL setting so that it always uses a different namespace,
-            *	so it won't affect pre-existing user storage (but then if users saves
-            *	that, it will then be subject to tampering
-            */
+             * Where permitted, sets canvas and/or defaultPrefs based on previous
+             *	storage. This will override URL settings (for security reasons) but
+             *	not config.js configuration (unless initial user overriding is explicitly
+             *	permitted there via allowInitialUserOverride).
+             * @todo Split allowInitialUserOverride into allowOverrideByURL and
+             *	allowOverrideByUserStorage so config.js can disallow some
+             *	individual items for URL setting but allow for user storage AND/OR
+             *	change URL setting so that it always uses a different namespace,
+             *	so it won't affect pre-existing user storage (but then if users saves
+             *	that, it will then be subject to tampering
+             */
         editor.loadContentAndPrefs = function () {
             if (!curConfig.forceStorage && (curConfig.noStorageOnLoad || !document.cookie.match(/(?:^|;\s*)store=(?:prefsAndContent|prefsOnly)/))) {
                 return;
@@ -283,7 +286,7 @@ define([
 
             // LOAD CONTENT
             if (editor.storage && // Cookies do not have enough available memory to hold large documents
-                (curConfig.forceStorage || (!curConfig.noStorageOnLoad && document.cookie.match(/(?:^|;\s*)store=prefsAndContent/)))
+                    (curConfig.forceStorage || (!curConfig.noStorageOnLoad && document.cookie.match(/(?:^|;\s*)store=prefsAndContent/)))
             ) {
                 var name = 'svgedit-' + curConfig.canvasName;
                 var cached = editor.storage.getItem(name);
@@ -313,23 +316,23 @@ define([
         };
 
         /**
-         * Allows setting of preferences or configuration (including extensions).
-         * @param {object} opts The preferences or configuration (including extensions)
-         * @param {object} [cfgCfg] Describes configuration which applies to the particular batch of supplied options
-         * @param {boolean} [cfgCfg.allowInitialUserOverride=false] Set to true if you wish
-         *	to allow initial overriding of settings by the user via the URL
-            *	(if permitted) or previously stored preferences (if permitted);
-            *	note that it will be too late if you make such calls in extension
-            *	code because the URL or preference storage settings will
-            *   have already taken place.
-            * @param {boolean} [cfgCfg.overwrite=true] Set to false if you wish to
-            *	prevent the overwriting of prior-set preferences or configuration
-            *	(URL settings will always follow this requirement for security
-            *	reasons, so config.js settings cannot be overridden unless it
-            *	explicitly permits via "allowInitialUserOverride" but extension config
-            *	can be overridden as they will run after URL settings). Should
-            *   not be needed in config.js.
-            */
+             * Allows setting of preferences or configuration (including extensions).
+             * @param {object} opts The preferences or configuration (including extensions)
+             * @param {object} [cfgCfg] Describes configuration which applies to the particular batch of supplied options
+             * @param {boolean} [cfgCfg.allowInitialUserOverride=false] Set to true if you wish
+             *	to allow initial overriding of settings by the user via the URL
+             *	(if permitted) or previously stored preferences (if permitted);
+             *	note that it will be too late if you make such calls in extension
+             *	code because the URL or preference storage settings will
+             *   have already taken place.
+             * @param {boolean} [cfgCfg.overwrite=true] Set to false if you wish to
+             *	prevent the overwriting of prior-set preferences or configuration
+             *	(URL settings will always follow this requirement for security
+             *	reasons, so config.js settings cannot be overridden unless it
+             *	explicitly permits via "allowInitialUserOverride" but extension config
+             *	can be overridden as they will run after URL settings). Should
+             *   not be needed in config.js.
+             */
         editor.setConfig = function (opts, cfgCfg) {
             cfgCfg = cfgCfg || {};
 
@@ -347,7 +350,7 @@ define([
                     if (defaultPrefs.hasOwnProperty(key)) {
                         if (cfgCfg.overwrite === false && (
                             curConfig.preventAllURLConfig ||
-                            curPrefs.hasOwnProperty(key)
+                                curPrefs.hasOwnProperty(key)
                         )) {
                             return;
                         }
@@ -358,11 +361,11 @@ define([
                         }
                     } else if (['extensions', 'allowedOrigins'].indexOf(key) > -1) {
                         if (cfgCfg.overwrite === false &&
-                            (
-                                curConfig.preventAllURLConfig ||
-                                key === 'allowedOrigins' ||
-                                (key === 'extensions' && curConfig.lockExtensions)
-                            )
+                                (
+                                    curConfig.preventAllURLConfig ||
+                                    key === 'allowedOrigins' ||
+                                    (key === 'extensions' && curConfig.lockExtensions)
+                                )
                         ) {
                             return;
                         }
@@ -372,7 +375,7 @@ define([
                     else if (defaultConfig.hasOwnProperty(key)) {
                         if (cfgCfg.overwrite === false && (
                             curConfig.preventAllURLConfig ||
-                            curConfig.hasOwnProperty(key)
+                                curConfig.hasOwnProperty(key)
                         )) {
                             return;
                         }
@@ -401,22 +404,22 @@ define([
         };
 
         /**
-         * @param {object} opts Extension mechanisms may call setCustomHandlers with three functions: opts.open, opts.save, and opts.exportImage
-         * opts.open's responsibilities are:
-         *	- invoke a file chooser dialog in 'open' mode
-            *	- let user pick a SVG file
-            *	- calls svgCanvas.setSvgString() with the string contents of that file
-            *  opts.save's responsibilities are:
-            *	- accept the string contents of the current document
-            *	- invoke a file chooser dialog in 'save' mode
-            *	- save the file to location chosen by the user
-            *  opts.exportImage's responsibilities (with regard to the object it is supplied in its 2nd argument) are:
-            *	- inform user of any issues supplied via the "issues" property
-            *	- convert the "svg" property SVG string into an image for export;
-            *		utilize the properties "type" (currently 'PNG', 'JPEG', 'BMP',
-            *		'WEBP', 'PDF'), "mimeType", and "quality" (for 'JPEG' and 'WEBP'
-            *		types) to determine the proper output.
-            */
+             * @param {object} opts Extension mechanisms may call setCustomHandlers with three functions: opts.open, opts.save, and opts.exportImage
+             * opts.open's responsibilities are:
+             *	- invoke a file chooser dialog in 'open' mode
+             *	- let user pick a SVG file
+             *	- calls svgCanvas.setSvgString() with the string contents of that file
+             *  opts.save's responsibilities are:
+             *	- accept the string contents of the current document
+             *	- invoke a file chooser dialog in 'save' mode
+             *	- save the file to location chosen by the user
+             *  opts.exportImage's responsibilities (with regard to the object it is supplied in its 2nd argument) are:
+             *	- inform user of any issues supplied via the "issues" property
+             *	- convert the "svg" property SVG string into an image for export;
+             *		utilize the properties "type" (currently 'PNG', 'JPEG', 'BMP',
+             *		'WEBP', 'PDF'), "mimeType", and "quality" (for 'JPEG' and 'WEBP'
+             *		types) to determine the proper output.
+             */
         editor.setCustomHandlers = function (opts) {
             editor.ready(function () {
                 if (opts.open) {
@@ -452,7 +455,7 @@ define([
                 if ('localStorage' in window) { // && onWeb removed so Webkit works locally
                     editor.storage = localStorage;
                 }
-            } catch (err) {console.log(err);}
+            } catch (err) { console.log(e); }
 
             // Todo: Avoid var-defined functions and group functions together, etc. where possible
             var good_langs = [];
@@ -585,8 +588,8 @@ define([
                 editor.putLocale(null, good_langs);
             };
 
-            // Load extensions
-            // Bit of a hack to run extensions in local Opera/IE9
+                // Load extensions
+                // Bit of a hack to run extensions in local Opera/IE9
             if (document.location.protocol === 'file:') {
                 setTimeout(extFunc, 100);
             } else {
@@ -814,7 +817,7 @@ define([
                     stroke: null
                 };
 
-            // For external openers
+                // For external openers
             (function () {
                 // let the opener know SVG Edit is ready (now that config is set up)
                 var svgEditorReadyEvent,
@@ -824,7 +827,7 @@ define([
                         svgEditorReadyEvent = w.document.createEvent('Event');
                         svgEditorReadyEvent.initEvent('svgEditorReady', true, true);
                         w.document.documentElement.dispatchEvent(svgEditorReadyEvent);
-                    } catch (e) {console.log(e);}
+                    } catch (e) { console.log(e); }
                 }
             })();
 
@@ -950,8 +953,8 @@ define([
                 }
             };
 
-            // used to make the flyouts stay on the screen longer the very first time
-            // var flyoutspeed = 1250; // Currently unused
+                // used to make the flyouts stay on the screen longer the very first time
+                // var flyoutspeed = 1250; // Currently unused
             var textBeingEntered = false;
             var selectedElement = null;
             var multiselected = false;
@@ -1028,15 +1031,16 @@ define([
                 var currentLayerName = drawing.getCurrentLayerName();
                 const layerCount = svgCanvas.getCurrentDrawing().getNumLayers();
 
-                let layer = 0;
-                while (layer < layerCount) {
+                let layer = layerCount - 1;
+                while (layer >= 0) {
                     var name = drawing.getLayerName(layer);
                     var layerTr = $('<tr class="layer">').toggleClass('layersel', name === currentLayerName);
                     var layerVis = $('<td class="layervis">').toggleClass('layerinvis', !drawing.getLayerVisibility(name));
+                    var layerColor = $('<td class="layercolor"><div style="background:' + drawing.getLayerColor(name) + '"></div></td>');
                     var layerName = $('<td class="layername">' + name + '</td>');
-                    layerlist.append(layerTr.append(layerVis, layerName));
+                    layerlist.append(layerTr.append(layerVis, layerColor, layerName));
                     selLayerNames.append('<option value="' + name + '">' + name + '</option>');
-                    layer += 1;
+                    layer--;
                 }
 
                 displayChangeLayerBlock(true);
@@ -1076,8 +1080,6 @@ define([
                     layerlist.append('<tr><td style="color:white">_</td><td/></tr>');
                 }
             };
-
-            window.populateLayers = populateLayers;
 
             var addLayerLaserConfig = function (layername) {
                 LaserPanelController.initConfig(layername);
@@ -1297,10 +1299,10 @@ define([
 
                 // draw x ruler then y ruler
                 /* 這裡code很亂 值得注意的點有：
-                    1. ruler的位置由css下 如top和margin
-                    2. 當超過limit時 會畫很多個canvas (參見"if (ruler_len >= limit)"段)
-                    3. 上述這些canvas根據css margin排列 因某種神秘原因ruler_y的canvas要加上margin-top:-3px
-                */
+                        1. ruler的位置由css下 如top和margin
+                        2. 當超過limit時 會畫很多個canvas (參見"if (ruler_len >= limit)"段)
+                        3. 上述這些canvas根據css margin排列 因某種神秘原因ruler_y的canvas要加上margin-top:-3px
+                    */
                 for (d = 0; d < 2; d++) {
                     var isX = (d === 0);
                     var dim = isX ? 'x' : 'y';
@@ -1313,7 +1315,7 @@ define([
                     var hcanv = $hcanv_orig[0],
                         $hcanv = $hcanv_orig;
 
-                    // Set the canvas size to the width of the container
+                        // Set the canvas size to the width of the container
                     var ruler_len = scanvas[lentype]();
                     var total_len = ruler_len;
                     hcanv.parentNode.style[lentype] = total_len + 'px';
@@ -1590,8 +1592,8 @@ define([
 
             };
 
-            // Updates the toolbar (colors, opacity, etc) based on the selected element
-            // This function also updates the opacity and id elements that are in the context panel
+                // Updates the toolbar (colors, opacity, etc) based on the selected element
+                // This function also updates the opacity and id elements that are in the context panel
             var updateToolbar = function () {
                 var i, len;
                 if (selectedElement != null) {
@@ -1654,7 +1656,7 @@ define([
                 updateToolButtonState();
             };
 
-            // updates the context panel tools based on the selected element
+                // updates the context panel tools based on the selected element
             var updateContextPanel = function () {
                 var elem = selectedElement;
                 ObjectPanelsController.setMe($(elem));
@@ -1669,8 +1671,8 @@ define([
                 var is_node = currentMode === 'pathedit'; //elem ? (elem.id && elem.id.indexOf('pathpointgrip') == 0) : false;
                 var menu_items = $('#cmenu_canvas li');
                 $('#selected_panel, #multiselected_panel, #g_panel, #rect_panel, #circle_panel,' +
-                    '#ellipse_panel, #line_panel, #text_panel, #image_panel, #container_panel,' +
-                    ' #use_panel, #a_panel').hide();
+                        '#ellipse_panel, #line_panel, #text_panel, #image_panel, #container_panel,' +
+                        ' #use_panel, #a_panel').hide();
                 if (elem != null) {
                     var elname = elem.nodeName;
                     ObjectPanelsController.setType(elname);
@@ -1695,9 +1697,9 @@ define([
                                 promptImgURL();
                             }
                         }
-                        /*else if (elname == 'text') {
-                            // TODO: Do something here for new text
-                        }*/
+                        /*else if (elname === 'text') {
+                                // TODO: Do something here for new text
+                            }*/
                     }
 
                     if (!is_node && currentMode !== 'pathedit') {
@@ -1918,7 +1920,7 @@ define([
                 if (supportsNonSS) {
                     return;
                 }
-
+                // console.warn("Wireframe disabled by FLUX Studio")
                 var rule = '#workarea.wireframe #svgcontent * { stroke-width: ' + 1 / svgCanvas.getZoom() + 'px; }';
                 $('#wireframe_rules').text(workarea.hasClass('wireframe') ? rule : '');
             };
@@ -1934,7 +1936,7 @@ define([
                 $('title:first').text(newTitle);
             };
 
-            // called when we've selected a different element
+                // called when we've selected a different element
             var selectedChanged = function (win, elems) {
                 var mode = svgCanvas.getMode();
                 if (mode === 'select') {
@@ -1964,8 +1966,8 @@ define([
                 });
             };
 
-            // Call when part of element is in process of changing, generally
-            // on mousemove actions like rotate, move, etc.
+                // Call when part of element is in process of changing, generally
+                // on mousemove actions like rotate, move, etc.
             var elementTransition = function (win, elems) {
                 var mode = svgCanvas.getMode();
                 var elem = elems[0];
@@ -1984,10 +1986,10 @@ define([
                             $('#tool_reorient').toggleClass('disabled', ang === 0);
                             break;
 
-                        // TODO: Update values that change on move/resize, etc
-                        //						case "select":
-                        //						case "resize":
-                        //							break;
+                            // TODO: Update values that change on move/resize, etc
+                            //						case "select":
+                            //						case "resize":
+                            //							break;
                     }
                 }
                 svgCanvas.runExtensions('elementTransition', {
@@ -1995,11 +1997,11 @@ define([
                 });
             };
 
-            /**
-             * Test whether an element is a layer or not.
-             * @param {SVGGElement} elem - The SVGGElement to test.
-             * @returns {boolean} True if the element is a layer
-             */
+                /**
+                 * Test whether an element is a layer or not.
+                 * @param {SVGGElement} elem - The SVGGElement to test.
+                 * @returns {boolean} True if the element is a layer
+                 */
             function isLayer(elem) {
                 return elem && elem.tagName === 'g' && svgedit.draw.Layer.CLASS_REGEX.test(elem.getAttribute('class'));
             }
@@ -2123,7 +2125,7 @@ define([
                 updateTitle();
             };
 
-            // Makes sure the current selected paint is available to work with
+                // Makes sure the current selected paint is available to work with
             var prepPaints = function () {
                 paintBox.fill.prep();
                 paintBox.stroke.prep();
@@ -2338,8 +2340,8 @@ define([
 
                 //				var elems = $('.tool_button, .push_button, .tool_button_current, .disabled, .icon_label, #url_notice, #tool_open');
                 var sel_toscale = '#tools_top .toolset, #editor_panel > *, #history_panel > *,' +
-                    '				#main_button, #tools_left > *, #path_node_panel > *, #multiselected_panel > *,' +
-                    '				#g_panel > *, #tool_font_size > *, .tools_flyout';
+                        '				#main_button, #tools_left > *, #path_node_panel > *, #multiselected_panel > *,' +
+                        '				#g_panel > *, #tool_font_size > *, .tools_flyout';
 
                 var elems = $(sel_toscale);
                 var scale = 1;
@@ -2389,7 +2391,7 @@ define([
                 //					'#logo > svg, #logo > img': size_num * 1.3,
                 //					'#tools_bottom .icon_label > *': (size_num === 16 ? 18 : size_num * .75)
                 //				});
-                //				if (size != 's') {
+                //				if (size !== 's') {
                 //					$.resizeSvgIcons({'#layerbuttons svg, #layerbuttons img': size_num * .6});
                 //				}
 
@@ -2536,9 +2538,9 @@ define([
                     //this.style[uaPrefix + 'Transform'] = 'scale(' + scale + ')';
                     var prefix = '-' + uaPrefix.toLowerCase() + '-';
                     styleStr += (sel_toscale + '{' + prefix + 'transform: scale(' + scale + ');}' +
-                        ' #svg_editor div.toolset .toolset {' + prefix + 'transform: scale(1); margin: 1px !important;}' // Hack for markers
-                        +
-                        ' #svg_editor .ui-slider {' + prefix + 'transform: scale(' + (1 / scale) + ');}' // Hack for sliders
+                            ' #svg_editor div.toolset .toolset {' + prefix + 'transform: scale(1); margin: 1px !important;}' // Hack for markers
+                            +
+                            ' #svg_editor .ui-slider {' + prefix + 'transform: scale(' + (1 / scale) + ');}' // Hack for sliders
                     );
                     rule_elem.text(styleStr);
                 }
@@ -2546,7 +2548,7 @@ define([
                 setFlyoutPositions();
             };
 
-            // TODO: Combine this with addDropDown or find other way to optimize
+                // TODO: Combine this with addDropDown or find other way to optimize
             var addAltDropDown = function (elem, list, callback, opts) {
                 var button = $(elem);
                 list = $(list);
@@ -2682,7 +2684,7 @@ define([
                                 break;
                             case 'select':
                                 html = '<label' + cont_id + '>' +
-                                    '<select id="' + tool.id + '">';
+                                        '<select id="' + tool.id + '">';
                                 $.each(tool.options, function (val, text) {
                                     var sel = (val == tool.defval) ? ' selected' : '';
                                     html += '<option value="' + val + '"' + sel + '>' + text + '</option>';
@@ -2697,7 +2699,7 @@ define([
                                 break;
                             case 'button-select':
                                 html = '<div id="' + tool.id + '" class="dropdown toolset" title="' + tool.title + '">' +
-                                    '<div id="cur_' + tool.id + '" class="icon_label"></div><button></button></div>';
+                                        '<div id="cur_' + tool.id + '" class="icon_label"></div><button></button></div>';
 
                                 var list = $('<ul id="' + tool.id + '_opts"></ul>').appendTo('#option_lists');
 
@@ -2719,10 +2721,10 @@ define([
                                 break;
                             case 'input':
                                 html = '<label' + cont_id + '>' +
-                                    '<span id="' + tool.id + '_label">' +
-                                    tool.label + ':</span>' +
-                                    '<input id="' + tool.id + '" title="' + tool.title +
-                                    '" size="' + (tool.size || '4') + '" value="' + (tool.defval || '') + '" type="text"/></label>';
+                                        '<span id="' + tool.id + '_label">' +
+                                        tool.label + ':</span>' +
+                                        '<input id="' + tool.id + '" title="' + tool.title +
+                                        '" size="' + (tool.size || '4') + '" value="' + (tool.defval || '') + '" type="text"/></label>';
 
                                 // Creates the tool, hides & adds it, returns the select element
 
@@ -2752,7 +2754,7 @@ define([
                         svgicons = ext.svgicons,
                         holders = {};
 
-                    // Add buttons given by extension
+                        // Add buttons given by extension
                     $.each(ext.buttons, function (i, btn) {
                         var icon, svgicon, tls_id;
                         var id = btn.id;
@@ -3327,11 +3329,11 @@ define([
                 var set_click = false;
 
                 /*
-                // Currently unused
-                var hideMenu = function() {
-                    list.fadeOut(200);
-                };
-                */
+                    // Currently unused
+                    var hideMenu = function() {
+                        list.fadeOut(200);
+                    };
+                    */
 
                 $(window).mouseup(function (evt) {
                     if (!on_button) {
@@ -3510,19 +3512,19 @@ define([
 
             /*
 
-            When a flyout icon is selected
-                (if flyout) {
-                - Change the icon
-                - Make pressing the button run its stuff
-                }
-                - Run its stuff
+                When a flyout icon is selected
+                    (if flyout) {
+                    - Change the icon
+                    - Make pressing the button run its stuff
+                    }
+                    - Run its stuff
 
-            When its shortcut key is pressed
-                - If not current in list, do as above
-                , else:
-                - Just run its stuff
+                When its shortcut key is pressed
+                    - If not current in list, do as above
+                    , else:
+                    - Just run its stuff
 
-            */
+                */
 
             // Unfocus text input when workarea is mousedowned.
             (function () {
@@ -3617,8 +3619,8 @@ define([
                 }
             };
 
-            // Delete is a contextual tool that only appears in the ribbon if
-            // an element has been selected
+                // Delete is a contextual tool that only appears in the ribbon if
+                // an element has been selected
             var deleteSelected = function () {
                 if (selectedElement != null || multiselected) {
                     svgCanvas.deleteSelectedElements();
@@ -3745,21 +3747,21 @@ define([
                 updateContextPanel();
             };
 
-            // var clickClear = function() {
-            // 	var dims = curConfig.dimensions;
-            // 	$.confirm(uiStrings.notification.QwantToClear, function(ok) {
-            // 		if (!ok) {return;}
-            // 		setSelectMode();
-            // 		svgCanvas.clear();
-            // 		svgCanvas.setResolution(dims[0], dims[1]);
-            // 		updateCanvas(true);
-            // 		unzoom();
-            // 		populateLayers();
-            // 		updateContextPanel();
-            // 		prepPaints();
-            // 		svgCanvas.runExtensions('onNewDocument');
-            // 	});
-            // };
+                // var clickClear = function() {
+                // 	var dims = curConfig.dimensions;
+                // 	$.confirm(uiStrings.notification.QwantToClear, function(ok) {
+                // 		if (!ok) {return;}
+                // 		setSelectMode();
+                // 		svgCanvas.clear();
+                // 		svgCanvas.setResolution(dims[0], dims[1]);
+                // 		updateCanvas(true);
+                // 		unzoom();
+                // 		populateLayers();
+                // 		updateContextPanel();
+                // 		prepPaints();
+                // 		svgCanvas.runExtensions('onNewDocument');
+                // 	});
+                // };
 
             var clickBold = function () {
                 svgCanvas.setBold(!svgCanvas.getBold());
@@ -3830,9 +3832,9 @@ define([
                 });
             };
 
-            // by default, svgCanvas.open() is a no-op.
-            // it is up to an extension mechanism (opera widget, etc)
-            // to call setCustomHandlers() which will make it do something
+                // by default, svgCanvas.open() is a no-op.
+                // it is up to an extension mechanism (opera widget, etc)
+                // to call setCustomHandlers() which will make it do something
             var clickOpen = function () {
                 svgCanvas.open();
             };
@@ -4179,7 +4181,7 @@ define([
             //	background-image to none.png (otherwise partially transparent gradients look weird)
             var colorPicker = function (elem) {
                 var picker = elem.attr('id') === 'stroke_color' ? 'stroke' : 'fill';
-                //				var opacity = (picker == 'stroke' ? $('#stroke_opacity') : $('#fill_opacity'));
+                //				var opacity = (picker === 'stroke' ? $('#stroke_opacity') : $('#fill_opacity'));
                 var paint = paintBox[picker].paint;
                 var title = (picker === 'stroke' ? 'Pick a Stroke Paint and Opacity' : 'Pick a Fill Paint and Opacity');
                 // var was_none = false; // Currently unused
@@ -4217,11 +4219,11 @@ define([
             var PaintBox = function (container, type) {
                 var paintColor, paintOpacity,
                     cur = curConfig[type === 'fill' ? 'initFill' : 'initStroke'];
-                // set up gradients to be used for the buttons
+                    // set up gradients to be used for the buttons
                 var svgdocbox = new DOMParser().parseFromString(
                     '<svg xmlns="http://www.w3.org/2000/svg"><rect width="16.5" height="16.5"' +
-                    '					fill="#' + cur.color + '" opacity="' + cur.opacity + '"/>' +
-                    '					<defs><linearGradient id="gradbox_"/></defs></svg>', 'text/xml');
+                        '					fill="#' + cur.color + '" opacity="' + cur.opacity + '"/>' +
+                        '					<defs><linearGradient id="gradbox_"/></defs></svg>', 'text/xml');
                 var docElem = svgdocbox.documentElement;
 
                 docElem = $(container)[0].appendChild(document.importNode(docElem, true));
@@ -4451,12 +4453,6 @@ define([
             function deleteLayer() {
                 if (svgCanvas.deleteCurrentLayer()) {
                     updateContextPanel();
-                    populateLayers();
-                    // This matches what SvgCanvas does
-                    // TODO: make this behavior less brittle (svg-editor should get which
-                    // layer is selected from the canvas and then select that one in the UI)
-                    $('#layerlist tr.layer').removeClass('layersel');
-                    $('#layerlist tr.layer:first').addClass('layersel');
                 }
             }
 
@@ -4480,7 +4476,7 @@ define([
             }
 
             function mergeLayer() {
-                if ($('#layerlist tr.layersel').index() === svgCanvas.getCurrentDrawing().getNumLayers() - 1) {
+                if ($('#layerlist tr.layersel').index() === 0) {
                     return;
                 }
                 svgCanvas.mergeLayer();
@@ -4489,8 +4485,8 @@ define([
             }
 
             function moveLayer(pos) {
-                var curIndex = $('#layerlist tr.layersel').index();
                 var total = svgCanvas.getCurrentDrawing().getNumLayers();
+                var curIndex = total - 1 - $('#layerlist tr.layersel').index();
                 if (curIndex > 0 || curIndex < total - 1) {
                     curIndex += pos;
                     svgCanvas.setCurrentLayerPosition(curIndex);
@@ -4501,11 +4497,11 @@ define([
             $('#layer_delete').click(deleteLayer);
 
             $('#layer_up').click(function () {
-                moveLayer(-1);
+                moveLayer(1);
             });
 
             $('#layer_down').click(function () {
-                moveLayer(1);
+                moveLayer(-1);
             });
 
             $('#layer_rename').click(function () {
@@ -4680,8 +4676,8 @@ define([
                     fn: clickImage,
                     evt: 'mouseup'
                 },
-                // {sel: '#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['Z', true]},
-                // {sel: '#tool_clear', fn: clickClear, evt: 'mouseup', key: ['N', true]},
+                    // {sel: '#tool_zoom', fn: clickZoom, evt: 'mouseup', key: ['Z', true]},
+                    // {sel: '#tool_clear', fn: clickClear, evt: 'mouseup', key: ['N', true]},
                 {
                     sel: '#tool_save',
                     fn: function () {
@@ -4887,7 +4883,7 @@ define([
                     // {key: ['alt+shift+right', true], fn: function(){svgCanvas.cloneSelectedElements(10,0);}},
                 ];
 
-                // Tooltips not directly associated with a single function
+                    // Tooltips not directly associated with a single function
                 var key_assocs = {
                     '4/Shift+4': '#tools_rect_show',
                     '5/Shift+5': '#tools_ellipse_show'
@@ -4928,41 +4924,41 @@ define([
                                 }
                             }
                             /*
-                            // Bind function to shortcut key
-                            if (opts.key) {
-                                // Set shortcut based on options
-                                var keyval, disInInp = true, fn = opts.fn, pd = false;
-                                if ($.isArray(opts.key)) {
-                                    keyval = opts.key[0];
-                                    if (opts.key.length > 1) {pd = opts.key[1];}
-                                    if (opts.key.length > 2) {disInInp = opts.key[2];}
-                                } else {
-                                    keyval = opts.key;
-                                }
-                                keyval += '';
+                                // Bind function to shortcut key
+                                if (opts.key) {
+                                    // Set shortcut based on options
+                                    var keyval, disInInp = true, fn = opts.fn, pd = false;
+                                    if ($.isArray(opts.key)) {
+                                        keyval = opts.key[0];
+                                        if (opts.key.length > 1) {pd = opts.key[1];}
+                                        if (opts.key.length > 2) {disInInp = opts.key[2];}
+                                    } else {
+                                        keyval = opts.key;
+                                    }
+                                    keyval += '';
 
-                                $.each(keyval.split('/'), function(i, key) {
-                                    $(document).bind('keydown', key, function(e) {
-                                        fn();
-                                        if (pd) {
-                                            e.preventDefault();
-                                        }
-                                        // Prevent default on ALL keys?
-                                        // return false; //return false in jquery do both preventDefault and stopPropogation
+                                    $.each(keyval.split('/'), function(i, key) {
+                                        $(document).bind('keydown', key, function(e) {
+                                            fn();
+                                            if (pd) {
+                                                e.preventDefault();
+                                            }
+                                            // Prevent default on ALL keys?
+                                            // return false; //return false in jquery do both preventDefault and stopPropogation
+                                        });
                                     });
-                                });
 
-                                // Put shortcut in title
-                                if (opts.sel && !opts.hidekey && btn.attr('title')) {
-                                    var newTitle = btn.attr('title').split('[')[0] + ' (' + keyval + ')';
-                                    key_assocs[keyval] = opts.sel;
-                                    // Disregard for menu items
-                                    if (!btn.parents('#main_menu').length) {
-                                        btn.attr('title', newTitle);
+                                    // Put shortcut in title
+                                    if (opts.sel && !opts.hidekey && btn.attr('title')) {
+                                        var newTitle = btn.attr('title').split('[')[0] + ' (' + keyval + ')';
+                                        key_assocs[keyval] = opts.sel;
+                                        // Disregard for menu items
+                                        if (!btn.parents('#main_menu').length) {
+                                            btn.attr('title', newTitle);
+                                        }
                                     }
                                 }
-                            }
-                            */
+                                */
                         });
 
                         // 'fnkey' means 'cmd' or 'ctrl'
@@ -5201,7 +5197,8 @@ define([
                 if (svgCanvas.clipBoard.length) {
                     canv_menu.enableContextMenuItems('#paste,#paste_in_place');
                 }
-            });
+            }
+            );
 
             var lmenu_func = function (action, el, pos) {
                 switch (action) {
@@ -5219,21 +5216,19 @@ define([
                 }
             };
 
-            $('#layerlist').contextMenu(
-                {
-                    menu: 'cmenu_layers',
-                    inSpeed: 0
-                },
-                lmenu_func
+            $('#layerlist').contextMenu({
+                menu: 'cmenu_layers',
+                inSpeed: 0
+            },
+            lmenu_func
             );
 
-            $('#layer_moreopts').contextMenu(
-                {
-                    menu: 'cmenu_layers',
-                    inSpeed: 0,
-                    allowLeft: true
-                },
-                lmenu_func
+            $('#layer_moreopts').contextMenu({
+                menu: 'cmenu_layers',
+                inSpeed: 0,
+                allowLeft: true
+            },
+            lmenu_func
             );
 
             $('.contextMenu li').mousedown(function (ev) {
@@ -5287,6 +5282,89 @@ define([
             // and provide a file input to click. When that change event fires, it will
             // get the text contents of the file and send it to the canvas
             if (window.FileReader) {
+                function readImage(file, scale = 1) {
+                    return new Promise((resolve, reject) => {
+                        reader = new FileReader();
+                        reader.onloadend = function (e) {
+                            // let's insert the new image until we know its dimensions
+                            var insertNewImage = function (width, height) {
+                                var newImage = svgCanvas.addSvgElementFromJson({
+                                    element: 'image',
+                                    attr: {
+                                        x: 0,
+                                        y: 0,
+                                        width: width * scale,
+                                        height: height * scale,
+                                        id: svgCanvas.getNextId(),
+                                        style: 'pointer-events:inherit',
+                                        preserveAspectRatio: 'none',
+                                        'data-threshold': 100,
+                                        'data-shading': true,
+                                        origImage: e.target.result
+                                    }
+                                });
+                                ImageData(
+                                    newImage.getAttribute('origImage'), {
+                                        height: height,
+                                        width: width,
+                                        grayscale: {
+                                            is_rgba: true,
+                                            is_shading: Boolean(newImage.getAttribute('data-shading')),
+                                            threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
+                                            is_svg: false
+                                        },
+                                        onComplete: function (result) {
+                                            svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
+                                        }
+                                    }
+                                );
+
+                                svgCanvas.selectOnly([newImage]);
+                                svgCanvas.alignSelectedElements('l', 'page');
+                                svgCanvas.alignSelectedElements('t', 'page');
+                                resolve();
+                                updateContextPanel();
+                                $('#dialog_box').hide();
+                            };
+                                // create dummy img so we know the default dimensions
+                            var imgWidth = 100;
+                            var imgHeight = 100;
+                            var img = new Image();
+                            img.src = e.target.result;
+                            img.style.opacity = 0;
+                            img.onload = function () {
+                                imgWidth = img.width;
+                                imgHeight = img.height;
+                                insertNewImage(imgWidth, imgHeight);
+                            };
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+                function readSVG(blob, type) {
+                    return new Promise((resolve, reject) => {
+                        var reader = new FileReader();
+                        reader.onloadend = function (e) {
+                            console.log('Reading SVG');
+                            var newElement = svgCanvas.importSvgString(e.target.result, type);
+                            svgCanvas.ungroupSelectedElement();
+                            svgCanvas.ungroupSelectedElement();
+                            svgCanvas.groupSelectedElements();
+                            svgCanvas.alignSelectedElements('m', 'page');
+                            svgCanvas.alignSelectedElements('c', 'page');
+                            // highlight imported element, otherwise we get strange empty selectbox
+                            try {
+                                svgCanvas.selectOnly([newElement]);
+                            } catch(e) {
+                                console.warn('Reading empty SVG');
+                            }
+                            // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+                            $('#dialog_box').hide();
+                            resolve();
+                        };
+                        reader.readAsText(blob);
+                    });
+                }
                 var importImage = function (e) {
                     $.process_cancel(uiStrings.notification.loadingImage);
                     e.stopPropagation();
@@ -5300,40 +5378,43 @@ define([
                     }
                     /* if (file.type === 'application/pdf') { // Todo: Handle PDF imports
 
-                    }
-                    else */
+                        }
+                        else */
                     if (file.type.indexOf('image') > -1) {
                         // Detected an image
                         // svg handling
-                        var reader;
                         if (file.type.indexOf('svg') > -1) {
-                            reader = new FileReader();
-
-                            function importAs(type) {
-                                reader.onloadend = function (e) {
-                                    var newElement = svgCanvas.importSvgString(e.target.result, type);
-                                    svgCanvas.ungroupSelectedElement();
-                                    svgCanvas.ungroupSelectedElement();
-                                    svgCanvas.groupSelectedElements();
-                                    svgCanvas.alignSelectedElements('m', 'page');
-                                    svgCanvas.alignSelectedElements('c', 'page');
-                                    // highlight imported element, otherwise we get strange empty selectbox
-                                    svgCanvas.selectOnly([newElement]);
-                                    // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-                                    $('#dialog_box').hide();
-                                };
-                                reader.readAsText(file);
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
+                            async function importAs(type) {
+                                if (type === 'color') {
+                                    await svgWebSocket.uploadPlainSVG(file);
+                                    const outputs = await svgWebSocket.divideSVG();
+                                    await readSVG(outputs['strokes'], type);
+                                    console.log('Loading colors');
+                                    await readSVG(outputs['colors'], type); 
+                                    console.log('Loading bitmap', outputs['bitmap']);
+                                    if (outputs['bitmap'].size > 0) {
+                                        svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                                        await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+                                    }
+                                    console.log('Load complete');
+                                } else {
+                                    readSVG(file, type);
+                                }
                             }
 
                             AlertActions.showPopupCustomGroup(
                                 'confirm_mouse_input_device',
                                 LANG.popup.select_import_method,
-                                [LANG.popup.layer_by_layer, LANG.popup.nolayer],
+                                [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
                                 '',
                                 '',
                                 [
                                     () => {
                                         importAs('layer');
+                                    },
+                                    () => {
+                                        importAs('color');
                                     },
                                     () => {
                                         importAs('nolayer');
@@ -5342,70 +5423,18 @@ define([
                             );
 
                         } else {
-                            //bitmap handling
-                            reader = new FileReader();
-                            reader.onloadend = function (e) {
-                                // let's insert the new image until we know its dimensions
-                                var insertNewImage = function (width, height) {
-                                    var newImage = svgCanvas.addSvgElementFromJson({
-                                        element: 'image',
-                                        attr: {
-                                            x: 0,
-                                            y: 0,
-                                            width: width,
-                                            height: height,
-                                            id: svgCanvas.getNextId(),
-                                            style: 'pointer-events:inherit',
-                                            preserveAspectRatio: 'none',
-                                            'data-threshold': 100,
-                                            'data-shading': true,
-                                            origImage: e.target.result
-                                        }
-                                    });
-                                    ImageData(
-                                        newImage.getAttribute('origImage'), {
-                                            height: height,
-                                            width: width,
-                                            grayscale: {
-                                                is_rgba: true,
-                                                is_shading: Boolean(newImage.getAttribute('data-shading')),
-                                                threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
-                                                is_svg: false
-                                            },
-                                            onComplete: function (result) {
-                                                svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
-                                            }
-                                        }
-                                    );
-
-                                    svgCanvas.selectOnly([newImage]);
-                                    svgCanvas.alignSelectedElements('l', 'page');
-                                    svgCanvas.alignSelectedElements('t', 'page');
-                                    updateContextPanel();
-                                    $('#dialog_box').hide();
-                                };
-                                // create dummy img so we know the default dimensions
-                                var imgWidth = 100;
-                                var imgHeight = 100;
-                                var img = new Image();
-                                img.src = e.target.result;
-                                img.style.opacity = 0;
-                                img.onload = function () {
-                                    imgWidth = img.width;
-                                    imgHeight = img.height;
-                                    insertNewImage(imgWidth, imgHeight);
-                                };
-                            };
-                            reader.readAsDataURL(file);
+                            //handle bitmap
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
+                            readImage(file);
                         }
                     } else if (file.name.toLowerCase().indexOf('.dxf') > 0) {
                         console.log('Load DXF');
                         reader = new FileReader();
                         let divideLayer = false;
                         reader.onloadend = function (evt) {
-                            var parsed = dxfToSvg.parseString(evt.target.result);
+                            var parsed = Dxf2Svg.parseString(evt.target.result);
                             console.log('Parsed DXF', parsed);
-                            let svg = dxfToSvg.toSVG(parsed);
+                            let svg = Dxf2Svg.toSVG(parsed);
                             let newElement;
 
                             if (divideLayer) {
@@ -5473,6 +5502,9 @@ define([
                 // enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
                 var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
                 $('#tool_import').show().prepend(imgImport);
+
+                window.populateLayers = populateLayers;
+                window.updateContextPanel = updateContextPanel;
             }
 
             //			$(function() {
@@ -5572,9 +5604,9 @@ define([
                 svgCanvas.assignAttributes(greyscaleMatrix, {
                     type: 'matrix',
                     values: '0.3333 0.3333 0.3333 0  0\
-                        0.3333 0.3333 0.3333 0  0\
-                        0.3333 0.3333 0.3333 0  0\
-                        0 	   0      0      1  0'
+							0.3333 0.3333 0.3333 0  0\
+							0.3333 0.3333 0.3333 0  0\
+							0 	   0      0      1  0'
                 });
                 greyscaleFilter.appendChild(greyscaleMatrix);
                 $('#svgroot defs').append(greyscaleFilter);

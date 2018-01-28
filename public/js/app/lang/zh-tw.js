@@ -721,6 +721,7 @@ define(function() {
             button_advanced: '進階',
             confirm: '確認',
             get_fcode: '儲存<br/>工作',
+            export_fcode: '儲存成工作檔案 ...',
             name: '名稱',
             go: 'GO',
             showOutline: '顯示<br/>輪廓',
@@ -1006,7 +1007,8 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: '預設圖層'
+                    layer1: '預設圖層',
+                    layer_bitmap: '點陣圖層'
                 },
                 laser_panel: {
                     strength: '功率',
@@ -1152,7 +1154,7 @@ define(function() {
             pause                               : '暫停',
             stop                                : '停止',
             record                              : 'RECORD',
-            camera                              : '監控',
+            camera                              : '相機',
             connecting                          : '連線中，請稍候',
             HEAD_OFFLINE                        : '#110 沒有偵測到工具頭\n請確認工具頭傳輸線完整插入 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/218183157">暸解更多</a>',
             HEAD_ERROR_CALIBRATING              : '#112 工具頭校正失誤\n請重新裝載工具頭，並確認磁鐵關節的附著',
@@ -1207,13 +1209,14 @@ define(function() {
             updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
-                EXTRUDER                        : '列印工作',
-                PRINT                           : '列印工作',
-                LASER                           : '雕刻工作',
-                DRAW                            : '繪製工作',
-                CUT                             : '切割工作',
-                VINYL                           : '切割工作',
-                'N/A'                           : '繪製工作'
+                EXTRUDER                        : '列印',
+                PRINT                           : '列印',
+                LASER                           : '雷射雕刻',
+                DRAW                            : '數位繪圖',
+                CUT                             : '貼紙切割',
+                VINYL                           : '貼紙切割',
+                BEAMBOX                         : '雷射雕刻',
+                'N/A'                           : '自由模式'
             },
             device: {
                 EXTRUDER                        : '列印工具頭',

@@ -53,6 +53,7 @@
                 padding: 0 20px;
                 overflow-y: auto;
                 height: 100%;
+                border-radius: 2px;
                 img {
                     width: 100%;
                 }
@@ -153,7 +154,7 @@
                     width: 332px;
                     height: 100px;
                     bottom: 0px;
-                    padding: 35px 10px 10px 10px;
+                    padding: 20px 10px 10px 10px;
                     text-shadow: 0 2px 5px rgba(0,0,0,0.15);
 
                     .verticle-align {
@@ -161,6 +162,7 @@
                         position: relative;
                         bottom: -8px;
                         color: #FFF;
+                        text-shadow: 0 2px 5px rgba(0,0,0,0.5);
 
                         div {
                             margin: 5px 0;
@@ -180,6 +182,7 @@
                 }
                 .status-info.running {
                     background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.5));
+                    border-radius: 2px;
                 }
 
                 .btn-snap {

@@ -12,6 +12,7 @@
         pointer-events: none;
         .ui-dialog-menu-item {
             .dialog-label {
+                border-radius: 1px;
                 transition: all .1s ease;
                 min-width: auto;
                 div {
@@ -177,7 +178,7 @@
             padding-right: 10px;
             opacity: 0.8;
             z-index: 2;
-            top: calc(50% - 220px);
+            top: 110px;
             right: 9px;
             transition: opacity 0.3s;
             &:hover {
@@ -207,6 +208,16 @@
                 }
                 #layerlist {
                     width: 100%;
+                    .layercolor div{
+                        position: relative;
+                        top: 2px;
+                        border: 1px solid black;
+                        background: black;
+                        width: 14px;
+                        height: 14px;
+                        margin-left: 5px;
+                        display: inline-block;
+                    }
                     .layervis {
                         text-align: center;
                     }

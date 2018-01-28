@@ -724,6 +724,7 @@ define(function() {
             button_advanced: 'ADVANCED',
             confirm: 'Confirm',
             get_fcode: 'Save<br/>Task',
+            export_fcode: 'Save as File ...',
             name: 'Name',
             go: 'GO',
             showOutline: 'View\nFrame',
@@ -1009,7 +1010,8 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: 'Default Layer'
+                    layer1: 'Default',
+                    layer_bitmap: 'Bitmap'
                 },
                 laser_panel: {
                     strength: 'Power',
@@ -1207,13 +1209,14 @@ define(function() {
             updatePrintPresetSetting            : 'FLUX Studio has new default printing parameters, do you want to update?\n( Current settings will be overwritten )',
             confirmFileDelete                   : 'Are you sure you want to delete this file?',
             task: {
-                EXTRUDER                        : 'Printing Task',
-                PRINT                           : 'Printing Task',
-                LASER                           : 'Engraving Task',
-                DRAW                            : 'Drawing Task',
-                CUT                             : 'Cutting Task',
-                VINYL                           : 'Cutting Task',
-                'N/A'                           : 'Drawing Task'
+                EXTRUDER                        : 'Printing',
+                PRINT                           : 'Printing',
+                LASER                           : 'Laser Engraving',
+                DRAW                            : 'Digital Drawing',
+                CUT                             : 'Vinyl Cutting',
+                VINYL                           : 'Vinyl Cutting',
+                BEAMBOX                         : 'Laser Engraving',
+                'N/A'                           : 'Free Mode'
             },
             device: {
                 EXTRUDER                        : 'Printing Toolhead',

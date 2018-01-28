@@ -438,6 +438,7 @@ input.switch:checked ~ label:after {
         z-index: 9999;
     }
     .advanced-panel {
+        border-radius: 2px;
         $border-color: #DDD;
         background-color: #fff;
         box-shadow: 0 7px 15px rgba(0, 0, 0, .2), 0 10px 20px rgba(0, 0, 0, 0.1);
@@ -507,6 +508,8 @@ input.switch:checked ~ label:after {
                     padding: 4% 0;
                 }
                 border-top: 0;
+                border-bottom-left-radius: 2px;
+                border-bottom-right-radius: 2px;
             }
         }
 
@@ -640,6 +643,7 @@ input.switch:checked ~ label:after {
         z-index: 1;
 
         .arrowBox {
+            border-radius: 2px;
             background: #fff;
             color: $primaryColor;
             cursor: pointer;
@@ -786,6 +790,7 @@ input.switch:checked ~ label:after {
             margin: 0 0 3px 0;
             padding: 0 20px;
             width: 260px;
+            border-radius: 2px;
         }
 
         .control {

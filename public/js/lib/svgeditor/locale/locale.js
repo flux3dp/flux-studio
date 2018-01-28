@@ -49,7 +49,7 @@ var svgEditor = (function($, editor) {'use strict';
 				
 				
 			} else {
-				console.log('Missing: ' + sel);
+				console.log('Missing Element: ' + sel);
 			}
 		}
 	}

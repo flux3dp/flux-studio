@@ -282,6 +282,30 @@ select {
 	background-color: #FFFFFF;
 }
 
+#layerlist_container {
+	overflow-x: hidden;
+	overflow-y: scroll;
+	background: white;
+	height: calc(100vh - 490px);
+}
+#layerlist_container::-webkit-scrollbar {
+	-webkit-appearance: none;
+	background-color: #EEE;
+	width: 7px;
+	padding: 2px;
+}
+#layerlist_container::-webkit-scrollbar-thumb {
+	transition: all 0.5s;
+	border-radius: 4px;
+	background-color: rgba(0,0,0,.2);
+	-webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+#layerlist_container::-webkit-scrollbar-thumb:hover {
+	background-color: rgba(0,0,0,.5);
+}
+
 #layerlist tr.layer {
 	background-color: #FFFFFF;
 	margin: 0;
@@ -500,8 +524,21 @@ div.palette_item:first-child {
 	z-index: 4;
 }
 
-#workarea.wireframe #svgcontent * {
-	fill: #FFFFFF;
+#workarea.wireframe #svgcontent ellipse[stroke=none],
+#workarea.wireframe #svgcontent rect[stroke=none],
+#workarea.wireframe #svgcontent path[stroke=none],
+#workarea.wireframe #svgcontent polygon[stroke=none] {
+	fill-opacity: 1 !important;
+	stroke-width: 0 !important;
+	/* TODO:
+	Better way to do object selection:
+		Duplicate the origina object, and use invisible outline with stroke width: 5px,
+		so that object can be selected with some error tolerance.
+	*/
+	/* pointer-events: stroke; */
+}
+
+#workarea.wireframe #svgcontent *[stroke] {
 	fill-opacity: 0;
 	stroke: #000;
 	stroke-width: 1px;

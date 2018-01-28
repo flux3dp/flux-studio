@@ -702,6 +702,14 @@ define([
                 },
 
                 _handleDeviceSelected: function(printer) {
+                    if (printer == "export_fcode") {
+                        if(director.getModelCount() !== 0) {
+                            director.downloadFCode().then(function() {
+                                this.setState({ openWaitWindow: false });
+                            });
+                        }
+                        return;
+                    }
                     selectedPrinter = printer;
                     this.setState({
                         openPrinterSelectorWindow: false
@@ -951,6 +959,7 @@ define([
                         <PrinterSelector
                             uniqleId='print'
                             lang={lang}
+                            showExport={true}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onUnmount={this._handlePrinterSelectorUnmount}
                             onGettingPrinter={this._handleDeviceSelected} />

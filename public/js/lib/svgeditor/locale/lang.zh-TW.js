@@ -5,10 +5,10 @@ svgEditor.readLang({
 	common: {
 		"ok": "好",
 		"cancel": "取消",
-		"key_backspace": "空白", 
-		"key_del": "刪除", 
-		"key_down": "下", 
-		"key_up": "上", 
+		"key_backspace": "空白",
+		"key_del": "刪除",
+		"key_down": "下",
+		"key_up": "上",
 		"more_opts": "更多選項",
 		"url": "URL",
 		"width": "Width",
@@ -16,7 +16,7 @@ svgEditor.readLang({
 	},
 	misc: {
 		"powered_by": "Powered by"
-	}, 
+	},
 	ui: {
 		"toggle_stroke_tools": "Show/hide more stroke tools",
 		"palette_info": "點擊更改填充顏色，按住Shift鍵單擊更改線條顏色",
@@ -68,7 +68,7 @@ svgEditor.readLang({
 		"bold": "粗體",
 		"italic": "斜體"
 	},
-	tools: { 
+	tools: {
 		"main_menu": "Main Menu",
 		"bkgnd_color_opac": "更改背景顏色/不透明",
 		"connector_no_arrow": "No arrow",
@@ -155,7 +155,7 @@ svgEditor.readLang({
 		"rename": "重新命名圖層",
 		"move_up": "向上移動圖層",
 		"dupe": "複製圖層",
-		"merge_down": "合併圖層",
+		"merge_down": "向上合併圖層",
 		"merge_all": "合併全部圖層",
 		"move_elems_to": "移動物件到:",
 		"move_selected": "移動被點選的物件其他圖層"

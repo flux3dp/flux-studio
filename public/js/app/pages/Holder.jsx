@@ -278,9 +278,13 @@ define([
                 _renderPrinterSelectorWindow: function() {
                     if (!this.state.openPrinterSelectorWindow) { return ''; }
                     var self = this,
-                        onGettingPrinter = function(auth_printer) {
+                        onGettingPrinter = function(selected_printer) {
+                            if (selected_printer == 'export_fcode') {
+                                self.state.laserEvents.exportTaskCode(self._fetchFormalSettings(), '-f')
+                                return;
+                            }
                             self.setState({
-                                selectedPrinter: auth_printer,
+                                selectedPrinter: selected_printer,
                                 openPrinterSelectorWindow: false
                             });
 
@@ -296,6 +300,7 @@ define([
                                 uniqleId="laser"
                                 className="laser-device-selection-popup"
                                 lang={lang}
+                                showExport={true}
                                 onClose={onClose}
                                 onGettingPrinter={onGettingPrinter}
                             />
@@ -347,18 +352,6 @@ define([
 
                     var cx = React.addons.classSet,
                         buttons = [{
-                            label: lang.laser.get_fcode,
-                            className: cx({
-                                'btn-disabled': !this.state.hasImage,
-                                'btn-default': true,
-                                'btn-hexagon': true,
-                                'btn-get-fcode': true
-                            }),
-                            dataAttrs: {
-                                'ga-event': 'get-laser-fcode'
-                            },
-                            onClick: this._handleExportClick.bind(null, '-f')
-                        }, {
                             label: lang.monitor.start,
                             className: cx({
                                 'btn-disabled': !this.state.hasImage,
