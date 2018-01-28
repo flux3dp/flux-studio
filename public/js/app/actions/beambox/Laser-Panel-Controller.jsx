@@ -7,7 +7,7 @@ define([
 ){
 
     const _defaultConfig = {
-        speed: 250,
+        speed: 150,
         strength: 15
         ,
     }
