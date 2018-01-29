@@ -5032,13 +5032,9 @@ define([
         // * import should happen in top-left of current zoomed viewport
         this.importSvgString = function (xmlString, _type) {
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
-            const newDoc = svgedit.utilities.text2xml(xmlString);
-            const rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
-            svgCanvas.prepareSvg(newDoc);
 
             function parseSvg(svg, type) {
                 function _parseSvgByLayer(svg) {
-                    debugger;
                     const layerNodes = Object.values(svg.childNodes).filter(node => !['defs', 'title'].includes(node.tagName));
 
                     const isUnvalidLayeredSvg = layerNodes.some(node => (node.tagName !== 'g' || node.id == null));
@@ -5089,11 +5085,12 @@ define([
                 function _parseSvgByNolayer(svg) {
                     uniquifyElems(svg);
 
-                    // TODO: may have something wrong. use clone to preserve origin viewbox attribute.
-                    svg.removeAttribute('viewBox');
+                    const svgString = new XMLSerializer().serializeToString(svg);
+                    const clonedSvgXml = svgedit.utilities.text2xml(svgString);
+                    const clonedSvg = svgdoc.adoptNode(clonedSvgXml.documentElement);
+                    clonedSvg.removeAttribute('viewBox');
 
-                    symbols = [svgCanvas.makeSymbol(svg, svg.attributes, batchCmd)];
-                    return symbols;
+                    return [svgCanvas.makeSymbol(clonedSvg, clonedSvg.attributes, batchCmd)];
                 }
                 // return symbols
                 switch (type) {
@@ -5125,7 +5122,7 @@ define([
                         }
                 }
             }
-            function setAndAppendUseElement(symbol, type) {
+            function appendUseElement(symbol, type) {
                 // create a use element
                 const use_el = svgdoc.createElementNS(NS.SVG, 'use');
                 use_el.id = getNextId();
@@ -5148,27 +5145,8 @@ define([
 
                 batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 
-                const bb = svgedit.utilities.getBBox(use_el);
-
-                // Scale
-                const dpi = 72, //72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
-                    svgUnitScaling = 25.4 / dpi * 10, // inch to mm
-                    mt = rootTransform.scale(svgUnitScaling),
-                    matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
-
-                console.log('rootTransform: ', rootTransform);
-                use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
-
-                svgedit.recalculate.recalculateDimensions(use_el);
-
                 $(use_el).data('symbol', symbol).data('ref', symbol);
 
-                // set data-xform
-                let dataXform = '';
-                $.each(bb, function (key, value) {
-                    dataXform += key + '=' + value + ' ';
-                });
-                use_el.setAttribute('data-xform', dataXform);
 
                 return use_el;
             }
@@ -5187,24 +5165,86 @@ define([
                 hex.padStart(6, '0'); // pad zero
                 return '#' + hex.toUpperCase(); // ex: #0A23C5
             }
-            try {
-                // import new svg document into our document
-                const svg = svgdoc.adoptNode(newDoc.documentElement);
-                const {symbols, confirmedType} = parseSvg(svg, _type);
+            function resizeAndRepositionElements(use_el, svgStr) {
+                // Scale
+                const rootWidth = unit2Pixel(svgStr.getAttribute('width'));
+                const rootHeight = unit2Pixel(svgStr.getAttribute('height'));
+                const rootViewbox = svgStr.getAttribute('viewBox')?svgStr.getAttribute('viewBox').split(' '):undefined;
+                const rootTransform = svgedit.utilities.getMatrixFromTransformAttr(svgStr.getAttribute('transform') || '');
 
-                const use_elements = symbols.map(symbol => setAndAppendUseElement(symbol, confirmedType));
+                if(rootWidth && rootHeight && rootViewbox) {
+                    console.log('resize with width height viewbox');
+                    const resizeW = rootWidth / rootViewbox[2];
+                    const resizeH = rootHeight / rootViewbox[3];
+                    const matrixValues = [resizeW, 0, 0, resizeH, -rootViewbox[0], -rootViewbox[1]];
 
-                removeDefaultLayerIfEmpty();
+                    use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+                    svgedit.recalculate.recalculateDimensions(use_el);
 
-                addCommandToHistory(batchCmd);
-                call('changed', [svgcontent]);
+                } else if(rootViewbox) {
+                    console.log('resize with only viewbox');
+                    const matrixValues = [1, 0, 0, 1, -rootViewbox[0], -rootViewbox[1]];
+                    use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+                    svgedit.recalculate.recalculateDimensions(use_el);
 
-                // we want to return the element so we can automatically select it
-                return use_elements[use_elements.length - 1];
-            } catch (e) {
-                console.log(e);
-                return null;
+                } else {
+                    console.log('resize with 72 dpi');
+
+                    // 72 pixel is 1 inch (dpi = 72)
+                    const dpi = 72;
+                    const svgUnitScaling = 25.4 / dpi * 10;
+
+                    const mt = rootTransform.scale(svgUnitScaling);
+                    const matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+
+                    use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+                    svgedit.recalculate.recalculateDimensions(use_el);
+                }
+                return use_el;
             }
+            function setDataXform(use_el) {
+                const bb = svgedit.utilities.getBBox(use_el);
+                let dataXform = '';
+                $.each(bb, function (key, value) {
+                    dataXform += key + '=' + value + ' ';
+                });
+                use_el.setAttribute('data-xform', dataXform);
+                return use_el;
+            }
+            function unit2Pixel(val) {
+                const dpi = 72;
+                const svgUnitScaling = 25.4 / dpi * 10; //本來 72 個點代表 1 inch, 現在 254 個點代表 1 inch.
+                const unitMap = {
+                    'in': 25.4 * 10,
+                    'cm': 10 * 10,
+                    'mm': 10,
+                    'px': svgUnitScaling,
+                };
+                if (!isNaN(val)) {return val-0;}
+                const unit = val.substr(-2);
+                const num = val.substr(0, val.length-2);
+                if(!unitMap[unit]) {
+                    console.log('unsupported unit');
+                }
+                return num * (unitMap[unit] || unitMap['px']);
+            }
+
+            const newDoc = svgedit.utilities.text2xml(xmlString);
+            svgCanvas.prepareSvg(newDoc);
+            const svg = svgdoc.adoptNode(newDoc.documentElement);
+            const {symbols, confirmedType} = parseSvg(svg, _type);
+
+            const use_elements = symbols.map(symbol => appendUseElement(symbol, confirmedType));
+            use_elements.map(element => setDataXform(element));
+            use_elements.map(element => resizeAndRepositionElements(element, svg));
+
+            removeDefaultLayerIfEmpty();
+
+            addCommandToHistory(batchCmd);
+            call('changed', [svgcontent]);
+
+            // we want to return the element so we can automatically select it
+            return use_elements[use_elements.length - 1];
 
         };
 

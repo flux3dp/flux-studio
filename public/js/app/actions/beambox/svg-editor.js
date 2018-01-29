@@ -5467,7 +5467,7 @@ define([
                         };
                         reader.readAsText(file);
                     } else {
-                        if (file.name.endsWith('.ai') || file.path.endsWith('.ai')) {
+                        if (file.name.endsWith('.ai') || (file.path && file.path.endsWith('.ai'))) {
                             $.alert(LANG.svg_editor.unnsupport_ai_file_directly);
                         } else {
                             $.alert(LANG.svg_editor.unnsupported_file_type);
