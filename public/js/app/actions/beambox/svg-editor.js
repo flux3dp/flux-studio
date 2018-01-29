@@ -1276,9 +1276,6 @@ define([
             };
 
             function updateRulers() {
-
-
-
                 // draw x ruler then y ruler
                 /* 這裡code很亂 值得注意的點有：
                     1. ruler的位置由css下 如top和margin
@@ -1445,7 +1442,6 @@ define([
                                             // end of all drawing
                                             break drawAll;
                                         }
-                                        ctx.stroke();
                                         currentCtxIndex++;
                                         ctx = ctxs[currentCtxIndex];
                                         ruler_pos -= limit;
@@ -1466,7 +1462,7 @@ define([
                                 ruler_pos += big_interval;
                             }
                         }
-                        ctx.stroke();
+                        ctxs.map(ctx => ctx.stroke());
 
                     })();
                 }
@@ -5392,7 +5388,7 @@ define([
                                     const outputs = await svgWebSocket.divideSVG();
                                     await readSVG(outputs['strokes'], type);
                                     console.log('Loading colors');
-                                    await readSVG(outputs['colors'], type); 
+                                    await readSVG(outputs['colors'], type);
                                     console.log('Loading bitmap', outputs['bitmap']);
                                     if (outputs['bitmap'].size > 0) {
                                         svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);

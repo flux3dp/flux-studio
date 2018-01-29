@@ -5055,14 +5055,6 @@ define([
                     return symbols;
                 }
                 function _parseSvgByColor(svg) {
-                    function _getColor(node) {
-                        let color = node.getAttribute('stroke');
-                        if (color === 'none') {
-                            color = node.getAttribute('fill');
-                        }
-                        return color;
-                    }
-
                     function traverseForColors(colors, node) {
                         for (var i = 0; i < node.childNodes.length; i++) {
                             var grandchild = node.childNodes[i];
@@ -5101,7 +5093,9 @@ define([
 
                     const defNodes = Object.values(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
-                    defNodes.map(def => defChildren.concat(Object.values(def.childNodes)));
+                    defNodes.map(def => {
+                        defChildren = defChildren.concat(Object.values(def.childNodes));
+                    });
 
                     const originLayerNodes = Object.values(svg.childNodes).filter(child => child.tagName === 'g');
 
@@ -5156,13 +5150,13 @@ define([
                     case 'color':
                         return {
                             symbols: _parseSvgByColor(svg),
-                            validatedType: 'color'
+                            confirmedType: 'color'
                         };
 
                     case 'nolayer':
                         return {
                             symbols: _parseSvgByNolayer(svg),
-                            validatedType: 'nolayer'
+                            confirmedType: 'nolayer'
                         };
 
                     case 'layer':
@@ -5170,13 +5164,13 @@ define([
                         if(symbols) {
                             return {
                                 symbols: symbols,
-                                validatedType: 'layer'
+                                confirmedType: 'layer'
                             };
                         } else {
                             console.log('Not valid layer. Use nolayer parsing option instead');
                             return {
                                 symbols: _parseSvgByNolayer(svg),
-                                validatedType: 'nolayer'
+                                confirmedType: 'nolayer'
                             };
                         }
                 }
@@ -5186,9 +5180,11 @@ define([
                 const use_el = svgdoc.createElementNS(NS.SVG, 'use');
                 use_el.id = getNextId();
                 setHref(use_el, '#' + symbol.id);
-
                 //switch currentLayer, and create layer if necessary
-                if(['color', 'layer'].includes(type) && symbol.getAttribute('data-id') != null) {
+                console.log('symbol: ', symbol);
+
+                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color'))) {
+
                     const color = symbol.getAttribute('data-color');
                     const layerName = symbol.getAttribute('data-id') || rgbToHex(color);
 
@@ -5220,11 +5216,11 @@ define([
             }
             function rgbToHex(rgbStr) {
                 const rgb = rgbStr.substring(4).split(',');
-                const hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
-                if (hex == "NaN") {
+                let hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
+                if (hex == 'NaN') {
                     hex = '0';
                 }
-                hex.padStart(6, '0'); // pad zero
+                hex = hex.padStart(6, '0'); // pad zero
                 return '#' + hex.toUpperCase(); // ex: #0A23C5
             }
             function resizeAndRepositionElements(use_el, svgStr) {
@@ -5313,10 +5309,19 @@ define([
         this.makeSymbol = function (elem, attrs, batchCmd, defs) {
             var symbol = svgdoc.createElementNS(NS.SVG, 'symbol'),
                 symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
+            var oldLinkMap = {};
 
+            console.log('defs: ', defs);
             if (defs) {
                 // this is a group color object, copy defs into symbol;
-                defs.map(def => symbol_defs.appendChild(def));
+                defs.map(def => {
+                    this.clipCount = this.clipCount || 1;
+                    const clonedDef = def.cloneNode(true),
+                        newId = 'def' + (this.clipCount++);
+                    oldLinkMap[clonedDef.id] = newId;
+                    clonedDef.id = newId;
+                    symbol_defs.appendChild(clonedDef);
+                });
             }
 
             symbol.appendChild(symbol_defs);
@@ -5329,6 +5334,31 @@ define([
             } else {
                 symbol.appendChild(elem);
             }
+
+            function traverseForRemappingId(node) {
+                if (!node.attributes) {
+                    return;
+                }
+                for (var i = 0; i < node.attributes.length; i++) {
+                    var attr = node.attributes[i];
+                    var re = /url\(#([^)]+)\)/g;
+                    var urlMatch = re.exec(attr.value);
+                    if (urlMatch) {
+                        var oldId = urlMatch[1];
+                        if (oldLinkMap[oldId]) {
+                            node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap[oldId]));
+                        }
+                    }
+                }
+                if (!node.childNodes) {
+                    return;
+                }
+                for (var i = 0; i < node.childNodes.length; i++) {
+                    traverseForRemappingId(node.childNodes[i]);
+                }
+            }
+            traverseForRemappingId(symbol);
+
 
             for (var i = 0; i < attrs.length; i++) {
                 var attr = attrs[i];

@@ -26,15 +26,15 @@ define([
             $clonedSvg.find('#selectorParentGroup').remove();
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
-            // $clonedSvg.find('#svgcontent *').css({
-            //     'fill': '#ffffff',
-            //     'fill-opacity': '0',
-            //     'stroke': '#000',
-            //     'stroke-width': '1px',
-            //     'stroke-opacity': '1.0',
-            //     'stroke-dasharray': '0',
-            //     'vector-effect': 'non-scaling-stroke'
-            // });
+            $clonedSvg.find('#svgcontent *').css({
+                'fill': '#ffffff',
+                'fill-opacity': '0',
+                'stroke': '#000',
+                'stroke-width': '1px',
+                'stroke-opacity': '1.0',
+                'stroke-dasharray': '0',
+                'vector-effect': 'non-scaling-stroke'
+            });
             return $clonedSvg;
         }
 
