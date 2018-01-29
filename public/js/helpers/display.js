@@ -3,9 +3,10 @@
  */
 define([
     'react',
+    'reactDOM',
     'jquery',
     'helpers/i18n'
-], function(React, $, i18n) {
+], function(React, ReactDOM, $, i18n) {
     'use strict';
 
     var views = [];
@@ -16,12 +17,11 @@ define([
         args.state = args.state || {};
 
         args.state.lang = i18n.get();
+        const viewFactory = React.createFactory(view(args));
+        var view = viewFactory(args);
 
-        view = React.createFactory(view(args));
-        view = view();
+        // view.props = args.props;
 
-        view.props = args.props;
-
-        views.push(React.render(view, el));
+        views.push(ReactDOM.render(view, el));
     };
 });

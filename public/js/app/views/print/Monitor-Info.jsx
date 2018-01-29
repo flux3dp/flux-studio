@@ -1,11 +1,13 @@
 define([
     'react',
+    'reactPropTypes',
     'app/constants/global-constants',
     'app/constants/device-constants',
     'app/constants/monitor-status',
     'helpers/duration-formatter'
 ], (
     React,
+    PropTypes,
     GlobalConstants,
     DeviceConstants,
     MonitorStatus,
@@ -20,9 +22,9 @@ define([
 
     return React.createClass({
         contextTypes: {
-            store: React.PropTypes.object,
-            slicingResult: React.PropTypes.object,
-            lang: React.PropTypes.object
+            store: PropTypes.object,
+            slicingResult: PropTypes.object,
+            lang: PropTypes.object
         },
 
         componentWillMount: function() {

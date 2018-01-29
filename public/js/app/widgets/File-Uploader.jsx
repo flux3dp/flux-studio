@@ -1,7 +1,8 @@
 define([
     'jquery',
-    'react'
-], function($, React) {
+    'react',
+    'reactClassset'
+], function($, React, ReactCx) {
     'use strict';
 
     var deferred = $.Deferred();
@@ -123,9 +124,8 @@ define([
 
         render: function() {
             var self = this,
-                cx = React.addons.classSet,
                 props = self.props,
-                className = cx(props.className);
+                className = ReactCx.cx(props.className);
 
             return (
                 <input

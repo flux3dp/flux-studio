@@ -1,19 +1,20 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, UnitInput, i18n) {
+], function($, React, PropTypes, UnitInput, i18n) {
     'use strict';
 
     const LANG = i18n.lang.beambox.right_panel.laser_panel;
 
     return React.createClass({
         propTypes: {
-            layerName:  React.PropTypes.string.isRequired,
-            speed:      React.PropTypes.number.isRequired,
-            strength:   React.PropTypes.number.isRequired,
-            funcs:      React.PropTypes.object.isRequired
+            layerName:  PropTypes.string.isRequired,
+            speed:      PropTypes.number.isRequired,
+            strength:   PropTypes.number.isRequired,
+            funcs:      PropTypes.object.isRequired
         },
         
         getInitialState: function() {

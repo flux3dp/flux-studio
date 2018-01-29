@@ -1,22 +1,23 @@
 define([
     'react',
+    'reactPropTypes',
     'app/constants/keycode-constants',
     'helpers/round',
     'plugins/classnames/index'
-], function(React, keyCodeConstants, round, ClassNames) {
+], function(React, PropTypes, keyCodeConstants, round, ClassNames) {
     'use strict';
 
     return React.createClass({
         propTypes: {
-            getValue: React.PropTypes.func.isRequired,
-            defaultValue: React.PropTypes.number.isRequired,
-            className: React.PropTypes.object,
-            unit: React.PropTypes.string,
-            min: React.PropTypes.number,
-            max: React.PropTypes.number,
-            step: React.PropTypes.number,
-            decimal: React.PropTypes.number,
-            disabled: React.PropTypes.bool
+            getValue: PropTypes.func.isRequired,
+            defaultValue: PropTypes.number.isRequired,
+            className: PropTypes.object,
+            unit: PropTypes.string,
+            min: PropTypes.number,
+            max: PropTypes.number,
+            step: PropTypes.number,
+            decimal: PropTypes.number,
+            disabled: PropTypes.bool
         },
 
         getDefaultProps: function() {

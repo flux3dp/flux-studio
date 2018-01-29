@@ -1,11 +1,13 @@
 define([
     'react',
+    'reactDOM',
     'jsx!views/beambox/Object-Panels/Object-Panels',
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/actions/beambox/constant',
     'app/actions/beambox/beambox-global-interaction',
 ], function(
     React,
+    ReactDOM,
     ObjectPanels,
     FnWrapper,
     Constant,
@@ -152,13 +154,13 @@ define([
         }
 
         unmount() {
-            React.unmountComponentAtNode(document.getElementById(this.reactRoot));
+            ReactDOM.unmountComponentAtNode(document.getElementById(this.reactRoot));
         }
 
         
 
         _render() {
-            React.render(
+            ReactDOM.render(
                 <ObjectPanels
                 isEditable={this.isEditable}
                 type={this.type}

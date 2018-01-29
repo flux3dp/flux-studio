@@ -1,10 +1,11 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
     'helpers/api/config',
     'jsx!widgets/List',
     'jsx!widgets/Dialog-Menu'
-], function($, React, config, List, DialogMenu) {
+], function($, React, ReactCx, config, List, DialogMenu) {
     'use strict';
 
     return React.createClass({
@@ -108,14 +109,13 @@ define([
                 lang = props.lang,
                 resolutionOptions = this._getResolutionOptions(lang),
                 calibrate = this._getCalibrate(lang),
-                cx = React.addons.classSet,
                 className = props.className,
                 items = [resolutionOptions, calibrate];
 
             className['setup-panel'] = true;
 
             return (
-                <div className={cx(className)}>
+                <div className={ReactCx.cx(className)}>
                     <DialogMenu ref="dialogMenu" items={items}/>
                 </div>
             );

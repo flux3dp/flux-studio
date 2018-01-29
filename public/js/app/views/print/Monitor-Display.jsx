@@ -1,5 +1,6 @@
 define([
     'react',
+    'reactPropTypes',
     'app/constants/global-constants',
     'app/constants/device-constants',
     'helpers/device-master',
@@ -7,6 +8,7 @@ define([
     'helpers/duration-formatter'
 ], (
     React,
+    PropTypes,
     GlobalConstants,
     DeviceConstants,
     DeviceMaster,
@@ -42,9 +44,9 @@ define([
         },
 
         contextTypes: {
-            store: React.PropTypes.object,
-            slicingResult: React.PropTypes.object,
-            lang: React.PropTypes.object
+            store: PropTypes.object,
+            slicingResult: PropTypes.object,
+            lang: PropTypes.object
         },
 
         getInitialState: function() {
@@ -130,9 +132,9 @@ define([
                 return (
                     <div
                         className="folder"
-                        data-test-key={folder}
-                        onClick={this.props.onFolderClick.bind(this, folder)}
-                        onDoubleClick={this.props.onFolderDoubleClick.bind(this, folder)}
+                        data-foldername={folder}
+                        onClick={this.props.onFolderClick}
+                        onDoubleClick={this.props.onFolderDoubleClick}
                     >
                         <div className={folderNameClass}>
                             {folder}
@@ -155,12 +157,13 @@ define([
                         title={item[0]}
                         className="file"
                         data-test-key={item[0]}
-                        onClick={this.props.onFileClick.bind(null, item[0], DeviceConstants.SELECT)}
-                        onDoubleClick={this.props.onFileClick.bind(null, item[0], DeviceConstants.PREVIEW)}>
+                        data-filename={item[0]}
+                        onClick={this.props.onFileClick}
+                        onDoubleClick={this.props.onFileDoubleClick}>
                         <div className="image-wrapper">
-                            <img src={imgSrc} onError={this._imageError.bind(this)}/>
+                            <img src={imgSrc} onError={this._imageError}/>
                             <i className={iNameClass}
-                               onClick={this.props.onFileCrossIconClick.bind(this)}></i>
+                               onClick={this.props.onFileCrossIconClick}></i>
                         </div>
                         <div className={fileNameClass}>
                             {item[0].length > maxFileNameLength ? item[0].substring(0, maxFileNameLength) + '...' : item[0]}

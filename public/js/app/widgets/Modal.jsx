@@ -1,17 +1,20 @@
 define([
     'jquery',
     'react',
-    'helpers/shortcuts'
-], function($, React, shortcuts) {
+    'reactPropTypes',
+    'reactClassset',
+    'helpers/shortcuts',
+    'reactCreateReactClass'
+], function($, React, PropTypes, ReactCx, shortcuts) {
     'use strict';
 
     var View = React.createClass({
 
         propTypes: {
-            onOpen      : React.PropTypes.func,
-            onClose     : React.PropTypes.func,
-            content     : React.PropTypes.element,
-            className   : React.PropTypes.object
+            onOpen      : PropTypes.func,
+            onClose     : PropTypes.func,
+            content     : PropTypes.element,
+            className   : PropTypes.object
         },
 
         getDefaultProps: function() {
@@ -63,12 +66,10 @@ define([
         },
 
         render: function() {
-            var cx = React.addons.classSet,
-                backgroundClass;
+            var backgroundClass;
 
-            this.props.className = this.props.className || {};
             this.props.className['modal-window'] = true;
-            backgroundClass = cx(this.props.className);
+            backgroundClass = ReactCx.cx(this.props.className);
 
             return (
                 <div className={backgroundClass}>

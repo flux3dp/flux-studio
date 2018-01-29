@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
     'app/actions/print',
     'plugins/classnames/index',
     'jsx!views/print/Advanced',
@@ -39,6 +40,7 @@ define([
 ], function(
     $,
     React,
+    ReactDOM,
     director,
     ClassNames,
     AdvancedPanel,
@@ -211,7 +213,7 @@ define([
 
                     // events
 
-                    $importBtn = this.refs.importBtn.getDOMNode();
+                    $importBtn = ReactDOM.findDOMNode(this.refs.importBtn);
 
                     if(!window.customEvent) {
                         window.customEvent = {};

@@ -1,17 +1,18 @@
 define([
     'react',
+    'reactPropTypes',
     'plugins/classnames/index'
-], function(React, ClassNames) {
+], function(React, PropTypes, ClassNames) {
     'use strict';
 
     return React.createClass({
 
         propTypes: {
-            id: React.PropTypes.string.isRequired,
-            label: React.PropTypes.string,
-            options: React.PropTypes.array,
-            default: React.PropTypes.string,
-            onChange: React.PropTypes.func.isRequired
+            id: PropTypes.string.isRequired,
+            label: PropTypes.string,
+            options: PropTypes.array,
+            default: PropTypes.string,
+            onChange: PropTypes.func.isRequired
         },
 
         getInitialState: function() {

@@ -1,6 +1,8 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
+    'reactPropTypes',
     'jsx!widgets/Slider-Control',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Switch-Control',
@@ -16,6 +18,8 @@ define([
 ], function(
     $,
     React,
+    ReactDOM,
+    PropTypes,
     SliderControl,
     DropdownControl,
     SwitchControl,
@@ -60,10 +64,10 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang            : React.PropTypes.object,
-            setting         : React.PropTypes.object,
-            onClose         : React.PropTypes.func,
-            onApply         : React.PropTypes.funcs
+            lang            : PropTypes.object,
+            setting         : PropTypes.object,
+            onClose         : PropTypes.func,
+            onApply         : PropTypes.func
         },
 
         getInitialState: function() {
@@ -139,8 +143,8 @@ define([
         },
 
         _isValidValue: function(key, value) {
-            var min = parseInt(this.refs[key].getDOMNode().min),
-                max = parseInt(this.refs[key].getDOMNode().max);
+            var min = parseInt(ReactDOM.findDOMNode(this.refs[key]).min),
+                max = parseInt(ReactDOM.findDOMNode(this.refs[key]).max);
 
             return min <= value && value <= max;
         },
@@ -331,7 +335,7 @@ define([
 
                 // write back to custom fields for each engine type
                 advancedSetting.custom = advancedSetting.custom.replace(`support_material = ${value ? 0 : 1}`, `support_material = ${value ? 1 : 0}`);
-                advancedSetting.setCustomCura2(dvancedSetting.customCura2.replace(`support_enable = ${value ? 0 : 1}`, `support_enable = ${value ? 1 : 0}`));
+                advancedSetting.setCustomCura2(advancedSetting.customCura2.replace(`support_enable = ${value ? 0 : 1}`, `support_enable = ${value ? 1 : 0}`));
 
                 this.setState({
                     custom: advancedSetting.custom,
@@ -463,7 +467,7 @@ define([
                             min={170}
                             max={230}
                             step={1}
-                            default={advancedSetting.temperature}
+                            default={parseInt(advancedSetting.temperature)}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -473,7 +477,7 @@ define([
                             min={180}
                             max={230}
                             step={1}
-                            default={advancedSetting.first_layer_temperature}
+                            default={parseInt(advancedSetting.first_layer_temperature)}
                             onChange={this._handleControlValueChange} />
                         
                         <SwitchControl
@@ -522,7 +526,7 @@ define([
                             min={0.05}
                             max={0.3}
                             step={0.025}
-                            default={advancedSetting.layer_height}
+                            default={parseFloat(advancedSetting.layer_height)}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -532,7 +536,7 @@ define([
                             min={0.2}
                             max={0.35}
                             step={0.05}
-                            default={advancedSetting.first_layer_height}
+                            default={parseFloat(advancedSetting.first_layer_height)}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -547,7 +551,7 @@ define([
                             min={1}
                             max={6}
                             step={1}
-                            default={advancedSetting.perimeters}
+                            default={parseInt(advancedSetting.perimeters)}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -557,7 +561,7 @@ define([
                             min={0}
                             max={12}
                             step={1}
-                            default={advancedSetting.top_solid_layers}
+                            default={parseInt(advancedSetting.top_solid_layers)}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -567,7 +571,7 @@ define([
                             min={0}
                             max={12}
                             step={1}
-                            default={advancedSetting.bottom_solid_layers}
+                            default={parseInt(advancedSetting.bottom_solid_layers)}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -1012,7 +1016,6 @@ define([
 
         render: function() {
             var self = this,
-                cx = React.addons.classSet,
                 className = {
                     'hide': (this.state.mode === mode.save),
                     'box-shadow': true
