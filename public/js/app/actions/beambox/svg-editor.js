@@ -1290,7 +1290,7 @@ define([
 
                     const $rulersWrapper = $('#ruler_' + axis + ' > div');
                     const total_len = $('#svgcanvas')[side]();
-                    const limit = 30000;
+                    const limit = 3000;
                     const rulersCount = parseInt(total_len / limit, 10) + 1;
 
 
