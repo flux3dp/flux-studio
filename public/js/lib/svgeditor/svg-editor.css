@@ -524,8 +524,12 @@ div.palette_item:first-child {
 	z-index: 4;
 }
 
-#workarea.wireframe #svgcontent .poly {
-	fill-opacity: 1;
+#workarea.wireframe #svgcontent ellipse[stroke=none],
+#workarea.wireframe #svgcontent rect[stroke=none],
+#workarea.wireframe #svgcontent path[stroke=none],
+#workarea.wireframe #svgcontent polygon[stroke=none] {
+	fill-opacity: 1 !important;
+	stroke-width: 0 !important;
 	/* TODO:
 	Better way to do object selection:
 		Duplicate the origina object, and use invisible outline with stroke width: 5px,
@@ -534,8 +538,7 @@ div.palette_item:first-child {
 	/* pointer-events: stroke; */
 }
 
-#workarea.wireframe #svgcontent *:not(.poly) {
-	fill: #FFFFFF;
+#workarea.wireframe #svgcontent *[stroke] {
 	fill-opacity: 0;
 	stroke: #000;
 	stroke-width: 1px;

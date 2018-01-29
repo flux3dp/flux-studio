@@ -389,7 +389,7 @@ define([
 
                 ws.send([
                     'upload_plain_svg',
-                    file.name,
+                    encodeURIComponent(file.name),
                     file.size
                 ].join(' '));
 
