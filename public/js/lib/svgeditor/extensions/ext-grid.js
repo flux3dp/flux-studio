@@ -74,6 +74,7 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 	});
 	$('#canvasGrid').append(gridBox);
 
+	var gridUri = null;
 	function updateGrid(zoom) {
 		var i;
 		// TODO: Try this with <line> elements, then compare performance difference
@@ -118,12 +119,22 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		ctx.lineTo(0, cur_d);
 		ctx.stroke();
 
-		var datauri = hcanvas.toDataURL('image/png');
+		function updateBackground() {
+			hcanvas.toBlob((blob) => {
+				var newGridUri = URL.createObjectURL(blob);
+				svgCanvas.setHref(gridimg, newGridUri);
+				if (gridUri) {
+					URL.revokeObjectURL(gridUri);
+				}
+				gridUri = newGridUri;
+			});	
+		}
+		
 		gridimg.setAttribute('width', big_int);
 		gridimg.setAttribute('height', big_int);
 		gridimg.parentNode.setAttribute('width', big_int);
 		gridimg.parentNode.setAttribute('height', big_int);
-		svgCanvas.setHref(gridimg, datauri);
+		updateBackground();
 	}
 
 	function gridUpdate () {
@@ -138,7 +149,9 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		svgicons: svgEditor.curConfig.extPath + 'grid-icon.xml',
 
 		zoomChanged: function(zoom) {
-			if (showGrid) {updateGrid(zoom);}
+			if (showGrid) {
+				updateGrid(zoom);
+			}
 		},
 		callback: function () {
 			if (showGrid) {
