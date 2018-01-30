@@ -520,7 +520,7 @@ define([
                 d.reject(["UPLOAD_FAILED"]);
             })
             .then(()=>{
-                ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);                
+                ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
                 waitTillCompleted().fail((error) => {
                     // Error while running test
                     d.reject(error);
@@ -543,7 +543,7 @@ define([
                 d.reject("UPLOAD_FAILED"); // Error while uploading task
             })
             .then(()=>{
-                ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);                
+                ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);
                 waitTillCompleted()
                 .fail((err) => {
                     d.reject(err); // Error while running test
@@ -551,7 +551,7 @@ define([
                 .then(()=>{
                     d.resolve();
                 });
-                
+
             })
         });
 
@@ -640,37 +640,41 @@ define([
     function changeFilament(type, flexible) {
         _stopChangingFilament = false;
         let d = $.Deferred();
-        SocketMaster.addTask('enterMaintainMode').then(() => {
-            if(!_stopChangingFilament) {
-                return SocketMaster.addTask('maintainHome');
-            }
-        })
-        .then(() => {
-            if(!_stopChangingFilament) {
-                return SocketMaster.addTask('changeFilament', type, flexible);
-            }
-        })
-        .then(() => {
-            if(_stopChangingFilament) {
+
+        (async function(){
+            await SocketMaster.addTask('enterMaintainMode');
+
+            if (_stopChangingFilament) {
                 d.reject({ error: ['CANCEL'] });
                 _stopChangingFilamentCallback();
+                return;
             }
-            else {
-                d.resolve();
-            }
-        })
-        .progress((response) => {
-            if(_stopChangingFilament) {
-                _stopChangingFilamentCallback();
-            }
-            else {
-                d.notify(response);
-            }
-        })
-        .fail((response) => {
-            d.reject(response);
-        });
 
+            await SocketMaster.addTask('maintainHome');
+
+            if (_stopChangingFilament) {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+                return;
+            }
+
+            await SocketMaster.addTask('changeFilament', type, flexible).progress((response) => {
+                if (_stopChangingFilament) {
+                    d.reject({ error: ['CANCEL'] });
+                    _stopChangingFilamentCallback();
+                } else {
+                    d.notify(response);
+                }
+            });
+
+            if (_stopChangingFilament) {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+                return;
+            }
+
+            d.resolve();
+        })().catch(response => d.reject(response));
         return d.promise();
     }
 
