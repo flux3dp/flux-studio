@@ -192,7 +192,7 @@
                 border: 1px #444 solid;
                 border-radius: 2px;
                 // box-shadow: 4px 5px 14px #444;
-            
+
                 #layerbuttons {
                     padding: 0;
                     width: 100%;
@@ -233,7 +233,7 @@
                         &:hover {
                             color: black;
                             background-color: #ddd;
-                            
+
                         }
                         &:not(.layersel):first-child {
                             &:hover {
@@ -243,7 +243,7 @@
                         }
                     }
                 }
-                
+
             }
             #sidepanel_handle {
                 @include force-hide();
@@ -268,7 +268,7 @@
             border-radius: 2px;
             .layername {
                 margin-bottom: 10px;
-                border-bottom: 1px #444 solid;                
+                border-bottom: 1px #444 solid;
                 padding: 2px;
                 text-align: center;
             }
@@ -334,7 +334,7 @@
                 }
                 input[type=button] {
                     font-size: 1.3rem;
-                    padding: 6px 12px;                
+                    padding: 6px 12px;
                     margin-top: 10px;
                     background-color: unset;
                     color: #C0C0C0;
@@ -354,14 +354,15 @@
     #svg_source_editor,
     #docprops,
     #svg_prefs,
-    #cmenu_canvas {
+    //#cmenu_canvas
+    {
         @include force-hide();
     }
 
     #tools_top {
         z-index: 91;
     }
-    
+
     #grid_mask {
         z-index: 5;
         position: absolute;

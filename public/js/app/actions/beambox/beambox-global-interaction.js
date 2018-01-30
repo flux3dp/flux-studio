@@ -9,31 +9,31 @@ define([
         constructor() {
             super();
             this._actions = {
-                "IMPORT": () => {
+                'IMPORT': () => {
                     if(electron) {
-                        electron.trigger_file_input_click("import_image");
+                        electron.trigger_file_input_click('import_image');
                     }
                 },
-                "SAVE_SCENE": () => {},
-                "EXPORT_FLUX_TASK": () => {},
-                "UNDO": () => FnWrapper.undo(),
-                "DUPLICATE": () => FnWrapper.cloneSelectedElement(),
-                "ROTATE": () => {},
-                "SCALE": () => {},
-                "RESET": () => {},
-                "ALIGN_CENTER": () => {},
-                "CLEAR_SCENE": () => {},
-                "TUTORIAL": () => {}
-            }
+                'SAVE_SCENE': () => {},
+                'EXPORT_FLUX_TASK': () => {},
+                'UNDO': () => FnWrapper.undo(),
+                'DUPLICATE': () => FnWrapper.cloneSelectedElement(),
+                'ROTATE': () => {},
+                'SCALE': () => {},
+                'RESET': () => {},
+                'ALIGN_CENTER': () => {},
+                'CLEAR_SCENE': () => {},
+                'TUTORIAL': () => {}
+            };
         }
         attach() {
-            super.attach(["IMPORT", "UNDO"]);
+            super.attach(['IMPORT', 'UNDO']);
         }
         onObjectFocus() {
-            this.enableMenuItems(["DUPLICATE"]);
+            this.enableMenuItems(['DUPLICATE']);
         }
         onObjectBlur() {
-            this.disableMenuItems(["DUPLICATE"]);
+            this.disableMenuItems(['DUPLICATE']);
         }
     }
     const instance = new BeamboxGlobalInteraction();

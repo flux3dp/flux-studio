@@ -2505,8 +2505,6 @@ define([
                 let targetZoom;
                 let timer;
                 let trigger = Date.now();
-                const DURATION = 10;
-                let durationCounter = 0;
 
                 return function (e) {
                     e.stopImmediatePropagation();
@@ -2536,28 +2534,29 @@ define([
                     function _zoomAsIllustrator() {
                         const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 
-                        targetZoom *= (1 + delta / 2000.0);
+                        targetZoom *= (1 + delta * targetZoom**1.1 / 2000.0);
 
-                        targetZoom = Math.min(100, targetZoom);
+                        targetZoom = Math.min(20, targetZoom);
                         targetZoom = Math.max(0.1, targetZoom);
+                        if((targetZoom > 19 ) && (delta > 0)) {
+                            return;
+                        }
 
-                        durationCounter = 0;
                         if (!timer) {
-                            const interval = 2;
+                            const interval = 20;
                             timer = setInterval(_zoomProcess, interval);
                         }
 
                         // due to wheel event bug (which zoom gesture will sometimes block all other processes), we trigger the zoomProcess about every few miliseconds
-                        if (Date.now() - trigger > 10) {
+                        if (Date.now() - trigger > 20) {
                             _zoomProcess();
                             trigger = Date.now();
                         }
 
                         function _zoomProcess() {
-                            durationCounter++;
                             // End of animation
                             const currentZoom = svgCanvas.getZoom();
-                            if ((currentZoom === targetZoom) || (durationCounter >= DURATION)) {
+                            if ((currentZoom === targetZoom) || (Date.now() - trigger > 500)) {
                                 clearInterval(timer);
                                 timer = undefined;
                                 return;
@@ -2566,7 +2565,7 @@ define([
                             // Calculate next animation zoom level
                             var nextZoom = currentZoom + (targetZoom - currentZoom) / 5;
 
-                            if (Math.abs(targetZoom - currentZoom) < 0.01) {
+                            if (Math.abs(targetZoom - currentZoom) < 0.005) {
                                 nextZoom = targetZoom;
                             }
 
@@ -5032,74 +5031,30 @@ define([
         // arbitrary transform lists, but makes some assumptions about how the transform list
         // was obtained
         // * import should happen in top-left of current zoomed viewport
-        this.importSvgString = function (xmlString, type) {
-            var j, rootTransform = '';
-            var symbols = [],
-                use_el;
-            try {
-                var batchCmd = new svgedit.history.BatchCommand('Import Image');
-                var symbol;
+        this.importSvgString = function (xmlString, _type) {
+            const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
-                // convert string into XML document
-                var newDoc = svgedit.utilities.text2xml(xmlString);
-                rootTransform = svgedit.utilities.getMatrixFromTransformAttr(newDoc.documentElement.getAttribute('transform') || '');
-                this.prepareSvg(newDoc);
+            function parseSvg(svg, type) {
+                function _parseSvgByLayer(svg) {
+                    const defNodes = Object.values(svg.childNodes).filter(node => 'defs' === node.tagName);
+                    let defChildren = [];
+                    defNodes.map(def => defChildren.concat(Object.values(def.childNodes)));
 
-                // import new svg document into our document
-                const svg = svgdoc.adoptNode(newDoc.documentElement);
+                    const layerNodes = Object.values(svg.childNodes).filter(node => !['defs', 'title'].includes(node.tagName));
 
-
-                var groups = [];
-                var svgDefs = [];
-                if (type === 'layer') {
-                    for (var i = 0; i < svg.childNodes.length; i++) {
-                        var child = svg.childNodes[i];
-                        console.log('Getting child(layer)', child);
-                        if (['title'].indexOf(child.tagName) >= 0) {continue;}
-                        if (child.tagName == 'defs') {
-                            for (var j = 0; j < child.childNodes.length; j++) {
-                                svgDefs.push(child.childNodes[j]);
-                            }
-                        } else if (child.tagName !== 'g' || child.id == null) {
-                            type = 'nolayer';
-                            break;
-                        } else {
-                            groups.push(child);
-                        }
+                    const isUnvalidLayeredSvg = layerNodes.some(node => (node.tagName !== 'g' || node.id == null));
+                    if(!isUnvalidLayeredSvg) {
+                        return false;
                     }
+
+                    const symbols = layerNodes.map(node => {
+                        const symbol = svgCanvas.makeSymbol(node, [], batchCmd, defChildren);
+                        return symbol;
+                    });
+
+                    return symbols;
                 }
-                if (type === 'color') {
-                    var groupColorMap = {};
-                    function getGroupColorMap(stroke) {
-                        if (!groupColorMap[stroke]) {
-                            groupColorMap[stroke] = svgdoc.createElementNS(NS.SVG, 'g');
-                            groupColorMap[stroke].setAttribute('data-color', stroke);
-                        }
-                        return groupColorMap[stroke];
-                    } 
-                    function filterColor(filter, node) {
-                        var children = [];
-                        for (var i = 0; i < node.childNodes.length; i++) {
-                            children.push(node.childNodes[i]);
-                        }
-                        for (var i = 0; i < children.length; i++) {
-                            var grandchild = children[i];
-                            if (['polygon', 'path', 'line', 'rect', 'circle', 'ellipse'].indexOf(grandchild.tagName) >=0 ) {
-                                var stroke = grandchild.getAttribute('stroke');
-                                if (stroke === 'none') {
-                                    stroke = grandchild.getAttribute('fill');
-                                }
-                                if (stroke != filter) {
-                                    grandchild.parentElement.removeChild(grandchild);
-                                } else {
-                                    node.setAttribute('data-color', stroke);
-                                }
-                            } else if (grandchild.tagName == 'g') {
-                                grandchild.setAttribute('data-color', stroke);                                    
-                                filterColor(filter, grandchild)
-                            }
-                        }
-                    }
+                function _parseSvgByColor(svg) {
                     function traverseForColors(colors, node) {
                         for (var i = 0; i < node.childNodes.length; i++) {
                             var grandchild = node.childNodes[i];
@@ -5110,170 +5065,263 @@ define([
                                 }
                                 colors[stroke] = 1;
                             } else if (grandchild.tagName == 'g') {
-                                traverseForColors(colors, grandchild)
+                                traverseForColors(colors, grandchild);
                             }
                         }
                     }
-                    
-                    for (var i = 0; i < svg.childNodes.length; i++) {
-                        var child = svg.childNodes[i];
-                        console.log('Getting child(color)', child);
-                        
-                        switch (child.tagName) {
-                            case 'g':
-                                var colors = {};
-                                traverseForColors(colors, child);
-                                for (var strokeColor in colors) {
-                                    var deepClone = child.cloneNode(true);
-                                    filterColor(strokeColor, deepClone);
-                                    getGroupColorMap(strokeColor).appendChild(deepClone);
+
+
+                    function filterColor(filter, node) {
+                        const children = Object.values(node.childNodes);
+                        children.map((grandchild) => {
+                            if (['polygon', 'path', 'line', 'rect', 'ellipse', 'circle'].indexOf(grandchild.tagName) >=0 ) {
+                                var stroke = grandchild.getAttribute('stroke');
+                                if (stroke === 'none') {
+                                    stroke = grandchild.getAttribute('fill');
                                 }
-                                break;
-                            case 'defs':
-                                for (var j = 0; j < child.childNodes.length; j++) {
-                                    svgDefs.push(child.childNodes[j]);
+                                if (stroke !== filter) {
+                                    node.removeChild(grandchild);
+                                } else {
+                                    node.setAttribute('data-color', stroke);
                                 }
-                                break;
-                            default:
-                                console.log("Ignoring tag", child.tagName)
-                                break;
-						}
+                            } else if (grandchild.tagName === 'g') {
+                                grandchild.setAttribute('data-color', stroke);
+                                filterColor(filter, grandchild);
+                            }
+                        });
                     }
-                    for (var k in groupColorMap) {
-                        console.log("Adding Color Group", k);
-                        groups.push(groupColorMap[k]);
-                    }
-                    type = 'layer';
-                    console.log("Final Defs", svgDefs)
+
+                    const defNodes = Object.values(svg.childNodes).filter(node => 'defs' === node.tagName);
+                    let defChildren = [];
+                    defNodes.map(def => {
+                        defChildren = defChildren.concat(Object.values(def.childNodes));
+                    });
+
+                    const originLayerNodes = Object.values(svg.childNodes).filter(child => child.tagName === 'g');
+
+                    // re-classify elements by their color
+                    const groupColorMap = {};
+                    let availableColors = {};
+
+                    originLayerNodes.map(child => {
+                        traverseForColors(availableColors, child);
+                        for (var strokeColor in availableColors) {
+                            if (availableColors.hasOwnProperty(strokeColor)) {
+                                const clonedGroup = child.cloneNode(true);
+                                filterColor(strokeColor, clonedGroup);
+                                if (!groupColorMap[strokeColor]) {
+                                    groupColorMap[strokeColor] = svgdoc.createElementNS(NS.SVG, 'g');
+                                    groupColorMap[strokeColor].setAttribute('data-color', strokeColor);
+                                }
+                                groupColorMap[strokeColor].appendChild(clonedGroup);
+                            }
+                        }
+                        // child.map(grandChild => {
+                        //     const color = _getColor(grandChild);
+                        //     grandChild.setAttribute('class', 'poly');
+                        //     if(!groupColorMap[color]) {
+                        //         groupColorMap[color] = svgdoc.createElementNS(NS.SVG, 'g').setAttribute('data-color', stroke);
+                        //     }
+                        //     groupColorMap[color].appendChild(grandChild);
+                        // });
+                    });
+
+                    const coloredLayerNodes = Object.values(groupColorMap);
+
+                    const symbols = coloredLayerNodes.map(node => {
+                        const symbol = svgCanvas.makeSymbol(node, [], batchCmd, defChildren);
+                        symbol.setAttribute('data-color', node.getAttribute('data-color'));
+                        return symbol;
+                    });
+                    return symbols;
                 }
-                if (type === 'layer') {
-                    for (var i in groups) {
-                        let sym = this.makeSymbol(groups[i], [], batchCmd, svgDefs);
-                        console.log("Symbol", groups[i])
-                        sym.setAttribute('data-color', groups[i].getAttribute('data-color'));
-                        symbols.push(sym);
-                    }
-                } else if (type === 'nolayer') {
+                function _parseSvgByNolayer(svg) {
                     uniquifyElems(svg);
 
-                    var innerw = svgedit.units.convertToNum('width', svg.getAttribute('width')),
-                        innerh = svgedit.units.convertToNum('height', svg.getAttribute('height')),
-                        innervb = svg.getAttribute('viewBox'),
-                        // if no explicit viewbox, create one out of the width and height
-                        vb = innervb ? innervb.split(' ') : [0, 0, innerw, innerh];
+                    const svgString = new XMLSerializer().serializeToString(svg);
+                    const clonedSvgXml = svgedit.utilities.text2xml(svgString);
+                    const clonedSvg = svgdoc.adoptNode(clonedSvgXml.documentElement);
+                    clonedSvg.removeAttribute('viewBox');
 
-                    svg.removeAttribute('viewBox');
+                    return [svgCanvas.makeSymbol(clonedSvg, clonedSvg.attributes, batchCmd)];
+                }
+                // return symbols
+                switch (type) {
+                    case 'color':
+                        return {
+                            symbols: _parseSvgByColor(svg),
+                            confirmedType: 'color'
+                        };
 
-                    for (j = 0; j < 4; ++j) {
-                        vb[j] = +(vb[j]);
+                    case 'nolayer':
+                        return {
+                            symbols: _parseSvgByNolayer(svg),
+                            confirmedType: 'nolayer'
+                        };
+
+                    case 'layer':
+                        let symbols = _parseSvgByLayer(svg);
+                        if(symbols) {
+                            return {
+                                symbols: symbols,
+                                confirmedType: 'layer'
+                            };
+                        } else {
+                            console.log('Not valid layer. Use nolayer parsing option instead');
+                            return {
+                                symbols: _parseSvgByNolayer(svg),
+                                confirmedType: 'nolayer'
+                            };
+                        }
+                }
+            }
+            function appendUseElement(symbol, type) {
+                // create a use element
+                const use_el = svgdoc.createElementNS(NS.SVG, 'use');
+                use_el.id = getNextId();
+                setHref(use_el, '#' + symbol.id);
+                //switch currentLayer, and create layer if necessary
+                console.log('symbol: ', symbol);
+
+                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color'))) {
+
+                    const color = symbol.getAttribute('data-color');
+                    const layerName = symbol.getAttribute('data-id') || rgbToHex(color);
+
+                    const isLayerExist = svgCanvas.setCurrentLayer(layerName);
+                    if(!isLayerExist) {
+                        const layer = svgCanvas.createLayer(layerName);
+                        layer.color = color;
                     }
-
-                    // TODO: properly handle preserveAspectRatio
-                    var canvasw = +svgcontent.getAttribute('width'),
-                        canvash = +svgcontent.getAttribute('height');
-                    // imported content should be 1/3 of the canvas on its largest dimension
-
-                    if (svgedit.browser.isGecko()) {
-                        // Move all gradients into root for Firefox, workaround for this bug: https://bugzilla.mozilla.org/show_bug.cgi?id=353575
-                        // TODO: Make this properly undo-able.
-                        $(svg).find('linearGradient, radialGradient, pattern').appendTo(defs);
-                    }
-
-                    symbols.push(this.makeSymbol(svg, svg.attributes, batchCmd));
-
                 }
 
-                for (var i = 0; i < symbols.length; i++) {
-                    var symbol = symbols[i];
-                    use_el = svgdoc.createElementNS(NS.SVG, 'use');
-                    use_el.id = getNextId();
-                    setHref(use_el, '#' + symbol.id);
+                // append ~~~~~ ya
+                getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
-                    if (symbol.getAttribute('data-id') != null && type === 'layer') {
-                        function rgbToHex(str) {
-                            var rgb = str.substring(4).split(',');
-                            var hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
-                            if (hex == "NaN") {
-                                hex = '0';
-                            }
-                            while (hex.length < 6) {
-                                hex = '0' + hex;
-                            }
-                            return '#' + hex.toUpperCase();
-                        }
-                        var layerName = symbol.getAttribute('data-id') || rgbToHex(symbol.getAttribute('data-color'));
-                        if (!svgCanvas.setCurrentLayer(layerName)) {
-                            var layer = svgCanvas.createLayer(layerName);
-                            layer.color = symbol.getAttribute('data-color');
-                        }
-                    }
+                batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 
-                    (current_group || getCurrentDrawing().getCurrentLayer()).appendChild(use_el);
-                    batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
-                    clearSelection();
+                $(use_el).data('symbol', symbol).data('ref', symbol);
 
-                    var bb = svgedit.utilities.getBBox(use_el);
-                    // Scale
-                    var dpi = 72, //72 dpi: 1mm = 2.83464567px  ; 72 / 25.4
-                        svgUnitScaling = 25.4 / dpi * 10, // inch to mm
-                        mt = rootTransform.scale(svgUnitScaling),
-                        matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+
+                return use_el;
+            }
+            function removeDefaultLayerIfEmpty() {
+                const defaultLayerName = LANG.right_panel.layer_panel.layer1;
+                if ($('svg title')[0].innerHTML === defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length === 0)) {
+                    svgCanvas.setCurrentLayer(defaultLayerName);
+                    svgCanvas.deleteCurrentLayer();
+                    window.updateContextPanel();
+                    window.populateLayers();
+                }
+            }
+            function rgbToHex(rgbStr) {
+                const rgb = rgbStr.substring(4).split(',');
+                let hex = (Math.floor(parseFloat(rgb[0]) * 2.55) * 65536 + Math.floor(parseFloat(rgb[1]) * 2.55) * 256 + Math.floor(parseFloat(rgb[2]) * 2.55)).toString(16);
+                if (hex == 'NaN') {
+                    hex = '0';
+                }
+                hex = hex.padStart(6, '0'); // pad zero
+                return '#' + hex.toUpperCase(); // ex: #0A23C5
+            }
+            function resizeAndRepositionElements(use_el, svgStr) {
+                // Scale
+                const rootWidth = unit2Pixel(svgStr.getAttribute('width'));
+                const rootHeight = unit2Pixel(svgStr.getAttribute('height'));
+                const rootViewbox = svgStr.getAttribute('viewBox')?svgStr.getAttribute('viewBox').split(' '):undefined;
+                const rootTransform = svgedit.utilities.getMatrixFromTransformAttr(svgStr.getAttribute('transform') || '');
+
+                if(rootWidth && rootHeight && rootViewbox) {
+                    console.log('resize with width height viewbox');
+                    const resizeW = rootWidth / rootViewbox[2];
+                    const resizeH = rootHeight / rootViewbox[3];
+                    const matrixValues = [resizeW, 0, 0, resizeH, -rootViewbox[0], -rootViewbox[1]];
 
                     use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
-
                     svgedit.recalculate.recalculateDimensions(use_el);
 
-                    $(use_el).data('symbol', symbol).data('ref', symbol);
-                    addToSelection([use_el]);
+                } else if(rootViewbox) {
+                    console.log('resize with only viewbox');
+                    const matrixValues = [1, 0, 0, 1, -rootViewbox[0], -rootViewbox[1]];
+                    use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+                    svgedit.recalculate.recalculateDimensions(use_el);
 
-                    // TODO: Find way to add this in a recalculateDimensions-parsable way
-                    //				if (vb[0] != 0 || vb[1] != 0)
-                    //					ts = 'translate(' + (-vb[0]) + ',' + (-vb[1]) + ') ' + ts;
-                    addCommandToHistory(batchCmd);
-                    call('changed', [svgcontent]);
+                } else {
+                    console.log('resize with 72 dpi');
 
-                    var dataXform = '';
-                    $.each(bb, function (key, value) {
-                        dataXform += key + '=' + value + ' ';
-                    });
-                    use_el.setAttribute('data-xform', dataXform);
+                    // 72 pixel is 1 inch (dpi = 72)
+                    const dpi = 72;
+                    const svgUnitScaling = 25.4 / dpi * 10;
+
+                    const mt = rootTransform.scale(svgUnitScaling);
+                    const matrixValues = [mt.a, mt.b, mt.c, mt.d, mt.e, mt.f];
+
+                    use_el.setAttribute('transform', 'matrix(' + matrixValues.join(',') + ')');
+                    svgedit.recalculate.recalculateDimensions(use_el);
                 }
-
-                if ((type == 'color' || type == 'layer')) {
-                    // Remove unnecessary default empty layer
-                    const defaultLayerName = LANG.right_panel.layer_panel.layer1;
-                    if ($('svg title')[0].innerHTML == defaultLayerName && ($($('svg title')[0]).parent().find('g').is(':empty') || $($('svg title')[0]).parent().find('g').length == 0)) {
-                        this.setCurrentLayer(defaultLayerName);
-                        this.deleteCurrentLayer();
-                        window.updateContextPanel();
-                        window.populateLayers();
-                    }
+                return use_el;
+            }
+            function setDataXform(use_el) {
+                const bb = svgedit.utilities.getBBox(use_el);
+                let dataXform = '';
+                $.each(bb, function (key, value) {
+                    dataXform += key + '=' + value + ' ';
+                });
+                use_el.setAttribute('data-xform', dataXform);
+                return use_el;
+            }
+            function unit2Pixel(val) {
+                const dpi = 72;
+                const svgUnitScaling = 25.4 / dpi * 10; //本來 72 個點代表 1 inch, 現在 254 個點代表 1 inch.
+                const unitMap = {
+                    'in': 25.4 * 10,
+                    'cm': 10 * 10,
+                    'mm': 10,
+                    'px': svgUnitScaling,
+                };
+                if (!isNaN(val)) {return val-0;}
+                const unit = val.substr(-2);
+                const num = val.substr(0, val.length-2);
+                if(!unitMap[unit]) {
+                    console.log('unsupported unit');
                 }
-            } catch (e) {
-                console.log(e);
-                return null;
+                return num * (unitMap[unit] || unitMap['px']);
             }
 
+            const newDoc = svgedit.utilities.text2xml(xmlString);
+            svgCanvas.prepareSvg(newDoc);
+            const svg = svgdoc.adoptNode(newDoc.documentElement);
+            const {symbols, confirmedType} = parseSvg(svg, _type);
+
+            const use_elements = symbols.map(symbol => appendUseElement(symbol, confirmedType));
+            use_elements.map(element => setDataXform(element));
+            use_elements.map(element => resizeAndRepositionElements(element, svg));
+
+            removeDefaultLayerIfEmpty();
+
+            addCommandToHistory(batchCmd);
+            call('changed', [svgcontent]);
 
             // we want to return the element so we can automatically select it
-            return use_el;
+            return use_elements[use_elements.length - 1];
+
         };
 
         this.makeSymbol = function (elem, attrs, batchCmd, defs) {
             var symbol = svgdoc.createElementNS(NS.SVG, 'symbol'),
                 symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
+            var oldLinkMap = {};
 
-            var oldLinkMap = {}
+            console.log('defs: ', defs);
             if (defs) {
                 // this is a group color object, copy defs into symbol;
-                for (var i in defs) {
+                defs.map(def => {
                     this.clipCount = this.clipCount || 1;
-                    const def = defs[i].cloneNode(true),
-                          newId = 'def' + (this.clipCount++);
-                    oldLinkMap[def.id] = newId;
-                    def.id = newId;
-                    symbol_defs.appendChild(def);
-                }
+                    const clonedDef = def.cloneNode(true),
+                        newId = 'def' + (this.clipCount++);
+                    oldLinkMap[clonedDef.id] = newId;
+                    clonedDef.id = newId;
+                    symbol_defs.appendChild(clonedDef);
+                });
             }
 
             symbol.appendChild(symbol_defs);
@@ -5288,6 +5336,9 @@ define([
             }
 
             function traverseForRemappingId(node) {
+                if (!node.attributes) {
+                    return;
+                }
                 for (var i = 0; i < node.attributes.length; i++) {
                     var attr = node.attributes[i];
                     var re = /url\(#([^)]+)\)/g;
@@ -5299,12 +5350,15 @@ define([
                         }
                     }
                 }
-                if (!node.childNodes) return;
-                for(var i = 0; i < node.childNodes.length; i++) {
+                if (!node.childNodes) {
+                    return;
+                }
+                for (var i = 0; i < node.childNodes.length; i++) {
                     traverseForRemappingId(node.childNodes[i]);
                 }
             }
             traverseForRemappingId(symbol);
+
 
             for (var i = 0; i < attrs.length; i++) {
                 var attr = attrs[i];

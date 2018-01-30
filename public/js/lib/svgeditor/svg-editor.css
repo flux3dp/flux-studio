@@ -538,7 +538,7 @@ div.palette_item:first-child {
 	/* pointer-events: stroke; */
 }
 
-#workarea.wireframe #svgcontent *[stroke] {
+#workarea.wireframe #svgcontent * {
 	fill-opacity: 0;
 	stroke: #000;
 	stroke-width: 1px;
