@@ -360,9 +360,8 @@ define([
         },
 
         // renders
-        _renderPrinterSelection: function(lang) {
-            var self = this,
-                printOptions = self.state.printOptions,
+        _renderPrinterSelection: function() {
+            var printOptions = this.state.printOptions,
                 options = (0 < printOptions.length ? printOptions : [{
                     label: (
                         <div className="spinner-roller spinner-roller-reverse"/>

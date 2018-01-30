@@ -393,7 +393,7 @@ define([
                     ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
                     DeviceMaster.select(device)
                     .done(() => {
-                        ProgressActions.close();                        
+                        ProgressActions.close();
                         AlertActions.showCameraCalibration(device);
                     })
                     .fail(() => {
@@ -710,7 +710,11 @@ define([
 
             _openAlertWithnoPrinters: function() {
                 if (0 === this.state.deviceList.length && true === this.state.showDeviceList) {
-                    AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                    if(location.hash === '#studio/beambox') {
+                        AlertActions.showPopupRetry('no-printer', lang.device_selection.no_beambox);
+                    } else {
+                        AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
+                    }
                 }
             },
 
