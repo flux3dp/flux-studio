@@ -641,27 +641,39 @@ define([
         _stopChangingFilament = false;
         let d = $.Deferred();
 
-        //so ugly ~~~~~~~~~~
         (async function(){
             await SocketMaster.addTask('enterMaintainMode');
-            if (!_stopChangingFilament) {
-                await SocketMaster.addTask('maintainHome');
-            }
-            if (!_stopChangingFilament) {
-                await SocketMaster.addTask('changeFilament', type, flexible).progress((response) => {
-                    if (!_stopChangingFilament) {
-                        d.notify(response);
-                    } else {
-                        _stopChangingFilamentCallback();
-                    }
-                });
-            }
-            if (!_stopChangingFilament) {
-                d.resolve();
-            } else {
+
+            if (_stopChangingFilament) {
                 d.reject({ error: ['CANCEL'] });
                 _stopChangingFilamentCallback();
+                return;
             }
+
+            await SocketMaster.addTask('maintainHome');
+
+            if (_stopChangingFilament) {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+                return;
+            }
+
+            await SocketMaster.addTask('changeFilament', type, flexible).progress((response) => {
+                if (_stopChangingFilament) {
+                    d.reject({ error: ['CANCEL'] });
+                    _stopChangingFilamentCallback();
+                } else {
+                    d.notify(response);
+                }
+            });
+
+            if (_stopChangingFilament) {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+                return;
+            }
+
+            d.resolve();
         })().catch(response => d.reject(response));
         return d.promise();
     }
