@@ -1,5 +1,6 @@
 define([
     'react',
+    'reactClassset',
     'app/actions/beambox/bottom-right-funcs',
     'jsx!widgets/Button-Group',
     'helpers/i18n',
@@ -9,6 +10,7 @@ define([
     'app/actions/beambox/beambox-version-master'
 ], function (
     React,
+    ReactCx,
     BottomRightFuncs,
     ButtonGroup,
     i18n,
@@ -84,11 +86,10 @@ define([
             );
         }
         _renderActionButtons() {
-            const cx = React.addons.classSet;
             const buttons = [
                 {
                     label: lang.monitor.start,
-                    className: cx({
+                    className: ReactCx.cx({
                         'btn-disabled': false,
                         'btn-default': true,
                         'btn-hexagon': true,

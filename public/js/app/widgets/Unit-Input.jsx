@@ -1,10 +1,11 @@
 define([
     'react',
+    'reactDOM',
     'helpers/unit-converter',
     'app/constants/keycode-constants',
     'helpers/round',
     'plugins/classnames/index'
-], function(React, unitConverter, keyCodeConstants, round, ClassNames) {
+], function(React, ReactDOM, unitConverter, keyCodeConstants, round, ClassNames) {
     'use strict';
 
     return React.createClass({
@@ -47,12 +48,12 @@ define([
 
             if ('number' === typeof val) {
                 val = this.props.handleNumberFormat(val);
-                this.refs.unitInput.getDOMNode().value = val + this.props.defaultUnit;
+                ReactDOM.findDOMNode(this.refs.unitInput).value = val + this.props.defaultUnit;
 
                 return val;
             }
             else {
-                val = round(parseFloat(this.refs.unitInput.getDOMNode().value), -2);
+                val = round(parseFloat(this.refs.unitInput.findDOMNode().value), -2);
 
                 return val;
             }
@@ -89,7 +90,7 @@ define([
         _confirmValue: function(addValue) {
             addValue = parseFloat(addValue, 10) || 0;
 
-            var el = this.refs.unitInput.getDOMNode(),
+            var el = this.refs.unitInput.findDOMNode(),
                 value = el.value.replace(/\s+/g, ''),
                 value = el.value.replace('/s', 's'),
                 isNegative = /^-.*/.test(value),
@@ -145,10 +146,10 @@ define([
         // UI Events
         _onBlur: function(e) {
             e.preventDefault();
-            let textboxValue = this.refs.unitInput.getDOMNode().value;
+            let textboxValue = this.refs.unitInput.findDOMNode().value;
             var value = this._confirmValue();
             if(textboxValue === '') {
-                this.refs.unitInput.getDOMNode().value = this.props.defaultValue + this.props.defaultUnit;
+                this.refs.unitInput.findDOMNode().value = this.props.defaultValue + this.props.defaultUnit;
             }
             else {
                 this.props.getValue(e, value);

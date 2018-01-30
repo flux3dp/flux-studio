@@ -1,6 +1,9 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
+    'reactDOM',
+    'reactPropTypes',
     'app/actions/laser',
     'app/actions/alert-actions',
     'app/actions/global-interaction',
@@ -19,6 +22,9 @@ define([
 ], function(
     $,
     React,
+    ReactCx,
+    ReactDOM,
+    PropTypes,
     laserEvents,
     AlertActions,
     GlobalInteraction,
@@ -79,7 +85,7 @@ define([
         let view = React.createClass({
                 getDefaultProps: function() {
                     return {
-                        page: React.PropTypes.string
+                        page: PropTypes.string
                     };
                 },
 
@@ -113,7 +119,7 @@ define([
                     DnDHandler.plug(document, self._handleDragAndDrop);
 
 
-                    self.state.laserEvents.setPlatform(self.refs.laserObject.getDOMNode());
+                    self.state.laserEvents.setPlatform(ReactDOM.findDOMNode(self.refs.laserObject));
 
                     self.state.laserEvents.menuFactory.items.execute.enabled = false;
                     self.state.laserEvents.menuFactory.items.execute.onClick = function() {
@@ -229,8 +235,7 @@ define([
                 // Lifecycle
                 _renderStageSection: function() {
                     var self = this,
-                        cx = React.addons.classSet,
-                        image_panel_class = cx({
+                        image_panel_class = ReactCx.cx({
                             'panel object-position': true
                         }),
                         imagePanel = (
@@ -313,8 +318,7 @@ define([
 
                 _renderFileUploader: function() {
                     var self = this,
-                        cx = React.addons.classSet,
-                        uploadStyle = cx({
+                        uploadStyle = ReactCx.cx({
                             'file-importer': !self.state.hasImage,
                             'absolute-center': !self.state.hasImage,
                             'hide': self.state.hasImage
@@ -350,10 +354,9 @@ define([
                 _renderActionButtons: function() {
                     globalInteraction.onImageChanged(this.state.hasImage);
 
-                    var cx = React.addons.classSet,
-                        buttons = [{
+                    var buttons = [{
                             label: lang.monitor.start,
-                            className: cx({
+                            className: ReactCx.cx({
                                 'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,
                                 'btn-hexagon': true,
@@ -368,7 +371,7 @@ define([
                     if (this.props.page === 'laser') {
                         buttons = [{
                             label: lang.laser.showOutline,
-                            className: cx({
+                            className: ReactCx.cx({
                                 'btn-disabled': !this.state.hasImage,
                                 'btn-default': true,
                                 'btn-hexagon': true,
@@ -384,7 +387,7 @@ define([
                     if (this.props.page === 'cut' || this.props.page === 'mill') {
                         buttons = [{
                             label: lang.cut.horizontal_calibrate,
-                            className: cx({
+                            className: ReactCx.cx({
                                 'btn-disabled': false,
                                 'btn-default': true,
                                 'btn-hexagon': true,
@@ -398,7 +401,7 @@ define([
                         },
                         {
                             label: lang.cut.height_calibrate,
-                            className: cx({
+                            className: ReactCx.cx({
                                 'btn-disabled': false,
                                 'btn-default': true,
                                 'btn-hexagon': true,

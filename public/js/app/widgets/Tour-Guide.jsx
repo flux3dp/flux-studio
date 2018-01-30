@@ -1,9 +1,11 @@
 define([
     'react',
+    'reactPropTypes',
     'app/actions/alert-actions',
     'helpers/device-master',
 ], function(
     React,
+    PropTypes,
     AlertActions,
     DeviceMaster
 ) {
@@ -13,11 +15,11 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang: React.PropTypes.object,
-            guides: React.PropTypes.array,
-            step: React.PropTypes.number,
-            onNextClick: React.PropTypes.func,
-            onComplete: React.PropTypes.func
+            lang: PropTypes.object,
+            guides: PropTypes.array,
+            step: PropTypes.number,
+            onNextClick: PropTypes.func,
+            onComplete: PropTypes.func
         },
 
         getInitialState: function() {

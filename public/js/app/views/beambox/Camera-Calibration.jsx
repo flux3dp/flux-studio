@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'helpers/i18n',
     'helpers/api/config',
     'jsx!widgets/Modal',
@@ -18,6 +19,7 @@ define([
 ], function(
     $,
     React,
+    PropTypes,
     i18n,
     ConfigHelper,
     Modal,
@@ -91,8 +93,8 @@ define([
         }
     };
     CameraCalibrationStateMachine.propTypes = {
-        device  : React.PropTypes.object,
-        onClose : React.PropTypes.func
+        device  : PropTypes.object,
+        onClose : PropTypes.func
     };
 
     class StepRefocus extends React.Component {

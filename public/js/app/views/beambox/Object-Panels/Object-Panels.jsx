@@ -1,5 +1,6 @@
 define([
     'react',
+    'reactPropTypes',
     'plugins/classnames/index',
     'jsx!views/beambox/Object-Panels/Position',
     'jsx!views/beambox/Object-Panels/Rotation',
@@ -10,6 +11,7 @@ define([
     'jsx!views/beambox/Object-Panels/Threshold'
 ], function(
     React,
+    PropTypes,
     ClassNames,
     PositionPanel, 
     RotationPanel, 
@@ -39,10 +41,10 @@ define([
     
     let ObjectPanel = React.createClass({
         propTypes: {
-            type: React.PropTypes.oneOf(Object.keys(validPanels)).isRequired,
-            data: React.PropTypes.object.isRequired,
-            $me: React.PropTypes.object.isRequired,
-            isEditable: React.PropTypes.bool.isRequired
+            type: PropTypes.oneOf(Object.keys(validPanels)).isRequired,
+            data: PropTypes.object.isRequired,
+            $me: PropTypes.object.isRequired,
+            isEditable: PropTypes.bool.isRequired
         },
                   
         

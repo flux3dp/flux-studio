@@ -1,10 +1,11 @@
 define([
     'react',
+    'reactPropTypes',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'app/constants/progress-constants'
 ],
-function(React, Modal, Alert, ProgressConstants) {
+function(React, PropTypes, Modal, Alert, ProgressConstants) {
     'use strict';
 
     var acceptableTypes = [
@@ -16,15 +17,15 @@ function(React, Modal, Alert, ProgressConstants) {
     return React.createClass({
 
         propTypes: {
-            type       : React.PropTypes.oneOf(acceptableTypes),
-            isOpen     : React.PropTypes.bool,
-            lang       : React.PropTypes.object,
-            caption    : React.PropTypes.string,
-            message    : React.PropTypes.string,
-            percentage : React.PropTypes.number,
-            hasStop    : React.PropTypes.object,
-            onStop     : React.PropTypes.func,
-            onFinished : React.PropTypes.func
+            type       : PropTypes.oneOf(acceptableTypes),
+            isOpen     : PropTypes.bool,
+            lang       : PropTypes.object,
+            caption    : PropTypes.string,
+            message    : PropTypes.string,
+            percentage : PropTypes.number,
+            hasStop    : PropTypes.bool,
+            onStop     : PropTypes.func,
+            onFinished : PropTypes.func
         },
 
         getDefaultProps: function () {

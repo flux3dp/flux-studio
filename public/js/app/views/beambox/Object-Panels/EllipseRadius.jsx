@@ -1,19 +1,20 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
     'app/actions/beambox/constant',
-], function($, React, FnWrapper, UnitInput, i18n, Constant) {
+], function($, React, PropTypes, FnWrapper, UnitInput, i18n, Constant) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
     
     return React.createClass({
         propTypes: {
-            rx: React.PropTypes.number.isRequired,
-            ry: React.PropTypes.number.isRequired
+            rx: PropTypes.number.isRequired,
+            ry: PropTypes.number.isRequired
         },
 
         getInitialState: function() {

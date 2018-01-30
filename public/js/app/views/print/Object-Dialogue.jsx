@@ -1,8 +1,9 @@
 define([
     'react',
+    'reactPropTypes',
     'plugins/classnames/index',
     'jsx!widgets/Unit-Input'
-], function(React, ClassNames, UnitInput) {
+], function(React, PropTypes, ClassNames, UnitInput) {
     'use strict';
 
     var refSize,
@@ -17,18 +18,18 @@ define([
 
     return React.createClass({
         propTypes: {
-            lang            : React.PropTypes.object,
-            model           : React.PropTypes.object,
-            mode            : React.PropTypes.string,
-            scaleLocked     : React.PropTypes.bool,
-            onRotate        : React.PropTypes.func,
-            onScale         : React.PropTypes.func,
-            onScaleLock     : React.PropTypes.func,
-            onResize        : React.PropTypes.func,
-            onFocus         : React.PropTypes.func,
-            onModeChange    : React.PropTypes.func,
-            isTransforming  : React.PropTypes.bool,
-            style           : React.PropTypes.object
+            lang            : PropTypes.object,
+            model           : PropTypes.object,
+            mode            : PropTypes.string,
+            scaleLocked     : PropTypes.bool,
+            onRotate        : PropTypes.func,
+            onScale         : PropTypes.func,
+            onScaleLock     : PropTypes.func,
+            onResize        : PropTypes.func,
+            onFocus         : PropTypes.func,
+            onModeChange    : PropTypes.func,
+            isTransforming  : PropTypes.bool,
+            style           : PropTypes.object
         },
 
         getInitialState: function() {

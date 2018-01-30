@@ -1,6 +1,8 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
+    'reactPropTypes',
     'helpers/i18n',
     'helpers/shortcuts',
     'jsx!widgets/Modal',
@@ -14,6 +16,8 @@ define([
 ], function(
     $,
     React,
+    ReactDOM,
+    PropTypes,
     i18n,
     shortcuts,
     Modal,
@@ -42,10 +46,10 @@ define([
         View = React.createClass({
 
             propTypes: {
-                open    : React.PropTypes.bool,
-                device  : React.PropTypes.object,
-                src     : React.PropTypes.string,
-                onClose : React.PropTypes.func
+                open    : PropTypes.bool,
+                device  : PropTypes.object,
+                src     : PropTypes.string,
+                onClose : PropTypes.func
             },
 
             getDefaultProps: function() {
@@ -284,7 +288,7 @@ define([
 
             _onClose: function(e) {
                 this.props.onClose(e);
-                React.unmountComponentAtNode(this.refs.modal.getDOMNode().parentNode);
+                React.unmountComponentAtNode(ReactDOM.findDOMNode(this.refs.modal).parentNode);
             },
 
             _next: function(nextStep, type) {

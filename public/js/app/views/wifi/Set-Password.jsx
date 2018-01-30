@@ -1,16 +1,17 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'helpers/i18n'
-], function($, React, i18n, localStorage) {
+], function($, React, PropTypes, i18n, localStorage) {
     'use strict';
 
     return React.createClass({
         getDefaultProps: function() {
             return {
-                onJoin: React.PropTypes.func,
-                onBack: React.PropTypes.func,
-                wifiName: React.PropTypes.string
+                onJoin: PropTypes.func,
+                onBack: PropTypes.func,
+                wifiName: PropTypes.string
             };
         },
         getInitialState: function() {

@@ -840,6 +840,7 @@ define([
 
                         return (
                             <li
+                                key={device.uuid}
                                 name={device.uuid}
                                 onClick={this._handleSelectDevice.bind(null, device)}
                                 data-test-key={device.serial}
@@ -860,11 +861,11 @@ define([
                 list = (
                     0 < options.length
                     ? options :
-                    [<div className="spinner-roller spinner-roller-reverse"/>]
+                    [<div key="spinner-roller" className="spinner-roller spinner-roller-reverse"/>]
                 );
 
                 return (
-                    <ul>{list}</ul>
+                    <ul key={Math.random()}>{list}</ul>
                 );
             },
 
@@ -887,7 +888,7 @@ define([
 
                 return (
                     <div className={ClassNames(topClass)}>
-                        <div className="brand-logo" onContextMenu={this._handleContextMenu.bind(this)}>
+                        <div className="brand-logo" onContextMenu={this._handleContextMenu}>
                             <img className="logo-icon" src="img/menu/main_logo.svg" draggable="false"/>
                             <span className="func-name">{currentWorkingFunction.displayName}</span>
                             <div className="menu">

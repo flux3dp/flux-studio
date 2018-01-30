@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'jsx!views/miller/Setup-Panel',
     'jsx!pages/Holder',
     'helpers/api/config',
@@ -8,6 +9,7 @@ define([
 ], function(
     $,
     React,
+    PropTypes,
     MillSetupPanel,
     HolderGenerator,
     ConfigHelper,
@@ -27,7 +29,7 @@ define([
         let view = React.createClass({
                 getDefaultProps: function() {
                     return {
-                        page: React.PropTypes.string
+                        page: PropTypes.string
                     };
                 },
 

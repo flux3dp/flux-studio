@@ -1,17 +1,19 @@
 define([
     'react',
-], function(React) {
+    'reactPropTypes',
+    'reactClassset'
+], function(React, PropTypes, ReactCx) {
     'use strict';
 
     return React.createClass({
             ESTIMATED_STEP: 10,
 
             propTypes: {
-                lang: React.PropTypes.object,
-                percentage: React.PropTypes.number,
-                remainingTime: React.PropTypes.number,
-                currentSteps: React.PropTypes.number,
-                onStop: React.PropTypes.func
+                lang: PropTypes.object,
+                percentage: PropTypes.number,
+                remainingTime: PropTypes.number,
+                currentSteps: PropTypes.number,
+                onStop: PropTypes.func
             },
 
             getDefaultProps: function() {
@@ -65,8 +67,7 @@ define([
                         lang.scan.remaining_time :
                         ''
                     ),
-                    cx = React.addons.classSet,
-                    stopButtonClasses = cx({
+                    stopButtonClasses = ReactCx.cx({
                         'btn': true,
                         'btn-hexagon': true,
                         'btn-stop-scan': true,
@@ -96,7 +97,6 @@ define([
             render : function() {
                 var lang = this.props.lang,
                     isFinish = (100 <= this.props.percentage),
-                    cx = React.addons.classSet,
                     className = {
                         'scan-progress': true,
                         'hide': true === this.state.stop
@@ -108,7 +108,7 @@ define([
                     );
 
                 return (
-                    <div className={cx(className)}>
+                    <div className={ReactCx.cx(className)}>
                         {content}
                     </div>
                 );
