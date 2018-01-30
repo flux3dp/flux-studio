@@ -1,6 +1,7 @@
 module.exports = {
     'en': {
         preferences: 'Preferences',
+        reload_app: 'Reload App',
         file: 'File',
         edit: 'Edit',
         help: 'Help',
@@ -59,6 +60,7 @@ module.exports = {
     },
     'zh-tw': {
         preferences: '偏好設定',
+        reload_app: '重新整理',
         file: '檔案',
         edit: '編輯',
         help: '說明',
