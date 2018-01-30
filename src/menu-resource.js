@@ -1,7 +1,15 @@
 module.exports = {
     'en': {
         preferences: 'Preferences',
+        about: 'About FLUX Studio',
+        hide: 'Hide FLUX Studio',
+        hideothers: 'Hide Others',
+        service: 'Services',
         reload_app: 'Reload App',
+        quit: 'Quit',
+        window: 'Window',
+        minimize: 'Minimize',
+        close: 'Close Window',
         file: 'File',
         edit: 'Edit',
         help: 'Help',
@@ -19,7 +27,7 @@ module.exports = {
         add_new_machine: 'Machine Setup',
         help_center: 'Help Center',
         contact: 'Contact Us',
-        tutorial: 'Start Printing Tutorial',
+        tutorial: 'Start Delta Family Printing Tutorial',
         forum: 'Community Forum',
         software_update: 'Software Update',
         bug_report: 'Bug Report',
@@ -47,20 +55,28 @@ module.exports = {
         download_log_canceled: 'Log download canceled',
         download_log_error: 'Unknown error occurred, please try it again later',
         log: {
-          network: 'Network',
-          hardware: 'Hardware',
-          discover: 'Discover',
-          usb: 'USB',
-          camera: 'Camera',
-          cloud: 'Cloud',
-          player: 'Player',
-          robot: 'robot'
+            network: 'Network',
+            hardware: 'Hardware',
+            discover: 'Discover',
+            usb: 'USB',
+            camera: 'Camera',
+            cloud: 'Cloud',
+            player: 'Player',
+            robot: 'robot'
         }
 
     },
     'zh-tw': {
         preferences: '偏好設定',
+        about: '關於 FLUX Studio',
+        hide: '隱藏 FLUX Studio',
+        hideothers: '隱藏其他',
+        service: '服務',
         reload_app: '重新整理',
+        quit: '離開',
+        window: '視窗',
+        minimize: '最小化',
+        close: '關閉視窗',
         file: '檔案',
         edit: '編輯',
         help: '說明',
@@ -78,7 +94,7 @@ module.exports = {
         add_new_machine: '新增或設定機器',
         help_center: '說明中心',
         contact: '聯絡我們',
-        tutorial: '列印教學',
+        tutorial: 'Delta Family 列印教學',
         forum: '社群論壇',
         software_update: '軟體更新',
         bug_report: '錯誤回報',
@@ -106,14 +122,14 @@ module.exports = {
         download_log_canceled: '取消日誌下載',
         download_log_error: '不明錯誤發生，請稍候再試一次',
         log: {
-          network: 'Network',
-          hardware: 'Hardware',
-          discover: 'Discover',
-          usb: 'USB',
-          camera: 'Camera',
-          cloud: 'Cloud',
-          player: 'Player',
-          robot: 'robot'
+            network: 'Network',
+            hardware: 'Hardware',
+            discover: 'Discover',
+            usb: 'USB',
+            camera: 'Camera',
+            cloud: 'Cloud',
+            player: 'Player',
+            robot: 'robot'
         }
     }
 };

@@ -9,16 +9,16 @@ function _buildOSXAppMenu(callback) {
     return {
         label: 'FLUX Studio',
         submenu: [
-            { label: 'About FLUX Studio', role: 'about'},
+            { label: r.about, role: 'about'},
             { id: 'PREFERENCE',  label: r.preferences, accelerator: 'Cmd+,', click: callback },
             { type: 'separator' },
-            { role: 'services', submenu: [] },
+            { label: r.service, role: 'services', submenu: [] },
             { type: 'separator' },
-            { label: 'Hide', role: 'hide' },
-            { role: 'hideothers' },
+            { label: r.hide, role: 'hide' },
+            { label: r.hideothers, role: 'hideothers' },
             { type: 'separator' },
             { id: 'RELOAD_APP' ,label: r.reload_app, accelerator: 'Cmd+R', click: callback},
-            { label: 'Quit', role: 'quit'}
+            { label: r.quit, role: 'quit'}
         ]
     };
 }
@@ -107,10 +107,11 @@ function buildMenu(callback) {
 
     if(process.platform === 'darwin') {
         menu.push({
+            label: r.window,
             role: 'window',
             submenu: [
-                {role: 'minimize'},
-                {role: 'close'}
+                {label: r.minimize,role: 'minimize'},
+                {label: r.close, role: 'close'}
             ]
         });
     }
