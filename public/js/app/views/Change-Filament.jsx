@@ -285,7 +285,7 @@ define([
 
             _onClose: function (e) {
                 this.props.onClose(e);
-                React.unmountComponentAtNode(ReactDOM.findDOMNode(this.refs.modal).parentNode);
+                ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.refs.modal).parentNode);
             },
 
             _next: function (nextStep, type) {

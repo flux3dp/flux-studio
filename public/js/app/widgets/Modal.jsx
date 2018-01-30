@@ -1,12 +1,12 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
     'reactPropTypes',
     'reactClassset',
     'helpers/shortcuts',
     'reactCreateReactClass'
-], function($, React, PropTypes, ReactCx, shortcuts) {
-    'use strict';
+], function($, React, ReactDOM, PropTypes, ReactCx, shortcuts) {
 
     var View = React.createClass({
 
@@ -53,7 +53,7 @@ define([
         },
 
         _onClose: function(e) {
-            React.unmountComponentAtNode(View);
+            ReactDOM.unmountComponentAtNode(View);
             this.props.onClose(e);
         },
 
