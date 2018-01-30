@@ -640,37 +640,29 @@ define([
     function changeFilament(type, flexible) {
         _stopChangingFilament = false;
         let d = $.Deferred();
-        SocketMaster.addTask('enterMaintainMode').then(() => {
-            if (!_stopChangingFilament) {
-                return SocketMaster.addTask('maintainHome');
-            }
-        })
-            .then(() => {
-                if (!_stopChangingFilament) {
-                    return SocketMaster.addTask('changeFilament', type, flexible);
-                }
-            })
-            .then(() => {
-                if (_stopChangingFilament) {
-                    d.reject({ error: ['CANCEL'] });
-                    _stopChangingFilamentCallback();
-                }
-                else {
-                    d.resolve();
-                }
-            })
-            .progress((response) => {
-                if (_stopChangingFilament) {
-                    _stopChangingFilamentCallback();
-                }
-                else {
-                    d.notify(response);
-                }
-            })
-            .fail((response) => {
-                d.reject(response);
-            });
 
+        //so ugly ~~~~~~~~~~
+        (async function(){
+            await SocketMaster.addTask('enterMaintainMode');
+            if (!_stopChangingFilament) {
+                await SocketMaster.addTask('maintainHome');
+            }
+            if (!_stopChangingFilament) {
+                await SocketMaster.addTask('changeFilament', type, flexible).progress((response) => {
+                    if (!_stopChangingFilament) {
+                        d.notify(response);
+                    } else {
+                        _stopChangingFilamentCallback();
+                    }
+                });
+            }
+            if (!_stopChangingFilament) {
+                d.resolve();
+            } else {
+                d.reject({ error: ['CANCEL'] });
+                _stopChangingFilamentCallback();
+            }
+        })().catch(response => d.reject(response));
         return d.promise();
     }
 
