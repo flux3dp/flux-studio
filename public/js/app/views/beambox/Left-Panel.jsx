@@ -27,37 +27,39 @@ define([
     ConfigHelper,
     i18n
 ) {
-    'use strict';
 
     const Config = ConfigHelper();
     const LANG = i18n.lang.beambox.left_panel;
 
-    return React.createClass({
+    class LeftPanel extends React.Component {
 
-        getInitialState: function() {
-            return {
+        constructor() {
+            super();
+            this.state = {
                 isPreviewMode: false,
                 isPrinterSelectorOpen: false
             };
-        },
-        _handlePreviewClick: function() {
+
+            this._handlePreviewClick = this._handlePreviewClick.bind(this);
+        }
+        _handlePreviewClick() {
             const __tooglePrinterSelector = () => {
                 if(this.state.isPrinterSelectorOpen) {
                     this.setState({isPrinterSelectorOpen: false});
                 } else {
                     this.setState({isPrinterSelectorOpen: true});
                 }
-            }
+            };
             const __endPreviewMode = () => {
                 try {
                     PreviewModeController.end();
                 } catch (error) {
-                    console.log(error);                    
+                    console.log(error);
                 } finally {
                     FnWrapper.useSelectTool();
                     this.setState({isPreviewMode: false});
                 }
-            }
+            };
             const __remindCalibrateOnce = () => {
                 AlertActions.showPopupInfo('what-is-this-parameter-for?', LANG.suggest_calibrate_camera_first);
                 Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
@@ -74,8 +76,8 @@ define([
             else {
                 __endPreviewMode();
             }
-        },
-        _renderInsertObject: function() {
+        }
+        _renderInsertObject() {
             return {
                 label: (
                     <div onClick={FnWrapper.useSelectTool}>
@@ -87,9 +89,9 @@ define([
                 ),
                 disable: false
             };
-        },
+        }
 
-        _renderPreview: function() {
+        _renderPreview() {
             return {
                 label: (
                     <div onClick={this._handlePreviewClick}>
@@ -101,9 +103,9 @@ define([
                     'preview-mode-on': this.state.isPreviewMode
                 }
             };
-        },
+        }
 
-        _startPreviewMode: async function(auth_printer) {
+        async _startPreviewMode(auth_printer) {
             const errorCallback = (errMessage) => {
                 AlertActions.showPopupError('menu-item', errMessage);
                 this.setState({ isPreviewMode: false });
@@ -113,18 +115,18 @@ define([
             $(workarea).css('cursor', 'wait');
 
             try {
-                await PreviewModeController.start(auth_printer, errorCallback)
+                await PreviewModeController.start(auth_printer, errorCallback);
                 this.setState({ isPreviewMode: true });
                 $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
-                
+
             } catch (error) {
                 console.log(error);
                 AlertActions.showPopupError('menu-item', error);
                 FnWrapper.useSelectTool();
             }
-        },
+        }
 
-        _renderPrinterSelecter: function() {
+        _renderPrinterSelecter() {
             const __onGettingPrinter = async (auth_printer) => {
                 if(await BeamboxVersionMaster.isUnusableVersion(auth_printer)) {
                     AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
@@ -133,10 +135,10 @@ define([
                     __closePrinterSelector();
                     this._startPreviewMode(auth_printer);
                 }
-            }
+            };
             const __onClose = () => {
                 __closePrinterSelector();
-            }
+            };
 
             const __closePrinterSelector = () => {
                 this.setState({ isPrinterSelectorOpen: false });
@@ -157,13 +159,13 @@ define([
             return (
                 <Modal content={content} onClose={__onClose}/>
             );
-        },
+        }
 
-        render: function() {
+        render() {
             let items = [
-                    this._renderInsertObject(),
-                    this._renderPreview(),
-                ];
+                this._renderInsertObject(),
+                this._renderPreview(),
+            ];
             const printerSelecter = (this.state.isPrinterSelectorOpen)?this._renderPrinterSelecter():'';
 
             return (
@@ -173,6 +175,6 @@ define([
                 </div>
             );
         }
-
-    });
+    }
+    return LeftPanel;
 });
