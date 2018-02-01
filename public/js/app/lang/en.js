@@ -1453,7 +1453,8 @@ define(function() {
             USED                : 'Used',
             HARDWARE_VERSION    : 'Hardware Version',
             FOCAL_LENGTH        : 'Focal Length',
-            hours               : 'Hours'
+            hours               : 'Hours',
+            cannot_get_info     : 'Toolhead type is unreadable'
         }
     };
 });

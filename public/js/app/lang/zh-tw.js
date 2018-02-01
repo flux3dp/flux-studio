@@ -1452,7 +1452,8 @@ define(function() {
             USED                : '使用時間',
             HARDWARE_VERSION    : '硬體版本',
             FOCAL_LENGTH        : '焦距調整',
-            hour                : '小時'
+            hours               : '小時',
+            cannot_get_info     : '無法讀取工具頭資訊'
         }
     };
 });

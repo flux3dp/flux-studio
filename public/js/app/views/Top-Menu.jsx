@@ -346,60 +346,57 @@ define([
                     AlertActions.showPopupInfo('', info);
                 };
 
-                _action['TOOLHEAD_INFO'] = (device) => {
-                    DeviceMaster.selectDevice(device).then(function(status) {
-                        if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                _action['TOOLHEAD_INFO'] = async (device) => {
+                    const status = await DeviceMaster.selectDevice(device);
+                    if (status === DeviceConstants.TIMEOUT) {
+                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        return;
+                    }
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
+                    await checkDeviceStatus(device);
+                    await DeviceMaster.enterMaintainMode();
+                    const info = await DeviceMaster.headInfo();
+                    ProgressActions.close();
+                    DeviceMaster.endMaintainMode();
+
+                    const headModule = info.head_module;
+
+                    if (headModule === null) {
+                        AlertActions.showPopupInfo('', lang.head_info.cannot_get_info);
+                        return;
+                    }
+
+                    let fields = ['ID', 'VERSION', 'HEAD_MODULE', 'USED'];
+                    if (headModule === 'LASER') {
+                        fields.push('FOCAL_LENGTH');
+                    }
+
+                    let displayInfo = fields.map(field => {
+                        let k = info[field];
+                        if(field.toUpperCase() === 'HEAD_MODULE') {
+                            k = lang.head_info[info[field.toLowerCase()]];
                         }
-                        else {
-                            ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
-                            checkDeviceStatus(device)
-                            .then(() => {
-                                DeviceMaster.enterMaintainMode().then(() => {
-                                    DeviceMaster.headInfo().then(info => {
-                                        ProgressActions.close();
-                                        DeviceMaster.endMaintainMode();
-
-                                        let fields = ['ID', 'VERSION', 'HEAD_MODULE', 'USED', 'HARDWARE_VERSION', 'FOCAL_LENGTH'];
-
-                                        let displayInfo = fields.map(field => {
-                                            let k = info[field];
-                                            if(field.toUpperCase() === 'HEAD_MODULE') {
-                                                k = lang.head_info[info[field.toLowerCase()]];
-                                            }
-                                            else if(field === 'USED') {
-                                                k = `${parseInt(info[field] / 60)} ${lang.head_info.hours}`;
-                                            }
-                                            return `${lang.head_info[field]}: ${k}`;
-                                        });
-
-                                        // remove focal length if it's not laser
-                                        if(info.head_module === 'EXTRUDER') {
-                                            displayInfo.splice(5, 1);
-                                        }
-                                        else if(info.head_module === 'LASER') {
-                                            displayInfo.splice(4, 1);
-                                        }
-
-                                        AlertActions.showPopupInfo('', displayInfo.join('\n'));
-                                    });
-                                });
-                            });
+                        else if(field === 'USED') {
+                            k = `${parseInt(info[field] / 60)} ${lang.head_info.hours}`;
                         }
+                        return `${lang.head_info[field]}:  ${k}`;
                     });
+
+
+                    AlertActions.showPopupInfo('', displayInfo.join('\n'));
                 };
 
                 _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
                     ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
                     DeviceMaster.select(device)
-                    .done(() => {
-                        ProgressActions.close();
-                        AlertActions.showCameraCalibration(device);
-                    })
-                    .fail(() => {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                    });
+                        .done(() => {
+                            ProgressActions.close();
+                            AlertActions.showCameraCalibration(device);
+                        })
+                        .fail(() => {
+                            ProgressActions.close();
+                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
+                        });
                 };
 
                 _action['CHANGE_FILAMENT'] = (device) => {

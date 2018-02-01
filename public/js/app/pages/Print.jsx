@@ -33,7 +33,6 @@ define([
     'helpers/local-storage',
     'helpers/api/cloud',
     'helpers/i18n',
-    'helpers/check-device-status',
     'app/tutorial-steps',
     'helpers/slicer-settings',
     'helpers/get-device'
@@ -72,7 +71,6 @@ define([
     LocalStorage,
     CloudApi,
     i18n,
-    CheckDeviceStatus,
     TutorialSteps,
     SlicerSettings,
     GetDevice
