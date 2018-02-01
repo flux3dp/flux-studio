@@ -4120,7 +4120,7 @@ define([
                         $('#ruler_x')[0].scrollLeft = workarea[0].scrollLeft;
                     }
                     if ($('#ruler_y').length !== 0) {
-                        $('#ruler_y')[0].scrollTop = workarea[0].scrollTop;
+                        $('#ruler_y')[0].scrollTop = workarea[0].scrollTop - workarea[0].offsetTop;
                     }
                 });
 

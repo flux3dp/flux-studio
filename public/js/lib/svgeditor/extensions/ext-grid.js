@@ -119,22 +119,12 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		ctx.lineTo(0, cur_d);
 		ctx.stroke();
 
-		function updateBackground() {
-			hcanvas.toBlob((blob) => {
-				var newGridUri = URL.createObjectURL(blob);
-				svgCanvas.setHref(gridimg, newGridUri);
-				if (gridUri) {
-					URL.revokeObjectURL(gridUri);
-				}
-				gridUri = newGridUri;
-			});	
-		}
-		
 		gridimg.setAttribute('width', big_int);
 		gridimg.setAttribute('height', big_int);
 		gridimg.parentNode.setAttribute('width', big_int);
 		gridimg.parentNode.setAttribute('height', big_int);
-		updateBackground();
+        svgCanvas.setHref(gridimg, hcanvas.toDataURL('image/png'));
+
 	}
 
 	function gridUpdate () {
