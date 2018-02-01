@@ -18,11 +18,42 @@
                 div {
                     pointer-events: visible;
                 }
-                &.preview-mode-on {
-                    background: #444;
-                    color: #E0E0DF;
+                &.preview-btns {
+                    cursor: auto;
+                    padding: 0px;
+                    overflow: visible; //hack to put clear-preview button
+                    &:hover {
+                        color: #888;
+                        background-color: unset;
+                    }
+                    .preview-btn, .clear-preview {
+                        cursor: pointer;
+                        &.preview-btn {
+                            padding: 10px 6px;
+                            &:hover {
+                                background: #888;
+                                color: #E0E0DF;
+                            }
+                            &.preview-mode-on {
+                                background: #444;
+                                color: #E0E0DF;
+                            }
+                        }
+                        &.clear-preview {
+                            position: relative;
+                            left: 5px;
+                            color: #888;
+                            &:hover {
+                                cursor: pointer;
+                                color: #333;
+                                font-size: bold;
+                            }
+                        }
+                    }
+
                 }
             }
+
             .dialog-window {
                 pointer-events: visible;
                 .slider {
