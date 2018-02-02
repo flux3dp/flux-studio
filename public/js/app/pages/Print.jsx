@@ -704,7 +704,7 @@ define([
                 _handleDeviceSelected: function(printer) {
                     if (printer == "export_fcode") {
                         if(director.getModelCount() !== 0) {
-                            director.downloadFCode().then(function() {
+                            director.downloadFCode().then(() => {
                                 this.setState({ openWaitWindow: false });
                             });
                         }

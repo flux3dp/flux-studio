@@ -99,10 +99,10 @@ define([
             }
         }
         onSceneImport() {
-            this.enableMenuItems(["CLEAR_SCENE"]);
+            this.enableMenuItems(["CLEAR_SCENE", "SAVE_SCENE", "EXPORT_FLUX_TASK"]);
         }
         onSceneClear() {
-            this.disableMenuItems(["CLEAR_SCENE"]);
+            this.disableMenuItems(["CLEAR_SCENE", "SAVE_SCENE", "EXPORT_FLUX_TASK"]);
         }
     }
 
@@ -387,6 +387,7 @@ define([
 
             uploadStl(mesh.uuid, file, ext).then(() => {
                 addToScene();
+                globalInteraction.onSceneImport();
                 callback();
             }).progress((steps, total) => {
                 console.log(steps, total);

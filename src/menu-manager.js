@@ -121,13 +121,13 @@ function buildMenu(callback) {
         label: r.help || 'Help',
         role: 'help',
         submenu: [
-            { id: 'HELP_CENTER', label: r.help_center || 'Help Center', click() { shell.openExternal('http://helpcenter.flux3dp.com/'); } },
-            { id: 'CONTACT_US', label: r.contact || 'Contact Us', click() { shell.openExternal('http://flux3dp.zendesk.com/hc/en-us/requests/new'); } },
+            { id: 'HELP_CENTER', label: r.help_center || 'Help Center', click() { shell.openExternal(r.link.help_center); } },
+            { id: 'CONTACT_US', label: r.contact || 'Contact Us', click() { shell.openExternal(r.link.contact_us); } },
             { type: 'separator' },
             { id: 'TUTORIAL', label: r.tutorial || 'Tutorial', click: callback },
-            { id: 'FORUM', label: r.forum || 'Forum', click() { shell.openExternal('http://forum.flux3dp.com/'); } },
+            { id: 'FORUM', label: r.forum || 'Forum', click() { shell.openExternal(r.link.forum); } },
             { type: 'separator' },
-            { id: 'SOFTWARE_UPDATE', label: r.software_update || 'Software Update', click() { shell.openExternal('http://flux3dp.com/downloads/'); } },
+            { id: 'SOFTWARE_UPDATE', label: r.software_update || 'Software Update', click() { shell.openExternal(r.link.downloads); } },
             { id: 'BUG_REPORT', label: r.bug_report || 'Bug Report', click: callback }
         ]
     });
