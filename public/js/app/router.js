@@ -4,15 +4,14 @@ define([
     'helpers/i18n',
     'jquery',
     'backbone',
-    'helpers/display',
     'helpers/api/config',
     'app/app-settings',
     'helpers/detect-webgl',
 ],
-function(React, ReactDOM, i18n, $, Backbone, display, config, appSettings, detectWebgl) {
-    'use strict';
+function(React, ReactDOM, i18n, $, Backbone, config, appSettings, detectWebgl) {
 
-    var _display = function(view, args) {
+    const _display = function(view, args, el) {
+        el = el || $('section.content')[0];
         args = args || {};
         args.props = args.props || {};
         args.state = args.state || {};
@@ -20,7 +19,7 @@ function(React, ReactDOM, i18n, $, Backbone, display, config, appSettings, detec
         args.state.lang = i18n.get();
         // Shpuldn;t pass props and state using args.
         const component = React.createElement(view(args), args.props);
-        ReactDOM.render(component, $('section.content')[0]);
+        ReactDOM.render(component, el);
     };
 
     return Backbone.Router.extend({
@@ -102,14 +101,14 @@ function(React, ReactDOM, i18n, $, Backbone, display, config, appSettings, detec
 
         appendNotificationCollection: function() {
             requirejs(['jsx!views/Notification-Collection'], function(view) {
-                display(view, {}, $('.notification')[0]);
+                _display(view, {}, $('.notification')[0]);
             });
         },
 
         appendSideBar: function(show) {
             show = ('boolean' === typeof show ? show : true);
             requirejs(['jsx!views/Top-Menu'], function(view) {
-                display(view, {
+                _display(view, {
                     props: {
                         show: show
                     }
