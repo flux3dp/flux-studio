@@ -7,12 +7,10 @@ define([
     'use strict';
 
     return React.createClass({
-        getDefaultProps: function() {
-            return {
-                onJoin: PropTypes.func,
-                onBack: PropTypes.func,
-                wifiName: PropTypes.string
-            };
+        PropTypes: {
+            onJoin: PropTypes.func,
+            onBack: PropTypes.func,
+            wifiName: PropTypes.string
         },
         getInitialState: function() {
             return {

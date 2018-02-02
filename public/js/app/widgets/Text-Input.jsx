@@ -23,10 +23,8 @@ define([
             );
         },
 
-        getDefaultProps: function() {
-            return {
-                defaultValue: PropTypes.string
-            };
+        propTypes: {
+            defaultValue: PropTypes.string
         }
     });
 });

@@ -36,15 +36,13 @@ define([
 
     return React.createClass({
 
-        getDefaultProps: function() {
-            return {
-                lang: PropTypes.object,
-                defaultMaterial: PropTypes.object,
-                onLoadPreset: PropTypes.func,
-                onClose: PropTypes.func,
-                onSave: PropTypes.func,
-                onDone : PropTypes.func
-            };
+        PropTypes: {
+            lang: PropTypes.object,
+            defaultMaterial: PropTypes.object,
+            onLoadPreset: PropTypes.func,
+            onClose: PropTypes.func,
+            onSave: PropTypes.func,
+            onDone : PropTypes.func
         },
 
         getInitialState: function() {

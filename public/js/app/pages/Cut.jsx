@@ -27,10 +27,8 @@ define([
         let Holder = HolderGenerator(args);
 
         let view = React.createClass({
-                getDefaultProps: function() {
-                    return {
-                        page: PropTypes.string
-                    };
+                propTypes: {
+                    page: PropTypes.string
                 },
 
                 getInitialState: function() {

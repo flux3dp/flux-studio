@@ -8,8 +8,11 @@ define(['react', 'reactPropTypes'], function(React, PropTypes){
         getDefaultProps: function(){
             return {
                 multiple: false,
-                onChange: PropTypes.func
             };
+        },
+
+        PropTypes: {
+            onChange: PropTypes.func
         },
 
         render: function() {

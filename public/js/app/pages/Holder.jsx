@@ -83,10 +83,8 @@ define([
         let globalInteraction = new HolderGlobalInteraction();
 
         let view = React.createClass({
-                getDefaultProps: function() {
-                    return {
-                        page: PropTypes.string
-                    };
+                PropTypes: {
+                    page: PropTypes.string
                 },
 
                 getInitialState: function() {

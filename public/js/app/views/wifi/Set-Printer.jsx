@@ -9,10 +9,8 @@ define([
     'use strict';
 
     return React.createClass({
-        getDefaultProps: function() {
-            return {
-                onSetPrinter: PropTypes.func
-            };
+        PropTypes: {
+            onSetPrinter: PropTypes.func
         },
 
         getInitialState: function() {
