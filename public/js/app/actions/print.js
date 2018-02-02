@@ -1,6 +1,5 @@
 define([
     'jquery',
-    'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/fcode-reader',
@@ -35,7 +34,6 @@ define([
     'helpers/object-assign',
 ], function(
     $,
-    display,
     websocket,
     printSlicing,
     fcodeReader,

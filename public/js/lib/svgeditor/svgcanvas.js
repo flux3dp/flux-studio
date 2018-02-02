@@ -5278,7 +5278,11 @@ define([
                     'mm': 10,
                     'px': svgUnitScaling,
                 };
-                if (!isNaN(val)) {return val-0;}
+
+                if (!isNaN(val)) {
+                    return val * unitMap['px'];
+                }
+
                 const unit = val.substr(-2);
                 const num = val.substr(0, val.length-2);
                 if(!unitMap[unit]) {
