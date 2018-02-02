@@ -1,7 +1,5 @@
 define([
     'react',
-    'reactDOM',
-    'helpers/i18n',
     'jquery',
     'backbone',
     'helpers/display',
@@ -9,18 +7,16 @@ define([
     'app/app-settings',
     'helpers/detect-webgl',
 ],
-function(React, ReactDOM, i18n, $, Backbone, display, config, appSettings, detectWebgl) {
+function(React, $, Backbone, display, config, appSettings, detectWebgl) {
     'use strict';
 
-    var _display = function(view, args) {
+    var _display = function(view, args, el) {
         args = args || {};
-        args.props = args.props || {};
-        args.state = args.state || {};
+        el = el || $('.content')[0];
 
-        args.state.lang = i18n.get();
-        // Shpuldn;t pass props and state using args.
-        const component = React.createElement(view(args), args.props);
-        ReactDOM.render(component, $('section.content')[0]);
+        // WARNING: this function includes GLOBAL LIVE EVENTS.
+        // DO NOT use non-uniqle selector here (e.g. class, tag name, attribute...etc.)
+        display(view, args, el);
     };
 
     return Backbone.Router.extend({
