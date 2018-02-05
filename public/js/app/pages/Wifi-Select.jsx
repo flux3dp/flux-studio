@@ -482,7 +482,7 @@ define([
                                     placeholder=""
                                     defaultValue=""
                                     required={true}
-                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]{8,}$"
+                                    pattern="^.{8,}$"
                                     title={lang.initialize.set_machine_generic.ap_mode_pass_format}
                                     placeholder={lang.initialize.set_machine_generic.ap_mode_pass_placeholder}
                                     onChange={self._checkApModeSetting}
@@ -546,7 +546,7 @@ define([
                                     type="password"
                                     className={passClass}
                                     required={true}
-                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]{8,}$"
+                                    pattern="^.{8,}$"
                                 />
                             </label>
                             <label className="h-control">
