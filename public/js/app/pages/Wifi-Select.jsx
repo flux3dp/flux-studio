@@ -464,7 +464,7 @@ define([
                                     defaultValue={self.state.settingPrinter.name}
                                     autoFocus={true}
                                     required={true}
-                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]+$"
+                                    pattern="^.+$"
                                     maxLength="32"
                                     title={lang.initialize.set_machine_generic.ap_mode_name_format}
                                     placeholder={lang.initialize.set_machine_generic.ap_mode_name_placeholder}
@@ -533,7 +533,7 @@ define([
                                     className={nameClass}
                                     autoFocus={true}
                                     required={true}
-                                    pattern="^[a-zA-Z0-9_! \-\.\,\[\]\(\)]+$"
+                                    pattern="^.+$"
                                     maxLength="32"
                                 />
                             </label>
