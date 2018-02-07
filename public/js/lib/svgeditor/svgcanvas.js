@@ -5258,7 +5258,9 @@ define([
                 if (hex === 'NaN') {
                     hex = '0';
                 }
-                hex = hex.padStart(6, '0'); // pad zero
+                while (hex.length < 6) {
+                    hex = '0' + hex;
+                }
                 return '#' + hex.toUpperCase(); // ex: #0A23C5
             }
             function setDataXform(use_el) {
