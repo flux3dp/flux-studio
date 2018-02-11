@@ -4028,7 +4028,7 @@ define([
             while (i--) {
                 var defelem = defelems[i];
                 var id = defelem.id;
-                if (defelem_uses.indexOf(id) < 0) {
+                if ( id && defelem_uses.indexOf(id) < 0) {
                     // Not found, so remove (but remember)
                     removedElements[id] = defelem;
                     defelem.parentNode.removeChild(defelem);
@@ -4047,7 +4047,6 @@ define([
         this.svgCanvasToString = function () {
             // keep calling it until there are none to remove
             while (removeUnusedDefElems() > 0) {}
-
             pathActions.clear(true);
 
             // Keep SVG-Edit comment on top
