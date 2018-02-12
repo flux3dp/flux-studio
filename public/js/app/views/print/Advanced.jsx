@@ -82,22 +82,6 @@ define([
 
         componentWillMount: function() {
             lang = this.props.lang.print.advanced;
-            slic3rInfill = [
-                { label: lang.rectilinear, value: 'rectilinear' },
-                { label: lang.line, value: 'line' },
-                { label: lang.honeycomb, value: 'honeycomb' }
-            ];
-            slic3rSupport = [
-                { label: lang.rectilinearGrid, value: 'rectilinear-grid' },
-                { label: lang.rectilinear, value: 'rectilinear' },
-                { label: lang.honeycomb, value: 'honeycomb' }
-            ];
-            curaInfill = [
-                { label: lang.curaInfill.automatic, value: 'AUTOMATIC' },
-                { label: lang.curaInfill.grid, value: 'GRID' },
-                { label: lang.curaInfill.lines, value: 'LINES' },
-                { label: lang.curaInfill.concentric, value: 'CONCENTRIC' }
-            ];
             cura2Infill = [
                 { label: lang.curaInfill.automatic, value: 'AUTOMATIC' },
                 { label: lang.curaInfill.grid, value: 'GRID' },
@@ -110,10 +94,6 @@ define([
                 { label: lang.curaInfill.triangles, value: 'TRIANGLES' },
                 { label: lang.curaInfill.zigzag, value: 'ZIGZAG' },
             ];
-            curaSupport = [
-                { label: lang.curaSupport.grid, value: 'GRID' },
-                { label: lang.curaSupport.lines, value: 'LINES' }
-            ];
             cura2Support = [
                 { label: lang.curaSupport.grid, value: 'GRID' },
                 { label: lang.curaSupport.lines, value: 'LINES' },
@@ -122,7 +102,7 @@ define([
             advancedSetting.engine = this.props.setting.engine;
             advancedSetting.load(this.props.setting, true);
 
-            this._updateCustomField();
+            this.setState({ configStr: advancedSetting.getConfigStr() });
         },
 
         _createState: function(key, value) {
@@ -143,13 +123,6 @@ define([
                 max = parseInt(this.refs[key].getDOMNode().max);
 
             return min <= value && value <= max;
-        },
-
-        _updateCustomField: function() {
-            // console.log('updating custom', this.state.custom, this.state.customCura2);
-            this.setState({
-                configStr: advancedSetting.getConfigStr(this.state.configStr)
-            });
         },
 
         _getLineNumber: function(array, key) {
@@ -284,58 +257,26 @@ define([
         },
 
         _handleControlValueChange: function(id, value) {
-            if(typeof(value) === 'boolean') {
-                var onValue = 1;
-                if(id === 'skirts') {
-                    onValue = 2;
-                }
-                advancedSetting.set(id, value ? onValue : 0);
+            switch (id) {
+                case 'skirts':
+                    advancedSetting.set(id, value ? 2 : 0);
+                    break;
+                case 'support_material':
+                    advancedSetting.set('support_enable', value ? 1 : 0, true);
+                    break;
+                default:
+                    if (typeof(value) === 'boolean') value = value ? 1 : 0;
+                    advancedSetting.set(id, value);
             }
-            else {
-                advancedSetting.set(id, value);
-            }
-
-            const setFillPatternToRectilinear = () => {
-                advancedSetting.set('fill_pattern', 'rectilinear');
-                this.removeInfillSection = true;
-                this.forceUpdate();
-                setTimeout(() => { this.forceUpdate(); }, 10);
-                AlertActions.showPopupError('', this.props.lang.slicer.pattern_not_supported_at_100_percent_infill);
-            }
-            let { engine, fill_density, fill_pattern } = advancedSetting;
-
-            if(id === 'support_material') {
-                // reset support properties first for each engine
-                // delete advancedSetting['support_material'];
-                // delete advancedSetting['support_enable'];
-
-                advancedSetting.set('support_material', value ? 1 : 0, true);
-                advancedSetting.set('support_enable', value ? 1 : 0, true);
-
-                // write back to custom fields for each engine type
-                advancedSetting.custom = advancedSetting.custom.replace(`support_material = ${value ? 0 : 1}`, `support_material = ${value ? 1 : 0}`);
-                advancedSetting.setCustomCura2(dvancedSetting.customCura2.replace(`support_enable = ${value ? 0 : 1}`, `support_enable = ${value ? 1 : 0}`));
-
-                this.setState({
-                    custom: advancedSetting.custom,
-                    customCura2: advancedSetting.customCura2
-                });
-            }
-
-            console.log('end of fillpattern', fill_pattern);
-
-            // support already take care of custom fields
-            if(id !== 'support_material') {
-                this._updateCustomField();
-            }
+            advancedSetting.update();
+            this.setState({ configStr: advancedSetting.getConfigStr() });
         },
 
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
             advancedSetting.load(JSON.parse(p));
-            var customKey = advancedSetting.configStr;
-            this.setState({ [customKey]: advancedSetting[customKey] }, function() {
-                this._updateCustomField();
+
+            this.setState({ configStr: advancedSetting.getConfigStr() }, function () {
                 this._handleBackToSetting();
             });
         },

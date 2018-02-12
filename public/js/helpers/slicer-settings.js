@@ -233,7 +233,7 @@ define([
         if(this.configStr == null) { throw new Error('null configStr error'); }
     };
 
-    SlicerConfig.prototype.set = function (id, value, update = false) {
+    SlicerConfig.prototype.set = function (id, value) {
         // TODO map keys
         if (id == 'flexible_material') {
             if (value) {
@@ -245,10 +245,6 @@ define([
         }
         console.log("setting config", id, value, this.config);
         this.config[id] = value;
-        if (this.configStr == null) { throw new Error('null configStr error'); }
-        if (update) {
-            this.setConfigStr(this.getConfigStr(''));
-        }
     };
 
     SlicerConfig.prototype.filter = function(p0) {
