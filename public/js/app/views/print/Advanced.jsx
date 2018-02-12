@@ -148,8 +148,7 @@ define([
         _updateCustomField: function() {
             // console.log('updating custom', this.state.custom, this.state.customCura2);
             this.setState({
-                custom: advancedSetting.toExpert(this.state.custom, 'slic3r'),
-                customCura2: advancedSetting.toExpert(this.state.customCura2, 'cura2')
+                configStr: advancedSetting.getConfigStr(this.state.configStr)
             });
         },
 
@@ -220,10 +219,10 @@ define([
         },
 
         _processCustomInput: function() {
-            let c = this.state[advancedSetting.getEngineType()],
+            let c = this.state.configStr,
                 i = c.indexOf('support_enable');
 
-            advancedSetting.load(this.state[advancedSetting.getEngineType()]);
+            advancedSetting.load(this.state.configStr);
         },
 
         _handleNavigate: function(selectedTab, e) {
@@ -305,23 +304,7 @@ define([
             }
             let { engine, fill_density, fill_pattern } = advancedSetting;
 
-            if(id === 'engine') {
-                advancedSetting.engine = value;
-                advancedSetting.fill_pattern = {'slic3r': 'honeycomb', 'cura': 'GRID', 'cura2':'TRIANGLES'}[value];
-                advancedSetting.support_material_pattern = {'slic3r': 'rectilinear', 'cura': 'LINES', 'cura2':'ZIGZAG'}[value];
-                this.setState({ showBridgeSpeed: value !== 'cura2' });
-            }
-            else if(id === 'fill_pattern' && value !== 'rectilinear') {
-                if(engine === 'slic3r' && fill_density === '100') {
-                    setFillPatternToRectilinear();
-                }
-            }
-            else if(id === 'fill_density' && value === '100') {
-                if(engine === 'slic3r' && fill_pattern !== 'rectilinear') {
-                    setFillPatternToRectilinear();
-                }
-            }
-            else if(id === 'support_material') {
+            if(id === 'support_material') {
                 // reset support properties first for each engine
                 // delete advancedSetting['support_material'];
                 // delete advancedSetting['support_enable'];
@@ -350,7 +333,7 @@ define([
         _handleApplyPreset: function() {
             var p = this.state.presets[this.state.selectedPreset];
             advancedSetting.load(JSON.parse(p));
-            var customKey = advancedSetting.getEngineType();
+            var customKey = advancedSetting.configStr;
             this.setState({ [customKey]: advancedSetting[customKey] }, function() {
                 this._updateCustomField();
                 this._handleBackToSetting();
@@ -388,17 +371,10 @@ define([
 
         _handleLoadPreset: function() {
             this.setState({
-                custom: DefaultPrintSettings.custom,
-                customCura2: DefaultPrintSettings.customCura2
+                configStr: DefaultPrintSettings.cura2,
             });
 
-            if (advancedSetting.engine === 'cura2') {
-                console.log('in advanced');
-                advancedSetting.load(DefaultPrintSettings.customCura2);
-            } else {
-                advancedSetting.load(DefaultPrintSettings.custom);
-            }
-
+            advancedSetting.load(DefaultPrintSettings.cura2);
         },
 
         _renderTabs: function() {
@@ -426,14 +402,6 @@ define([
         _renderGeneralSection: function() {
             var options = [
                 {
-                    id: 'slic3r',
-                    name: lang.slic3r
-                },
-                {
-                    id: 'cura',
-                    name: lang.cura
-                },
-                {
                     id: 'cura2',
                     name: lang.cura2
                 }
@@ -448,7 +416,7 @@ define([
                             <RadioControl
                                 id="engine"
                                 options={options}
-                                default={advancedSetting.engine}
+                                default={advancedSetting.config.engine}
                                 onChange={this._handleControlValueChange}
                                 />
                         </div>
@@ -463,7 +431,7 @@ define([
                             min={170}
                             max={230}
                             step={1}
-                            default={advancedSetting.temperature}
+                            default={advancedSetting.config.temperature}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -473,20 +441,20 @@ define([
                             min={180}
                             max={230}
                             step={1}
-                            default={advancedSetting.first_layer_temperature}
+                            default={advancedSetting.config.first_layer_temperature}
                             onChange={this._handleControlValueChange} />
                         
                         <SwitchControl
                             id="flexible_material"
                             name="flexible_material"
                             label={lang.flexibleMaterial}
-                            default={advancedSetting.flexible_material}
+                            default={advancedSetting.config.flexible_material}
                             onChange={this._handleControlValueChange} />
 
                         {/* <SwitchControl
                             id="detect_filament_runout"
                             label={lang.detect_filament_runout}
-                            default={advancedSetting.detect_filament_runout === 1}
+                            default={advancedSetting.config.detect_filament_runout === 1}
                             onChange={this._handleControlValueChange} /> */}
                     </div>
 
@@ -495,12 +463,12 @@ define([
                         <SwitchControl
                             id="flux_calibration"
                             label={lang.flux_calibration}
-                            default={advancedSetting.flux_calibration === 1}
+                            default={advancedSetting.config.flux_calibration === 1}
                             onChange={this._handleControlValueChange} />
                         <SwitchControl
                             id="detect_head_tilt"
                             label={lang.detect_head_tilt}
-                            default={advancedSetting.detect_head_tilt === 1}
+                            default={advancedSetting.config.detect_head_tilt === 1}
                             onChange={this._handleControlValueChange} />
                     </div> */}
 
@@ -522,7 +490,7 @@ define([
                             min={0.05}
                             max={0.3}
                             step={0.025}
-                            default={advancedSetting.layer_height}
+                            default={advancedSetting.config.layer_height}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -532,7 +500,7 @@ define([
                             min={0.2}
                             max={0.35}
                             step={0.05}
-                            default={advancedSetting.first_layer_height}
+                            default={advancedSetting.config.first_layer_height}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -547,7 +515,7 @@ define([
                             min={1}
                             max={6}
                             step={1}
-                            default={advancedSetting.perimeters}
+                            default={advancedSetting.config.perimeters}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -557,7 +525,7 @@ define([
                             min={0}
                             max={12}
                             step={1}
-                            default={advancedSetting.top_solid_layers}
+                            default={advancedSetting.config.top_solid_layers}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -567,7 +535,7 @@ define([
                             min={0}
                             max={12}
                             step={1}
-                            default={advancedSetting.bottom_solid_layers}
+                            default={advancedSetting.config.bottom_solid_layers}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -581,15 +549,7 @@ define([
                 this.removeInfillSection = false;
                 return <div></div>;
             }
-            var infillPattern;
-            if(advancedSetting.engine === 'cura') {
-                infillPattern = curaInfill;
-            } else if(advancedSetting.engine === 'cura2') {
-                infillPattern = cura2Infill;
-            }
-            else {
-                infillPattern = slic3rInfill;
-            }
+            var infillPattern = cura2Infill;
 
             return (
                 <div className="content-wrapper">
@@ -604,14 +564,14 @@ define([
                             min={0}
                             max={100}
                             step={1}
-                            default={advancedSetting.fill_density}
+                            default={advancedSetting.config.fill_density}
                             onChange={this._handleControlValueChange} />
 
                         <DropdownControl
                             id="fill_pattern"
                             label={lang.pattern}
                             options={infillPattern}
-                            default={advancedSetting.fill_pattern}
+                            default={advancedSetting.config.fill_pattern}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -622,23 +582,8 @@ define([
 
         _renderSupportSection: function() {
             // determin support on / off
-            let supportOn;
-            if(advancedSetting.engine === 'cura2') {
-                supportOn = advancedSetting.support_enable === 1;
-            } else {
-                supportOn = advancedSetting.support_material === 1;
-            }
-
-            var supportPattern;
-            if(advancedSetting.engine === 'cura'){
-                supportPattern = curaSupport;
-            }
-            else if(advancedSetting.engine === 'cura2') {
+            let supportOn = advancedSetting.config.support_enable === 1,
                 supportPattern = cura2Support;
-            }
-            else {
-                supportPattern = slic3rSupport;
-            }
 
             return (
                 <div className="content-wrapper">
@@ -660,7 +605,7 @@ define([
                             min={0.4}
                             max={5}
                             step={0.1}
-                            default={advancedSetting.support_material_spacing}
+                            default={advancedSetting.config.support_material_spacing}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -670,14 +615,14 @@ define([
                             min={0}
                             max={90}
                             step={1}
-                            default={advancedSetting.support_material_threshold}
+                            default={advancedSetting.config.support_material_threshold}
                             onChange={this._handleControlValueChange} />
 
                         <DropdownControl
                             id="support_material_pattern"
                             label={lang.pattern}
                             options={supportPattern}
-                            default={advancedSetting.support_material_pattern}
+                            default={advancedSetting.config.support_material_pattern}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -687,7 +632,7 @@ define([
                             min={0}
                             max={1}
                             step={0.1}
-                            default={advancedSetting.support_material_contact_distance}
+                            default={advancedSetting.config.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -698,7 +643,7 @@ define([
                         <SwitchControl
                             id="raft"
                             label={lang.raft}
-                            default={advancedSetting.raft === 1}
+                            default={advancedSetting.config.raft === 1}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -708,7 +653,7 @@ define([
                             min={0}
                             max={6}
                             step={1}
-                            default={advancedSetting.raft_layers}
+                            default={advancedSetting.config.raft_layers}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -718,13 +663,13 @@ define([
                             min={0}
                             max={10}
                             step={1}
-                            default={advancedSetting.brim_width}
+                            default={advancedSetting.config.brim_width}
                             onChange={this._handleControlValueChange} />
 
                         <SwitchControl
                             id="skirts"
                             label={lang.skirts}
-                            default={advancedSetting.skirts > 0}
+                            default={advancedSetting.config.skirts > 0}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -742,10 +687,9 @@ define([
                     min={1}
                     max={100}
                     step={1}
-                    default={advancedSetting.bridge_speed}
+                    default={advancedSetting.config.bridge_speed}
                     onChange={this._handleControlValueChange} />
             );
-            bridgeSpeed = this.state.showBridgeSpeed ? bridgeSpeed : '';
             return (
                 <div className="content-wrapper">
 
@@ -758,7 +702,7 @@ define([
                             min={10}
                             max={200}
                             step={1}
-                            default={advancedSetting.travel_speed}
+                            default={advancedSetting.config.travel_speed}
                             onChange={this._handleControlValueChange} />
                     </div>
 
@@ -772,7 +716,7 @@ define([
                             min={10}
                             max={100}
                             step={1}
-                            default={advancedSetting.support_material_speed}
+                            default={advancedSetting.config.support_material_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -782,7 +726,7 @@ define([
                             min={10}
                             max={100}
                             step={1}
-                            default={advancedSetting.infill_speed}
+                            default={advancedSetting.config.infill_speed}
                             onChange={this._handleControlValueChange} />
 
                     </div>
@@ -797,7 +741,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
-                            default={advancedSetting.first_layer_speed}
+                            default={advancedSetting.config.first_layer_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -807,7 +751,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
-                            default={advancedSetting.solid_infill_speed}
+                            default={advancedSetting.config.solid_infill_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -817,7 +761,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
-                            default={advancedSetting.perimeter_speed}
+                            default={advancedSetting.config.perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
                         <SliderControl
@@ -827,7 +771,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
-                            default={advancedSetting.external_perimeter_speed}
+                            default={advancedSetting.config.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
                         {bridgeSpeed}
@@ -854,8 +798,8 @@ define([
                                     <textarea
                                         rows="20"
                                         cols="50"
-                                        value={this.state[advancedSetting.getEngineType()]}
-                                        onChange={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
+                                        value={this.state.configStr}
+                                        onChange={this._handleParameterChange.bind(null, 'configStr')}
                                         // onKeyUp={this._handleParameterChange.bind(null, advancedSetting.engine === 'cura2' ? 'customCura2' : 'custom')}
                                     />
                                 </div>
