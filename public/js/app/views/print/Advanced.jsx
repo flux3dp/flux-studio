@@ -70,8 +70,7 @@ define([
             return {
                 mode                : 1,
                 selectedTab         : 1,
-                custom              : this.props.setting.custom || '',
-                customCura2         : this.props.setting.customCura2 || '',
+                configStr           : null,
                 showBridgeSpeed     : this.props.setting.engine !== 'cura2',
 
                 // Presets

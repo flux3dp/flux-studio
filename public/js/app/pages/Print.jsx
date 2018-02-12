@@ -428,7 +428,7 @@ define([
                     }
                     else if(answer === 'print-setting-version') {
                         advancedSettings.load(DefaultPrintSettings);
-                        Config().write('advanced-settings', advancedSettings.toString());
+                        Config().write('slicing-config', advancedSettings.toString());
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
                     else if(answer === GlobalConstants.EXIT_PREVIEW) {
@@ -562,7 +562,7 @@ define([
                         // Do comparsion with default settings
                         let params = DefaultPrintSettings[this.state.model][q];
                         for(var i in params) {
-                            if(params[i] !== advancedSettings[i]) { return; }
+                            if(params[i] !== advancedSettings.config[i]) { return; }
                         }
                         // No difference then quality equals q
                         quality = q;
@@ -875,7 +875,7 @@ define([
 
                 _saveSetting: function() {
                     // extra process for raft (because it's a direct control on left panel)
-                    Config().write('advanced-settings', advancedSettings.toString());
+                    Config().write('slicing-config', advancedSettings.toString());
                 },
 
                 _checkDefaultPrintSettingsVersion: function() {
