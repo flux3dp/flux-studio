@@ -448,7 +448,7 @@ define(function() {
                 cura: 'Cura',
                 cura2: 'Cura2',
                 filament: '線料',
-                temperature: '溫度',
+                temperature: '溫度與材料',
                 detect_filament_runout: '偵測線料',
                 flux_calibration: '自動校正',
                 detect_head_tilt: '偵測工具頭傾斜',
@@ -466,6 +466,11 @@ define(function() {
                 rectilinear: '直線',         // do not change
                 rectilinearGrid: '直線格狀',// do not change
                 honeycomb: '蜂巢狀',             // do not change
+                offset: '位移',
+                xyOffset: '外框補償',
+                zOffset: 'Z 軸位移',
+                cutBottom: '移除底部',
+                
                 curaInfill: {
                     automatic: '自動',
                     grid: '格狀',

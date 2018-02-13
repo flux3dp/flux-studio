@@ -38,7 +38,7 @@ define([
         tab = {
             'GENERAL'   : 1,
             'LAYERS'    : 2,
-            'INFILL'    : 3,
+            'OFFSET'    : 3,
             'SUPPORT'   : 4,
             'SPEED'     : 5,
             'CUSTOM'    : 6
@@ -320,7 +320,7 @@ define([
         _renderTabs: function() {
             var tabGeneral  = ClassNames('tab tab-general', {selected: this.state.selectedTab === tab.GENERAL}),
                 tabLayers   = ClassNames('tab tab-layer', {selected: this.state.selectedTab === tab.LAYERS}),
-                tabInfill   = ClassNames('tab tab-infill', {selected: this.state.selectedTab === tab.INFILL}),
+                tabOffset   = ClassNames('tab tab-infill', {selected: this.state.selectedTab === tab.OFFSET}),
                 tabSupport  = ClassNames('tab tab-support', {selected: this.state.selectedTab === tab.SUPPORT}),
                 tabSpeed    = ClassNames('tab tab-speed', {selected: this.state.selectedTab === tab.SPEED}),
                 tabCustom   = ClassNames('tab tab-custom', {selected: this.state.selectedTab === tab.CUSTOM});
@@ -330,9 +330,9 @@ define([
                     <ul className="tab-list">
                         <li className={tabGeneral} onClick={this._handleNavigate.bind(null, 1)}><a href="#">{lang.general}</a></li>
                         <li className={tabLayers} onClick={this._handleNavigate.bind(null, 2)}><a href="#">{lang.layers}</a></li>
-                        <li className={tabInfill} onClick={this._handleNavigate.bind(null, 3)}><a href="#">{lang.infill}</a></li>
                         <li className={tabSupport} onClick={this._handleNavigate.bind(null, 4)}><a href="#">{lang.support}</a></li>
                         <li className={tabSpeed} onClick={this._handleNavigate.bind(null, 5)}><a href="#">{lang.speed}</a></li>
+                        <li className={tabOffset} onClick={this._handleNavigate.bind(null, 3)}><a href="#">{lang.offset}</a></li>
                         <li className={tabCustom} onClick={this._handleNavigate.bind(null, 6)}><a href="#">{lang.custom}</a></li>
                     </ul>
                 </div>
@@ -375,6 +375,7 @@ define([
                             min={170}
                             max={230}
                             step={1}
+                            unit="degree"
                             default={advancedSetting.config.temperature}
                             onChange={this._handleControlValueChange} />
 
@@ -385,6 +386,7 @@ define([
                             min={180}
                             max={230}
                             step={1}
+                            unit="degree"
                             default={advancedSetting.config.first_layer_temperature}
                             onChange={this._handleControlValueChange} />
                         
@@ -400,6 +402,29 @@ define([
                             label={lang.detect_filament_runout}
                             default={advancedSetting.config.detect_filament_runout === 1}
                             onChange={this._handleControlValueChange} /> */}
+                    </div>
+                    
+                    <div className="content-wrapper">
+                        <div className="section">
+                            <div className="title">{lang.infill}</div>
+                            <SliderControl
+                                id="fill_density"
+                                key="fill_density"
+                                label={lang.density}
+                                min={0}
+                                max={100}
+                                step={1}
+                                unit="percent"
+                                default={advancedSetting.config.fill_density}
+                                onChange={this._handleControlValueChange} />
+
+                            <DropdownControl
+                                id="fill_pattern"
+                                label={lang.pattern}
+                                options={cura2Infill}
+                                default={advancedSetting.config.fill_pattern}
+                                onChange={this._handleControlValueChange} />
+                        </div>
                     </div>
 
                     {/* <div className="section">
@@ -434,6 +459,7 @@ define([
                             min={0.05}
                             max={0.3}
                             step={0.025}
+                            unit="mm"
                             default={advancedSetting.config.layer_height}
                             onChange={this._handleControlValueChange} />
 
@@ -444,6 +470,7 @@ define([
                             min={0.2}
                             max={0.35}
                             step={0.05}
+                            unit="mm"
                             default={advancedSetting.config.first_layer_height}
                             onChange={this._handleControlValueChange} />
 
@@ -488,39 +515,45 @@ define([
             );
         },
 
-        _renderInfillSection: function() {
-            if(this.removeInfillSection) {
-                this.removeInfillSection = false;
-                return <div></div>;
-            }
-            var infillPattern = cura2Infill;
-
+        _renderOffsetSection: function() {
             return (
-                <div className="content-wrapper">
+            <div className="content-wrapper">
+                <div className="section">
+                    <div className="title">{lang.offset}</div>
+                    <SliderControl
+                        id="z_offset"
+                        key="z_offset"
+                        label={lang.zOffset}
+                        min={0}
+                        max={210}
+                        step={0.01}
+                        unit="mm"
+                        default={advancedSetting.config.z_offset}
+                        onChange={this._handleControlValueChange} />
 
-                    <div className="section">
-                        <div className="title">{lang.infill}</div>
-
-                        <SliderControl
-                            id="fill_density"
-                            key="fill_density"
-                            label={lang.density}
-                            min={0}
-                            max={100}
-                            step={1}
-                            default={advancedSetting.config.fill_density}
-                            onChange={this._handleControlValueChange} />
-
-                        <DropdownControl
-                            id="fill_pattern"
-                            label={lang.pattern}
-                            options={infillPattern}
-                            default={advancedSetting.config.fill_pattern}
-                            onChange={this._handleControlValueChange} />
-
-                    </div>
-
+                    <SliderControl
+                        id="xy_offset"
+                        key="xy_offset"
+                        label={lang.xyOffset}
+                        min={-0.4}
+                        max={0.4}
+                        step={0.01}
+                        unit="mm"
+                        default={advancedSetting.config.xy_offset}
+                        onChange={this._handleControlValueChange} />
+                    
+                    <SliderControl
+                        id="cut_bottom"
+                        name="cut_bottom"
+                        label={lang.cutBottom}
+                        min={0}
+                        max={210}
+                        step={0.01}
+                        unit="mm"
+                        default={advancedSetting.config.cut_bottom}
+                        onChange={this._handleControlValueChange} />
                 </div>
+            </div>
             );
         },
 
@@ -549,6 +582,7 @@ define([
                             min={0.4}
                             max={5}
                             step={0.1}
+                            unit="mm"
                             default={advancedSetting.config.support_material_spacing}
                             onChange={this._handleControlValueChange} />
 
@@ -559,6 +593,7 @@ define([
                             min={0}
                             max={90}
                             step={1}
+                            unit="angle"
                             default={advancedSetting.config.support_material_threshold}
                             onChange={this._handleControlValueChange} />
 
@@ -566,6 +601,7 @@ define([
                             id="support_material_pattern"
                             label={lang.pattern}
                             options={supportPattern}
+                            unit="mm"
                             default={advancedSetting.config.support_material_pattern}
                             onChange={this._handleControlValueChange} />
 
@@ -576,6 +612,7 @@ define([
                             min={0}
                             max={1}
                             step={0.1}
+                            unit="mm"
                             default={advancedSetting.config.support_material_contact_distance}
                             onChange={this._handleControlValueChange} />
 
@@ -631,6 +668,7 @@ define([
                     min={1}
                     max={100}
                     step={1}
+                    unit="mms"
                     default={advancedSetting.config.bridge_speed}
                     onChange={this._handleControlValueChange} />
             );
@@ -646,6 +684,7 @@ define([
                             min={10}
                             max={200}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.travel_speed}
                             onChange={this._handleControlValueChange} />
                     </div>
@@ -660,6 +699,7 @@ define([
                             min={10}
                             max={100}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.support_material_speed}
                             onChange={this._handleControlValueChange} />
 
@@ -670,6 +710,7 @@ define([
                             min={10}
                             max={100}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.infill_speed}
                             onChange={this._handleControlValueChange} />
 
@@ -685,6 +726,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.first_layer_speed}
                             onChange={this._handleControlValueChange} />
 
@@ -695,6 +737,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.solid_infill_speed}
                             onChange={this._handleControlValueChange} />
 
@@ -705,6 +748,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
@@ -715,6 +759,7 @@ define([
                             min={1}
                             max={100}
                             step={1}
+                            unit="mms"
                             default={advancedSetting.config.external_perimeter_speed}
                             onChange={this._handleControlValueChange} />
 
@@ -762,22 +807,28 @@ define([
             switch(this.state.selectedTab) {
 
                 case tab.GENERAL:
-                    content = self._renderGeneralSection(); break;
+                    content = self._renderGeneralSection();
+                    break;
 
                 case tab.LAYERS:
-                    content = self._renderLayersSection(); break;
+                    content = self._renderLayersSection();
+                    break;
 
-                case tab.INFILL:
-                    content = self._renderInfillSection(); break;
+                case tab.OFFSET:
+                    content = self._renderOffsetSection();
+                    break;
 
                 case tab.SUPPORT:
-                    content = self._renderSupportSection(); break;
+                    content = self._renderSupportSection();
+                    break;
 
                 case tab.SPEED:
-                    content = self._renderSpeedSection(); break;
+                    content = self._renderSpeedSection();
+                    break;
 
                 case tab.CUSTOM:
-                    content = self._renderCustomSection(); break;
+                    content = self._renderCustomSection();
+                    break;
 
                 default:
                     break;

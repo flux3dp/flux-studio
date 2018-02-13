@@ -1,3 +1,10 @@
+
+#support_material_spacing::after {
+    content: "mm/s";
+    color: black;
+    position: relative;
+}
+
 .controls {
     overflow: hidden;
 
@@ -20,6 +27,34 @@
 
         .error {
             border: 2px solid #F00;
+        }
+
+        &::after {
+            position: absolute;
+            right: 10px;
+            font-size: 12px;
+            color: #CCC;
+            line-height: 45px;
+        }
+
+        &.unit-mm::after{
+            content: "mm";
+        }
+
+        &.unit-mms::after{
+            content: "mm/s";
+        }
+
+        &.unit-degree::after{
+            content: "°C";
+        }
+
+        &.unit-angle::after{
+            content: "°";
+        }
+
+        &.unit-percent::after{
+            content: "%";
         }
     }
 

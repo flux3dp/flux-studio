@@ -434,7 +434,7 @@ define(function() {
                 cura: 'Cura',
                 cura2: 'Cura2',
                 filament: 'Filament',
-                temperature: 'Temperature',
+                temperature: 'Material & Temperature',
                 detect_filament_runout: 'Filament Detection',
                 flux_calibration: 'Auto Calibration',
                 detect_head_tilt: 'Tilt Detection',
@@ -452,6 +452,10 @@ define(function() {
                 rectilinear: 'Rectilinear',         // do not change
                 rectilinearGrid: 'Rectilinear Grid',// do not change
                 honeycomb: 'Honeycomb',             // do not change
+                offset: 'Offset',
+                xyOffset: 'XY Compensate',
+                zOffset: 'Z Offset',
+                cutBottom: 'Cut Bottom',
                 curaInfill: {
                     automatic: 'Automatic',
                     grid: 'Grid',
