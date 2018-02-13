@@ -342,25 +342,29 @@ define([
         _renderGeneralSection: function() {
             var options = [
                 {
-                    id: 'cura2',
-                    name: lang.cura2
+                    id: 'MostUsed',
+                    name: "Most Used"
+                },
+                {
+                    id: 'Expert',
+                    name: "Full Options"
                 }
             ];
             return (
                 <div className="content-wrapper">
 
-                    <div className="section">
-                        <div className="title">{lang.slicingEngine}</div>
+                    {/* <div className="section">
+                        <div className="title">選項顯示模式</div>
                         <div className="controls">
                             <div className="label"></div>
                             <RadioControl
                                 id="engine"
                                 options={options}
-                                default={advancedSetting.config.engine}
+                                default={'MostUsed'}
                                 onChange={this._handleControlValueChange}
                                 />
                         </div>
-                    </div>
+                    </div> */}
 
                     <div className="section">
                         <div className="title">{lang.temperature}</div>
