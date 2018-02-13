@@ -428,7 +428,7 @@ define(function() {
                 infill: 'Infill',
                 support: 'Support',
                 speed: 'Speed',
-                custom: 'Expert',
+                custom: 'Text',
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
