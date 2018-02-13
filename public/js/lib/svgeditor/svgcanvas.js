@@ -4023,18 +4023,42 @@ define([
                 }
             }
 
-            var defelems = $(defs).find('linearGradient, radialGradient, filter, marker, svg, symbol');
-            i = defelems.length;
-            while (i--) {
-                var defelem = defelems[i];
-                var id = defelem.id;
-                if ( id && defelem_uses.indexOf(id) < 0) {
-                    // Not found, so remove (but remember)
-                    removedElements[id] = defelem;
-                    defelem.parentNode.removeChild(defelem);
-                    numRemoved++;
+            const isDefUsed = node => {
+                const id = node.id;
+                if (id && defelem_uses.includes(id)) {
+                    return true;
                 }
-            }
+                return false;
+            };
+
+            // remove if both itself and all its children are unused.
+            const removeUnusedDef = node => {
+                let shouldIStay = false;
+                const children = node.childNodes;
+
+                if (isDefUsed(node)) {
+                    shouldIStay = true;
+                } else if (children.length > 0) {
+                    shouldIStay = Array.from(children)
+                        .map(child => removeUnusedDef(child))
+                        .reduce((acc, cur) => (acc && cur));
+                }
+
+                if (shouldIStay) {
+                    return true;
+                } else {
+                    // Good bye node
+                    removedElements[node.id] = node;
+                    node.parentNode.removeChild(node);
+                    numRemoved++;
+
+                    return false;
+                }
+            };
+            $(defs)
+                .children('linearGradient, radialGradient, filter, marker, svg, symbol')
+                .toArray()
+                .map(def => removeUnusedDef(def));
 
             return numRemoved;
         };
