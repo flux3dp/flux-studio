@@ -302,7 +302,7 @@ define([
                             value={this.state.chooseSpeed || 0}
                             className="readonly"
                         />
-                        <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
+                        <span className="value-text" ref="presetSpeedDisplay" data-tail={' ' + advancedLang.form.laser_speed.unit}>
                             {this.state.chooseSpeed || 0}
                         </span>
                     </div>
@@ -317,7 +317,7 @@ define([
                             value={this.state.choosePower || 0}
                             className="readonly"
                         />
-                        <span className="value-text" ref="presetPowerDisplay" data-tail="%">
+                        <span className="value-text" ref="presetPowerDisplay" data-tail=" %">
                             {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
                         </span>
                     </div>
