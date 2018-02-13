@@ -21,7 +21,7 @@
         & > div {
             display: inline-block;
             margin-right: 30px;
-            color: #B3B3B3;
+            color: #888;
             size: 13px;
         }
 
@@ -147,13 +147,14 @@
             line-height: 20px;
             border: 2px solid #E0E0DF;
             resize: none;
+            overflow-y: scroll;
         }
     }
     input {
         width: 90px;
         height: 30px;
         font-size: 15px;
-        color: #B3B3B3;
+        color: #888;
     }
     input.url {
         width: 400px;
@@ -210,11 +211,11 @@
     }
     input[type=range]::-webkit-slider-thumb {
         box-shadow: 0 0 0 rgba(0, 0, 0, 0), 0 0 0 rgba(130, 13, 13, 0);
-        border: 2.5px solid #B3B3B3;
+        border: 2.5px solid #AAA;
         height: 13px;
         width: 13px;
         border-radius: 12px;
-        background: #B3B3B3;
+        background: #AAA;
         cursor: pointer;
         -webkit-appearance: none;
         margin-top: -5px;
