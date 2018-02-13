@@ -551,6 +551,7 @@ div.palette_item:first-child {
 	opacity: 1;
 	vector-effect: non-scaling-stroke;
 	filter: none;
+	cursor: move;
 	/* TODO:
 	Better way to do object selection:
 		Duplicate the origina object, and use invisible outline with stroke width: 5px,
