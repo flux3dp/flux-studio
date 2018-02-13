@@ -527,7 +527,11 @@ div.palette_item:first-child {
 #workarea.wireframe #svgcontent ellipse[stroke=none],
 #workarea.wireframe #svgcontent rect[stroke=none],
 #workarea.wireframe #svgcontent path[stroke=none],
-#workarea.wireframe #svgcontent polygon[stroke=none] {
+#workarea.wireframe #svgcontent polygon[stroke=none],
+#workarea.wireframe #svgcontent ellipse:not([stroke]),
+#workarea.wireframe #svgcontent rect:not([stroke]),
+#workarea.wireframe #svgcontent path:not([stroke]),
+#workarea.wireframe #svgcontent polygon:not([stroke]) {
 	fill-opacity: 1 !important;
 	stroke-width: 0 !important;
 	/* TODO:

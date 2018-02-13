@@ -74,7 +74,6 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 	});
 	$('#canvasGrid').append(gridBox);
 
-	var gridUri = null;
 	function updateGrid(zoom) {
 		var i;
 		// TODO: Try this with <line> elements, then compare performance difference
@@ -139,9 +138,7 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		svgicons: svgEditor.curConfig.extPath + 'grid-icon.xml',
 
 		zoomChanged: function(zoom) {
-			if (showGrid) {
-				updateGrid(zoom);
-			}
+			if (showGrid) {updateGrid(zoom);}
 		},
 		callback: function () {
 			if (showGrid) {

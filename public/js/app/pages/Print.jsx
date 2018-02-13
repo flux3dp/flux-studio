@@ -107,26 +107,20 @@ define([
             view = React.createClass({
 
                 getInitialState: function() {
-                    var _settings           = Config().read('advanced-settings'),
+                    var storedSlicingConfig           = Config().read('slicing-config'),
                         tutorialFinished    = Config().read('tutorial-finished'),
                         configuredPrinter   = Config().read('configured-printer');
 
                     this._checkDefaultPrintSettingsVersion();
 
-                    if (!_settings) {
-                        console.log('settinggs missing: advanced-settings');
-                        console.log('DefaultPrintSettings', DefaultPrintSettings);
-                        advancedSettings.load(DefaultPrintSettings);
+                    if (!storedSlicingConfig) {
+                        advancedSettings.load(DefaultPrintSettings.cura2);
                         var defaultMedium = DefaultPrintSettings[Config().read('default-model') || Config().read('preferred-model') || 'fd1']['med'];
-                        advancedSettings.update(defaultMedium, 'slic3r');
+                        console.log("loading default medium", defaultMedium)
+                        advancedSettings.update(defaultMedium);
                     }
                     else {
-                        advancedSettings.load(_settings, true);
-                        // Load new default cura2 config
-                        if (!_settings.customCura2) {
-                            advancedSettings.setCustomCura2(DefaultPrintSettings.customCura2);
-                            advancedSettings.setCustomCura2(advancedSettings.toExpert(advancedSettings.customCura2, 'cura2'));
-                        }
+                        advancedSettings.load(storedSlicingConfig, true);
                     }
 
                     if(tutorialFinished !== 'true' && configuredPrinter !== '') {
@@ -134,13 +128,7 @@ define([
                     }
 
                     // processing support
-                    let supportOn;
-                    if(advancedSettings.engine === 'cura2') {
-                        supportOn = advancedSettings.support_enable === 1;
-                    }
-                    else {
-                        supportOn = advancedSettings.support_material === 1;
-                    }
+                    let supportOn = advancedSettings.config.support_enable === 1;
 
                     return ({
                         showAdvancedSettings        : false,
@@ -161,7 +149,7 @@ define([
                         slicingPercentage           : 0,
                         currentTutorialStep         : 0,
                         layerHeight                 : 0.1,
-                        raftOn                      : advancedSettings.raft === 1,
+                        raftOn                      : advancedSettings.config.raft === 1,
                         supportOn                   : supportOn,
                         displayModelControl         : !Config().read('default-model'),
                         model                       : Config().read('default-model') || Config().read('preferred-model') || 'fd1',
@@ -298,23 +286,24 @@ define([
                 },
 
                 _updateAdvancedSettings: function(opts) {
-                    let settings = {};
+                    let uploadingConfig = {};
                     Object.keys(opts).map((key) => {
                         let value = opts[key];
                         let filteredParam = advancedSettings.filter({key: key, value: value});
                         if (filteredParam) {
                             if(filteredParam.key instanceof Array) {
                                 for(let i = 0; i < filteredParam.key.length; i ++) {
-                                    settings[filteredParam.key[i]] = filteredParam.value[i];
+                                    uploadingConfig[filteredParam.key[i]] = filteredParam.value[i];
                                 }
                             }
                             else {
-                                settings[filteredParam.key] = filteredParam.value;
+                                uploadingConfig[filteredParam.key] = filteredParam.value;
                             }
                         };
                     });
-                    director.setParameters(settings);
-                    advancedSettings.update(opts, 'slic3r');
+                    console.log("Uploading config", uploadingConfig)
+                    director.setParameters(uploadingConfig);
+                    advancedSettings.update(opts);
 
                     // update dom state
                     this.setState(opts);
@@ -439,7 +428,7 @@ define([
                     }
                     else if(answer === 'print-setting-version') {
                         advancedSettings.load(DefaultPrintSettings);
-                        Config().write('advanced-settings', advancedSettings.toString());
+                        Config().write('slicing-config', advancedSettings.toString());
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
                     else if(answer === GlobalConstants.EXIT_PREVIEW) {
@@ -494,32 +483,9 @@ define([
                         });
                     }.bind(this));
 
-                    let {custom} = advancedSettings,
-                        {customCura2} = advancedSettings;
+                    let configStr = advancedSettings.configStr;
 
-                    advancedSettings.set('support_material', isOn ? 1 : 0, true);
                     advancedSettings.set('support_enable', isOn ? 1 : 0, true);
-
-                    // write support config into custom / customCura2
-
-                    let otherExistSupportEnable = advancedSettings.custom.indexOf('support_enable') >= 0,
-                        cura2ExistSupportMaterial = advancedSettings.customCura2.indexOf('support_material') >= 0;
-
-                    // slic3r & cura shouldn't contain support_enable
-                    if(otherExistSupportEnable) {
-                        let i = custom.indexOf('support_enable');
-                        advancedSettings.custom = custom.slice(0, i) + custom.slice(i + 20);
-                    }
-
-                    // cura2 shouldn't contain support_material
-                    if(cura2ExistSupportMaterial) {
-                        let i = customCura2.indexOf('support_material');
-                        advancedSettings.custom = customCura2.slice(0, i, customCura2.slice(i + 18));
-                    }
-
-                    // write back to custom fields for each engine type
-                    advancedSettings.custom = advancedSettings.custom.replace(`support_material = ${isOn ? 0 : 1}`, `support_material = ${isOn ? 1 : 0}`);
-                    advancedSettings.setCustomCura2(advancedSettings.customCura2.replace(`support_enable = ${isOn ? 0 : 1}`, `support_enable = ${isOn ? 1 : 0}`));
 
                     this._saveSetting();
                 },
@@ -588,7 +554,7 @@ define([
 
                     advancedSettings.load(setting || {}, true);
                     // remove old properties
-                    delete advancedSettings.raft_on;
+                    delete advancedSettings.config.raft_on;
 
                     this._saveSetting();
 
@@ -596,23 +562,16 @@ define([
                         // Do comparsion with default settings
                         let params = DefaultPrintSettings[this.state.model][q];
                         for(var i in params) {
-                            if(params[i] !== advancedSettings[i]) { return; }
+                            if(params[i] !== advancedSettings.config[i]) { return; }
                         }
                         // No difference then quality equals q
                         quality = q;
                     });
 
-                    if(advancedSettings.engine === 'cura2') {
-                        supportOn = advancedSettings.support_enable === 1;
-                    }
-                    else {
-                        supportOn = advancedSettings.support_material === 1;
-                    }
-
                     this.setState({
-                        supportOn: supportOn,
-                        layerHeight: advancedSettings.layer_height,
-                        raftOn:  advancedSettings.raft === 1,
+                        supportOn: advancedSettings.config.support_enable === 1,
+                        layerHeight: advancedSettings.config.layer_height,
+                        raftOn:  advancedSettings.config.raft === 1,
                         quality: quality
                     });
 
@@ -620,10 +579,11 @@ define([
                     if (!setting) {
                         let self = this;
                         let uploadSettings = () => {
+                            console.log("Uploading Settings", advancedSettings);
                             director.setAdvanceParameter(advancedSettings.deepClone()).then(() => {
-                                Object.assign(fineAdvancedSettings, advancedSettings);
-                                advancedSettings.engine = advancedSettings.engine || defaultSlicingEngine;
+                                fineAdvancedSettings = advancedSettings.deepClone();
                             }).fail(() => {
+                                console.log("Uploading Settings Failed", advancedSettings);
                                 advancedSettings.load(fineAdvancedSettings);
                                 director.setAdvanceParameter(advancedSettings);
                                 self._saveSetting();
@@ -632,19 +592,13 @@ define([
                             });
                         };
 
-                        if(advancedSettings.engine !== 'slic3r') {
-                            this._handleSlicingEngineChange(advancedSettings.engine)
-                            .then(uploadSettings)
-                            .fail(() => {
-                                d.reject();
-                            });
-                        } else {
-                            uploadSettings();
-                        }
+                        this._handleSlicingEngineChange('cura2').then(uploadSettings).fail(() => {
+                            d.reject();
+                        });
                     }
 
                     else {
-                        this._handleSlicingEngineChange(advancedSettings.engine).then(() => {
+                        this._handleSlicingEngineChange('cura2').then(() => {
                             director.setAdvanceParameter(advancedSettings).then(() => {
                                 Object.assign(fineAdvancedSettings, advancedSettings);
                             }).fail(() => {
@@ -903,23 +857,16 @@ define([
                     var d = $.Deferred(),
                         path = 'default';
 
-                    const setDefaultEngine = (result) => {
-                        advancedSettings.engine = 'slic3r';
-                        this._saveSetting();
-                        AlertActions.showPopupWarning(
-                            'engine-change',
-                            lang.settings.engine_change_fail[result.error] + ', ' + result.info,
-                            `${lang.settings.engine_change_fail.caption} ${engineName}`
-                        );
-                    };
-
                     director.changeEngine(engineName).then((error) => {
-                        if(error) {
-                            setDefaultEngine(error);
+                        if (error) {
+                            AlertActions.showPopupWarning(
+                                'engine-change',
+                                lang.settings.engine_change_fail[error.error] + ', ' + error.info,
+                                `${lang.settings.engine_change_fail.caption}`
+                            );
                         }
                         d.resolve();
                     }).fail((error) => {
-                        setDefaultEngine(error);
                         d.reject(error);
                     });
 
@@ -928,7 +875,7 @@ define([
 
                 _saveSetting: function() {
                     // extra process for raft (because it's a direct control on left panel)
-                    Config().write('advanced-settings', advancedSettings.toString());
+                    Config().write('slicing-config', advancedSettings.toString());
                 },
 
                 _checkDefaultPrintSettingsVersion: function() {
