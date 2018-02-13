@@ -769,6 +769,10 @@ define([
 
         let sliceParams = JSON.stringify(fullSliceParameters, (key, val) => {
             // Fix precision to .00001
+            if (val === undefined) {
+                console.warn("Empty Parameter:" , key);
+                return val;
+            }
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
         if (sliceParams === lastSliceParams) {
@@ -1779,6 +1783,10 @@ define([
     function planeBoundary(sourceMesh) {
         let transformation = JSON.stringify({ p: sourceMesh.position, s: sourceMesh.scale, r: sourceMesh.rotation}, (key, val) => {
             // Fix precision to .00001
+            if (val === undefined) {
+                console.warn("Empty Parameter:" , key);
+                return val;
+            }
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
         if (sourceMesh.jTransformation === transformation) {
