@@ -5174,35 +5174,35 @@ define([
                             }
                             groupColorMap[strokeColor].appendChild(clonedGroup);
                         });
-                        // child.map(grandChild => {
-                        //     const color = _getColor(grandChild);
-                        //     grandChild.setAttribute('class', 'poly');
-                        //     if(!groupColorMap[color]) {
-                        //         groupColorMap[color] = svgdoc.createElementNS(NS.SVG, 'g').setAttribute('data-color', stroke);
-                        //     }
-                        //     groupColorMap[color].appendChild(grandChild);
-                        // });
                     });
 
                     const coloredLayerNodes = Object.values(groupColorMap);
 
                     const symbols = coloredLayerNodes.map(node => {
                         const wrappedSymbolContent = _symbolWrapper(node);
-                        wrappedSymbolContent.setAttribute('data-color', node.getAttribute('data-color'));
+                        const color = node.getAttribute('data-color');
+                        if (color) {
+                            wrappedSymbolContent.setAttribute('data-color', color);
+                        }
                         const symbol = svgCanvas.makeSymbol(wrappedSymbolContent, [], batchCmd, defChildren);
                         return symbol;
                     });
                     return symbols;
                 }
                 function _parseSvgByNolayer(svg) {
-                    uniquifyElems(svg);
+                    //this is same as parseByLayer .....
+                    const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
+                    let defChildren = [];
+                    defNodes.map(def => defChildren.concat(Array.from(def.childNodes)));
 
-                    const svgString = new XMLSerializer().serializeToString(svg);
-                    const clonedSvgXml = svgedit.utilities.text2xml(svgString);
-                    const clonedSvg = svgdoc.adoptNode(clonedSvgXml.documentElement);
-                    clonedSvg.removeAttribute('viewBox');
+                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
 
-                    return [svgCanvas.makeSymbol(_symbolWrapper(clonedSvg), [], batchCmd)];
+                    const symbols = layerNodes.map(node => {
+                        const symbol = svgCanvas.makeSymbol(_symbolWrapper(node), [], batchCmd, defChildren);
+                        return symbol;
+                    });
+
+                    return symbols;
                 }
                 // return symbols
                 switch (type) {
@@ -5400,7 +5400,9 @@ define([
             }
             symbol.id = getNextId();
             symbol.setAttribute('data-id', elem.firstChild.id);
-            symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
+            if (elem.firstChild.getAttribute('data-color')) {
+                symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
+            }
 
             svgedit.utilities.findDefs().appendChild(symbol);
 

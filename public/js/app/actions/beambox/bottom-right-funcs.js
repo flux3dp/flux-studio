@@ -26,15 +26,39 @@ define([
             $clonedSvg.find('#selectorParentGroup').remove();
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
-            $clonedSvg.find('#svgcontent *').css({
-                // 'fill': '#ffffff',
-                // 'fill-opacity': '0',
-                // 'stroke': '#000',
-                // 'stroke-width': '1px',
-                // 'stroke-opacity': '1.0',
-                // 'stroke-dasharray': '0',
-                'vector-effect': 'non-scaling-stroke'
-            });
+
+            // these are rules in svg-editor.css
+            $clonedSvg.find('#svgcontent').append(
+                `<style>
+                    #svgcontent * {
+                        fill-opacity: 0;
+                        stroke: #000;
+                        stroke-width: 1px;
+                        stroke-opacity: 1.0;
+                        stroke-dasharray: 0;
+                        opacity: 1;
+                        vector-effect: non-scaling-stroke;
+                        filter: none;
+                    }
+                    #svgcontent g[data-color] ellipse[stroke=none],
+                    #svgcontent g[data-color] circle[stroke=none],
+                    #svgcontent g[data-color] rect[stroke=none],
+                    #svgcontent g[data-color] path[stroke=none],
+                    #svgcontent g[data-color] polygon[stroke=none],
+                    #svgcontent g[data-color] ellipse:not([stroke]),
+                    #svgcontent g[data-color] circle:not([stroke]),
+                    #svgcontent g[data-color] rect:not([stroke]),
+                    #svgcontent g[data-color] path:not([stroke]),
+                    #svgcontent g[data-color] polygon:not([stroke]) {
+                        fill-opacity: 1 !important;
+                        stroke-width: 0 !important;
+                    }
+                    #svgcontent text {
+                        fill: #000;
+                        stroke: none;
+                    }
+                </style>`
+            );
             return $clonedSvg;
         }
 
