@@ -5090,7 +5090,9 @@ define([
                 function _parseSvgByLayer(svg) {
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
-                    defNodes.map(def => defChildren.concat(Array.from(def.childNodes)));
+                    defNodes.map(def => {
+                        defChildren = defChildren.concat(Array.from(def.childNodes))
+                    });
 
                     const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
 
@@ -5193,7 +5195,9 @@ define([
                     //this is same as parseByLayer .....
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
-                    defNodes.map(def => defChildren.concat(Array.from(def.childNodes)));
+                    defNodes.map(def => {
+                        defChildren = defChildren.concat(Array.from(def.childNodes));
+                    });
 
                     const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
 
@@ -5374,12 +5378,14 @@ define([
                 if (!node.attributes) {
                     return;
                 }
-                for (var i = 0; i < node.attributes.length; i++) {
-                    var attr = node.attributes[i];
-                    var re = /url\(#([^)]+)\)/g;
-                    var urlMatch = re.exec(attr.value);
+                for (let i = 0; i < node.attributes.length; i++) {
+                    const attr = node.attributes[i];
+                    const re = /url\(#([^)]+)\)/g;
+                    const linkRe = /\#(.+)/g;
+                    const urlMatch = attr.nodeName === 'xlink:href' ? linkRe.exec(attr.value) : re.exec(attr.value);
+
                     if (urlMatch) {
-                        var oldId = urlMatch[1];
+                        const oldId = urlMatch[1];
                         if (oldLinkMap[oldId]) {
                             node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap[oldId]));
                         }
@@ -5388,9 +5394,7 @@ define([
                 if (!node.childNodes) {
                     return;
                 }
-                for (var i = 0; i < node.childNodes.length; i++) {
-                    traverseForRemappingId(node.childNodes[i]);
-                }
+                Array.from(node.childNodes).map( child => traverseForRemappingId(child) );
             }
             traverseForRemappingId(symbol);
 
@@ -5411,9 +5415,9 @@ define([
             }).remove();
 
             //add prefix(which constrain css selector to symbol's id) to prevent class style pollution
-            const origionStyle = $(symbol).find('style').text();
+            const originStyle = $(symbol).find('style').text();
             //the regex indicate the css selector, but the selector may contain comma, so we replace it again.
-            let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
+            let prefixedStyle = originStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
                 const prefix = '#' + symbol.id + ' ';
                 match = match.replace(',', ',' + prefix);
                 return prefix + match;
