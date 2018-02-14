@@ -125,7 +125,7 @@ function createWindow () {
             preload: path.join(__dirname, 'src', 'main-window-entry.js')
         },
         vibrancy: 'light'});
-    
+
     mainWindow.maximize();
 
     mainWindow.loadURL(url.format({
@@ -177,6 +177,8 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
         console.error('Recv async-status request but main window not exist');
     }
 });
+
+app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
 
 app.on('ready', () => {
     app.makeSingleInstance((commandLine, workingDirectory) => {
