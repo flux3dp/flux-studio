@@ -455,7 +455,7 @@ define(function() {
                 rectilinearGrid: 'Rectilinear Grid',// do not change
                 honeycomb: 'Honeycomb',             // do not change
                 offset: 'Offset',
-                xyOffset: 'XY Compensate',
+                xyOffset: 'Horizontal Expansion',
                 zOffset: 'Z Offset',
                 cutBottom: 'Cut Bottom',
                 curaInfill: {

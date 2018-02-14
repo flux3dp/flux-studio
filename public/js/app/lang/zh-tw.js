@@ -469,7 +469,7 @@ define(function() {
                 rectilinearGrid: '直線格狀',// do not change
                 honeycomb: '蜂巢狀',             // do not change
                 offset: '位移',
-                xyOffset: '外框補償',
+                xyOffset: '水平擴張',
                 zOffset: 'Z 軸位移',
                 cutBottom: '移除底部',
                 
