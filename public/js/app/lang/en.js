@@ -319,6 +319,8 @@ define(function() {
             projection_perspective: 'Perspective',
             projection_orthographic: 'Orthographic',
             antialiasing: 'Anti-aliasing',
+            auto_slice: 'Auto Slice',
+            lock_selection: 'Lock Selection',
             default_machine: 'Default Machine',
             default_machine_button: 'Empty',
             remove_default_machine_button: 'Remove',

@@ -656,10 +656,11 @@ define([
                 },
 
                 _handleDeviceSelected: function(printer) {
+                    let self = this;
                     if (printer == "export_fcode") {
                         if(director.getModelCount() !== 0) {
                             director.downloadFCode().then(function() {
-                                this.setState({ openWaitWindow: false });
+                                self.setState({ openWaitWindow: false });
                             });
                         }
                         return;

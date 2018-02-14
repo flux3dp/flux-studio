@@ -525,7 +525,9 @@ define([
                         if(files.length > index + 1) {
                             appendModels(files, index + 1, callback);
                         } else {
-                            startSlicing(slicingType.F);
+                            if (localStorage.get('auto-slicing') !== 'false') {
+                                startSlicing(slicingType.F);
+                            }
                             callback();
                         }
                     }
@@ -710,6 +712,7 @@ define([
         let d = $.Deferred(),
             wasInPreviewMode = false;
 
+        checkAndReslice(true);
         _checkNeedToShowProgress();
         if(importFromGCode || importFromFCode) {
             d.resolve();
@@ -750,7 +753,8 @@ define([
         return d.promise();
     }
 
-    function doSlicing() {
+    function checkAndReslice(sliceIfChanged = false) {
+        if (localStorage.get('auto-slicing') === 'false' && !sliceIfChanged) return;
         // Check if slicing is necessary
         fullSliceParameters.objs = {};
         objects.forEach((o) => {
@@ -1096,13 +1100,15 @@ define([
 
             if (!allOutOfBound()) {
                 //set the OrbitControls target to move around.
-                _orbitTargetMesh(SELECTED);
+                if (localStorage.get('lock-selected') !== 'false') {
+                    _orbitTargetMesh(SELECTED);
+                }
             }
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
 
                 setObjectDialoguePosition(SELECTED);
-                doSlicing();
+                checkAndReslice();
             }
         });
         render();
@@ -1403,7 +1409,7 @@ define([
 
             slicingStatus.showProgress = false;
 
-            doSlicing();
+            checkAndReslice();
             syncObjectOutline(src);
             setObjectDialoguePosition(src);
         }
@@ -1435,7 +1441,7 @@ define([
             Object.assign(fullSliceParameters.settings, settings);
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
-                doSlicing();
+                checkAndReslice();
             }
             deferred.resolve('');
         }).fail((error) => {
@@ -1459,7 +1465,7 @@ define([
             fullSliceParameters.settings[name] = value;
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
-                doSlicing();
+                checkAndReslice();
             }
             d.resolve('');
         }).fail((error) => {
@@ -1475,7 +1481,7 @@ define([
         hasPreviewImage = false;
         lastSliceParams = '';
         if(objects.length > 0) {
-            doSlicing();
+            checkAndReslice();
         }
         return sliceMaster.addTask('setParameters', keyValueObject);
     }
@@ -1501,7 +1507,7 @@ define([
             reactSrc.setState({
                 modelsrc: src.uuid ? src : null
             }, () => {
-                doSlicing();
+                checkAndReslice();
             });
             src.plane_boundary = planeBoundary(src);
             groundIt(src);
@@ -1715,7 +1721,7 @@ define([
                 });
             }
             else {
-                doSlicing();
+                checkAndReslice();
             }
 
             _clearPath();
@@ -1760,7 +1766,7 @@ define([
                         objects.push(mesh);
                         addHistory('ADD', mesh);
 
-                        doSlicing();
+                        checkAndReslice();
                         syncObjectOutline(mesh);
                         setObjectDialoguePosition(mesh);
                         render();
@@ -2198,6 +2204,7 @@ define([
     }
 
     function togglePreview() {
+        checkAndReslice(true);
         if (objects.length === 0 || allOutOfBound()) {
             _closePreview();
             return;
@@ -2650,7 +2657,7 @@ define([
             reactSrc.setState({ hasObject: !allOutOfBound()});
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
-                doSlicing();
+                checkAndReslice();
             }
         });
         render();
@@ -2730,22 +2737,26 @@ define([
         }
 
         if(blobExpired) {
+            console.log("Blob Expired");
             let progress;
             slicingStatus.showProgress = true;
             slicingStatus.needToCloseWait = true;
 
             if(willReslice) {
+                console.log("Will Reslice");
                 progress = lang.print.reRendering;
                 if(!slicingStatus.isComplete) {
                     _showWait(progress, !showStopButton);
                 }
             }
             else {
+                console.log("Update Slice Progress");
                 updateSlicingProgressFromReport(slicingStatus.lastReport);
             }
         }
         else {
             if(!printPath || printPath.length === 0) {
+                console.log("Getting Path");
                 _showWait(lang.print.drawingPreview, !showStopButton);
                 sliceMaster.addTask('getPath').then((result) => {
                     if(result.error) {
@@ -2763,6 +2774,7 @@ define([
                 });
             }
             else {
+                console.log("Drawing Path");
                 _drawPath().then(function() {
                     changePreviewLayer(getCurrentPreviewLayer());
                     _closeWait();

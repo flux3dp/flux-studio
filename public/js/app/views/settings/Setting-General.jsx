@@ -115,6 +115,8 @@ define([
                 defaultAppOptions = [],
                 projectionOptions = [],
                 antialiasingOptions = [],
+                autoSlicingOptions = [],
+                lockSelectionOptions = [],
                 defaultModelOptions = [],
                 defaultBeamboxModelOptions = [],
                 options = [];
@@ -199,6 +201,31 @@ define([
                 }
             ];
 
+            autoSlicingOptions = [
+                {
+                    value: 'true',
+                    label: lang.settings.on,
+                    selected: config().read('auto-slicing') !== 'false'
+                },
+                {
+                    value: 'false',
+                    label: lang.settings.off,
+                    selected: config().read('auto-slicing') === 'false'
+                }
+            ];
+
+            lockSelectionOptions = [
+                {
+                    value: 'true',
+                    label: lang.settings.on,
+                    selected: config().read('lock-selection') !== 'false'
+                },
+                {
+                    value: 'false',
+                    label: lang.settings.off,
+                    selected: config().read('lock-selection') === 'false'
+                }
+            ];
 
             defaultModelOptions = [
                 {
@@ -309,6 +336,24 @@ define([
                             className="font3"
                             options={antialiasingOptions}
                             onChange={this._updateOptions.bind(null, 'antialiasing')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.auto_slice}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={autoSlicingOptions}
+                            onChange={this._updateOptions.bind(null, 'auto-slicing')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.lock_selection}>
+                        <SelectView
+                            id="select-lang"
+                            className="font3"
+                            options={lockSelectionOptions}
+                            onChange={this._updateOptions.bind(null, 'lock-selected')}
                         />
                     </Controls>
 

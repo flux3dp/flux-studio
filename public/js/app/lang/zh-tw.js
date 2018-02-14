@@ -319,6 +319,8 @@ define(function() {
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
+            auto_slice: '自動切片',
+            lock_selection: '鎖定選取目標',
             reset: '重置所有設定',
             default_machine: '預設機器',
             default_machine_button: '無',
