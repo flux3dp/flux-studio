@@ -33,7 +33,7 @@ define([
                     #svgcontent * {
                         fill-opacity: 0;
                         stroke: #000;
-                        stroke-width: 1px;
+                        stroke-width: 1px !important;
                         stroke-opacity: 1.0;
                         stroke-dasharray: 0;
                         opacity: 1;
@@ -181,7 +181,7 @@ define([
         exportFcode: async function () {
             const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
             let defaultFCodeName = svgCanvas.getLatestImportFileName();
-            if (!defaultFCodeName) { defaultFCodeName = 'untitled' }
+            if (!defaultFCodeName) { defaultFCodeName = 'untitled'; }
             saveAs(fcodeBlob,  defaultFCodeName + '.fc');
             ProgressActions.close();
         },

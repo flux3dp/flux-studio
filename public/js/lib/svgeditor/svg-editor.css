@@ -547,7 +547,7 @@ div.palette_item:first-child {
 #workarea.wireframe #svgcontent * {
 	fill-opacity: 0;
 	stroke: #000;
-	stroke-width: 1px;
+	stroke-width: 1px !important;
 	stroke-opacity: 1.0;
 	stroke-dasharray: 0;
 	opacity: 1;

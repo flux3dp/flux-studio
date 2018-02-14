@@ -5091,7 +5091,7 @@ define([
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
                     defNodes.map(def => {
-                        defChildren = defChildren.concat(Array.from(def.childNodes))
+                        defChildren = defChildren.concat(Array.from(def.childNodes));
                     });
 
                     const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
@@ -5405,7 +5405,9 @@ define([
             }
             symbol.id = getNextId();
             symbol.setAttribute('data-id', elem.firstChild.id);
-            symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
+            if (elem.firstChild.getAttribute('data-color')) {
+                symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
+            }
 
             svgedit.utilities.findDefs().appendChild(symbol);
 
