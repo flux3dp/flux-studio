@@ -9,7 +9,7 @@ define([
     'helpers/api/fcode-reader',
     'app/actions/alert-actions',
     'app/actions/global-actions',
-    'helpers/sprintf',    
+    'helpers/sprintf',
     'helpers/check-device-status',
     'app/actions/beambox/constant'
 ], function (
@@ -45,12 +45,12 @@ define([
         }
 
         //main functions
-        
+
         async start(selectedPrinter, errCallback) {
             await this._reset();
-            
+
             await DeviceMaster.select(selectedPrinter);
-            
+
             ProgressActions.open(ProgressConstants.NONSTOP, sprintf(i18n.lang.message.connectingMachine, selectedPrinter.name));
 
             try {
@@ -65,7 +65,7 @@ define([
             } catch (error) {
                 throw error;
             } finally {
-                ProgressActions.close();                
+                ProgressActions.close();
             }
         }
 
@@ -83,12 +83,12 @@ define([
             const constrainedXY = this._constrainPreviewXY(x, y);
             x = constrainedXY.x;
             y = constrainedXY.y;
-            
-            $(workarea).css('cursor', 'wait');      
+
+            $(workarea).css('cursor', 'wait');
 
             this._getPhotoAfterMove(x, y)
             .then((imgUrl)=>{
-                $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');                
+                $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
                 this._drawIntoBackground(imgUrl, x, y);
                 this.isPreviewBlocked = false;
             })
@@ -137,7 +137,7 @@ define([
         _getCameraOffset() {
             return this.cameraOffset;
         }
-        
+
         _clearData() {
             this.storedPrinter = null;
             this.isPreviewModeOn = false;
@@ -166,6 +166,11 @@ define([
         _constrainPreviewXY(x, y) {
             const maxWidth = Constant.dimension.width;
             const maxHeight = Constant.dimension.height;
+
+            // Align grid
+            x = Math.round(x / 100) * 100;
+            y = Math.round(y / 100) * 100;
+
             x = Math.max(x, this._getCameraOffset().x * 10);
             x = Math.min(x, maxWidth);
             y = Math.max(y, this._getCameraOffset().y * 10);
@@ -201,11 +206,11 @@ define([
 
         _getPhotoFromStream() {
             const d = $.Deferred();
-            
+
             const waitTimeForMovementStop = Constant.camera.waitTimeForMovementStop; //millisecond. this value need optimized
             setTimeout(() => {
                 this.cameraStream.take(1).subscribe((imageBlob) => {
-                    const imgUrl = URL.createObjectURL(imageBlob); 
+                    const imgUrl = URL.createObjectURL(imageBlob);
                     d.resolve(imgUrl);
                 });
             }, waitTimeForMovementStop);
@@ -219,7 +224,7 @@ define([
 
             const cvs = document.createElement("canvas");
             const ctx = cvs.getContext("2d");
-            
+
             const a = angle;
             const s = scaleRatio;
             const w = imageObj.width;
@@ -228,9 +233,9 @@ define([
             const c = h / (Math.cos(a) + Math.sin(a));
             const dstx = (h - w) / 2 * s;
             const dsty = - h * Math.sin(a) / (Math.cos(a) + Math.sin(a)) * s;
-        
+
             cvs.width = cvs.height = c * s;
-        
+
             ctx.rotate(a);
             ctx.drawImage(imageObj, 0, 0, w, h, dstx, dsty, w * s, h * s);
 
@@ -243,7 +248,7 @@ define([
             img.onload = () => {
                 // free unused blob memory
                 URL.revokeObjectURL(imgUrl);
-                
+
                 const img_regulated = this._cropAndRotateImg(img);
 
                 const dstX = x - img_regulated.width/2;
@@ -287,7 +292,7 @@ define([
             });
             const uncapturabledHeight = (this._getCameraOffset().y * Constant.dpmm) - (Constant.camera.imgHeight * this._getCameraOffset().scaleRatio / 2);
             const uncapturabledHeightRatio = uncapturabledHeight / Constant.dimension.height;
-            
+
             const descText = svgCanvas.addSvgElementFromJson({
                 'element': 'text',
                 'attr': {
