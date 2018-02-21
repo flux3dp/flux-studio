@@ -524,49 +524,6 @@ div.palette_item:first-child {
 	z-index: 4;
 }
 
-#workarea.wireframe #svgcontent g[data-color] ellipse[stroke=none],
-#workarea.wireframe #svgcontent g[data-color] circle[stroke=none],
-#workarea.wireframe #svgcontent g[data-color] rect[stroke=none],
-#workarea.wireframe #svgcontent g[data-color] path[stroke=none],
-#workarea.wireframe #svgcontent g[data-color] polygon[stroke=none],
-#workarea.wireframe #svgcontent g[data-color] ellipse:not([stroke]),
-#workarea.wireframe #svgcontent g[data-color] circle:not([stroke]),
-#workarea.wireframe #svgcontent g[data-color] rect:not([stroke]),
-#workarea.wireframe #svgcontent g[data-color] path:not([stroke]),
-#workarea.wireframe #svgcontent g[data-color] polygon:not([stroke]) {
-	fill-opacity: 1 !important;
-	stroke-width: 0 !important;
-	/* TODO:
-	Better way to do object selection:
-		Duplicate the origina object, and use invisible outline with stroke width: 5px,
-		so that object can be selected with some error tolerance.
-	*/
-	/* pointer-events: stroke; */
-}
-
-#workarea.wireframe #svgcontent * {
-	fill-opacity: 0;
-	stroke: #000;
-	stroke-width: 1px !important;
-	stroke-opacity: 1.0;
-	stroke-dasharray: 0;
-	opacity: 1;
-	vector-effect: non-scaling-stroke;
-	filter: none;
-	cursor: move;
-	/* TODO:
-	Better way to do object selection:
-		Duplicate the origina object, and use invisible outline with stroke width: 5px,
-		so that object can be selected with some error tolerance.
-	*/
-	/* pointer-events: stroke; */
-}
-
-#workarea.wireframe #svgcontent text {
-	fill: #000;
-	stroke: none;
-}
-
 #workarea.wireframe #canvasBackground > rect {
 	fill: #FFF !important;
 }

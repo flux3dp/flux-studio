@@ -27,38 +27,6 @@ define([
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
 
-            // these are rules in svg-editor.css
-            $clonedSvg.find('#svgcontent').append(
-                `<style>
-                    #svgcontent * {
-                        fill-opacity: 0;
-                        stroke: #000;
-                        stroke-width: 1px !important;
-                        stroke-opacity: 1.0;
-                        stroke-dasharray: 0;
-                        opacity: 1;
-                        vector-effect: non-scaling-stroke;
-                        filter: none;
-                    }
-                    #svgcontent g[data-color] ellipse[stroke=none],
-                    #svgcontent g[data-color] circle[stroke=none],
-                    #svgcontent g[data-color] rect[stroke=none],
-                    #svgcontent g[data-color] path[stroke=none],
-                    #svgcontent g[data-color] polygon[stroke=none],
-                    #svgcontent g[data-color] ellipse:not([stroke]),
-                    #svgcontent g[data-color] circle:not([stroke]),
-                    #svgcontent g[data-color] rect:not([stroke]),
-                    #svgcontent g[data-color] path:not([stroke]),
-                    #svgcontent g[data-color] polygon:not([stroke]) {
-                        fill-opacity: 1 !important;
-                        stroke-width: 0 !important;
-                    }
-                    #svgcontent text {
-                        fill: #000;
-                        stroke: none;
-                    }
-                </style>`
-            );
             return $clonedSvg;
         }
 
@@ -108,6 +76,7 @@ define([
     const prepareFileWrappedFromSvgStringAndThumbnail = async () => {
         const [thumbnail, thumbnailBlobURL] = await fetchThumbnail();
         const svgString = svgCanvas.getSvgString();
+        console.log('svgString: ', svgString);
 
         const blob = new Blob([thumbnail, svgString], { type: 'application/octet-stream' });
         const reader = new FileReader();

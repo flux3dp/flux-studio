@@ -110,7 +110,33 @@ define([
                 'xmlns:se': NS.SE,
                 'xmlns:xlink': NS.XLINK
             }).appendTo(svgroot);
-
+            $(svgcontent).append(
+                `<style>
+                    #svgcontent * {
+                        fill-opacity: 0;
+                        stroke: #F00;
+                        stroke-width: 1px !important;
+                        stroke-opacity: 1.0;
+                        stroke-dasharray: 0;
+                        opacity: 1;
+                        vector-effect: non-scaling-stroke;
+                        filter: none;
+                    }
+                    #svgcontent g[data-color] ellipse[stroke=none],
+                    #svgcontent g[data-color] circle[stroke=none],
+                    #svgcontent g[data-color] rect[stroke=none],
+                    #svgcontent g[data-color] path[stroke=none],
+                    #svgcontent g[data-color] polygon[stroke=none],
+                    #svgcontent g[data-color] ellipse:not([stroke]),
+                    #svgcontent g[data-color] circle:not([stroke]),
+                    #svgcontent g[data-color] rect:not([stroke]),
+                    #svgcontent g[data-color] path:not([stroke]),
+                    #svgcontent g[data-color] polygon:not([stroke]) {
+                        fill-opacity: 1 !important;
+                        stroke-width: 0 !important;
+                    }
+                </style>`
+            );
         };
         clearSvgContentElement();
 
@@ -4166,7 +4192,7 @@ define([
                         res.h = svgedit.units.convertUnit(res.h, unit) + unit;
                     }
 
-                    out.push(' width="' + res.w + '" height="' + res.h + '"' + vb + ' xmlns="' + NS.SVG + '"');
+                    out.push(' id="svgcontent" width="' + res.w + '" height="' + res.h + '"' + vb + ' xmlns="' + NS.SVG + '"');
 
                     var nsuris = {};
 
@@ -5347,47 +5373,37 @@ define([
         };
 
         this.makeSymbol = function (elem, attrs, batchCmd, defs) {
-            var symbol = svgdoc.createElementNS(NS.SVG, 'symbol'),
-                symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
-            var oldLinkMap = {};
+            const symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
+            const symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
+            const oldLinkMap = new Map();
 
-            if (defs) {
-                // this is a group color object, copy defs into symbol;
-                defs.map(def => {
-                    this.clipCount = this.clipCount || 1;
-                    const clonedDef = def.cloneNode(true),
-                        newId = 'def' + (this.clipCount++);
-                    oldLinkMap[clonedDef.id] = newId;
-                    clonedDef.id = newId;
-                    symbol_defs.appendChild(clonedDef);
-                });
-            }
+            defs.map(def => {
+                this.clipCount = this.clipCount || 1;
+                const clonedDef = def.cloneNode(true);
+                const oldId = clonedDef.id;
+                const newId = 'def' + (this.clipCount++);
+                oldLinkMap.set(oldId, newId);
+                clonedDef.id = newId;
+                symbol_defs.appendChild(clonedDef);
+            });
 
             symbol.appendChild(symbol_defs);
 
-            if (elem.tagName !== 'g') {
-                while (elem.firstChild) {
-                    var first = elem.firstChild;
-                    symbol.appendChild(first);
-                }
-            } else {
-                symbol.appendChild(elem);
-            }
+            symbol.appendChild(elem);
 
             function traverseForRemappingId(node) {
                 if (!node.attributes) {
                     return;
                 }
-                for (let i = 0; i < node.attributes.length; i++) {
-                    const attr = node.attributes[i];
+                for (let attr of node.attributes) {
                     const re = /url\(#([^)]+)\)/g;
                     const linkRe = /\#(.+)/g;
                     const urlMatch = attr.nodeName === 'xlink:href' ? linkRe.exec(attr.value) : re.exec(attr.value);
 
                     if (urlMatch) {
                         const oldId = urlMatch[1];
-                        if (oldLinkMap[oldId]) {
-                            node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap[oldId]));
+                        if (oldLinkMap.get(oldId)) {
+                            node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap.get(oldId)));
                         }
                     }
                 }
