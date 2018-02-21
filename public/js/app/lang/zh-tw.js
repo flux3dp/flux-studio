@@ -177,7 +177,7 @@ define(function() {
             connect_flux: '連接機器',
             via_usb: '使用 USB',
             via_wifi: '使用 WiFi',
-            select_machine_type: '請選擇您的機種',            
+            select_machine_type: '請選擇您的機種',
             name_your_flux: '為你的機器取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -472,7 +472,7 @@ define(function() {
                 xyOffset: '水平擴張',
                 zOffset: 'Z 軸位移',
                 cutBottom: '移除底部',
-                
+
                 curaInfill: {
                     automatic: '自動',
                     grid: '格狀',
@@ -1397,7 +1397,7 @@ define(function() {
             analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
             drawing_calibration_image: '繪製校正圖片中...',
             please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
-            calibrate_done: '校正相機完成<br/>使用時請正確對焦已取得良好的預覽效果。'
+            calibrate_done: '校正相機完成<br/>使用時請正確對焦以取得良好的預覽效果。'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
