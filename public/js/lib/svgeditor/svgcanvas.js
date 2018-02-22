@@ -110,33 +110,7 @@ define([
                 'xmlns:se': NS.SE,
                 'xmlns:xlink': NS.XLINK
             }).appendTo(svgroot);
-            $(svgcontent).append(
-                `<style>
-                    #svgcontent * {
-                        fill-opacity: 0;
-                        stroke: #F00;
-                        stroke-width: 1px !important;
-                        stroke-opacity: 1.0;
-                        stroke-dasharray: 0;
-                        opacity: 1;
-                        vector-effect: non-scaling-stroke;
-                        filter: none;
-                    }
-                    #svgcontent g[data-color] ellipse[stroke=none],
-                    #svgcontent g[data-color] circle[stroke=none],
-                    #svgcontent g[data-color] rect[stroke=none],
-                    #svgcontent g[data-color] path[stroke=none],
-                    #svgcontent g[data-color] polygon[stroke=none],
-                    #svgcontent g[data-color] ellipse:not([stroke]),
-                    #svgcontent g[data-color] circle:not([stroke]),
-                    #svgcontent g[data-color] rect:not([stroke]),
-                    #svgcontent g[data-color] path:not([stroke]),
-                    #svgcontent g[data-color] polygon:not([stroke]) {
-                        fill-opacity: 1 !important;
-                        stroke-width: 0 !important;
-                    }
-                </style>`
-            );
+
         };
         clearSvgContentElement();
 
@@ -5285,10 +5259,14 @@ define([
                 // append ~~~~~ ya
                 getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
+                if(type !== 'color') {
+                    use_el.setAttribute('data-wireframe', true);
+                }
+
+                use_el.setAttribute('data-symbol', symbol);
+                use_el.setAttribute('data-ref', symbol);
+
                 batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
-
-                $(use_el).data('symbol', symbol).data('ref', symbol);
-
 
                 return use_el;
             }
@@ -5420,7 +5398,9 @@ define([
                 symbol.setAttribute(attr.nodeName, attr.value);
             }
             symbol.id = getNextId();
-            symbol.setAttribute('data-id', elem.firstChild.id);
+            if (elem.firstChild.id) {
+                symbol.setAttribute('data-id', elem.firstChild.id);
+            }
             if (elem.firstChild.getAttribute('data-color')) {
                 symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
             }
@@ -5440,7 +5420,50 @@ define([
                 match = match.replace(',', ',' + prefix);
                 return prefix + match;
             });
-            $(symbol).find('style').text(prefixedStyle);
+            prefixedStyle = prefixedStyle + `
+                *[data-color] ellipse[stroke=none],
+                *[data-color] circle[stroke=none],
+                *[data-color] rect[stroke=none],
+                *[data-color] path[stroke=none],
+                *[data-color] polygon[stroke=none],
+                *[data-color] ellipse:not([stroke]),
+                *[data-color] circle:not([stroke]),
+                *[data-color] rect:not([stroke]),
+                *[data-color] path:not([stroke]),
+                *[data-color] polygon:not([stroke]) {
+                    fill-opacity: 1 !important;
+                    stroke-width: 0 !important;
+                }
+                *[data-wireframe] {
+                    fill-opacity: 0 !important;
+                    stroke: #000 !important;
+                    stroke-width: 1px !important;
+                    stroke-opacity: 1.0 !important;
+                    stroke-dasharray: 0 !important;
+                    opacity: 1 !important;
+                    vector-effect: non-scaling-stroke !important;
+                    filter: none !important;
+                }
+                #${symbol.id} * {
+                    fill-opacity: 0;
+                    stroke: #000;
+                    stroke-width: 1px !important;
+                    stroke-opacity: 1.0;
+                    stroke-dasharray: 0;
+                    opacity: 1;
+                    vector-effect: non-scaling-stroke !important;
+                    filter: none;
+                }
+
+            `;
+
+            if ($(symbol).find('style').length) {
+                $(symbol).find('style').text(prefixedStyle);
+            } else {
+                $(symbol).find('defs').append(
+                    `<style>${prefixedStyle}</style>`
+                );
+            }
 
             batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(symbol));
 
