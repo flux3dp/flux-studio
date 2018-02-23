@@ -1,6 +1,8 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
+    'reactPropTypes',
     'jsx!widgets/Slider-Control',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Switch-Control',
@@ -16,6 +18,8 @@ define([
 ], function(
     $,
     React,
+    ReactDOM,
+    PropTypes,
     SliderControl,
     DropdownControl,
     SwitchControl,
@@ -60,10 +64,10 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang            : React.PropTypes.object,
-            setting         : React.PropTypes.object,
-            onClose         : React.PropTypes.func,
-            onApply         : React.PropTypes.funcs
+            lang            : PropTypes.object,
+            setting         : PropTypes.object,
+            onClose         : PropTypes.func,
+            onApply         : PropTypes.func
         },
 
         getInitialState: function() {
@@ -118,8 +122,8 @@ define([
         },
 
         _isValidValue: function(key, value) {
-            var min = parseInt(this.refs[key].getDOMNode().min),
-                max = parseInt(this.refs[key].getDOMNode().max);
+            var min = parseInt(ReactDOM.findDOMNode(this.refs[key]).min),
+                max = parseInt(ReactDOM.findDOMNode(this.refs[key]).max);
 
             return min <= value && value <= max;
         },
@@ -389,7 +393,7 @@ define([
                             unit="degree"
                             default={advancedSetting.config.first_layer_temperature}
                             onChange={this._handleControlValueChange} />
-                        
+
                         <SwitchControl
                             id="flexible_material"
                             name="flexible_material"
@@ -951,7 +955,6 @@ define([
 
         render: function() {
             var self = this,
-                cx = React.addons.classSet,
                 className = {
                     'hide': (this.state.mode === mode.save),
                     'box-shadow': true

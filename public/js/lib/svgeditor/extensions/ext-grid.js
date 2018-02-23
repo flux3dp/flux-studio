@@ -118,12 +118,12 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		ctx.lineTo(0, cur_d);
 		ctx.stroke();
 
-		var datauri = hcanvas.toDataURL('image/png');
 		gridimg.setAttribute('width', big_int);
 		gridimg.setAttribute('height', big_int);
 		gridimg.parentNode.setAttribute('width', big_int);
 		gridimg.parentNode.setAttribute('height', big_int);
-		svgCanvas.setHref(gridimg, datauri);
+        svgCanvas.setHref(gridimg, hcanvas.toDataURL('image/png'));
+
 	}
 
 	function gridUpdate () {

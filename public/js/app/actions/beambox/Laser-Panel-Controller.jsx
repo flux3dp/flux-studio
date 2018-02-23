@@ -1,8 +1,11 @@
 define([
     'react',
+    'reactDOM',
     'jsx!views/beambox/Right-Panels/Laser-Panel',
+    'reactCreateReactClass'
 ], function(
     React,
+    ReactDOM,
     LaserPanel
 ){
 
@@ -67,7 +70,7 @@ define([
             const speed = _getSpeed(name);
             const strength = _getStrength(name);
             
-            React.render(
+            ReactDOM.render(
                 <LaserPanel
                     layerName={name}
                     speed={speed}

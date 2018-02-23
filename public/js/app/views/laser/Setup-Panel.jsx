@@ -1,6 +1,8 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
+    'reactClassset',
     'jsx!widgets/Select',
     'jsx!widgets/List',
     'jsx!widgets/Modal',
@@ -18,6 +20,8 @@ define([
 ], function(
     $,
     React,
+    ReactDOM,
+    ReactCx,
     SelectView,
     List,
     Modal,
@@ -215,7 +219,7 @@ define([
                         'ga-event': 'apply-custom-laser-preset'
                     },
                     onClick: function(e) {
-                        var elCustomPresets = self.refs.customPresets.getDOMNode();
+                        var elCustomPresets = ReactDOM.findDOMNode(self.refs.customPresets);
 
                         self._saveLastestSet({ material: JSON.parse(elCustomPresets.dataset.selectedMaterial) });
                         self._togglePanel('customPresets', false)();
@@ -223,7 +227,7 @@ define([
                     }
                 }],
                 selectPresetMaterial = function(e) {
-                    var elCustomPresets = self.refs.customPresets.getDOMNode(),
+                    var elCustomPresets = ReactDOM.findDOMNode(self.refs.customPresets),
                         meta;
 
                     if ('undefined' !== typeof e.target.dataset.meta) {
@@ -239,7 +243,7 @@ define([
                     }
                 },
                 handleDelPreset = function(e) {
-                  let elCustomPresets = self.refs.customPresets.getDOMNode(),
+                  let elCustomPresets = ReactDOM.findDOMNode(self.refs.customPresets),
                       customPresets = config().read('laser-custom-presets') || [],
                       selectedPreset = JSON.parse(elCustomPresets.dataset.selectedMaterial),
                       isSelected,
@@ -444,9 +448,8 @@ define([
         },
 
         _renderShading: function() {
-            var cx = React.addons.classSet,
-                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
-                classes = cx('display-text', 'shading');
+            var checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
+                classes = ReactCx.cx('display-text', 'shading');
             return {
                 label: (
                     <TextToggle
@@ -512,8 +515,7 @@ define([
         },
 
         render: function() {
-            var cx = React.addons.classSet,
-                advancedPanel = this._renderAdvancedPanel(this.state.defaults.material),
+            var advancedPanel = this._renderAdvancedPanel(this.state.defaults.material),
                 customPresets = this._renderCustomPresets(),
                 alert = this._renderAlert(),
                 items = [

@@ -5317,7 +5317,6 @@ define([
                     'px': svgUnitScaling,
                 };
 
-                // if no unit was given
                 if (!isNaN(val)) {
                     return val * unitMap['px'];
                 }

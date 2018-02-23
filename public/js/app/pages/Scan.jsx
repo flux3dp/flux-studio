@@ -1,6 +1,8 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
+    'reactDOM',
     'jsx!widgets/List',
     'jsx!widgets/Modal',
     'app/actions/scanned-model',
@@ -34,6 +36,8 @@ define([
 ], function(
     $,
     React,
+    ReactCx,
+    ReactDOM,
     List,
     Modal,
     ScannedModel,
@@ -178,7 +182,7 @@ define([
                     menuFactory.items.undo.onClick = fireUndo;
                     menuFactory.items.import.enabled = false === self.state.isScanStarted;
                     menuFactory.items.import.onClick = function() {
-                        self.refs.fileUploader.getDOMNode().click();
+                        ReactDOM.findDOMNode(self.refs.fileUploader.click());
                     };
                     menuFactory.methods.refresh();
 
@@ -1443,7 +1447,6 @@ define([
                 _renderStageSection: function(lang) {
                     var self = this,
                         state = self.state,
-                        cx = React.addons.classSet,
                         camera_image_class,
                         settingPanel = self._renderSettingPanel(lang),
                         manipulationPanel = self._renderManipulationPanel(lang),
@@ -1453,7 +1456,7 @@ define([
                         },
                         cameraImage = (self.state.cameraImageSrc || 'img/menu/main_logo.svg');
 
-                    camera_image_class = cx({
+                    camera_image_class = ReactCx.cx({
                         'camera-image' : true === this.state.showCamera,
                         'hide' : false === this.state.showCamera
                     });
@@ -1571,7 +1574,6 @@ define([
                     var self = this,
                         thumbnails = [],
                         meshes = self.state.meshes,
-                        cx = React.addons.classSet,
                         itemClass = {};
 
                     thumbnails = meshes.map(function(mesh, i) {
@@ -1639,7 +1641,7 @@ define([
 
                         return {
                             label: (
-                                <div className={cx(itemClass)}>
+                                <div className={ReactCx.cx(itemClass)}>
                                     <div className="mesh-thumbnail-no" data-index={mesh.index} onClick={onChooseMesh}>{mesh.index}</div>
                                     <div className="mesh-thumbnail-close fa fa-times" onClick={self._onDeletingMesh.bind(self, mesh, i)}></div>
                                 </div>
@@ -1658,7 +1660,6 @@ define([
                     var state = this.state,
                         lang = state.lang,
                         progressBar = this._renderProgressBar(lang),
-                        cx = React.addons.classSet,
                         actionButtons = this._renderActionButtons(lang),
                         scanStage = this._renderStageSection(lang),
                         selectPrinter = this._renderPrinterSelectorWindow(lang);

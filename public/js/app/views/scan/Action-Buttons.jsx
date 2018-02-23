@@ -1,7 +1,8 @@
 define([
     'react',
+    'reactClassset',
     'jsx!widgets/Button-Group'
-], function(React, ButtonGroup) {
+], function(React, ReactCx, ButtonGroup) {
     'use strict';
 
     return React.createClass({
@@ -27,7 +28,6 @@ define([
         _getActionButtons: function(lang) {
             var self = this,
                 buttons = [],
-                cx = React.addons.classSet,
                 className;
 
             switch (self.props.mode) {
@@ -60,7 +60,7 @@ define([
 
                 buttons.push({
                     label: lang.scan.start_multiscan,
-                    className: cx(className),
+                    className: ReactCx.cx(className),
                     dataAttrs: {
                         'ga-event': 'going-to-multiscan'
                     },
@@ -118,7 +118,7 @@ define([
                 });
                 buttons.push({
                     label: lang.scan.start_multiscan,
-                    className: cx(className),
+                    className: ReactCx.cx(className),
                     dataAttrs: {
                         'ga-event': 'go-to-multiscan'
                     },
@@ -133,7 +133,6 @@ define([
         render : function() {
             var lang = this.props.lang,
                 buttons = this._getActionButtons(lang),
-                cx = React.addons.classSet,
                 defaultClassName = cx(this.props.className);
 
             return (

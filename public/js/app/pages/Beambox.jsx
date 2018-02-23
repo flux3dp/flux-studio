@@ -26,7 +26,6 @@ define([
         render() {
             return (
                 <div className="studio-container beambox-studio">
-                    <div id='grid_mask' />
                     <LeftPanel />
                     <SvgEditor />
                     <BottomRightPanel />

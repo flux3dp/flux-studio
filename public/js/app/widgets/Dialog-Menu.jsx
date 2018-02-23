@@ -1,6 +1,9 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
+    'reactPropTypes',
+    'reactClassset',
     'jsx!widgets/List',
     // non-return
     'helpers/object-assign'
@@ -8,15 +11,18 @@ define([
 function(
     $,
     React,
+    ReactDOM,
+    PropTypes,
+    ReactCx,
     List
 ) {
     'use strict';
 
     return React.createClass({
         propTypes: {
-            arrowDirection: React.PropTypes.oneOf(['LEFT', 'RIGHT', 'UP', 'BOTTOM']),
-            className: React.PropTypes.object,
-            items: React.PropTypes.array
+            arrowDirection: PropTypes.oneOf(['LEFT', 'RIGHT', 'UP', 'BOTTOM']),
+            className: PropTypes.object,
+            items: PropTypes.array
         },
 
         getDefaultProps: function() {
@@ -28,7 +34,7 @@ function(
         },
 
         toggleSubPopup: function(disable, e) {
-            var $wrapper = $(this.refs.uiDialogMenu.getDOMNode()),
+            var $wrapper = $(ReactDOM.findDOMNode(this.refs.uiDialogMenu)),
                 $me,
                 $popupOpen;
 
@@ -48,8 +54,7 @@ function(
         _renderItem: function() {
             var self = this,
                 items = self.props.items,
-                cx = React.addons.classSet,
-                arrowClassName = cx({
+                arrowClassName = ReactCx.cx({
                     'arrow': true,
                     'arrow-left': 'LEFT' === self.props.arrowDirection,
                     'arrow-right': 'RIGHT' === self.props.arrowDirection,
@@ -90,7 +95,7 @@ function(
                                     type="checkbox"
                                     disabled={disablePopup}
                                 />
-                                <div className={cx(itemLabelClassName)}>
+                                <div className={ReactCx.cx(itemLabelClassName)}>
                                     {opt.label}
                                 </div>
                                 <label className="dialog-window">
@@ -112,7 +117,6 @@ function(
         render: function() {
             var self = this,
                 props = self.props,
-                cx = React.addons.classSet,
                 className = props.className,
                 items = this._renderItem();
 
@@ -122,7 +126,7 @@ function(
                 <List
                     ref="uiDialogMenu"
                     items={items}
-                    className={cx(className)}
+                    className={ReactCx.cx(className)}
                 />
             );
         }

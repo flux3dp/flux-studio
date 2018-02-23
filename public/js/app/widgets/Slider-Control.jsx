@@ -1,7 +1,8 @@
 define([
     'react',
+    'reactPropTypes',
     'plugins/classnames/index'
-], function(React, ClassNames) {
+], function(React, PropTypes, ClassNames) {
     'use strict';
 
     return React.createClass({

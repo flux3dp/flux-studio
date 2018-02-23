@@ -1,8 +1,10 @@
 define([
     'app/actions/global-interaction',
+    'app/actions/beambox/bottom-right-funcs',
     'app/actions/beambox/svgeditor-function-wrapper',
 ],function(
     GlobalInteraction,
+    BottomRightFuncs,
     FnWrapper
 ){
     class BeamboxGlobalInteraction extends GlobalInteraction {
@@ -15,7 +17,7 @@ define([
                     }
                 },
                 'SAVE_SCENE': () => {},
-                'EXPORT_FLUX_TASK': () => {},
+                'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
                 'UNDO': () => FnWrapper.undo(),
                 'DUPLICATE': () => FnWrapper.cloneSelectedElement(),
                 'ROTATE': () => {},
@@ -27,7 +29,7 @@ define([
             };
         }
         attach() {
-            super.attach(['IMPORT', 'UNDO']);
+            super.attach(['IMPORT', 'UNDO', 'EXPORT_FLUX_TASK']);
         }
         onObjectFocus() {
             this.enableMenuItems(['DUPLICATE']);

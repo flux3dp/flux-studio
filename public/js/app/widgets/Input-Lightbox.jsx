@@ -1,11 +1,13 @@
 define([
     'react',
+    'reactDOM',
+    'reactPropTypes',
     'helpers/i18n',
     'app/constants/input-lightbox-constants',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'plugins/classnames/index'
-], function(React, i18n, Constants, Modal, Alert, classNames) {
+], function(React, ReactDOM, PropTypes, i18n, Constants, Modal, Alert, classNames) {
     'use strict';
 
     var acceptableTypes = [
@@ -17,15 +19,15 @@ define([
         View = React.createClass({
 
             propTypes: {
-                isOpen       : React.PropTypes.bool,
-                lang         : React.PropTypes.object,
-                type         : React.PropTypes.oneOf(acceptableTypes),
-                maxLength    : React.PropTypes.number,
-                inputHeader  : React.PropTypes.string,
-                defaultValue : React.PropTypes.string,
-                confirmText  : React.PropTypes.string,
-                onCustom     : React.PropTypes.func,
-                onClose      : React.PropTypes.func
+                isOpen       : PropTypes.bool,
+                lang         : PropTypes.object,
+                type         : PropTypes.oneOf(acceptableTypes),
+                maxLength    : PropTypes.number,
+                inputHeader  : PropTypes.string,
+                defaultValue : PropTypes.string,
+                confirmText  : PropTypes.string,
+                onCustom     : PropTypes.func,
+                onClose      : PropTypes.func
             },
 
             getDefaultProps: function() {
@@ -67,10 +69,10 @@ define([
                     result;
 
                 if (Constants.TYPE_FILE === this.props.type) {
-                    returnValue = this.refs.inputField.getDOMNode().files;
+                    returnValue = ReactDOM.findDOMNode(this.refs.inputField).files;
                 }
                 else {
-                    returnValue = this.refs.inputField.getDOMNode().value;
+                    returnValue = ReactDOM.findDOMNode(this.refs.inputField).value;
                 }
 
                 result = this.props.onSubmit(returnValue, e);

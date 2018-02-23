@@ -1,5 +1,5 @@
 define(function() {
-    'use strict';
+
 
     return {
         general: {
@@ -14,14 +14,15 @@ define(function() {
             osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         generic_error: {
-            UNKNOWN_ERROR: "[UE] 請重啟 FLUX Studio",
-            OPERATION_ERROR: "[OE] 機器發生狀態衝突，請再試一次",
-            SUBSYSTEM_ERROR: "[SE] 請重啟機器",
-            UNKNOWN_COMMAND: "[UC] 請更新機器韌體",
-            RESOURCE_BUSY: "[RB] 請重新啟動 Delta, 或再試一次"
+            UNKNOWN_ERROR: '[UE] 請重啟 FLUX Studio',
+            OPERATION_ERROR: '[OE] 機器發生狀態衝突，請再試一次',
+            SUBSYSTEM_ERROR: '[SE] 請重啟機器',
+            UNKNOWN_COMMAND: '[UC] 請更新機器韌體',
+            RESOURCE_BUSY: '[RB] 請重新啟動 Delta, 或再試一次'
         },
         device_selection: {
             no_printers: '無法透過 Wi-Fi 偵測到機器，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
+            no_beambox: '無法透過 Wi-Fi 偵測到機器，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://tw.flux3dp.com/beambox-tutorial/">暸解更多</a>',
             module: 'MODULE',
             status: 'STATUS'
         },
@@ -1458,7 +1459,8 @@ define(function() {
             USED                : '使用時間',
             HARDWARE_VERSION    : '硬體版本',
             FOCAL_LENGTH        : '焦距調整',
-            hour                : '小時'
+            hours               : '小時',
+            cannot_get_info     : '無法讀取工具頭資訊'
         }
     };
 });

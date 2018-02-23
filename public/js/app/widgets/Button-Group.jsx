@@ -1,4 +1,4 @@
-define(['react'], function(React){
+define(['react','reactCreateReactClass'], function(React){
     'use strict';
 
     return React.createClass({
@@ -49,6 +49,7 @@ define(['react'], function(React){
                     else if ('icon' === opt.type) {
                         content = (
                             <button
+                                key={opt.title}
                                 title={opt.title}
                                 className={className}
                                 type="button"
@@ -61,6 +62,7 @@ define(['react'], function(React){
                     else {
                         content = (
                             <button
+                                key={opt.title}
                                 title={opt.title}
                                 className={className}
                                 type={opt.type || 'button'}

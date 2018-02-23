@@ -1,5 +1,6 @@
 define([
     'react',
+    'plugins/classnames/index',
     'jsx!widgets/Unit-Input',
     'jsx!widgets/Slider-Control',
     'jsx!widgets/Dialog-Menu',
@@ -14,6 +15,7 @@ define([
     'helpers/i18n',
 ], function(
     React,
+    classNames,
     UnitInput,
     SliderControl,
     DialogMenu,
@@ -41,6 +43,7 @@ define([
             };
 
             this._handlePreviewClick = this._handlePreviewClick.bind(this);
+            this._handleClearPreviewClick = this._handleClearPreviewClick.bind(this);
         }
         _handlePreviewClick() {
             const __tooglePrinterSelector = () => {
@@ -77,6 +80,9 @@ define([
                 __endPreviewMode();
             }
         }
+        _handleClearPreviewClick() {
+            PreviewModeController.clearGraffiti();
+        }
         _renderInsertObject() {
             return {
                 label: (
@@ -92,15 +98,27 @@ define([
         }
 
         _renderPreview() {
+            const clearPreviewStyle = PreviewModeController.isGraffitied() ? { display: 'none' } : {};
             return {
                 label: (
-                    <div onClick={this._handlePreviewClick}>
-                        <span>{this.state.isPreviewMode?LANG.end_preview:LANG.preview}</span>
+                    <div>
+                        <span
+                            className={classNames('preview-btn', {'preview-mode-on': this.state.isPreviewMode})}
+                            onClick={this._handlePreviewClick}
+                        >
+                            {this.state.isPreviewMode?LANG.end_preview:LANG.preview}
+                        </span>
+                        <i
+                            className='fa fa-times clear-preview'
+                            style={clearPreviewStyle}
+                            title="Clear all"
+                            onClick={this._handleClearPreviewClick}
+                        />
                     </div>
                 ),
                 disable: false,
                 labelClass: {
-                    'preview-mode-on': this.state.isPreviewMode
+                    'preview-btns': true
                 }
             };
         }

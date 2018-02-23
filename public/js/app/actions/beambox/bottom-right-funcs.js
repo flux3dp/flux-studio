@@ -149,10 +149,9 @@ define([
 
         exportFcode: async function () {
             const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
-            let defaultFCodeName = svgCanvas.getLatestImportFileName();
-            if (!defaultFCodeName) { defaultFCodeName = 'untitled'; }
-            saveAs(fcodeBlob,  defaultFCodeName + '.fc');
+            const defaultFCodeName = svgCanvas.getLatestImportFileName() || 'untitled';
             ProgressActions.close();
+            saveAs(fcodeBlob,  defaultFCodeName + '.fc');
         },
     };
 });

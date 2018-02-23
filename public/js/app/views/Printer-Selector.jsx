@@ -1,5 +1,7 @@
 define([
     'react',
+    'reactPropTypes',
+    'reactClassset',
     'jquery',
     'jsx!widgets/Select',
     'jsx!widgets/List',
@@ -21,6 +23,8 @@ define([
     'helpers/device-list'
 ], function(
     React,
+    PropTypes,
+    ReactCx,
     $,
     SelectView,
     ListView,
@@ -48,9 +52,9 @@ define([
         selected_printer: null,
 
         propTypes: {
-            showExport: React.PropTypes.bool,
-            onClose: React.PropTypes.func,
-            onGettingPrinter: React.PropTypes.func
+            showExport: PropTypes.bool,
+            onClose: PropTypes.func,
+            onGettingPrinter: PropTypes.func
         },
 
         getDefaultProps: function() {
@@ -356,9 +360,8 @@ define([
         },
 
         // renders
-        _renderPrinterSelection: function(lang) {
-            var self = this,
-                printOptions = self.state.printOptions,
+        _renderPrinterSelection: function() {
+            var printOptions = this.state.printOptions,
                 options = (0 < printOptions.length ? printOptions : [{
                     label: (
                         <div className="spinner-roller spinner-roller-reverse"/>
@@ -449,16 +452,15 @@ define([
         render: function() {
             var self = this,
                 showPassword = self.state.showPassword,
-                cx = React.addons.classSet,
-                wrapperClass = ['select-printer'],
+                wrapperClass = {'select-printer': true},
                 wrapperStyle = self.props.WindowStyle,
                 content = self._renderPrinterSelection(lang),
                 hasDefaultPrinter = self.state.hasDefaultPrinter;
 
-            if ('string' === typeof self.props.className) {
-                wrapperClass.push(self.props.className);
+            if (self.props.className) {
+                wrapperClass[self.props.className] = true;
             }
-            wrapperClass = cx.apply(null, wrapperClass);
+            wrapperClass = ReactCx.cx(wrapperClass);
 
             const arrowClass = `arrow arrow-${this.props.arrowDirection}`;
 

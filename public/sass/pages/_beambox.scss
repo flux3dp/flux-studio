@@ -18,11 +18,42 @@
                 div {
                     pointer-events: visible;
                 }
-                &.preview-mode-on {
-                    background: #444;
-                    color: #E0E0DF;
+                &.preview-btns {
+                    cursor: auto;
+                    padding: 0px;
+                    overflow: visible; //hack to put clear-preview button
+                    &:hover {
+                        color: #888;
+                        background-color: unset;
+                    }
+                    .preview-btn, .clear-preview {
+                        cursor: pointer;
+                        &.preview-btn {
+                            padding: 10px 6px;
+                            &:hover {
+                                background: #888;
+                                color: #E0E0DF;
+                            }
+                            &.preview-mode-on {
+                                background: #444;
+                                color: #E0E0DF;
+                            }
+                        }
+                        &.clear-preview {
+                            position: relative;
+                            left: 5px;
+                            color: #888;
+                            &:hover {
+                                cursor: pointer;
+                                color: #333;
+                                font-size: bold;
+                            }
+                        }
+                    }
+
                 }
             }
+
             .dialog-window {
                 pointer-events: visible;
                 .slider {
@@ -162,7 +193,7 @@
         color: #000;
         #workarea {
             border: none;
-            top: 0px;
+            top: 105px;
             left: 0px;
             right: 0px;
             bottom: 0px;
@@ -363,13 +394,4 @@
         z-index: 91;
     }
 
-    #grid_mask {
-        z-index: 5;
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: #E0E0E0;
-        width: 100%;
-        height: 90px;
-    }
 }

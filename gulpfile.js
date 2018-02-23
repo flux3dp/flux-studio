@@ -10,28 +10,28 @@ var gulp = require('gulp'),
     cleanCSS = require('gulp-clean-css'),
     mocha = require('gulp-mocha');
 
-gulp.task('deployment', ['babel', 'cleancss'], function(cb) {
+gulp.task('deployment', ['babel', 'cleancss'], function (cb) {
     pump([
-            gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js']),
-            sourcemaps.init(),
-            uglify(),
-            sourcemaps.write(),
-            gulp.dest('public/js/')
-        ],
-        cb
+        gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js']),
+        sourcemaps.init(),
+        uglify(),
+        sourcemaps.write(),
+        gulp.dest('public/js/')
+    ],
+    cb
     );
 });
 
-gulp.task('cleancss', function() {
+gulp.task('cleancss', function () {
     return gulp.src('public/css/**/*.css')
         .pipe(cleanCSS())
         .pipe(gulp.dest('public/css/'));
 });
 
-gulp.task('babel', function() {
+gulp.task('babel', function () {
     return gulp.src(['public/js/**/*.js*', '!public/js/require.js', '!public/js/main.js', '!public/js/plugins/**/*.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
         .pipe(babel({
-            presets: ['es2015','react']
+            presets: ['es2015', 'react']
         }))
         .pipe(gulp.dest('public/js'));
 });
@@ -58,11 +58,11 @@ gulp.task('jsx:watch', function () {
     gulp.watch('./public/js/**/*.jsx', ['jsx']);
 });
 
-gulp.task('electron', function() {
+gulp.task('electron', function () {
     gulp.watch('./src/*', ['jsx']);
 });
 
-gulp.task('webserver', ['sass:watch'], function() {
+gulp.task('webserver', ['sass:watch'], function () {
     gulp.src('public')
         .pipe(webserver({
             livereload: true,
@@ -74,7 +74,7 @@ gulp.task('webserver', ['sass:watch'], function() {
 
 gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'sass', 'electron', 'webserver']);
 
-gulp.task('unit-test', function() {
+gulp.task('unit-test', function () {
     return gulp.
         src('./_test/unit/**/*.js', { read: false }).
         pipe(mocha({
@@ -82,15 +82,15 @@ gulp.task('unit-test', function() {
                 process.cwd() + '/_test/unit/bootstrap.js'
             ]
         })).
-        once('error', function() {
+        once('error', function () {
             process.exit(1);    // bad happens
         }).
-        once('end', function() {
+        once('end', function () {
             process.exit(); // good
         });
 });
 
-gulp.task('api-test', function() {
+gulp.task('api-test', function () {
     return gulp.
         src('./_test/api/**/*.js').
         pipe(exec('node <%= file.path %>')).

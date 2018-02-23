@@ -1,25 +1,27 @@
 define([
     'react',
+    'reactPropTypes',
     'app/constants/global-constants',
     'app/constants/device-constants',
 ], (
     React,
+    PropTypes,
     GlobalConstants,
     DeviceConstants
 ) => {
 
     return React.createClass({
         PropTypes: {
-            name:           React.PropTypes.string,
-            source:         React.PropTypes.string,
-            history:        React.PropTypes.array,
-            onBackClick:    React.PropTypes.func,
-            onFolderClick:  React.PropTypes.func,
-            onCloseClick:   React.PropTypes.func
+            name:           PropTypes.string,
+            source:         PropTypes.string,
+            history:        PropTypes.array,
+            onBackClick:    PropTypes.func,
+            onFolderClick:  PropTypes.func,
+            onCloseClick:   PropTypes.func
         },
 
         contextTypes: {
-            store: React.PropTypes.object
+            store: PropTypes.object
         },
 
         componentWillMount: function() {

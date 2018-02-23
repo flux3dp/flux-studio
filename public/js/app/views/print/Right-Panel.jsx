@@ -1,24 +1,26 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
+    'reactPropTypes',
     'app/actions/perspective-camera',
     'jsx!widgets/Button-Group',
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'helpers/duration-formatter'
-], function($, React, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore, DurationFormatter) {
+], function($, React, ReactCx, PropTypes, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore, DurationFormatter) {
     'use strict';
 
     return React.createClass({
         propTypes: {
-            lang                    : React.PropTypes.object,
-            hasObject               : React.PropTypes.bool,
-            hasOutOfBoundsObject    : React.PropTypes.bool,
-            onPreviewClick          : React.PropTypes.func,
-            onDownloadGCode         : React.PropTypes.func,
-            onDownloadFCode         : React.PropTypes.func,
-            onGoClick               : React.PropTypes.func,
-            onCameraPositionChange  : React.PropTypes.func,
+            lang                    : PropTypes.object,
+            hasObject               : PropTypes.bool,
+            hasOutOfBoundsObject    : PropTypes.bool,
+            onPreviewClick          : PropTypes.func,
+            onDownloadGCode         : PropTypes.func,
+            onDownloadFCode         : PropTypes.func,
+            onGoClick               : PropTypes.func,
+            onCameraPositionChange  : PropTypes.func,
         },
 
         getInitialState: function() {
@@ -74,10 +76,9 @@ define([
 
         _renderActionButtons: function(lang) {
             let { hasObject, hasOutOfBoundsObject, disableGoButtons } = this.props,
-                cx = React.addons.classSet,
                 buttons = [{
                         label: lang.monitor.start,
-                        className: cx({
+                        className: ReactCx.cx({
                             'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
                             'btn-default': true,
                             'btn-hexagon': true,

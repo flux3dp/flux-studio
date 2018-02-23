@@ -63,6 +63,12 @@ module.exports = {
             cloud: 'Cloud',
             player: 'Player',
             robot: 'robot'
+        },
+        link: {
+            help_center: 'https://helpcenter.flux3dp.com/',
+            contact_us: 'https://flux3dp.zendesk.com/hc/en-us/requests/new',
+            forum: 'https://forum.flux3dp.com/',
+            downloads: 'https://flux3dp.com/downloads/'
         }
 
     },
@@ -130,6 +136,12 @@ module.exports = {
             cloud: 'Cloud',
             player: 'Player',
             robot: 'robot'
+        },
+        link: {
+            help_center: 'https://helpcenter.flux3dp.com/',
+            contact_us: 'https://flux3dp.zendesk.com/hc/zh-tw/requests/new',
+            forum: 'https://forum.flux3dp.com/',
+            downloads: 'https://tw.flux3dp.com/downloads/'
         }
     }
 };

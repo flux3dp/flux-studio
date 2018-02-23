@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'app/actions/print',
     'plugins/classnames/index',
     'helpers/device-master',
@@ -8,7 +9,7 @@ define([
     'jsx!widgets/Dialog-Menu',
     'app/constants/global-constants',
     'app/actions/alert-actions'
-], function($, React, printController, ClassNames, DeviceMaster, Config, DialogMenu, GlobalConstants, AlertActions) {
+], function($, React, PropTypes, printController, ClassNames, DeviceMaster, Config, DialogMenu, GlobalConstants, AlertActions) {
     'use strict';
 
     var DEFAULT_QUALITY = 'high',
@@ -30,25 +31,25 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang                        : React.PropTypes.object,
-            enable                      : React.PropTypes.bool,
-            previewMode                 : React.PropTypes.bool,
-            previewModeOnly             : React.PropTypes.bool,
-            disablePreview              : React.PropTypes.bool,
-            displayModelControl         : React.PropTypes.bool,
-            hasObject                   : React.PropTypes.bool,
-            hasOutOfBoundsObject        : React.PropTypes.bool,
-            previewLayerCount           : React.PropTypes.number,
-            raftLayers                  : React.PropTypes.number,
-            supportOn                   : React.PropTypes.bool,
-            raftOn                      : React.PropTypes.bool,
-            onQualitySelected           : React.PropTypes.func,
-            onRaftClick                 : React.PropTypes.func,
-            onSupportClick              : React.PropTypes.func,
-            onPreviewClick              : React.PropTypes.func,
-            onPreviewLayerChange        : React.PropTypes.func,
-            onShowAdvancedSettingPanel  : React.PropTypes.func,
-            onValueChange               : React.PropTypes.func
+            lang                        : PropTypes.object,
+            enable                      : PropTypes.bool,
+            previewMode                 : PropTypes.bool,
+            previewModeOnly             : PropTypes.bool,
+            disablePreview              : PropTypes.bool,
+            displayModelControl         : PropTypes.bool,
+            hasObject                   : PropTypes.bool,
+            hasOutOfBoundsObject        : PropTypes.bool,
+            previewLayerCount           : PropTypes.number,
+            raftLayers                  : PropTypes.number,
+            supportOn                   : PropTypes.bool,
+            raftOn                      : PropTypes.bool,
+            onQualitySelected           : PropTypes.func,
+            onRaftClick                 : PropTypes.func,
+            onSupportClick              : PropTypes.func,
+            onPreviewClick              : PropTypes.func,
+            onPreviewLayerChange        : PropTypes.func,
+            onShowAdvancedSettingPanel  : PropTypes.func,
+            onValueChange               : PropTypes.func
         },
 
         getInitialState: function() {
@@ -184,7 +185,7 @@ define([
 
             qualitySelection = _quality.map(function(quality) {
                 return (
-                    <li onClick={this._handleActions.bind(null, constants.QUALITY, quality)}>
+                    <li key={Math.random()} onClick={this._handleActions.bind(null, constants.QUALITY, quality)}>
                         {lang.quality[quality]}
                     </li>
                 );
@@ -211,7 +212,7 @@ define([
 
             modelSelection = ['fd1', 'fd1p'].map(function(model) {
                 return (
-                    <li onClick={this._handleActions.bind(null, constants.MODEL, model)}>
+                    <li key={Math.random()} onClick={this._handleActions.bind(null, constants.MODEL, model)}>
                         {lang.model[model]}
                     </li>
                 );

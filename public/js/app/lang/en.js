@@ -22,6 +22,7 @@ define(function() {
         },
         device_selection: {
             no_printers: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
+            no_beambox: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.com/beambox-tutorial/">More Info</a>',
             module: 'MODULE',
             status: 'STATUS'
         },
@@ -190,7 +191,7 @@ define(function() {
                 please_goto_touchpad: 'Please go to Beambox touchpad',
                 tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".',
                 please_see_tutorial_video: 'Tutorial Video',
-                tutorial_url: 'https://flux3dp.com/beambox-tutorial/'             
+                tutorial_url: 'https://flux3dp.com/beambox-tutorial/'
             },
 
             set_machine_generic: {
@@ -1150,7 +1151,7 @@ define(function() {
             machine_radius: 'Delta Radius',
             disable: 'Disable',
             enable: 'Enable',
-            beambox_should_use_touch_panel_to_adjust: 'Beambox settings should be adjusted from Beambox touch panel.'            
+            beambox_should_use_touch_panel_to_adjust: 'Beambox settings should be adjusted from Beambox touch panel.'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1385,7 +1386,7 @@ define(function() {
             attach_toolhead: 'Please connect the printing toolhead'
         },
         camera_calibration: {
-            camera_calibration: 'Camera Calibration',            
+            camera_calibration: 'Camera Calibration',
             next: 'NEXT',
             cancel: 'CANCEL',
             back: 'BACK',
@@ -1458,7 +1459,8 @@ define(function() {
             USED                : 'Used',
             HARDWARE_VERSION    : 'Hardware Version',
             FOCAL_LENGTH        : 'Focal Length',
-            hours               : 'Hours'
+            hours               : 'Hours',
+            cannot_get_info     : 'Toolhead type is unreadable'
         }
     };
 });

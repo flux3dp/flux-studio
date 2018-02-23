@@ -1,9 +1,11 @@
 define([
     'react',
+    'reactDOM',
+    'reactClassset',
     'jquery',
     'jsx!widgets/Unit-Input',
     'helpers/round',
-], function(React, $, UnitInput, round) {
+], function(React, ReactDOM, ReactCx, $, UnitInput, round) {
     'use strict';
 
     return React.createClass({
@@ -141,7 +143,6 @@ define([
                     y: round(state.object.rotation.y * 180 / Math.PI || 0, 0),
                     z: round(state.object.rotation.z * 180 / Math.PI || 0, 0)
                 },
-                cx = React.addons.classSet,
                 cropClass = {
                     'btn': true,
                     'btn-action': true,
@@ -158,7 +159,7 @@ define([
                         </p>
                         <div className="accordion-body">
                             <div className="control">
-                                <button className={cx(cropClass)} data-ga-event="crop" onClick={this._onCrop}>
+                                <button className={ReactCx.cx(cropClass)} data-ga-event="crop" onClick={this._onCrop}>
                                     <img src="img/icon-crop.png"/>
                                     {lang.scan.manipulation.crop}
                                 </button>
@@ -277,13 +278,12 @@ define([
         render: function() {
             var self = this,
                 props = self.props,
-                cx = React.addons.classSet,
                 lang = props.lang,
                 wrapperClassName,
                 position,
                 content;
 
-            wrapperClassName = cx({
+            wrapperClassName = ReactCx.cx({
                 'manipulation-panel' : true,
                 'operating-panel' : true
             });
@@ -313,7 +313,7 @@ define([
         },
 
         _computePosition: function(position) {
-            var manipulationPanel = this.refs.manipulationPanel.getDOMNode(),
+            var manipulationPanel = ReactDOM.findDOMNode(this.refs.manipulationPanel),
                 windowSize = {
                     height: window.innerHeight,
                     width: window.innerWidth
@@ -356,7 +356,7 @@ define([
         },
 
         componentWillReceiveProps: function(nextProps) {
-            var manipulationPanel = this.refs.manipulationPanel.getDOMNode();
+            var manipulationPanel = ReactDOM.findDOMNode(this.refs.manipulationPanel);
             this.setState({
                 visible: true,
                 handleMesh: nextProps.selectedMeshes[0],

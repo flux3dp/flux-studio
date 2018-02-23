@@ -21,7 +21,7 @@ define([
     'helpers/socket-master',
     'helpers/device-error-handler',
     'helpers/array-findindex'
-], function(
+], function (
     $,
     i18n,
     sprintf,
@@ -44,7 +44,7 @@ define([
     Sm,
     DeviceErrorHandler
 ) {
-    'use strict';
+
 
     let lang = i18n.get(),
         SocketMaster,
@@ -68,17 +68,17 @@ define([
         usbEventListeners = {},
         self = this;
 
-    // Better select device
+        // Better select device
     function select(device, opts) {
         let d = $.Deferred();
-            selectDevice(device).then((result) => {
-                if (result == DeviceConstants.CONNECTED) {
-                    d.resolve();
-                } else {
-                    d.reject(lang.message.connectionTimeout);
-                }
-            },
-            (errmsg)=>{console.log('Device Master Select Error. Should handle errMsg here', errmsg)}
+        selectDevice(device).then((result) => {
+            if (result == DeviceConstants.CONNECTED) {
+                d.resolve();
+            } else {
+                d.reject(lang.message.connectionTimeout);
+            }
+        },
+        (errmsg) => { console.log('Device Master Select Error. Should handle errMsg here', errmsg); }
         );
 
         return d.promise();
@@ -97,25 +97,25 @@ define([
                     device.plaintext_password = password;
                     selectDevice(device, d);
                 })
-                .fail((response) => {
-                    let message = (
-                        false === response.reachable ?
-                        lang.select_printer.unable_to_connect :
-                        lang.select_printer.auth_failure
-                    );
+                    .fail((response) => {
+                        let message = (
+                            false === response.reachable ?
+                                lang.select_printer.unable_to_connect :
+                                lang.select_printer.auth_failure
+                        );
 
-                    goAuth(device.uuid);
+                        goAuth(device.uuid);
 
-                    AlertActions.showPopupError('device-auth-fail', message);
-                });
+                        AlertActions.showPopupError('device-auth-fail', message);
+                    });
             };
 
             const callback = {
-                caption     : sprintf(lang.input_machine_password.require_password, _device.name),
-                inputHeader : lang.input_machine_password.password,
-                confirmText : lang.input_machine_password.connect,
-                type        : InputLightBoxConstants.TYPE_PASSWORD,
-                onSubmit    : handleSubmit
+                caption: sprintf(lang.input_machine_password.require_password, _device.name),
+                inputHeader: lang.input_machine_password.password,
+                confirmText: lang.input_machine_password.connect,
+                type: InputLightBoxConstants.TYPE_PASSWORD,
+                onSubmit: handleSubmit
             };
 
             InputLightboxActions.open('auth', callback);
@@ -123,7 +123,7 @@ define([
         const createDeviceActions = (availableUsbChannel = -1, success) => {
             return DeviceController(device.uuid, {
                 availableUsbChannel,
-                onConnect: function(response, options) {
+                onConnect: function (response, options) {
                     d.notify(response);
 
                     if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
@@ -131,81 +131,81 @@ define([
                             ProgressActions.close();
                         }
                         let exist = _devices.some(dev => { return dev.uuid === device.uuid; });
-                        if(!exist) {
+                        if (!exist) {
                             _devices.push(device);
                         }
                         success(true);
                     }
                 },
-                onError: function(response) {
+                onError: function (response) {
                     console.log('createDeviceActions onError', response);
                     ProgressActions.close();
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                     switch (response.error.toUpperCase()) {
-                    case DeviceConstants.TIMEOUT:
-                        // TODO d.reject, come on...
-                        d.reject(DeviceConstants.TIMEOUT);
-                        break;
-                    case DeviceConstants.AUTH_ERROR:
-                    case DeviceConstants.AUTH_FAILED:
-                        _selectedDevice = {};
+                        case DeviceConstants.TIMEOUT:
+                            // TODO d.reject, come on...
+                            d.reject(DeviceConstants.TIMEOUT);
+                            break;
+                        case DeviceConstants.AUTH_ERROR:
+                        case DeviceConstants.AUTH_FAILED:
+                            _selectedDevice = {};
 
-                        if (device.password) {
-                            goAuth(_device.uuid);
-                        }
-                        else {
-                            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, _device.name));
-
-                            auth(_device.uuid, '').done((data) => {
-                                selectDevice(device, d);
-                            })
-                            .fail(() => {
-                                ProgressActions.close();
-                                AlertActions.showPopupError(
-                                    'auth-error-with-diff-computer',
-                                    lang.message.need_1_1_7_above
-                                );
-                            });
-                        }
-                        break;
-                    case DeviceConstants.MONITOR_TOO_OLD:
-                        AlertActions.showPopupError(
-                            'fatal-occurred',
-                            lang.message.monitor_too_old.content,
-                            lang.message.monitor_too_old.caption
-                        );
-                        break;
-                    default:
-                        let message = lang.message.unknown_error;
-
-                        if(response.error === 'NOT_FOUND' || response.error === 'DISCONNECTED') {
-                            // if connected usb is the usb version of default device
-                            // if(device.serial === self.usbProfile.serial) {
-                            if(_devices.some(d => d.serial === device.serial)) {
-                                success(false);
-                                return;
+                            if (device.password) {
+                                goAuth(_device.uuid);
                             }
                             else {
-                                message = lang.message.unable_to_find_machine;
+                                ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, _device.name));
+
+                                auth(_device.uuid, '').done((data) => {
+                                    selectDevice(device, d);
+                                })
+                                    .fail(() => {
+                                        ProgressActions.close();
+                                        AlertActions.showPopupError(
+                                            'auth-error-with-diff-computer',
+                                            lang.message.need_1_1_7_above
+                                        );
+                                    });
                             }
-                        }
+                            break;
+                        case DeviceConstants.MONITOR_TOO_OLD:
+                            AlertActions.showPopupError(
+                                'fatal-occurred',
+                                lang.message.monitor_too_old.content,
+                                lang.message.monitor_too_old.caption
+                            );
+                            break;
+                        default:
+                            let message = lang.message.unknown_error;
 
-                        if(response.error === 'UNKNOWN_DEVICE') {
-                            message = lang.message.unknown_device;
-                        }
+                            if (response.error === 'NOT_FOUND' || response.error === 'DISCONNECTED') {
+                                // if connected usb is the usb version of default device
+                                // if(device.serial === self.usbProfile.serial) {
+                                if (_devices.some(d => d.serial === device.serial)) {
+                                    success(false);
+                                    return;
+                                }
+                                else {
+                                    message = lang.message.unable_to_find_machine;
+                                }
+                            }
 
-                        success(false);
-                        AlertActions.showPopupError(
-                            'unhandle-exception',
-                            message
-                        );
+                            if (response.error === 'UNKNOWN_DEVICE') {
+                                message = lang.message.unknown_device;
+                            }
+
+                            success(false);
+                            AlertActions.showPopupError(
+                                'unhandle-exception',
+                                message
+                            );
                     }
                 },
-                onFatal: function(response) {
+                onFatal: function (response) {
                     console.log('createDeviceActions onFatal', response);
                     // process fatal
-                    if(!_wasKilled) {
+                    if (!_wasKilled) {
                         _selectedDevice = {};
                         _wasKilled = false;
                     }
@@ -213,19 +213,19 @@ define([
                     const removeTimedOutConnection = (uuid) => {
                         let newConnectedDevice = [];
                         _devices.forEach(d => {
-                            if(d.uuid != uuid) {
+                            if (d.uuid != uuid) {
                                 newConnectedDevice.push(d);
                             }
                         });
                         _devices = newConnectedDevice;
-                    }
+                    };
 
                     removeTimedOutConnection(availableUsbChannel);
                 }
             });
         };
         const initSocketMaster = () => {
-            if(typeof _actionMap[device.uuid] !== 'undefined') {
+            if (typeof _actionMap[device.uuid] !== 'undefined') {
                 _device.actions = _actionMap[device.uuid];
                 return;
             }
@@ -233,29 +233,29 @@ define([
             SocketMaster = new Sm();
             SocketMaster.onTimeout(handleSMTimeout);
 
-        //*******************************************************************
-        // just for backup, can be delete if everything is fine
+            //*******************************************************************
+            // just for backup, can be delete if everything is fine
             // if usb not detected but device us using usb
-            if(
+            if (
                 typeof self !== 'undefined' &&
-                !_devices.some(d => d.addr === device.addr) &&
-                // self.availableUsbChannel === -1 &&
-                device.source === 'h2h'
+                    !_devices.some(d => d.addr === device.addr) &&
+                    // self.availableUsbChannel === -1 &&
+                    device.source === 'h2h'
             ) {
                 device = getDeviceBySerialFromAvailableList(device.serial, false);
             }
-        //********************************************************************/
+            //********************************************************************/
 
             // if availableUsbChannel has been defined
-            if(
+            if (
                 typeof self !== 'undefined' &&
-                typeof self.availableUsbChannel !== 'undefined' &&
-                device.source === 'h2h'
+                    typeof self.availableUsbChannel !== 'undefined' &&
+                    device.source === 'h2h'
             ) {
                 _device.actions = createDeviceActions(this.availableUsbChannel, (success) => {
                     console.log('_device.actions', _device.actions);
                     console.log('success', success);
-                    if(success) {
+                    if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
                     else {
@@ -265,7 +265,7 @@ define([
             }
             else {
                 _device.actions = createDeviceActions(device.uuid, (success) => {
-                    if(success) {
+                    if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
                     else {
@@ -273,13 +273,13 @@ define([
                         // if(_device.serial === self.usbProfile.serial) {
                         let foundDevice;
                         _devices.forEach(d => {
-                            if(d.source === 'h2h' && d.serial === _device.serial) {
+                            if (d.source === 'h2h' && d.serial === _device.serial) {
                                 console.log('found usb version', d);
                                 foundDevice = d;
                             }
                         });
                         console.log('foundDevice', foundDevice);
-                        if(foundDevice) {
+                        if (foundDevice) {
                             foundDevice.uuid = foundDevice.addr;
                             foundDevice.name = foundDevice.nickname;
                             d.resolve(DeviceConstants.CONNECTED, foundDevice);
@@ -295,7 +295,7 @@ define([
             SocketMaster.setWebSocket(_device.actions);
         };
 
-        // match the device from the newest received device list
+            // match the device from the newest received device list
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
             self = this;
 
@@ -305,7 +305,7 @@ define([
 
         ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
 
-        if(_existConnection(device.uuid, device.source)) {
+        if (_existConnection(device.uuid, device.source)) {
             ProgressActions.close();
             _device = _switchDevice(device.uuid);
             SocketMaster.setWebSocket(_actionMap[device.uuid]);
@@ -330,15 +330,15 @@ define([
 
         let d = $.Deferred(),
             opts = {
-                onError: function(data) {
+                onError: function (data) {
                     ProgressActions.close();
                     d.reject(data);
                 },
-                onSuccess: function(data) {
+                onSuccess: function (data) {
                     ProgressActions.close();
                     d.resolve(data);
                 },
-                onFail: function(data) {
+                onFail: function (data) {
                     ProgressActions.close();
                     d.reject(data);
                 }
@@ -353,56 +353,56 @@ define([
         let d = $.Deferred();
         _device.actions = DeviceController(_selectedDevice.uuid, {
             availableUsbChannel: _selectedDevice.source === 'h2h' ? _selectedDevice.addr : -1,
-            onConnect: function(response) {
+            onConnect: function (response) {
                 d.notify(response);
 
                 if (response.status.toUpperCase() === DeviceConstants.CONNECTED) {
                     d.resolve(DeviceConstants.CONNECTED);
                 }
             },
-            onError: function(response) {
+            onError: function (response) {
                 ProgressActions.close();
                 // TODO: shouldn't do replace
                 response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
                 switch (response.error.toUpperCase()) {
-                case DeviceConstants.TIMEOUT:
-                    d.resolve(DeviceConstants.TIMEOUT);
-                    break;
-                case DeviceConstants.AUTH_ERROR:
-                case DeviceConstants.AUTH_FAILED:
-                    if (device.password) {
-                        goAuth(_device.uuid);
-                    }
-                    else {
-                        ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
-                        auth(_device.uuid, '').then((data) => {
-                            ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, sprintf(lang.message.connectingMachine, _device.name));
-                            selectDevice(device, d);
-                        }).fail(() => {
-                            ProgressActions.close();
-                            AlertActions.showPopupError(
-                                'auth-error-with-diff-computer',
-                                lang.message.need_1_1_7_above
-                            );
-                        });
-                    }
-                    break;
-                case DeviceConstants.MONITOR_TOO_OLD:
-                    ProgressActions.close();
-                    AlertActions.showPopupError(
-                        'fatal-occurred',
-                        lang.message.monitor_too_old.content,
-                        lang.message.monitor_too_old.caption
-                    );
-                    break;
-                default:
-                    AlertActions.showPopupError(
-                        'unhandle-exception',
-                        lang.message.unknown_error
-                    );
+                    case DeviceConstants.TIMEOUT:
+                        d.resolve(DeviceConstants.TIMEOUT);
+                        break;
+                    case DeviceConstants.AUTH_ERROR:
+                    case DeviceConstants.AUTH_FAILED:
+                        if (device.password) {
+                            goAuth(_device.uuid);
+                        }
+                        else {
+                            ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.message.authenticating);
+                            auth(_device.uuid, '').then((data) => {
+                                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, sprintf(lang.message.connectingMachine, _device.name));
+                                selectDevice(device, d);
+                            }).fail(() => {
+                                ProgressActions.close();
+                                AlertActions.showPopupError(
+                                    'auth-error-with-diff-computer',
+                                    lang.message.need_1_1_7_above
+                                );
+                            });
+                        }
+                        break;
+                    case DeviceConstants.MONITOR_TOO_OLD:
+                        ProgressActions.close();
+                        AlertActions.showPopupError(
+                            'fatal-occurred',
+                            lang.message.monitor_too_old.content,
+                            lang.message.monitor_too_old.caption
+                        );
+                        break;
+                    default:
+                        AlertActions.showPopupError(
+                            'unhandle-exception',
+                            lang.message.unknown_error
+                        );
                 }
             },
-            onFatal: function(response) {
+            onFatal: function (response) {
                 // if channel is not available, (opcode -1),
                 // default in createDeviceActions will catch first
             }
@@ -434,7 +434,7 @@ define([
 
     function go(data) {
         let d = $.Deferred();
-        if(!data || !(data instanceof Blob)) {
+        if (!data || !(data instanceof Blob)) {
             d.resolve(DeviceConstants.READY);
         }
         else {
@@ -447,8 +447,8 @@ define([
             SocketMaster.addTask('upload', data).then(() => {
                 SocketMaster.addTask('start').then(handleOk).fail(handleError);
             })
-            .progress(handleProgress)
-            .fail(handleError);
+                .progress(handleProgress)
+                .fail(handleError);
 
         }
 
@@ -458,7 +458,7 @@ define([
     function goFromFile(path, fileName) {
         let d = $.Deferred();
         SocketMaster.addTask('select', path, fileName).then((selectResult) => {
-            if(selectResult.status.toUpperCase() === DeviceConstants.OK) {
+            if (selectResult.status.toUpperCase() === DeviceConstants.OK) {
                 SocketMaster.addTask('start').then((startResult) => {
                     d.resolve(startResult);
                 }).fail((error) => {
@@ -466,7 +466,7 @@ define([
                 });
             }
             else {
-                d.resolve({status: 'error'});
+                d.resolve({ status: 'error' });
             }
         });
         return d.promise();
@@ -478,34 +478,34 @@ define([
 
         let t = setInterval(() => {
             SocketMaster.addTask('report')
-            .then(r => {
-                d.notify(r, t);
-                let { st_id, error } = r.device_status;
-                if (st_id === 64) {
-                    clearInterval(t);
-                    setTimeout(() => {
-                        quit().then(() => {
-                            d.resolve();
-                        }).fail(() => {
-                            d.reject("Quit failed");
-                        });
-                    }, 2000);
-                } else if (( st_id === 128 || st_id === 48 || st_id === 36 ) && error && error.length > 0) { // Error occured
-                    clearInterval(t);
-                    d.reject(error);
-                } else if(st_id === 128) {
-                    clearInterval(t);
-                    d.reject(error);
-                } else if (st_id === 0) {
-                    // Resolve if the status was running and some how skipped the completed part
-                    if (statusChanged) {
+                .then(r => {
+                    d.notify(r, t);
+                    let { st_id, error } = r.device_status;
+                    if (st_id === 64) {
                         clearInterval(t);
-                        d.resolve();
+                        setTimeout(() => {
+                            quit().then(() => {
+                                d.resolve();
+                            }).fail(() => {
+                                d.reject('Quit failed');
+                            });
+                        }, 2000);
+                    } else if ((st_id === 128 || st_id === 48 || st_id === 36) && error && error.length > 0) { // Error occured
+                        clearInterval(t);
+                        d.reject(error);
+                    } else if (st_id === 128) {
+                        clearInterval(t);
+                        d.reject(error);
+                    } else if (st_id === 0) {
+                        // Resolve if the status was running and some how skipped the completed part
+                        if (statusChanged) {
+                            clearInterval(t);
+                            d.resolve();
+                        }
+                    } else {
+                        statusChanged = true;
                     }
-                } else {
-                    statusChanged = true;
-                }
-            });
+                });
         }, 2000);
 
         return d.promise();
@@ -517,18 +517,18 @@ define([
         fetch(DeviceConstants.MOVEMENT_TEST).then(res => res.blob()).then(blob => {
             go(blob).fail(() => {
                 // Error while uploading task
-                d.reject(["UPLOAD_FAILED"]);
+                d.reject(['UPLOAD_FAILED']);
             })
-            .then(()=>{
-                ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
-                waitTillCompleted().fail((error) => {
-                    // Error while running test
-                    d.reject(error);
-                }).then(() => {
-                    // Completed
-                    d.resolve();
+                .then(() => {
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.runningTests);
+                    waitTillCompleted().fail((error) => {
+                        // Error while running test
+                        d.reject(error);
+                    }).then(() => {
+                        // Completed
+                        d.resolve();
+                    });
                 });
-            })
         });
 
         return d.promise();
@@ -539,20 +539,20 @@ define([
 
         fetch(DeviceConstants.BEAMBOX_CAMERA_TEST).then(res => res.blob()).then(blob => {
             go(blob)
-            .fail(() => {
-                d.reject("UPLOAD_FAILED"); // Error while uploading task
-            })
-            .then(()=>{
-                ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);
-                waitTillCompleted()
-                .fail((err) => {
-                    d.reject(err); // Error while running test
+                .fail(() => {
+                    d.reject('UPLOAD_FAILED'); // Error while uploading task
                 })
-                .then(()=>{
-                    d.resolve();
-                });
+                .then(() => {
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);
+                    waitTillCompleted()
+                        .fail((err) => {
+                            d.reject(err); // Error while running test
+                        })
+                        .then(() => {
+                            d.resolve();
+                        });
 
-            })
+                });
         });
 
         return d.promise();
@@ -626,10 +626,10 @@ define([
         let d = $.Deferred();
         _device.scanController = ScanController(_device.uuid, {
             availableUsbChannel: this.availableUsbChannel,
-            onReady: function() {
+            onReady: function () {
                 d.resolve('');
             },
-            onError: function(error) {
+            onError: function (error) {
                 AlertActions.showPopupError('', error);
             }
         });
@@ -706,13 +706,13 @@ define([
                     SocketMaster.addTask('report').then(r => {
                         d.notify(r, t);
                         let { rt, tt } = r.device_status;
-                        if(rt[0] && tt[0]) {
+                        if (rt[0] && tt[0]) {
                             let current = Math.round(rt[0]),  // current temperature rounded
                                 target = tt[0];              // goal temperature
 
-                            if(
+                            if (
                                 current >= target - fluctuation &&  // min
-                                current <= target + fluctuation     // max
+                                    current <= target + fluctuation     // max
                             ) {
                                 clearInterval(t);
                                 resolve();
@@ -745,7 +745,7 @@ define([
                     getReport().then(r => {
                         r.loading = true;
                         // if button is pressed from the machine, status will change from LOAD_FILAMENT to PAUSE
-                        if(r.st_label === 'PAUSED' || r.st_label === 'RESUMING') {
+                        if (r.st_label === 'PAUSED' || r.st_label === 'RESUMING') {
                             clearInterval(t);
                             resolve();
                         }
@@ -761,15 +761,15 @@ define([
             initOperation().then(() => {
                 return waitForTemperature();
             })
-            .then(() => {
-                return startOperation();
-            })
-            .then(() => {
-                return monitorStatus();
-            })
-            .then(() => {
-                d.resolve();
-            });
+                .then(() => {
+                    return startOperation();
+                })
+                .then(() => {
+                    return monitorStatus();
+                })
+                .then(() => {
+                    d.resolve();
+                });
         };
 
         operation();
@@ -822,8 +822,8 @@ define([
 
     function reconnect() {
         let d = $.Deferred();
-        _devices.some(function(device, i) {
-            if(device.uuid === _selectedDevice.uuid) {
+        _devices.some(function (device, i) {
+            if (device.uuid === _selectedDevice.uuid) {
                 _devices.splice(i, 1);
             }
         });
@@ -835,15 +835,15 @@ define([
     }
 
     function KickChangeFilament() {
-      let d = $.Deferred();
-      //return result is success always even the USB disconnected on device side.
-      //need to be figure it out.
-      selectDevice(_selectedDevice).then((result) => {
-        kick();
-        d.resolve();
+        let d = $.Deferred();
+        //return result is success always even the USB disconnected on device side.
+        //need to be figure it out.
+        selectDevice(_selectedDevice).then((result) => {
+            kick();
+            d.resolve();
 
-      });
-      return d.promise();
+        });
+        return d.promise();
     }
 
     // get functions
@@ -903,15 +903,15 @@ define([
     // Private Functions
 
     function _do(command) {
-        let actions =  {
-            'RESUME'    : () => SocketMaster.addTask('resume'),
-            'PAUSE'     : () => SocketMaster.addTask('pause'),
-            'STOP'      : () => SocketMaster.addTask('abort'),
-            'QUIT'      : () => SocketMaster.addTask('quit'),
-            'KICK'      : () => SocketMaster.addTask('kick'),
-            'QUIT_TASK' : () => SocketMaster.addTask('quitTask'),
+        let actions = {
+            'RESUME': () => SocketMaster.addTask('resume'),
+            'PAUSE': () => SocketMaster.addTask('pause'),
+            'STOP': () => SocketMaster.addTask('abort'),
+            'QUIT': () => SocketMaster.addTask('quit'),
+            'KICK': () => SocketMaster.addTask('kick'),
+            'QUIT_TASK': () => SocketMaster.addTask('quitTask'),
 
-            'REPORT'    : () => {
+            'REPORT': () => {
                 let d = $.Deferred(),
                     timeout;
 
@@ -923,7 +923,7 @@ define([
 
                     // force update st_label for a backend inconsistancy
                     let s = result.device_status;
-                    if(s.st_id === DeviceConstants.status.ABORTED) {
+                    if (s.st_id === DeviceConstants.status.ABORTED) {
                         s.st_label = 'ABORTED';
                     }
                     d.resolve(s);
@@ -940,13 +940,13 @@ define([
     }
 
     function updateNWProgress(deviceStatus) {
-        if(FLUX.isNW) {
-            if(!nwConsole) {
+        if (FLUX.isNW) {
+            if (!nwConsole) {
                 nwConsole = nw.Window.get();
             }
             let stId = deviceStatus.st_id;
-            if(stId !== 0 && stId !== 64 && stId !== 128) {
-                if(deviceStatus.st_prog) {
+            if (stId !== 0 && stId !== 64 && stId !== 128) {
+                if (deviceStatus.st_prog) {
                     nwConsole.setProgressBar(-1);
                     nwConsole.setProgressBar(deviceStatus.st_prog);
                 }
@@ -958,13 +958,13 @@ define([
     }
 
     function _existConnection(uuid, source) {
-        return _devices.some(function(d) {
+        return _devices.some(function (d) {
             return d.uuid === uuid && d.source === source;
         });
     }
 
     function _removeConnection(uuid) {
-        let index = _devices.findIndex(function(d) {
+        let index = _devices.findIndex(function (d) {
             return d.uuid === uuid;
         });
 
@@ -974,7 +974,7 @@ define([
     }
 
     function _switchDevice(uuid) {
-        let index = _devices.findIndex(function(d) {
+        let index = _devices.findIndex(function (d) {
             return d.uuid === uuid;
         });
 
@@ -988,7 +988,7 @@ define([
 
         opts = {
             availableUsbChannel: _device.source === 'h2h' ? parseInt(_device.uuid) : -1,
-            onError: function(message) {
+            onError: function (message) {
                 console.log('error from camera ws', message);
                 cameraStream.onError(message);
             }
@@ -1019,14 +1019,14 @@ define([
     }
 
     function stopStreamCamera() {
-        if(_device.camera) {
+        if (_device.camera) {
             clearTimeout(_cameraTimeoutTracker);
             _device.camera.closeStream();
         }
     }
 
     async function showOutline(object_height, positions) {
-      await SocketMaster.addTask('showOutline', object_height, positions);
+        await SocketMaster.addTask('showOutline', object_height, positions);
     }
 
     function calibrate(opts) {
@@ -1050,7 +1050,7 @@ define([
         const step1 = () => {
             let _d = $.Deferred();
             SocketMaster.addTask('enterMaintainMode').then((response) => {
-                if(response.status === 'ok') {
+                if (response.status === 'ok') {
                     return SocketMaster.addTask('getHeadInfo@maintain');
                 }
                 else {
@@ -1058,10 +1058,10 @@ define([
                 }
             }).then((headResp) => {
                 if (opts.forceExtruder) {
-                    if(headResp.module === null) {
-                        return $.Deferred().reject({module:null, error: ['HEAD_ERROR', 'HEAD_OFFLINE']});
-                    } else if(headResp.module !== 'EXTRUDER') {
-                        return $.Deferred().reject({module:'LASER', error: ['HEAD_ERROR', 'TYPE_ERROR']});
+                    if (headResp.module === null) {
+                        return $.Deferred().reject({ module: null, error: ['HEAD_ERROR', 'HEAD_OFFLINE'] });
+                    } else if (headResp.module !== 'EXTRUDER') {
+                        return $.Deferred().reject({ module: 'LASER', error: ['HEAD_ERROR', 'TYPE_ERROR'] });
                     }
                 }
                 return SocketMaster.addTask('maintainHome');
@@ -1075,7 +1075,7 @@ define([
 
         const step2 = () => {
             let _d = $.Deferred();
-            SocketMaster.addTask(opts.doubleZProbe ? 'calibrateDoubleZProbe@maintain' : ( opts.withoutZProbe ? 'calibrateWithoutZProbe@maintain' : 'calibrate@maintain' ) ).then((response) => {
+            SocketMaster.addTask(opts.doubleZProbe ? 'calibrateDoubleZProbe@maintain' : (opts.withoutZProbe ? 'calibrateWithoutZProbe@maintain' : 'calibrate@maintain')).then((response) => {
                 debug_data = response.debug;
                 return SocketMaster.addTask('endMaintainMode');
             }).then(() => {
@@ -1119,7 +1119,7 @@ define([
         const step1 = () => {
             let _d = $.Deferred();
             SocketMaster.addTask('enterMaintainMode').then((response) => {
-                if(response.status === 'ok') {
+                if (response.status === 'ok') {
                     return SocketMaster.addTask('getHeadInfo@maintain');
                 }
                 else {
@@ -1127,10 +1127,10 @@ define([
                 }
             }).then((headResp) => {
                 if (opts.forceExtruder) {
-                    if(headResp.module === null) {
-                        return $.Deferred().reject({module:null, error: ['HEAD_ERROR', 'HEAD_OFFLINE']});
-                    } else if(headResp.module !== 'EXTRUDER') {
-                        return $.Deferred().reject({module:'LASER', error: ['HEAD_ERROR', 'TYPE_ERROR']});
+                    if (headResp.module === null) {
+                        return $.Deferred().reject({ module: null, error: ['HEAD_ERROR', 'HEAD_OFFLINE'] });
+                    } else if (headResp.module !== 'EXTRUDER') {
+                        return $.Deferred().reject({ module: 'LASER', error: ['HEAD_ERROR', 'TYPE_ERROR'] });
                     }
                 }
                 return SocketMaster.addTask('maintainHome');
@@ -1181,7 +1181,7 @@ define([
         const step1 = () => {
             let _d = $.Deferred();
             SocketMaster.addTask('enterMaintainMode').then((response) => {
-                if(response.status === 'ok') {
+                if (response.status === 'ok') {
                     return SocketMaster.addTask('maintainHome');
                 }
                 else {
@@ -1221,18 +1221,18 @@ define([
             SocketMaster.addTask('enterMaintainMode').then(() => {
                 return SocketMaster.addTask('maintainHome');
             })
-            .then((response) => {
-                if(response.status === 'ok') {
-                    return SocketMaster.addTask('calibrate', true);
-                }
-                else {
-                    _d.reject(response);
-                }
-            }).then((response) => {
-                response.status === 'ok' ? _d.resolve() : _d.reject();
-            }).fail((error) => {
-                _d.reject(error);
-            });
+                .then((response) => {
+                    if (response.status === 'ok') {
+                        return SocketMaster.addTask('calibrate', true);
+                    }
+                    else {
+                        _d.reject(response);
+                    }
+                }).then((response) => {
+                    response.status === 'ok' ? _d.resolve() : _d.reject();
+                }).fail((error) => {
+                    _d.reject(error);
+                });
             return _d.promise();
         };
 
@@ -1249,34 +1249,34 @@ define([
     }
 
     function _scanDeviceError(devices) {
-        devices.forEach(function(device) {
-            if(typeof(_errors[device.serial]) === 'string')  {
-                if(_errors[device.serial] !== device.error_label && device.error_label) {
-                    if(window.debug) {
+        devices.forEach(function (device) {
+            if (typeof (_errors[device.serial]) === 'string') {
+                if (_errors[device.serial] !== device.error_label && device.error_label) {
+                    if (window.debug) {
                         AlertActions.showError(device.name + ': ' + device.error_label);
                         _errors[device.serial] = device.error_label;
                     }
                 }
-                else if(!device.error_label) {
+                else if (!device.error_label) {
                     _errors[device.serial] = '';
                 }
             }
             else {
                 _errors[device.serial] = '';
             }
-            if(defaultPrinter) {
-                if(defaultPrinter.serial === device.serial) {
-                    if(
+            if (defaultPrinter) {
+                if (defaultPrinter.serial === device.serial) {
+                    if (
                         device.st_id === DeviceConstants.status.PAUSED_FROM_RUNNING ||
-                        device.st_id === DeviceConstants.status.COMPLETED ||
-                        device.st_id === DeviceConstants.status.ABORTED
+                            device.st_id === DeviceConstants.status.COMPLETED ||
+                            device.st_id === DeviceConstants.status.ABORTED
                     ) {
-                        if(!defaultPrinterWarningShowed) {
+                        if (!defaultPrinterWarningShowed) {
                             let message = '';
-                            if(device.st_id === DeviceConstants.status.COMPLETED) {
+                            if (device.st_id === DeviceConstants.status.COMPLETED) {
                                 message = `${lang.device.completed}`;
                             }
-                            else if(device.st_id === DeviceConstants.status.ABORTED) {
+                            else if (device.st_id === DeviceConstants.status.ABORTED) {
                                 message = `${lang.device.aborted}`;
                             }
                             else {
@@ -1284,19 +1284,19 @@ define([
                                 message = device.error_label === '' ? '' : message;
                             }
 
-                            if(device.st_id === DeviceConstants.status.COMPLETED) {
-                                AlertActions.showInfo(message, function(growl) {
-                                    growl.remove(function() {});
-                                    selectDevice(defaultPrinter).then(function() {
+                            if (device.st_id === DeviceConstants.status.COMPLETED) {
+                                AlertActions.showInfo(message, function (growl) {
+                                    growl.remove(function () { });
+                                    selectDevice(defaultPrinter).then(function () {
                                         GlobalActions.showMonitor(defaultPrinter);
                                     });
                                 }, true);
                             }
                             else {
-                                if(message !== '') {
-                                    AlertActions.showWarning(message, function(growl) {
-                                        growl.remove(function() {});
-                                        selectDevice(defaultPrinter).then(function() {
+                                if (message !== '') {
+                                    AlertActions.showWarning(message, function (growl) {
+                                        growl.remove(function () { });
+                                        selectDevice(defaultPrinter).then(function () {
                                             GlobalActions.showMonitor(defaultPrinter);
                                         });
                                     }, true);
@@ -1305,9 +1305,9 @@ define([
 
                             defaultPrinterWarningShowed = true;
 
-                            if(Config().read('notification') === '1') {
+                            if (Config().read('notification') === '1') {
                                 Notification.requestPermission((permission) => {
-                                    if(permission === 'granted') {
+                                    if (permission === 'granted') {
                                         let notification = new Notification(device.name, {
                                             icon: 'img/icon-home-s.png',
                                             body: message
@@ -1318,7 +1318,7 @@ define([
                         }
                     }
                     else {
-                        if($('#growls').length > 0) {
+                        if ($('#growls').length > 0) {
                             AlertActions.closeNotification();
                             defaultPrinterWarningShowed = false;
                         }
@@ -1353,7 +1353,7 @@ define([
             _settings.push('backlash');
         }
 
-        if(withUpgradeKit) {
+        if (withUpgradeKit) {
             _settings = [
                 ..._settings,
                 'camera_version',
@@ -1367,19 +1367,19 @@ define([
             _settings.push('movement_test');
         }
 
-        const worker = function*() {
-            for(let i = 0; i < _settings.length; i++) {
+        const worker = function* () {
+            for (let i = 0; i < _settings.length; i++) {
                 yield SocketMaster.addTask('getDeviceSetting', _settings[i]);
             }
         };
 
         const go = (result) => {
-            if(!result.done) {
+            if (!result.done) {
                 result.value.then((r) => {
                     let { key, value } = r;
                     settings[key] = value;
                     go(w.next());
-                }).fail((err)=>{console.log(err)});
+                }).fail((err) => { console.log(err); });
             }
             else {
                 d.resolve(settings);
@@ -1393,7 +1393,7 @@ define([
     }
 
     function setDeviceSetting(name, value) {
-        if(value === 'delete') {
+        if (value === 'delete') {
             return SocketMaster.addTask('deleteDeviceSetting', name);
         }
         else {
@@ -1427,7 +1427,7 @@ define([
             deviceInfo = {};
 
         const createWebSocket = (availableUsbChannel = -1) => {
-            if(availableUsbChannel === -1) { return; }
+            if (availableUsbChannel === -1) { return; }
             let url = `control/usb/${availableUsbChannel}`;
             console.log('createWebSocket', url);
 
@@ -1435,7 +1435,7 @@ define([
         };
 
         const handleMessage = (response) => {
-            if(response.cmd === 'play report') {
+            if (response.cmd === 'play report') {
                 // specify nickname with usb
                 usbDeviceReport = Object.assign(deviceInfo, response.device_status);
                 console.log('usbDeviceReport', usbDeviceReport);
@@ -1460,12 +1460,12 @@ define([
         UsbChecker((connectedUsbDevices) => {
             let newList = [],
                 connectedUsbChannels = Object.keys(connectedUsbDevices).filter(c => {
-                    return connectedUsbDevices[c].connected
+                    return connectedUsbDevices[c].connected;
                 });
 
-            // remove old usb connection
+                // remove old usb connection
             _devices.forEach(d => {
-                if(d.source !== 'h2h' || connectedUsbChannels.indexOf(d.addr) !== -1) {
+                if (d.source !== 'h2h' || connectedUsbChannels.indexOf(d.addr) !== -1) {
                     newList.push(d);
                 }
             });
@@ -1476,18 +1476,18 @@ define([
             connectedUsbChannels.forEach(c => {
                 this.availableUsbChannel = c;
                 // if not exist, add
-                if(!_devices.some(d => d.addr === connectedUsbChannels)) {
+                if (!_devices.some(d => d.addr === connectedUsbChannels)) {
                     // if profile not exist, we grab from discover
                     // if usb is plugged before FS starts, it'll appear in discover list
-                    if(connectedUsbDevices[c].profile) {
+                    if (connectedUsbDevices[c].profile) {
                         _devices.push(connectedUsbDevices[c].profile);
                     }
                     else {
                         _availableDevices.forEach(ad => {
-                            if(ad.source === 'h2h' && ad.addr === c) {
+                            if (ad.source === 'h2h' && ad.addr === c) {
                                 _devices.push(ad);
                             }
-                        })
+                        });
                     }
                 }
             });
@@ -1498,7 +1498,7 @@ define([
 
             // to be replaced when redux is implemented
             // notify if usb is unplugged
-            if(_device && _device.source === 'h2h') {
+            if (_device && _device.source === 'h2h') {
                 Object.keys(usbEventListeners).forEach(id => {
                     usbEventListeners[id](connectedUsbChannels.some(c => c == _device.uuid));
                 });
@@ -1533,7 +1533,7 @@ define([
         }
 
         if (callback.timeout > 0) {
-            setTimeout(function() {
+            setTimeout(function () {
                 callback.timeout -= 500;
                 getDeviceBySerial(name, isUsb, callback);
             }, 500);
@@ -1554,15 +1554,15 @@ define([
     }
 
     function usbDefaultDeviceCheck(device) {
-        if(device.source !== 'h2h') {
+        if (device.source !== 'h2h') {
             return device;
         }
 
         // if(this.availableUsbChannel !== device.addr) {
-        if(!_devices.some(d => d.addr === device.addr)) {
+        if (!_devices.some(d => d.addr === device.addr)) {
             // get wifi version instead of h2h
             let dev = _availableDevices.filter(_dev => _dev.serial === device.serial);
-            if(dev[0]) {
+            if (dev[0]) {
                 return dev[0];
             }
         }
@@ -1582,7 +1582,7 @@ define([
     // Core
 
     function DeviceSingleton() {
-        if(_instance !== null) {
+        if (_instance !== null) {
             throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.get_instance()');
         }
 
@@ -1590,78 +1590,78 @@ define([
     }
 
     DeviceSingleton.prototype = {
-        init: function() {
-            this.KickChangeFilament             = KickChangeFilament;
-            this.select                         = select;
-            this.selectDevice                   = selectDevice;
-            this.uploadToDirectory              = uploadToDirectory;
-            this.go                             = go;
-            this.goFromFile                     = goFromFile;
-            this.resume                         = resume;
-            this.pause                          = pause;
-            this.stop                           = stop;
-            this.quit                           = quit;
-            this.quitTask                       = quitTask;
-            this.kick                           = kick;
-            this.getReport                      = getReport;
-            this.getSelectedDevice              = getSelectedDevice;
-            this.readyCamera                    = readyCamera;
-            this.ls                             = ls;
-            this.fileInfo                       = fileInfo;
-            this.deleteFile                     = deleteFile;
-            this.downloadFile                   = downloadFile;
-            this.getPreviewInfo                 = getPreviewInfo;
-            this.changeFilament                 = changeFilament;
-            this.reconnect                      = reconnect;
-            this.getDeviceByName                = getDeviceByName;
-            this.getFirstDevice                 = getFirstDevice;
-            this.updateFirmware                 = updateFirmware;
-            this.updateToolhead                 = updateToolhead;
-            this.headInfo                       = headInfo;
-            this.closeConnection                = closeConnection;
-            this.streamCamera                   = streamCamera;
-            this.stopStreamCamera               = stopStreamCamera;
-            this.calibrate                      = calibrate;
-            this.showOutline                    = showOutline;
-            this.zprobe                         = zprobe;
-            this.home                           = home;
-            this.cleanCalibration               = cleanCalibration;
-            this.detectHead                     = detectHead;
-            this.enterMaintainMode              = enterMaintainMode;
-            this.endMaintainMode                = endMaintainMode;
-            this.getDeviceList                  = getDeviceList;
-            this.getDeviceSettings              = getDeviceSettings;
-            this.getDeviceSetting               = getDeviceSetting;
-            this.setDeviceSetting               = setDeviceSetting;
-            this.getCloudValidationCode         = getCloudValidationCode;
-            this.enableCloud                    = enableCloud;
-            this.getDeviceInfo                  = getDeviceInfo;
-            this.downloadLog                    = downloadLog;
-            this.downloadErrorLog               = downloadErrorLog;
-            this.killSelf                       = killSelf;
-            this.setHeadTemperature             = setHeadTemperature;
-            this.getHeadStatus                  = getHeadStatus;
-            this.startMonitoringUsb             = startMonitoringUsb;
-            this.getAvailableUsbChannel         = getAvailableUsbChannel;
-            this.registerUsbEvent               = registerUsbEvent;
-            this.unregisterUsbEvent             = unregisterUsbEvent;
-            this.changeFilamentDuringPause      = changeFilamentDuringPause;
-            this.startToolheadOperation         = startToolheadOperation;
-            this.endToolheadOperation           = endToolheadOperation;
-            this.endLoadingDuringPause          = endLoadingDuringPause;
-            this.setHeadTemperatureDuringPause  = setHeadTemperatureDuringPause;
-            this.runMovementTests               = runMovementTests;
-            this.runBeamboxCameraTest          = runBeamboxCameraTest;
-            this.getDeviceBySerial              = getDeviceBySerial;
-            this.getAvailableDevices            = getAvailableDevices;
-            this.usbDefaultDeviceCheck          = usbDefaultDeviceCheck;
-            this.stopChangingFilament           = stopChangingFilament;
-            this.existDevice                    = existDevice;
-            this.maintainMove                   = maintainMove;
+        init: function () {
+            this.KickChangeFilament = KickChangeFilament;
+            this.select = select;
+            this.selectDevice = selectDevice;
+            this.uploadToDirectory = uploadToDirectory;
+            this.go = go;
+            this.goFromFile = goFromFile;
+            this.resume = resume;
+            this.pause = pause;
+            this.stop = stop;
+            this.quit = quit;
+            this.quitTask = quitTask;
+            this.kick = kick;
+            this.getReport = getReport;
+            this.getSelectedDevice = getSelectedDevice;
+            this.readyCamera = readyCamera;
+            this.ls = ls;
+            this.fileInfo = fileInfo;
+            this.deleteFile = deleteFile;
+            this.downloadFile = downloadFile;
+            this.getPreviewInfo = getPreviewInfo;
+            this.changeFilament = changeFilament;
+            this.reconnect = reconnect;
+            this.getDeviceByName = getDeviceByName;
+            this.getFirstDevice = getFirstDevice;
+            this.updateFirmware = updateFirmware;
+            this.updateToolhead = updateToolhead;
+            this.headInfo = headInfo;
+            this.closeConnection = closeConnection;
+            this.streamCamera = streamCamera;
+            this.stopStreamCamera = stopStreamCamera;
+            this.calibrate = calibrate;
+            this.showOutline = showOutline;
+            this.zprobe = zprobe;
+            this.home = home;
+            this.cleanCalibration = cleanCalibration;
+            this.detectHead = detectHead;
+            this.enterMaintainMode = enterMaintainMode;
+            this.endMaintainMode = endMaintainMode;
+            this.getDeviceList = getDeviceList;
+            this.getDeviceSettings = getDeviceSettings;
+            this.getDeviceSetting = getDeviceSetting;
+            this.setDeviceSetting = setDeviceSetting;
+            this.getCloudValidationCode = getCloudValidationCode;
+            this.enableCloud = enableCloud;
+            this.getDeviceInfo = getDeviceInfo;
+            this.downloadLog = downloadLog;
+            this.downloadErrorLog = downloadErrorLog;
+            this.killSelf = killSelf;
+            this.setHeadTemperature = setHeadTemperature;
+            this.getHeadStatus = getHeadStatus;
+            this.startMonitoringUsb = startMonitoringUsb;
+            this.getAvailableUsbChannel = getAvailableUsbChannel;
+            this.registerUsbEvent = registerUsbEvent;
+            this.unregisterUsbEvent = unregisterUsbEvent;
+            this.changeFilamentDuringPause = changeFilamentDuringPause;
+            this.startToolheadOperation = startToolheadOperation;
+            this.endToolheadOperation = endToolheadOperation;
+            this.endLoadingDuringPause = endLoadingDuringPause;
+            this.setHeadTemperatureDuringPause = setHeadTemperatureDuringPause;
+            this.runMovementTests = runMovementTests;
+            this.runBeamboxCameraTest = runBeamboxCameraTest;
+            this.getDeviceBySerial = getDeviceBySerial;
+            this.getAvailableDevices = getAvailableDevices;
+            this.usbDefaultDeviceCheck = usbDefaultDeviceCheck;
+            this.stopChangingFilament = stopChangingFilament;
+            this.existDevice = existDevice;
+            this.maintainMove = maintainMove;
 
             Discover(
                 'device-master',
-                function(devices) {
+                function (devices) {
                     devices = DeviceList(devices);
                     devices.forEach(d => {
                         _deviceNameMap[d.name] = d;
@@ -1673,8 +1673,8 @@ define([
         }
     };
 
-    DeviceSingleton.get_instance = function() {
-        if(_instance === null) {
+    DeviceSingleton.get_instance = function () {
+        if (_instance === null) {
             _instance = new DeviceSingleton();
         }
         defaultPrinter = Config().read('default-printer');

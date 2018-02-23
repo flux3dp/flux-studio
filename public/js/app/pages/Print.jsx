@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
     'app/actions/print',
     'plugins/classnames/index',
     'jsx!views/print/Advanced',
@@ -32,13 +33,13 @@ define([
     'helpers/local-storage',
     'helpers/api/cloud',
     'helpers/i18n',
-    'helpers/check-device-status',
     'app/tutorial-steps',
     'helpers/slicer-settings',
     'helpers/get-device'
 ], function(
     $,
     React,
+    ReactDOM,
     director,
     ClassNames,
     AdvancedPanel,
@@ -70,7 +71,6 @@ define([
     LocalStorage,
     CloudApi,
     i18n,
-    CheckDeviceStatus,
     TutorialSteps,
     SlicerSettings,
     GetDevice
@@ -199,7 +199,7 @@ define([
 
                     // events
 
-                    $importBtn = this.refs.importBtn.getDOMNode();
+                    $importBtn = ReactDOM.findDOMNode(this.refs.importBtn);
 
                     if(!window.customEvent) {
                         window.customEvent = {};
@@ -656,11 +656,10 @@ define([
                 },
 
                 _handleDeviceSelected: function(printer) {
-                    let self = this;
-                    if (printer == "export_fcode") {
+                    if (printer === 'export_fcode') {
                         if(director.getModelCount() !== 0) {
-                            director.downloadFCode().then(function() {
-                                self.setState({ openWaitWindow: false });
+                            director.downloadFCode().then(() => {
+                                this.setState({ openWaitWindow: false });
                             });
                         }
                         return;

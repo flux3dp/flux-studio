@@ -686,7 +686,7 @@ define([
                         <InputLightbox
                             isOpen={this.state.inputLightbox.open}
                             caption={this.state.inputLightbox.caption}
-                            type={this.state.inputLightbox.type}
+                            type={this.state.inputLightbox.type || 'TEXT_INPUT'}
                             inputHeader={this.state.inputLightbox.inputHeader}
                             defaultValue={this.state.inputLightbox.defaultValue}
                             confirmText={this.state.inputLightbox.confirmText}
@@ -701,7 +701,7 @@ define([
 
                         <NotificationModal
                             lang={lang}
-                            type={this.state.type}
+                            type={this.state.type || 'INFO'}
                             open={this.state.showNotificationModal}
                             caption={this.state.caption}
                             message={this.state.message}
@@ -724,7 +724,7 @@ define([
                             isOpen={this.state.progress.open}
                             caption={this.state.progress.caption}
                             message={this.state.progress.message}
-                            type={this.state.progress.type}
+                            type={this.state.progress.type || 'NONSTOP'}
                             percentage={this.state.progress.percentage}
                             hasStop={this.state.progress.hasStop}
                             onStop={this._handleProgressStop}
