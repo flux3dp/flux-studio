@@ -5448,7 +5448,7 @@ define([
                 }
                 #${symbol.id} * {
                     fill-opacity: 0;
-                    stroke: #000;
+                    stroke: #000 !important;
                     stroke-width: 1px !important;
                     stroke-opacity: 1.0;
                     stroke-dasharray: 0;
