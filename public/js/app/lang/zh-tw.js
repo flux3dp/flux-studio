@@ -1033,6 +1033,8 @@ define(function() {
                 height: '長',
                 center: '圓心',
                 ellipse_radius: '大小',
+                rounded_corner: '圓角',
+                radius: '半徑',
                 points: '端點',
                 laser_config: '雷射設定',
                 shading: '漸層',

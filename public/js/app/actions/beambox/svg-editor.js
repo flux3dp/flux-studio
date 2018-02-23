@@ -1764,7 +1764,7 @@ define([
                     var panels = {
                         g: [],
                         a: [],
-                        rect: ['width', 'height'],
+                        rect: ['rx', 'width', 'height'],
                         image: ['width', 'height'],
                         circle: ['cx', 'cy', 'r'],
                         ellipse: ['cx', 'cy', 'rx', 'ry'],
@@ -1777,7 +1777,7 @@ define([
                         height: ObjectPanelsController.setHeight,
                         cx: ObjectPanelsController.setEllipsePositionX,
                         cy: ObjectPanelsController.setEllipsePositionY,
-                        rx: ObjectPanelsController.setEllipseRadiusX,
+                        rx: (elem.tagName === 'rect') ? ObjectPanelsController.setRectRoundedCornerRadiusX : ObjectPanelsController.setEllipseRadiusX,
                         ry: ObjectPanelsController.setEllipseRadiusY,
                         x1: ObjectPanelsController.setLineX1,
                         y1: ObjectPanelsController.setLineY1,
@@ -1812,11 +1812,11 @@ define([
                     }
 
                     if (panels[el_name]) {
-                        var cur_panel = panels[el_name];
+                        const cur_panels = panels[el_name];
 
                         $('#' + el_name + '_panel').show();
 
-                        $.each(cur_panel, function (i, item) {
+                        $.each(cur_panels, function (i, item) {
                             var attrVal = elem.getAttribute(item);
                             if (curConfig.baseUnit !== 'px' && elem[item]) {
                                 var bv = elem[item].baseVal.value;

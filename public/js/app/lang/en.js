@@ -1035,6 +1035,8 @@ define(function() {
                 height: 'Height',
                 center: 'Center',
                 ellipse_radius: 'Size',
+                rounded_corner: 'Rounded Corner',
+                radius: 'Radius',
                 points: 'Points',
                 laser_config: 'Laser Config',
                 shading: 'Shading',

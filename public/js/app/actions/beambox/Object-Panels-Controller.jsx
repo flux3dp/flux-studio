@@ -45,6 +45,9 @@ define([
                 ellipseRadius: {
                     rx:undefined, ry:undefined
                 },
+                rectRoundedCorner: {
+                    rx: 0
+                },
                 line: {
                     x1:undefined, y1:undefined, x2:undefined, y2:undefined
                 },
@@ -113,6 +116,9 @@ define([
         setEllipseRadiusY(val) {
             this.data.ellipseRadius.ry = _toFixed(_pixel2mm(val));
         }
+        setRectRoundedCornerRadiusX(val) {
+            this.data.rectRoundedCorner.rx = _toFixed(_pixel2mm(val));
+        }
         setLineX1(val) {
             this.data.line.x1 = _toFixed(_pixel2mm(val));
         }
@@ -131,7 +137,7 @@ define([
         }
 
         setImageThreshold(val) {
-            this.data.image.threshold = val;            
+            this.data.image.threshold = val;
         }
 
         isResizeFixed() {
@@ -157,15 +163,15 @@ define([
             ReactDOM.unmountComponentAtNode(document.getElementById(this.reactRoot));
         }
 
-        
+
 
         _render() {
             ReactDOM.render(
                 <ObjectPanels
-                isEditable={this.isEditable}
-                type={this.type}
-                data={this.data}
-                $me={this.$me}
+                    isEditable={this.isEditable}
+                    type={this.type}
+                    data={this.data}
+                    $me={this.$me}
                 />, document.getElementById(this.reactRoot)
             );
         }

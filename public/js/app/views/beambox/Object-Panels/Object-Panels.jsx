@@ -7,6 +7,7 @@ define([
     'jsx!views/beambox/Object-Panels/Size',
     'jsx!views/beambox/Object-Panels/EllipsePosition',
     'jsx!views/beambox/Object-Panels/EllipseRadius',
+    'jsx!views/beambox/Object-Panels/RectRoundedCorner',
     'jsx!views/beambox/Object-Panels/Line',
     'jsx!views/beambox/Object-Panels/ShadingThreshold'
 ], function(
@@ -18,14 +19,14 @@ define([
     SizePanel,
     EllipsePositionPanel,
     EllipseRadiusPanel,
+    RectRoundedCorner,
     LinePanel,
     ShadingThresholdPanel
 ) {
-    'use strict';
 
     const validPanelsMap = {
         'unknown':  [],
-        'rect':     ['position', 'size', 'rotation'],
+        'rect':     ['position', 'size', 'rotation', 'rectRoundedCorner'],
         'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
         'image':    ['position', 'size', 'rotation', 'shadingThreshold'],
@@ -52,13 +53,15 @@ define([
             validPanels.forEach(function(panelName) {
                 let panel;
                 switch (panelName) {
-                    case 'position':            panel = <PositionPanel key={panelName} x={data.position.x} y={data.position.y} type={type}/>;       break;
-                    case 'rotation':            panel = <RotationPanel key={panelName} angle={data.rotation.angle} />;                  break;
-                    case 'size':                panel = <SizePanel key={panelName} width={data.size.width} height={data.size.height} type={type}/>;         break;
-                    case 'ellipsePosition':     panel = <EllipsePositionPanel key={panelName} cx={data.ellipsePosition.cx} cy={data.ellipsePosition.cy}/>;  break;
-                    case 'ellipseRadius':       panel = <EllipseRadiusPanel key={panelName} rx={data.ellipseRadius.rx} ry={data.ellipseRadius.ry}/>;        break;
-                    case 'line':                panel = <LinePanel key={panelName} x1={data.line.x1} y1={data.line.y1} x2={data.line.x2} y2={data.line.y2}/>;       break;
-                    case 'shadingThreshold':    panel = <ShadingThresholdPanel key={panelName} shading={data.image.shading} threshold={data.image.threshold} $me={$me}/>;  break;
+                    case 'position':            panel = <PositionPanel key={panelName} x={data.position.x} y={data.position.y} type={type}/>; break;
+                    case 'rotation':            panel = <RotationPanel key={panelName} angle={data.rotation.angle}/>; break;
+                    case 'size':                panel = <SizePanel key={panelName} width={data.size.width} height={data.size.height} type={type}/>; break;
+                    case 'ellipsePosition':     panel = <EllipsePositionPanel key={panelName} cx={data.ellipsePosition.cx} cy={data.ellipsePosition.cy}/>; break;
+                    case 'ellipseRadius':       panel = <EllipseRadiusPanel key={panelName} rx={data.ellipseRadius.rx} ry={data.ellipseRadius.ry}/>; break;
+                    case 'rectRoundedCorner':   panel = <RectRoundedCorner key={panelName} rx={data.rectRoundedCorner.rx}/>; break;
+                    case 'line':                panel = <LinePanel key={panelName} x1={data.line.x1} y1={data.line.y1} x2={data.line.x2} y2={data.line.y2}/>; break;
+                    case 'shadingThreshold':    panel = <ShadingThresholdPanel key={panelName} shading={data.image.shading} threshold={data.image.threshold} $me={$me}/>; break;
+
                 }
                 panelsToBeRender.push(panel);
             });
@@ -66,16 +69,16 @@ define([
         },
 
         _findPositionStyle: function() {
-            const angle = function(){
+            const angle = (function(){
                 const A = $('#selectorGrip_resize_w').offset();
                 const B = $('#selectorGrip_resize_e').offset();
                 const dX = B.left - A.left;
                 const dY = B.top - A.top;
                 const radius = Math.atan2(-dY, dX);
                 let degree = radius * (180 / Math.PI);
-                if(degree<0) degree += 360;
+                if (degree < 0) degree += 360;
                 return degree;
-            }();
+            })();
 
             const thePoint = (function () {
                 const E = $('#selectorGrip_resize_e').offset();

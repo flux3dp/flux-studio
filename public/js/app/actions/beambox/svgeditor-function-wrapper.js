@@ -75,6 +75,9 @@ define([
         update_ellipse_cx: function(val) {
             _update_attr_changer('ellipse_cx', _mm2pixel(val));
         },
+        update_rect_rx: function(val) {
+            _update_attr_changer('rect_rx', _mm2pixel(val));
+        },
         update_ellipse_cy: function(val) {
             _update_attr_changer('ellipse_cy', _mm2pixel(val));
         },
