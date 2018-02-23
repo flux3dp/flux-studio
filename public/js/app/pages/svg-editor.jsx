@@ -190,8 +190,10 @@ define([
             $(svgEditor.init);
         }
 
-        _handleDisableHref() {
-            return false;
+        _handleDisableHref(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
         }
 
         render() {
