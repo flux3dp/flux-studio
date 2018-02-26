@@ -835,6 +835,18 @@ define([
             return clone;
         };
 
+        this.getObjectLayer = function(elem) {
+            while (elem) {
+                elem = elem.parentNode;
+                if (elem && elem.getAttribute('class') === 'layer') {
+                    var title = $(elem).find('title')[0];
+                    if (title) {
+                        return { elem: elem, title: title.innerHTML };
+                    }
+                }
+            }
+            return null;
+        };
 
         // this.each is deprecated, if any extension used this it can be recreated by doing this:
         // $(canvas.getRootElem()).children().each(...)
@@ -1148,20 +1160,12 @@ define([
                 return selectorManager.selectorParentGroup;
             }
 
-            while (mouse_target && mouse_target.parentNode !== (current_group || current_layer)) {
-                if (mouse_target.parentNode && mouse_target.parentNode.getAttribute('class') === 'layer') {
-                    // Select layer of mouse_target
-                    var title = $(mouse_target.parentNode).find('title')[0];
-                    if (title) {
-                        if (selectedElements.indexOf(mouse_target) === -1) {
-                            svgCanvas.setCurrentLayer(title.innerHTML);
-                            window.populateLayers();
-                            selectOnly([mouse_target], true);
-                        }
-                        return mouse_target;
-                    }
-                }
-                mouse_target = mouse_target.parentNode;
+            var targetLayer = svgCanvas.getObjectLayer(mouse_target);
+            if (targetLayer && selectedElements.indexOf(targetLayer.elem) === -1 && targetLayer.elem !== current_layer) {
+                svgCanvas.setCurrentLayer(targetLayer.title);
+                window.populateLayers();
+                selectOnly([mouse_target], true);
+                return mouse_target;
             }
 
             if (!mouse_target) {

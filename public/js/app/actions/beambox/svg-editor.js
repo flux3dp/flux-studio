@@ -121,6 +121,7 @@ define([
                 'ext-polygon.js',
                 'ext-star.js',
                 'ext-panning.js',
+                'ext-multiselect.js',
                 // 'ext-storage.js',
 
                 'ext-closepath.js',

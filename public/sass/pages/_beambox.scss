@@ -261,6 +261,14 @@
                             background-color: #444;
                             font-weight: normal;
                         }
+
+                        &.mark, &.mark:hover {
+                            color: white;
+                            border: 1px solid #666 !important;
+                            background-color: #666 !important;
+                            font-weight: normal;
+                        }
+
                         &:hover {
                             color: black;
                             background-color: #ddd;
