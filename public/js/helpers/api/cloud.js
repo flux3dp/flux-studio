@@ -61,6 +61,10 @@ define([], function() {
 		return get(userUrl('me'), '');
 	};
 
+	const getDevices = () => {
+		return get(deviceUrl('list'), '');
+	};
+
 	// Device
 
 	const bindDevice = (uuid, token, accessId, signature) => {
@@ -79,6 +83,7 @@ define([], function() {
 		signIn,
 		signUp,
 		signOut,
+		getDevices,
 		resendVerification,
 		resetPassword,
 		changePassword,
