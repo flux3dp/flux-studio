@@ -10,9 +10,9 @@ define([
 ){
 
     const _defaultConfig = {
-        speed: 150,
-        strength: 15
-        ,
+        speed: 50,
+        strength: 15,
+        repeat: 1
     }
 
     const _getLayer = function(name) {
@@ -33,16 +33,26 @@ define([
     const _getSpeed = function(name) {
         return _getData(name, 'speed');
     }
+
     const _getStrength = function(name) {
         return _getData(name, 'strength');
     }
+    
+    const _getRepeat = function(name) {
+        return _getData(name, 'repeat');
+    }
+
     const writeSpeed = function(name, val) {
         return _writeData(name, 'speed', val);
     }
+
     const writeStrength = function(name, val) {
         return _writeData(name, 'strength', val);
     }
-    
+
+    const writeRepeat = function(name, val) {
+        return _writeData(name, 'repeat', val);
+    }    
 
     class LaserPanelController {
         constructor() {
@@ -50,6 +60,7 @@ define([
             this.funcs = {
                 writeSpeed: writeSpeed,
                 writeStrength: writeStrength,
+                writeRepeat: writeRepeat,
             }
         }
         init(reactRoot) {
@@ -59,22 +70,26 @@ define([
         initConfig(name) {
             writeSpeed(name, _defaultConfig.speed);
             writeStrength(name, _defaultConfig.strength);
+            writeRepeat(name, _defaultConfig.repeat);
         }
 
         cloneConfig(name, baseName) {
             writeSpeed(name, _getSpeed(baseName));
             writeStrength(name, _getStrength(baseName));
+            writeRepeat(name, _getRepeat(baseName));
         }
 
         render(name) {
             const speed = _getSpeed(name);
             const strength = _getStrength(name);
+            const repeat = _getRepeat(name);
             
             ReactDOM.render(
                 <LaserPanel
                     layerName={name}
                     speed={speed}
                     strength={strength}
+                    repeat={repeat}
                     funcs={this.funcs}
                 />
                 ,document.getElementById(this.reactRoot)
