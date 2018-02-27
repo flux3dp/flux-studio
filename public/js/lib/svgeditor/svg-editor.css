@@ -25,6 +25,11 @@ html, body, div{
 	-webkit-transform-origin: 0 0;
 }
 
+#svg_editor g {
+	cursor: move;
+}
+
+
 #svg_editor {
 	font-size: 10pt;
 	/* font-family: Verdana, Helvetica, Arial; */
@@ -286,7 +291,7 @@ select {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background: white;
-	height: calc(100vh - 490px);
+	height: calc(100vh - 510px);
 }
 #layerlist_container::-webkit-scrollbar {
 	-webkit-appearance: none;
