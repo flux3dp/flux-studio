@@ -1021,6 +1021,8 @@ define(function() {
                 laser_panel: {
                     strength: '功率',
                     speed: '速度',
+                    repeat: '執行次數',
+                    times: '次',
                     cut: '切割',
                     engrave: '雕刻'
                 },

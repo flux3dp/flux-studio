@@ -1023,6 +1023,8 @@ define(function() {
                 laser_panel: {
                     strength: 'Power',
                     speed: 'Speed',
+                    repeat: 'Execute',
+                    times: 'times',
                     cut: 'Cut',
                     engrave: 'Engrave'
                 },
