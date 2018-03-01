@@ -5270,8 +5270,8 @@ define([
                     use_el.setAttribute('data-wireframe', true);
                 }
 
-                use_el.setAttribute('data-symbol', symbol);
-                use_el.setAttribute('data-ref', symbol);
+                $(use_el).data('symbol', symbol).data('ref', symbol);
+
 
                 batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 
@@ -5459,6 +5459,9 @@ define([
                     opacity: 1;
                     vector-effect: non-scaling-stroke !important;
                     filter: none;
+                }
+                #${symbol.id} {
+                    overflow: visible;
                 }
 
             `;
