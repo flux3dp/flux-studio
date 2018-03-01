@@ -5263,6 +5263,7 @@ define([
                     use_el.setAttribute('data-wireframe', true);
                 }
 
+                $(use_el).data('symbol', symbol).data('ref', symbol);
                 use_el.setAttribute('data-symbol', symbol);
                 use_el.setAttribute('data-ref', symbol);
 
