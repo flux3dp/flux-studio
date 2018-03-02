@@ -1,18 +1,27 @@
 define([
-    'helpers/api/config'
+    'helpers/api/config',
+    'app/actions/beambox/default-config',
 ], function(
-    Config
+    Config,
+    DefaultConfig
 ){
-    const machineWorkareas = {
-        fbb1b: [4000, 3750],
-        fbb1p: [4200, 3850]
-    };
-    const model = Config().read('beambox-preference')['model'];
+    const workareaMap = new Map();
+    workareaMap.set('fbb1b', [4000, 3750]);
+    workareaMap.set('fbb1p', [4200, 3850]);
+
+    const model = (function(){
+        if (!Config().read('beambox-preference')) {
+            Config().update('beambox-preference', 'model', DefaultConfig.model);
+            return DefaultConfig.model;
+        } else {
+            return Config().read('beambox-preference')['model'];
+        }
+    })();
     return {
         dpmm: 10, //seem not to be used by all people QQ
         dimension: {
-            width: machineWorkareas[model][0],
-            height: machineWorkareas[model][1]
+            width: workareaMap.get(model)[0],
+            height: workareaMap.get(model)[1]
         },
         camera: {
             movementSpeed: (300 * 60), // mm/minutes
