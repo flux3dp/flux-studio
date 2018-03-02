@@ -9,19 +9,19 @@ define([
     workareaMap.set('fbb1b', [4000, 3750]);
     workareaMap.set('fbb1p', [4200, 3850]);
 
-    const model = (function(){
-        if (!Config().read('beambox-preference')) {
-            Config().update('beambox-preference', 'model', DefaultConfig.model);
-            return DefaultConfig.model;
+    const workarea = (function(){
+        if (Config().read('beambox-preference') && workareaMap.get(Config().read('beambox-preference')['model'])) {
+            //pass
         } else {
-            return Config().read('beambox-preference')['model'];
+            Config().update('beambox-preference', 'model', DefaultConfig.model);
         }
+        return workareaMap.get(Config().read('beambox-preference')['model']);
     })();
     return {
         dpmm: 10, //seem not to be used by all people QQ
         dimension: {
-            width: workareaMap.get(model)[0],
-            height: workareaMap.get(model)[1]
+            width: workarea[0],
+            height: workarea[1]
         },
         camera: {
             movementSpeed: (300 * 60), // mm/minutes
