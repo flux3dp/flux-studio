@@ -5365,9 +5365,11 @@ define([
                 this.clipCount = this.clipCount || 1;
                 const clonedDef = def.cloneNode(true);
                 const oldId = clonedDef.id;
-                const newId = 'def' + (this.clipCount++);
-                oldLinkMap.set(oldId, newId);
-                clonedDef.id = newId;
+                if (oldId) {
+                    const newId = 'def' + (this.clipCount++);
+                    oldLinkMap.set(oldId, newId);
+                    clonedDef.id = newId;
+                }
                 symbol_defs.appendChild(clonedDef);
             });
 
@@ -5398,6 +5400,21 @@ define([
             }
             traverseForRemappingId(symbol);
 
+            (function remapIdOfStyle(){
+                Array.from(symbol_defs.childNodes).map(child => {
+                    if (child.tagName !== 'style') {
+                        return;
+                    }
+                    const originStyle = child.innerHTML;
+                    const re = /url\(#([^)]+)\)/g;
+                    let mappedStyle = originStyle.replace(re, function replacer(match, p1, offset, string) {
+                        if (oldLinkMap.get(p1)) {
+                            return `url(#${oldLinkMap.get(p1)})`;
+                        }
+                    });
+                    child.innerHTML = mappedStyle;
+                });
+            })();
 
             for (var i = 0; i < attrs.length; i++) {
                 var attr = attrs[i];

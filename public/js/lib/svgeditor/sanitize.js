@@ -29,7 +29,7 @@ var svgWhiteList_ = {
   // SVG Elements
   "a": ["class", "clip-path", "clip-rule", "fill", "fill-opacity", "fill-rule", "filter", "id", "mask", "opacity", "stroke", "stroke-dasharray", "stroke-dashoffset", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width", "style", "systemLanguage", "transform", "xlink:href", "xlink:title"],
   "circle": ["class", "clip-path", "clip-rule", "cx", "cy", "fill", "fill-opacity", "fill-rule", "filter", "id", "mask", "opacity", "r", "requiredFeatures", "stroke", "stroke-dasharray", "stroke-dashoffset", "stroke-linecap", "stroke-linejoin", "stroke-miterlimit", "stroke-opacity", "stroke-width", "style", "systemLanguage", "transform"],
-  "clipPath": ["class", "clipPathUnits", "id"],
+  "clipPath": ["class", "clipPathUnits", "id", "transform"],
   "defs": [],
   "style" : ["type"],
   "desc": [],
@@ -154,7 +154,7 @@ svgedit.sanitize.sanitizeSvg = function(node) {
       var attrName = attr.nodeName;
       var attrLocalName = attr.localName;
       var attrNsURI = attr.namespaceURI;
-      // Check that an attribute with the correct localName in the correct namespace is on 
+      // Check that an attribute with the correct localName in the correct namespace is on
       // our whitelist or is a namespace declaration for one of our allowed namespaces
       if (!(allowedAttrsNS.hasOwnProperty(attrLocalName) && attrNsURI == allowedAttrsNS[attrLocalName] && attrNsURI != NS.XMLNS) &&
         !(attrNsURI == NS.XMLNS && REVERSE_NS[attr.value]) )
