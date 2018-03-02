@@ -8,32 +8,24 @@ define([
     'helpers/local-storage',
     'app/actions/initialize-machine',
 ], function($, React, i18n, config, SelectView, AlertActions, LocalStorage, initializeMachine) {
-    'use strict';
 
-    let Controls = React.createClass({
-        innerHtml: function() {
-            return {__html: this.props.label};
-        },
-        render: function() {
-            let style = { width: 'calc(100% / 10 * 3 - 10px)' };
-            return (
-                <div className="row-fluid">
-
-                    <div className="span3 no-left-margin" style={style}>
-                        <label className="font2"
-                            dangerouslySetInnerHTML={this.innerHtml()}
-                        >
-                        </label>
-                    </div>
-
-                    <div className="span8 font3">
-                        {this.props.children}
-                    </div>
-
+    const Controls = props => {
+        const style = { width: 'calc(100% / 10 * 3 - 10px)' };
+        const innerHtml = {__html: props.label};
+        return (
+            <div className="row-fluid">
+                <div className="span3 no-left-margin" style={style}>
+                    <label className="font2"
+                        dangerouslySetInnerHTML={innerHtml}
+                    />
                 </div>
-            );
-        }
-    });
+                <div className="span8 font3">
+                    {props.children}
+                </div>
+
+            </div>
+        );
+    };
 
     return React.createClass({
         getDefaultProps: function() {
@@ -46,7 +38,7 @@ define([
 
         getInitialState: function() {
             return {
-                lang: this.props.lang
+                lang: i18n.lang
             };
         },
 
@@ -91,8 +83,8 @@ define([
 
         _removeDefaultMachine: function() {
             if(confirm(this.state.lang.settings.confirm_remove_default)) {
-              initializeMachine.defaultPrinter.clear();
-              this.forceUpdate();
+                initializeMachine.defaultPrinter.clear();
+                this.forceUpdate();
             }
         },
 
@@ -247,11 +239,6 @@ define([
 
             defaultBeamboxModelOptions = [
                 {
-                    value: '',
-                    label: lang.settings.none,
-                    selected: config().read('beambox-preference')['model'] === ''
-                },
-                {
                     value: 'fbb1b',
                     label: 'Beambox',
                     selected: config().read('beambox-preference')['model'] === 'fbb1b'
@@ -367,7 +354,7 @@ define([
                     </Controls>
 
                     <div className="subtitle">{lang.settings.beambox_series}</div>
-                    
+
                     <Controls label={lang.settings.default_beambox_model}>
                         <SelectView
                             className="font3"

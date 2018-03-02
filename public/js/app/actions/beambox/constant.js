@@ -1,9 +1,18 @@
-define([], function(){
+define([
+    'helpers/api/config'
+], function(
+    Config
+){
+    const machineWorkareas = {
+        fbb1b: [4000, 3750],
+        fbb1p: [4200, 3850]
+    };
+    const model = Config().read('beambox-preference')['model'];
     return {
         dpmm: 10, //seem not to be used by all people QQ
         dimension: {
-            width: 4000,//4200,
-            height: 3750//3850
+            width: machineWorkareas[model][0],
+            height: machineWorkareas[model][1]
         },
         camera: {
             movementSpeed: (300 * 60), // mm/minutes
