@@ -4474,7 +4474,7 @@ define([
             }
 
             function mergeLayer() {
-                if ($('#layerlist tr.layersel').index() === 0) {
+                if ($('#layerlist tr.layersel').index() === $('#layerlist tr.layer').length - 1) {
                     return;
                 }
                 svgCanvas.mergeLayer();
