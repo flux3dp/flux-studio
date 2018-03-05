@@ -10,6 +10,8 @@
   "private": true,
   "main": "electron-main.js",
   "dependencies": {
+    "electron-rebuild": "^1.7.3",
+    "font-manager": "^0.2.2",
     "jquery": "^1.11.0",
     "jsdom-global": "^1.6.2",
     "nan": "^2.4.0",

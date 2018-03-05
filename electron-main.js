@@ -8,6 +8,8 @@ const MenuManager = require('./src/menu-manager.js');
 const UglyNotify = require('./src/ugly-notify.js');
 const events = require('./src/ipc-events');
 
+const fontManager = require('font-manager');
+
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
@@ -176,6 +178,11 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
     } else {
         console.error('Recv async-status request but main window not exist');
     }
+});
+
+ipcMain.on(events.LIST_AVAILABLE_FONTS , (event, arg) => {
+    const fonts = fontManager.getAvailableFontsSync();
+    event.returnValue = fonts;
 });
 
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
