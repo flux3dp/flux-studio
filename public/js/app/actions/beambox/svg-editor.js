@@ -5363,122 +5363,112 @@ define([
                         reader.readAsText(blob);
                     });
                 }
-                const importSvg = file => {
-                    svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
-                    async function importAs(type) {
-                        if (type === 'color') {
-                            await svgWebSocket.uploadPlainSVG(file);
-                            const outputs = await svgWebSocket.divideSVG();
-
-                            await readSVG(outputs['strokes'], type);
-                            console.log('Loading colors');
-
-                            await readSVG(outputs['colors'], type);
-                            console.log('Loading bitmap', outputs['bitmap']);
-
-                            if (outputs['bitmap'].size > 0) {
-                                svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
-                            }
-                            console.log('Load complete');
-                        } else {
-                            readSVG(file, type);
-                        }
-                    }
-
-                    AlertActions.showPopupCustomGroup(
-                        'confirm_mouse_input_device',
-                        LANG.popup.select_import_method,
-                        [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
-                        '',
-                        '',
-                        [
-                            () => {
-                                importAs('layer');
-                            },
-                            () => {
-                                importAs('color');
-                            },
-                            () => {
-                                importAs('nolayer');
-                            }
-                        ]
-                    );
-                };
-                const importBitmap = file => {
-                    svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
-                    readImage(file);
-                };
-                const importDxf = file => {
-                    console.log('Load DXF');
-                    const reader = new FileReader();
-                    reader.onloadend = function (evt) {
-                        const parsed = Dxf2Svg.parseString(evt.target.result);
-                        console.log('Parsed DXF', parsed);
-                        const svg = Dxf2Svg.toSVG(parsed);
-                        console.log('svg2: ', svg);
-
-                        const newElement = svgCanvas.importSvgString(svg, 'layer');
-
-                        svgCanvas.ungroupSelectedElement();
-                        svgCanvas.ungroupSelectedElement();
-                        svgCanvas.groupSelectedElements();
-                        svgCanvas.alignSelectedElements('m', 'page');
-                        svgCanvas.alignSelectedElements('c', 'page');
-                        // highlight imported element, otherwise we get strange empty selectbox
-                        try {
-                            svgCanvas.selectOnly([newElement]);
-                        } catch (e) {
-                            console.log(e);
-                        }
-                        // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-                        $('#dialog_box').hide();
-                    };
-                    reader.readAsText(file);
-                };
                 var importImage = function (e) {
                     $.process_cancel(uiStrings.notification.loadingImage);
                     e.stopPropagation();
                     e.preventDefault();
                     $('#workarea').removeAttr('style');
                     $('#main_menu').hide();
-                    const file = (e.type === 'drop') ? e.dataTransfer.files[0] : this.files[0];
+                    var file = (e.type === 'drop') ? e.dataTransfer.files[0] : this.files[0];
                     if (!file) {
                         $('#dialog_box').hide();
                         return;
                     }
-                    const fileType = (function() {
-                        if (file.type.includes('image')) {
-                            if (file.type.includes('svg')) {
-                                return 'svg';
-                            } else {
-                                return 'bitmap';
+                    /* if (file.type === 'application/pdf') { // Todo: Handle PDF imports
+
+                        }
+                        else */
+                    if (file.type.indexOf('image') > -1) {
+                        // Detected an image
+                        // svg handling
+                        if (file.type.indexOf('svg') > -1) {
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
+                            async function importAs(type) {
+                                if (type === 'color') {
+                                    await svgWebSocket.uploadPlainSVG(file);
+                                    const outputs = await svgWebSocket.divideSVG();
+                                    await readSVG(outputs['strokes'], type);
+                                    console.log('Loading colors');
+                                    await readSVG(outputs['colors'], type);
+                                    console.log('Loading bitmap', outputs['bitmap']);
+                                    if (outputs['bitmap'].size > 0) {
+                                        svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                                        await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+                                    }
+                                    console.log('Load complete');
+                                } else {
+                                    readSVG(file, type);
+                                }
                             }
+
+                            AlertActions.showPopupCustomGroup(
+                                'confirm_mouse_input_device',
+                                LANG.popup.select_import_method,
+                                [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
+                                '',
+                                '',
+                                [
+                                    () => {
+                                        importAs('layer');
+                                    },
+                                    () => {
+                                        importAs('color');
+                                    },
+                                    () => {
+                                        importAs('nolayer');
+                                    }
+                                ]
+                            );
+
+                        } else {
+                            //handle bitmap
+                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
+                            readImage(file);
                         }
-                        if (file.name.toLowerCase().includes('.dxf')) {
-                            return 'dxf';
-                        }
+                    } else if (file.name.toLowerCase().indexOf('.dxf') > 0) {
+                        console.log('Load DXF');
+                        reader = new FileReader();
+                        let divideLayer = false;
+                        reader.onloadend = function (evt) {
+                            var parsed = Dxf2Svg.parseString(evt.target.result);
+                            console.log('Parsed DXF', parsed);
+                            let svg = Dxf2Svg.toSVG(parsed);
+                            let newElement;
+
+                            if (divideLayer) {
+                                // Seperate layers
+                                Object.keys(svg).map((key) => {
+                                    if (svg[key] === '') {
+                                        return;
+                                    }
+                                    svgCanvas.createLayer(key);
+                                    newElement = svgCanvas.importSvgString(svg[key], true);
+                                });
+                            } else {
+                                svgCanvas.importSvgString(svg, 'layer');
+                            }
+
+                            svgCanvas.ungroupSelectedElement();
+                            svgCanvas.ungroupSelectedElement();
+                            svgCanvas.groupSelectedElements();
+                            svgCanvas.alignSelectedElements('m', 'page');
+                            svgCanvas.alignSelectedElements('c', 'page');
+                            // highlight imported element, otherwise we get strange empty selectbox
+                            try {
+                                svgCanvas.selectOnly([newElement]);
+                            } catch (e) {
+                                console.log(e);
+                            }
+                            // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+                            $('#dialog_box').hide();
+                        };
+                        reader.readAsText(file);
+                    } else {
                         if (file.name.endsWith('.ai') || (file.path && file.path.endsWith('.ai'))) {
-                            return 'ai';
-                        }
-                        return 'unknown';
-                    })();
-                    switch (fileType) {
-                        case 'svg':
-                            importSvg(file);
-                            break;
-                        case 'bitmap':
-                            importBitmap(file);
-                            break;
-                        case 'dxf':
-                            importDxf(file);
-                            break;
-                        case 'ai':
                             $.alert(LANG.svg_editor.unnsupport_ai_file_directly);
-                            break;
-                        case 'unknown':
+                        } else {
                             $.alert(LANG.svg_editor.unnsupported_file_type);
-                            break;
+                        }
                     }
                 };
 

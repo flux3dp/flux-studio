@@ -5065,7 +5065,7 @@ define([
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
             function parseSvg(svg, type) {
-                function _symbolWrapper(symbolContents) {
+                function _symbolWrapper(symbolContent) {
                     const rootViewBox = svg.getAttribute('viewBox');
                     const rootWidth = unit2Pixel(svg.getAttribute('width'));
                     const rootHeight = unit2Pixel(svg.getAttribute('height'));
@@ -5088,13 +5088,7 @@ define([
                     }
 
                     const wrappedSymbolContent = svgdoc.createElementNS(NS.SVG, 'g');
-                    if (symbolContents.length) {
-                        symbolContents.map(content => {
-                            wrappedSymbolContent.appendChild(content);
-                        });
-                    } else {
-                        wrappedSymbolContent.appendChild(symbolContents);
-                    }
+                    wrappedSymbolContent.appendChild(symbolContent);
                     wrappedSymbolContent.setAttribute('viewBox', rootViewBox);
                     wrappedSymbolContent.setAttribute('transform', transformList.join(' '));
 
@@ -5214,9 +5208,12 @@ define([
 
                     const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
 
-                    const symbol = svgCanvas.makeSymbol(_symbolWrapper(layerNodes), [], batchCmd, defChildren);
+                    const symbols = layerNodes.map(node => {
+                        const symbol = svgCanvas.makeSymbol(_symbolWrapper(node), [], batchCmd, defChildren);
+                        return symbol;
+                    });
 
-                    return [symbol];
+                    return symbols;
                 }
                 // return symbols
                 switch (type) {
@@ -5316,12 +5313,6 @@ define([
             function unit2Pixel(val) {
                 if ( (val === false) || (val === undefined) || (val === null) ) {
                     return false;
-                }
-
-                // is percentage
-                if (val.substr(-1) === '%') {
-                    console.log('unsupported unit "%" for', val);
-                    return;
                 }
 
                 const dpi = 72;
