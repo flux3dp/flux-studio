@@ -15,8 +15,6 @@ define([
     i18n,
     DeviceMaster
 ) {
-    'use strict';
-
     var View = React.createClass({
 
         getDefaultProps: function() {
@@ -66,33 +64,33 @@ define([
         _getButtons: function(lang) {
             var buttons,
                 laterButton = {
-                  label: lang.update.later,
-                  dataAttrs: {
-                      'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
-                  },
-                  onClick: this._onClose.bind(this, true)
+                    label: lang.update.later,
+                    dataAttrs: {
+                        'ga-event': 'update-' + this.props.type.toLowerCase() + '-later'
+                    },
+                    onClick: this._onClose.bind(this, true)
                 },
                 downloadButton = {
-                  label: lang.update.download,
-                  dataAttrs: {
-                      'ga-event': 'download-' + this.props.type.toLowerCase() + '-later'
-                  },
-                  onClick: this._onDownload
+                    label: lang.update.download,
+                    dataAttrs: {
+                        'ga-event': 'download-' + this.props.type.toLowerCase() + '-later'
+                    },
+                    onClick: this._onDownload
                 },
                 installButton = {
-                  label: ('software' === this.props.type ?
-                      lang.update.install :
-                      lang.update.upload
-                  ),
-                  dataAttrs: {
-                      'ga-event': 'install-new-' + this.props.type.toLowerCase()
-                  },
-                  onClick: this._onInstall
+                    label: ('software' === this.props.type ?
+                        lang.update.install :
+                        lang.update.upload
+                    ),
+                    dataAttrs: {
+                        'ga-event': 'install-new-' + this.props.type.toLowerCase()
+                    },
+                    onClick: this._onInstall
                 };
 
             buttons = (this.props.type === 'software') ?
-                          [laterButton, installButton] :
-                          [laterButton, downloadButton, installButton]
+                [laterButton, installButton] :
+                [laterButton, downloadButton, installButton];
 
             return buttons;
         },
@@ -108,8 +106,6 @@ define([
                 return <div/>;
             }
 
-            this.props.device = this.props.device || {};
-
             var lang = i18n.get(),
                 caption = lang.update[this.props.type].caption,
                 deviceModel = this.props.device.model,
@@ -118,10 +114,10 @@ define([
                 buttons = this._getButtons(lang),
                 skipButton = (
                     'software' === this.props.type ?
-                    <button className="btn btn-link" data-ga-event={'skip-' + this.props.type.toLowerCase() + '-update'} onClick={this._onSkip}>
-                        {lang.update.skip}
-                    </button> :
-                    ''
+                        (<button className="btn btn-link" data-ga-event={'skip-' + this.props.type.toLowerCase() + '-update'} onClick={this._onSkip}>
+                            {lang.update.skip}
+                        </button>) :
+                        ''
                 ),
                 content = (
                     <div className="update-wrapper">
