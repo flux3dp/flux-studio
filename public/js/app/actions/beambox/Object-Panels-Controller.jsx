@@ -53,6 +53,9 @@ define([
                 },
                 image: {
                     threshold:undefined, shading:undefined
+                },
+                font: {
+                    fontFamily:undefined, fontSize:undefined, fontStyle: undefined, leterSpacing: undefined
                 }
             };
 
@@ -135,13 +138,25 @@ define([
         setImageShading(val) {
             this.data.image.shading = val;
         }
-
         setImageThreshold(val) {
             this.data.image.threshold = val;
         }
 
+        setFontFamily(val) {
+            this.data.font.fontFamily = val;
+        }
+        setFontSize(val) {
+            this.data.font.fontSize = val;
+        }
+        setFontBold(val) {
+            this.data.font.isBold = val;
+        }
+        setFontItalic(val) {
+            this.data.font.isItalic = val;
+        }
+
         isResizeFixed() {
-            const useSizePanel = ['rect', 'image', 'use']; // 'use'
+            const useSizePanel = ['rect', 'image', 'use'];
             const useRadiusPanel = ['ellipse'];
 
             if(useSizePanel.includes(this.type) || useRadiusPanel.includes(this.type)) {

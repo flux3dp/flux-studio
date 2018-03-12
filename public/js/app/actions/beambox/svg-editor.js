@@ -32,6 +32,7 @@ define([
     'helpers/i18n',
     'app/actions/beambox/constant',
     'helpers/dxf2svg',
+    'app/constants/keycode-constants',
     'helpers/api/svg-laser-parser'
 ], function (
     ObjectPanelsController,
@@ -43,6 +44,7 @@ define([
     i18n,
     Constant,
     Dxf2Svg,
+    KeycodeConstants,
     SvgLaserParser
 ) {
     const LANG = i18n.lang.beambox;
@@ -141,9 +143,9 @@ define([
                     opacity: 1
                 },
                 text: {
-                    stroke_width: 0,
-                    font_size: 24,
-                    font_family: 'monospace'
+                    stroke_width: 1,
+                    font_size: 100,
+                    font_family: 'Arial'
                 },
                 initOpacity: 1,
                 colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
@@ -1849,6 +1851,8 @@ define([
                                     $('#text').focus().select();
                                 }, 100);
                             }
+                            ObjectPanelsController.setFontFamily(elem.getAttribute('font-family'));
+                            ObjectPanelsController.setFontSize(elem.getAttribute('font-size'));
                         } // text
                         else if (el_name === 'image') {
                             if (svgCanvas.getMode() === 'image') {
@@ -3162,8 +3166,15 @@ define([
                 svgCanvas.setSegType($(this).val());
             });
 
-            $('#text').bind('keyup input', function () {
+            $('#text').bind('keyup input', function (evt) {
+                evt.stopPropagation();
                 svgCanvas.setTextContent(this.value);
+            });
+            $('#text').bind('keydown', function(evt) {
+                evt.stopPropagation();
+                if (evt.keyCode === KeycodeConstants.KEY_RETURN) {
+                    svgCanvas.textActions.toSelectMode(true);
+                }
             });
 
             $('#image_url').change(function () {
