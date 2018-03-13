@@ -15,9 +15,7 @@ module.exports = {
 
     UPDATE_ACCOUNT          : 'UPDATE_ACCOUNT',
 
-    GET_AVAILABLE_FONTS     : 'GET_AVAILABLE_FONTS',
-    FIND_FONTS              : 'FIND_FONTS',
-    FIND_FONT               : 'FIND_FONT',
+    LIST_AVAILABLE_FONTS    : 'LIST_AVAILABLE_FONTS',
 
     SET_AS_DEFAULT          : 'SET_AS_DEFAULT'
 };

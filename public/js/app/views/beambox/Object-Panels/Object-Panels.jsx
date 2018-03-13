@@ -9,7 +9,6 @@ define([
     'jsx!views/beambox/Object-Panels/EllipseRadius',
     'jsx!views/beambox/Object-Panels/RectRoundedCorner',
     'jsx!views/beambox/Object-Panels/Line',
-    'jsx!views/beambox/Object-Panels/Text',
     'jsx!views/beambox/Object-Panels/ShadingThreshold'
 ], function(
     React,
@@ -22,7 +21,6 @@ define([
     EllipseRadiusPanel,
     RectRoundedCorner,
     LinePanel,
-    TextPanel,
     ShadingThresholdPanel
 ) {
 
@@ -32,11 +30,11 @@ define([
         'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
         'image':    ['position', 'size', 'rotation', 'shadingThreshold'],
-        'text':     ['rotation', 'text'],
+        'text':     ['rotation'],
         'use':      ['position', 'size', 'rotation']
     };
 
-    const ObjectPanel = React.createClass({
+    let ObjectPanel = React.createClass({
         propTypes: {
             type: PropTypes.oneOf(Object.keys(validPanelsMap)).isRequired,
             data: PropTypes.object.isRequired,
@@ -63,7 +61,7 @@ define([
                     case 'rectRoundedCorner':   panel = <RectRoundedCorner key={panelName} rx={data.rectRoundedCorner.rx}/>; break;
                     case 'line':                panel = <LinePanel key={panelName} x1={data.line.x1} y1={data.line.y1} x2={data.line.x2} y2={data.line.y2}/>; break;
                     case 'shadingThreshold':    panel = <ShadingThresholdPanel key={panelName} shading={data.image.shading} threshold={data.image.threshold} $me={$me}/>; break;
-                    case 'text':                panel = <TextPanel key={panelName} fontFamily={data.font.fontFamily} fontStyle={data.font.fontStyle} fontSize={data.font.fontSize} letterSpacing={data.font.letterSpacing}/>; break;
+
                 }
                 panelsToBeRender.push(panel);
             });
@@ -116,7 +114,6 @@ define([
 
             const positionStyle = {
                 position: 'absolute',
-                zIndex: 10,
                 top: constrainedPosition.top,
                 left: constrainedPosition.left
             };
