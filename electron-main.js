@@ -180,9 +180,21 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
     }
 });
 
-ipcMain.on(events.LIST_AVAILABLE_FONTS , (event, arg) => {
+ipcMain.on(events.GET_AVAILABLE_FONTS , (event, arg) => {
     const fonts = fontManager.getAvailableFontsSync();
     event.returnValue = fonts;
+});
+
+ipcMain.on(events.FIND_FONTS , (event, arg) => {
+    // fontManager.findFontsSync({ family: 'Arial' });
+    const fonts = fontManager.findFontsSync(arg);
+    event.returnValue = fonts;
+});
+
+ipcMain.on(events.FIND_FONT , (event, arg) => {
+    // fontManager.findFontSync({ family: 'Arial', weight: 700 })
+    const font = fontManager.findFontSync(arg);
+    event.returnValue = font;
 });
 
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
