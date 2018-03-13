@@ -98,9 +98,9 @@ requirejs([
     'jquery',
     'backbone',
     'app/router',
+    'jsx!app/actions/announcement',
     'app/actions/global'
-], function($, Backbone, Router, globalEvents) {
-    'use strict';
+], function($, Backbone, Router, Announcement, globalEvents) {
 
     console.log(`Flux-Studio: ${window.FLUX.version}`);
 
@@ -121,5 +121,6 @@ requirejs([
     globalEvents(function() {
         let router = new Router();
         Backbone.history.start();
+        Announcement.init('announcement');
     });
 });

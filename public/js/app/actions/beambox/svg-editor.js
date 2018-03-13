@@ -26,6 +26,8 @@ define([
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
     'app/actions/beambox/preview-mode-controller',
+    'jsx!app/actions/announcement',
+    'jsx!app/views/beambox/DxfDpiSelector',
     'app/actions/alert-actions',
     'helpers/image-data',
     'helpers/shortcuts',
@@ -37,6 +39,8 @@ define([
     ObjectPanelsController,
     LaserPanelController,
     PreviewModeController,
+    Announcement,
+    DxfDpiSelector,
     AlertActions,
     ImageData,
     Shortcuts,
@@ -5409,32 +5413,67 @@ define([
                     svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
                     readImage(file);
                 };
-                const importDxf = file => {
-                    console.log('Load DXF');
-                    const reader = new FileReader();
-                    reader.onloadend = function (evt) {
-                        const parsed = Dxf2Svg.parseString(evt.target.result);
-                        console.log('Parsed DXF', parsed);
-                        const svg = Dxf2Svg.toSVG(parsed);
-                        console.log('svg2: ', svg);
+                const importDxf = async file => {
+                    const parsedSvg = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onloadend = evt => {
+                            const parsed = Dxf2Svg.parseString(evt.target.result);
+                            console.log('Parsed DXF', parsed);
+                            const svg = Dxf2Svg.toSVG(parsed);
+                            console.log('svg: ', svg);
+                            resolve(svg);
+                        };
+                        reader.readAsText(file);
+                    });
+                    const dpi = await new Promise((resolve, reject) => {
+                        // I would like to use jsx expression, but I don't know how to make jsx compatible with requirejs's shim and dep feature
+                        Announcement.post(
+                            React.createElement(
+                                DxfDpiSelector,
+                                {
+                                    onSubmit: val => {
+                                        Announcement.unpost('DXF_DPI_SELECTOR');
+                                        resolve(val);
+                                    },
+                                    onCancel: () => {
+                                        Announcement.unpost('DXF_DPI_SELECTOR');
+                                        $('#dialog_box').hide();
+                                        reject();
+                                    }
+                                }
+                            ), 'DXF_DPI_SELECTOR',
+                            null
+                        );
+                    });
 
-                        const newElement = svgCanvas.importSvgString(svg, 'layer');
+                    const resizedSvg = (function(){
+                        const xml = (new window.DOMParser()).parseFromString(parsedSvg, 'text/xml');
+                        const $svgBase = $(xml).find('svg');
+                        const originWidth = $svgBase.attr('width');
+                        const originHeight = $svgBase.attr('height');
 
-                        svgCanvas.ungroupSelectedElement();
-                        svgCanvas.ungroupSelectedElement();
-                        svgCanvas.groupSelectedElements();
-                        svgCanvas.alignSelectedElements('m', 'page');
-                        svgCanvas.alignSelectedElements('c', 'page');
-                        // highlight imported element, otherwise we get strange empty selectbox
-                        try {
-                            svgCanvas.selectOnly([newElement]);
-                        } catch (e) {
-                            console.log(e);
-                        }
-                        // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-                        $('#dialog_box').hide();
-                    };
-                    reader.readAsText(file);
+                        // 72 is default dpi which is the same as svgcanvas.importSvgString()
+                        $svgBase.attr('width', originWidth * 72 / dpi);
+                        $svgBase.attr('height', originHeight * 72 / dpi);
+
+                        return new XMLSerializer().serializeToString($svgBase.get(0));
+                    })();
+
+                    const newElement = svgCanvas.importSvgString(resizedSvg, 'layer');
+
+                    svgCanvas.ungroupSelectedElement();
+                    svgCanvas.ungroupSelectedElement();
+                    svgCanvas.groupSelectedElements();
+                    svgCanvas.alignSelectedElements('m', 'page');
+                    svgCanvas.alignSelectedElements('c', 'page');
+                    // highlight imported element, otherwise we get strange empty selectbox
+                    try {
+                        svgCanvas.selectOnly([newElement]);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                    // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+                    $('#dialog_box').hide();
                 };
                 var importImage = function (e) {
                     $.process_cancel(uiStrings.notification.loadingImage);

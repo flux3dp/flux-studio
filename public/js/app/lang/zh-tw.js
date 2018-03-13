@@ -1308,6 +1308,7 @@ define(function() {
             new_app_download_canceled: 'FLUX Studio 下載已被取消',
             new_app_downloaded: '新版FLUX Studio 下載完畢',
             ask_for_upgrade: '馬上升級嗎?',
+            please_select_dpi: '請選擇該檔案的 dpi',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
             empty_file: '檔案內容不存在',

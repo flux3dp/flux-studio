@@ -1307,6 +1307,7 @@ define(function() {
             new_app_download_canceled: 'FLUX Studio download has been canceled',
             new_app_downloaded: 'Newest FLUX Studio has been downloaded',
             ask_for_upgrade: 'Do you wanna upgrade NOW?',
+            please_select_dpi: 'Please select the dpi of your file',
             need_1_1_7_above: 'Please update Machine Firmware to v1.1.7+',
             gcode_area_too_big: 'Imported gcode exceed the printable area.',
             empty_file: 'File is empty',
