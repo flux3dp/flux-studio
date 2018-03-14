@@ -105,6 +105,18 @@ define([
         update_font_size: function(val) {
             _update_attr_changer('font_size', val);
         },
+        update_font_italic: function(val) {
+            svgCanvas.setItalic(val);
+            window.updateContextPanel();
+        },
+        update_font_weight: function(val) {
+            svgCanvas.setFontWeight(val);
+            window.updateContextPanel();
+        },
+        update_letter_spacing: function(val) {
+            svgCanvas.setLetterSpacing(val);
+            window.updateContextPanel();
+        },
         write_image_data_shading: function(elem, val) {
             elem.attr('data-shading', val);
         },

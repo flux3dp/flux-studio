@@ -1851,8 +1851,14 @@ define([
                                     $('#text').focus().select();
                                 }, 100);
                             }
-                            ObjectPanelsController.setFontFamily(elem.getAttribute('font-family'));
-                            ObjectPanelsController.setFontSize(elem.getAttribute('font-size'));
+                            ObjectPanelsController.setFontFamily(svgCanvas.getFontFamily());
+                            ObjectPanelsController.setFontSize(svgCanvas.getFontSize());
+
+                            ObjectPanelsController.setFontStyle({
+                                weight: svgCanvas.getFontWeight(),
+                                italic: svgCanvas.getItalic()
+                            });
+                            ObjectPanelsController.setLetterSpacing(svgCanvas.getLetterSpacing());
                         } // text
                         else if (el_name === 'image') {
                             if (svgCanvas.getMode() === 'image') {

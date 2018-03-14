@@ -55,7 +55,7 @@ define([
                     threshold:undefined, shading:undefined
                 },
                 font: {
-                    fontFamily:undefined, fontSize:undefined, fontStyle: undefined, leterSpacing: undefined
+                    fontFamily:undefined, fontSize:undefined, fontWeight:undefined, italic:undefined, leterSpacing: undefined
                 }
             };
 
@@ -148,11 +148,12 @@ define([
         setFontSize(val) {
             this.data.font.fontSize = val;
         }
-        setFontBold(val) {
-            this.data.font.isBold = val;
+        setFontStyle({weight, italic}) {
+            this.data.font.fontWeight = weight;
+            this.data.font.italic = italic;
         }
-        setFontItalic(val) {
-            this.data.font.isItalic = val;
+        setLetterSpacing(val) {
+            this.data.font.letterSpacing = val;
         }
 
         isResizeFixed() {

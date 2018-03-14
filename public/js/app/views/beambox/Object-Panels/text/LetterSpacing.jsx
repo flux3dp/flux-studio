@@ -6,7 +6,6 @@ define([
     const LetterSpacing = ({currentLetterSpacing, onChange}) => {
         return (
             <UnitInput
-                min={1}
                 unit='px'
                 defaultValue={currentLetterSpacing}
                 getValue={onChange}

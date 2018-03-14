@@ -184,6 +184,9 @@
         -webkit-appearance: none;
         appearance: none;
         padding-left: 10px;
+        &.no-triangle {
+            background-image: none;
+        }
     }
     .slider-container {
         margin-right: 20px;

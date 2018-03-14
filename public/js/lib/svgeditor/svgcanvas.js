@@ -6714,6 +6714,46 @@ define([
             }
         };
 
+        this.getFontWeight = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                return (selected.getAttribute('font-weight'));
+            }
+            return false;
+        };
+
+        this.setFontWeight = function (i) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('font-weight', i ? i : 'normal');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
+        this.getLetterSpacing = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                return (selected.getAttribute('letter-spacing'));
+            }
+            return false;
+        };
+
+        this.setLetterSpacing = function (val) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('letter-spacing', val);
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
         // Function: getFontFamily
         // Returns the current font family
         this.getFontFamily = function () {

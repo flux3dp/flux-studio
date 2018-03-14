@@ -338,10 +338,14 @@
             font-weight: 300;
         }
         #main_button,
-        #tools_top,
         #tools_left,
         #tools_bottom {
             @include force-hide();
+        }
+        #tools_top {
+            opacity: 0;
+            // if display: none, text mode will break.
+            // this is just a quick workaround. maybe using @include force-hide() is more beautiful.
         }
     }
     #dialog_box {

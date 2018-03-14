@@ -17,7 +17,7 @@ define([
                 onChange={e => onChange(e.target.value)}
                 onKeyDown={e => e.stopPropagation()}
                 style={{
-                    lineHeight: '1em'
+                    lineHeight: '1.5em'
                 }}
             >
                 {options}
