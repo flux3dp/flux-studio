@@ -44,9 +44,6 @@ define([
         const fonts = fontsNoItalic.concat(fontsItalic);
         const fontStyles = Array.from(fonts).map(font => font.style);
 
-        console.log('fonts: ', fonts);
-        console.log('fontStyles: ', fontStyles);
-
         return fontStyles;
     };
     const requestFontByFamilyAndStyle = ({family, style, weight, italic}) => {
@@ -58,8 +55,31 @@ define([
         });
         return font;
     };
+    const requestToConvertTextToPath = ({text, x, y, fontFamily, fontSize, fontWeight, italic, transform, letterSpacing}) => {
+        const pathD = ipc.sendSync(events.GET_PATH_D_OF_TEXT, {
+            text: text,
+            x: x,
+            y: y,
+            fontFamily: fontFamily,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            italic: italic,
+            letterSpacing: letterSpacing
+        });
 
+        const path = document.createElementNS(window.svgedit.NS.SVG, 'path');
+        path.setAttribute('d', pathD);
+        path.setAttribute('transform', transform);
+        path.setAttribute('fill', '#fff');
+        path.setAttribute('fill-opacity', 0);
+        path.setAttribute('stroke', '#000');
+        path.setAttribute('stroke-width', '1px');
+        path.setAttribute('stroke-opacity', 1);
+        path.setAttribute('stroke-dasharray', 'none');
+        path.setAttribute('vector-effect', 'non-scaling-stroke');
 
+        return path;
+    };
     class Text extends React.Component {
         constructor(props) {
             super(props);
@@ -98,7 +118,7 @@ define([
                     fontFamily: props.fontFamily,
                     fontStyle: requestFontByFamilyAndStyle({
                         family: props.fontFamily,
-                        weight: props.weight,
+                        weight: props.fontWeight,
                         italic: props.italic
                     }).style,
                     fontSize: props.fontSize,
@@ -142,26 +162,50 @@ define([
                 letterSpacing: val
             });
         }
-
         convertToPath() {
-            console.log('TODO: convert to path');
+            const path = requestToConvertTextToPath({
+                text: this.props.$me.text(),
+                x: this.props.$me.attr('x'),
+                y: this.props.$me.attr('y'),
+                fontFamily: this.state.fontFamily,
+                fontSize: this.state.fontSize,
+                fontWeight: this.state.fontWeight,
+                italic: this.state.italic,
+                letterSpacing: this.state.letterSpacing,
+                transform: (this.props.$me.attr('transform')||'')
+            });
+
+            svgCanvas.setMode('select');
+
+            $(svgroot).trigger({
+                type: 'mousedown',
+                pageX: 0,
+                pageY: 0
+            });
+            $(svgroot).trigger({
+                type: 'mouseup',
+                pageX: 0,
+                pageY: 0
+            });
+            $(path).insertAfter(this.props.$me);
+            this.props.$me.remove();
+            svgCanvas.textActions.clear();
+            window.updateContextPanel();
         }
 
         render() {
-            console.log('render');
             const fontStyles = requestFontStylesOfTheFontFamily(this.state.fontFamily);
-            console.log('fontStyles: ', fontStyles);
             return (
-                <div className="object-panel">
-                    <label className="controls accordion">
-                        <input type="checkbox" className="accordion-switcher" defaultChecked={true} />
-                        <p className="caption">
+                <div className='object-panel'>
+                    <label className='controls accordion'>
+                        <input type='checkbox' className='accordion-switcher' defaultChecked={true} />
+                        <p className='caption'>
                             {LANG.text}
-                            <span className="value">{this.state.fontFamily}, {this.state.fontStyle}</span>
+                            <span className='value'>{this.state.fontFamily}, {this.state.fontStyle}</span>
                         </p>
-                        <label className="accordion-body">
+                        <label className='accordion-body'>
                             <div>
-                                <div className="control">
+                                <div className='control'>
                                     <FontFamilySelector
                                         currentFontFamily={this.state.fontFamily}
                                         fontFamilyOptions={requestAvailableFontFamilies()}
@@ -173,12 +217,12 @@ define([
                                         onChange={val => this.handleFontStyleChange(val)}
                                     />
                                     <br/>
-                                    <div className="text-center header" style={{fontSize: '16px'}}>{LANG.font_size}</div>
+                                    <div className='text-center header' style={{fontSize: '16px'}}>{LANG.font_size}</div>
                                     <FontSizeInput
                                         currentFontSize={this.state.fontSize}
                                         onChange={val => this.handleFontSizeChange(val)}
                                     />
-                                    <div className="text-center header" style={{fontSize: '16px'}}>{LANG.letter_spacing}</div>
+                                    <div className='text-center header' style={{fontSize: '16px'}}>{LANG.letter_spacing}</div>
                                     <LetterSpacingInput
                                         currentLetterSpacing={this.state.letterSpacing}
                                         onChange={val => this.handleLetterSpacingChange(val)}
@@ -186,8 +230,12 @@ define([
                                     <button
                                         className='btn-default'
                                         onClick={() => this.convertToPath()}
+                                        style={{
+                                            width: '100%',
+                                            lineHeight: '1.5em'
+                                        }}
                                     >
-                                        LANG.convert_to_path
+                                        {LANG.convert_to_path}
                                     </button>
                                 </div>
                             </div>
@@ -199,9 +247,10 @@ define([
     }
     Text.propTypes = {
         fontFamily: PropTypes.string.isRequired,
-        fontStyle: PropTypes.string.isRequired,
-        fontSize: PropTypes.string.isRequired,
-        letterSpacing: PropTypes.string.isRequired
+        fontWeight: PropTypes.number.isRequired,
+        italic: PropTypes.bool.isRequired,
+        fontSize: PropTypes.number.isRequired,
+        letterSpacing: PropTypes.number.isRequired
     };
 
     return Text;

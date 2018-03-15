@@ -8,6 +8,7 @@ define([
             <UnitInput
                 min={1}
                 unit='px'
+                decimal={0}
                 defaultValue={currentFontSize}
                 getValue={onChange}
             />

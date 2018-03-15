@@ -48,6 +48,7 @@ define([
         },
         insertText: function() {
             $('#tool_text').click();
+            $('#workarea').css('cursor', 'text');
         },
 
         //top panel

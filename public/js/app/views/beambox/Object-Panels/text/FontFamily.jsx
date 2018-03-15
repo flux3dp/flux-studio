@@ -3,7 +3,6 @@ define([
 ], function(React) {
 
     const FontFamily = ({currentFontFamily, fontFamilyOptions, onChange}) => {
-        console.log('currentFontFamily: ', currentFontFamily);
         const options = fontFamilyOptions.map(
             option => (
                 <option value={option} key={option}>

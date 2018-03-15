@@ -145,7 +145,8 @@ define([
                 text: {
                     stroke_width: 1,
                     font_size: 100,
-                    font_family: 'Arial'
+                    font_family: 'Arial',
+                    text_anchor: 'start'
                 },
                 initOpacity: 1,
                 colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
