@@ -1853,10 +1853,10 @@ define([
                                 }, 100);
                             }
                             ObjectPanelsController.setFontFamily(svgCanvas.getFontFamily());
-                            ObjectPanelsController.setFontSize(svgCanvas.getFontSize());
+                            ObjectPanelsController.setFontSize(Number(svgCanvas.getFontSize()));
 
                             ObjectPanelsController.setFontStyle({
-                                weight: svgCanvas.getFontWeight(),
+                                weight: Number(svgCanvas.getFontWeight()),
                                 italic: svgCanvas.getItalic()
                             });
                             ObjectPanelsController.setLetterSpacing(svgCanvas.getLetterSpacing());

@@ -2,12 +2,25 @@ define([
     'react',
     'reactPropTypes',
     'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'jsx!views/beambox/Object-Panels/text/FontFamily',
     'jsx!views/beambox/Object-Panels/text/FontStyle',
     'jsx!views/beambox/Object-Panels/text/FontSize',
     'jsx!views/beambox/Object-Panels/text/LetterSpacing',
     'helpers/i18n',
-], function(React, PropTypes, FnWrapper, FontFamilySelector, FontStyleSelector, FontSizeInput, LetterSpacingInput, i18n) {
+], function(
+    React,
+    PropTypes,
+    FnWrapper,
+    ProgressActions,
+    ProgressConstants,
+    FontFamilySelector,
+    FontStyleSelector,
+    FontSizeInput,
+    LetterSpacingInput,
+    i18n
+) {
 
     if (!window.electron) {
         console.log('font is not supported in web browser');
@@ -55,18 +68,22 @@ define([
         });
         return font;
     };
-    const requestToConvertTextToPath = ({text, x, y, fontFamily, fontSize, fontWeight, italic, transform, letterSpacing}) => {
-        const pathD = ipc.sendSync(events.GET_PATH_D_OF_TEXT, {
+    const requestToConvertTextToPath = async ({text, x, y, fontFamily, fontSize, fontStyle, transform, letterSpacing}) => {
+        const d = $.Deferred();
+        ipc.once(events.RESOLVE_PATH_D_OF_TEXT, (sender, pathD) => {
+            d.resolve(pathD);
+        });
+
+        ipc.send(events.REQUEST_PATH_D_OF_TEXT, {
             text: text,
             x: x,
             y: y,
             fontFamily: fontFamily,
             fontSize: fontSize,
-            fontWeight: fontWeight,
-            italic: italic,
+            fontStyle: fontStyle,
             letterSpacing: letterSpacing
         });
-
+        const pathD = await d;
         const path = document.createElementNS(window.svgedit.NS.SVG, 'path');
         path.setAttribute('d', pathD);
         path.setAttribute('transform', transform);
@@ -162,19 +179,17 @@ define([
                 letterSpacing: val
             });
         }
-        convertToPath() {
-            const path = requestToConvertTextToPath({
+        async convertToPath() {
+            const path = await requestToConvertTextToPath({
                 text: this.props.$me.text(),
                 x: this.props.$me.attr('x'),
                 y: this.props.$me.attr('y'),
                 fontFamily: this.state.fontFamily,
                 fontSize: this.state.fontSize,
-                fontWeight: this.state.fontWeight,
-                italic: this.state.italic,
+                fontStyle: this.state.fontStyle,
                 letterSpacing: this.state.letterSpacing,
                 transform: (this.props.$me.attr('transform')||'')
             });
-
             svgCanvas.setMode('select');
 
             $(svgroot).trigger({
@@ -229,7 +244,17 @@ define([
                                     />
                                     <button
                                         className='btn-default'
-                                        onClick={() => this.convertToPath()}
+                                        onClick={async () => {
+                                            ProgressActions.open(ProgressConstants.WAITING, LANG.wait_for_parsing_font);
+                                            //delay this.convertToPath() to ensure ProgressActions has already popup
+                                            await new Promise(resolve => {
+                                                setTimeout(async () => {
+                                                    await this.convertToPath();
+                                                    resolve();
+                                                }, 50);
+                                            });
+                                            ProgressActions.close();
+                                        }}
                                         style={{
                                             width: '100%',
                                             lineHeight: '1.5em'

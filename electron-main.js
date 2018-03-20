@@ -6,6 +6,8 @@ const MenuManager = require('./src/menu-manager.js');
 const UglyNotify = require('./src/ugly-notify.js');
 const events = require('./src/ipc-events');
 
+const TTC2TTF = require('./src/ttc2ttf.js');
+
 const FontManager = require('font-manager');
 const TextToSVG = require('text-to-svg');
 
@@ -196,27 +198,25 @@ ipcMain.on(events.FIND_FONT , (event, arg) => {
     event.returnValue = font;
 });
 
-ipcMain.on(events.GET_PATH_D_OF_TEXT , (event, {text, x, y, fontFamily, fontSize, fontWeight, italic, letterSpacing}) => {
-
-    const fontPath = FontManager.findFontSync({
+ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing}) => {
+    const font = FontManager.findFontSync({
         family: fontFamily,
-        weight: fontWeight,
-        italic: italic
-    }).path;
+        style: fontStyle
+    });
+    let fontPath = font.path;
 
-    console.log('fontPath: ', fontPath);
     if(fontPath.endsWith('.ttc') || fontPath.endsWith('.ttcf')) {
-        console.warn('not support ttc and ttcf now!');
-        event.returnValue = '';
+        fontPath = await TTC2TTF(fontPath, font.postscriptName);
     }
     const pathD = TextToSVG.loadSync(fontPath).getD(text, {
-        fontSize: fontSize,
+        fontSize: Number(fontSize),
         anchor: 'left baseline',
         x: x,
         y: y,
         letterSpacing: letterSpacing
     });
-    event.returnValue = pathD;
+
+    event.sender.send(events.RESOLVE_PATH_D_OF_TEXT, pathD);
 });
 
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');

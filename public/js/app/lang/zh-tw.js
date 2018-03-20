@@ -1042,6 +1042,7 @@ define(function() {
                 font_size: '字級',
                 letter_spacing: '字距',
                 convert_to_path: '繪製路徑',
+                wait_for_parsing_font: '解析字體中... 請稍等 10 秒',
                 laser_config: '雷射設定',
                 shading: '漸層',
                 threshold: '曝光閾值',

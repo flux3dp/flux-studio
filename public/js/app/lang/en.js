@@ -1044,6 +1044,7 @@ define(function() {
                 font_size: 'Size',
                 letter_spacing: 'Letter Spacing',
                 convert_to_path: 'Convert to path',
+                wait_for_parsing_font: 'Parsing font... Please wait a second',
                 laser_config: 'Laser Config',
                 shading: 'Shading',
                 threshold: 'Threshold',

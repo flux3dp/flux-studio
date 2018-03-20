@@ -1356,7 +1356,6 @@ define([
                         if (mouse_target !== svgroot) {
                             // if this element is not yet selected, clear selection and select it
                             if (selectedElements.indexOf(mouse_target) === -1) {
-                                console.log('Reselect');
                                 // only clear selection if shift is not pressed (otherwise, add
                                 // element to selection)
                                 if (!evt.shiftKey) {

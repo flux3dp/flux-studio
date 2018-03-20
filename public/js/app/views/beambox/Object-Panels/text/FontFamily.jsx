@@ -13,7 +13,9 @@ define([
         return (
             <select
                 value={currentFontFamily}
-                onChange={e => onChange(e.target.value)}
+                onChange={e => {
+                    onChange(e.target.value);
+                }}
                 onKeyDown={e => e.stopPropagation()}
                 style={{
                     lineHeight: '1.5em'
