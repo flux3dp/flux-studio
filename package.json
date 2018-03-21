@@ -10,11 +10,16 @@
   "private": true,
   "main": "electron-main.js",
   "dependencies": {
+    "bufferpack": "^0.0.6",
+    "electron-rebuild": "^1.7.3",
+    "font-manager": "^0.2.2",
+    "fontkit": "^1.7.7",
     "jquery": "^1.11.0",
     "jsdom-global": "^1.6.2",
     "nan": "^2.4.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
+    "text-to-svg": "jeffontheground/text-to-svg#94e50f5da1d29f74d03685925154cc11e43510ca",
     "websocket": "~1.0.24"
   },
   "devDependencies": {

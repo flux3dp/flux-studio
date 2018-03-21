@@ -1,35 +1,17 @@
 define([
     'jquery',
     'react',
-    'jsx!widgets/Select',
-    'jsx!widgets/List',
-    'jsx!widgets/Modal',
-    'jsx!views/laser/Advanced-Panel',
-    'jsx!widgets/Text-Toggle',
     'jsx!widgets/Unit-Input',
-    'jsx!widgets/Button-Group',
-    'jsx!widgets/Alert',
     'jsx!widgets/Dialog-Menu',
     'helpers/api/config',
     'helpers/i18n',
-    'helpers/round',
-    'plugins/classnames/index'
 ], function(
     $,
     React,
-    SelectView,
-    List,
-    Modal,
-    AdvancedPanel,
-    TextToggle,
     UnitInput,
-    ButtonGroup,
-    Alert,
     DialogMenu,
     config,
-    i18n,
-    round,
-    ClassNames
+    i18n
 ) {
     'use strict';
 

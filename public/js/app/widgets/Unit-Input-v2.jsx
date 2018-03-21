@@ -45,7 +45,7 @@ define([
             const val = this._validateValue(nextProps.defaultValue);
             this.setState({
                 displayValue: val,
-                savedValue: val   
+                savedValue: val
             });
         },
 
@@ -61,15 +61,15 @@ define([
                 value = Math.min(value, this.props.max);
                 value = Math.max(value, this.props.min);
             }
-            
+
             return Number(value).toFixed(this.props.decimal);
         },
 
         _updateValue: function(newVal) {
             const newValue = this._validateValue(newVal);
-            
+
             this.setState({displayValue: newValue});
-            
+
             if(newValue!==this.state.savedValue) {
                 this.setState({savedValue: newValue});
                 this.props.getValue(Number(newValue));
@@ -84,12 +84,12 @@ define([
         _handleChange: function(e) {
             this.setState({displayValue: e.target.value});
         },
-        
+
 
         _handleKeyDown: function(e) {
             e.stopPropagation();
             const step = Math.abs(this.props.step);
-            switch (e.keyCode) {                
+            switch (e.keyCode) {
                 case keyCodeConstants.KEY_RETURN:
                     this._updateValue(e.target.value);
                     return;
@@ -97,17 +97,17 @@ define([
                     this.setState({displayValue: this.state.savedValue});
                     return;
                 case keyCodeConstants.KEY_UP:
-                    this._updateValue(Math.round(parseFloat(this.state.savedValue) + step));
+                    this._updateValue(Math.round( parseFloat(this.state.savedValue / step) ) * step + step);
                     return;
                 case keyCodeConstants.KEY_DOWN:
-                    this._updateValue(Math.round(parseFloat(this.state.savedValue) - step));
+                    this._updateValue(Math.round( parseFloat(this.state.savedValue / step) ) * step - step);
                     return;
-                
+
                 default:
                     return;
             }
 
-            
+
         },
 
         render: function() {

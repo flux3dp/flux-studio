@@ -13,7 +13,6 @@ define([
     i18n,
     Shortcuts
 ){
-    'use strict';
 
     const LANG = i18n.lang.beambox.left_panel.insert_object_submenu;
 
@@ -41,9 +40,9 @@ define([
                     <li onClick={FnWrapper.importImage}>
                         {LANG.image}
                     </li>
-                    {/* <li onClick={FnWrapper.insertText}>
+                    <li onClick={FnWrapper.insertText}>
                         {LANG.text}
-                    </li> */}
+                    </li>
                 </ul>
             );
         }

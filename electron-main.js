@@ -1,12 +1,15 @@
-'use strict';
-
 const {app, ipcMain, BrowserWindow} = require('electron');
-app.commandLine.appendSwitch("ignore-gpu-blacklist")
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
 
 const BackendManager = require('./src/backend-manager.js');
 const MenuManager = require('./src/menu-manager.js');
 const UglyNotify = require('./src/ugly-notify.js');
 const events = require('./src/ipc-events');
+
+const TTC2TTF = require('./src/ttc2ttf.js');
+
+const FontManager = require('font-manager');
+const TextToSVG = require('text-to-svg');
 
 const path = require('path');
 const url = require('url');
@@ -19,7 +22,7 @@ global.backend = {alive: false};
 global.devices = {};
 
 function createLogFile() {
-    var storageDir = app.getPath("userData");
+    var storageDir = app.getPath('userData');
 
     function chkDir(target) {
         if (fs.existsSync(target)) {
@@ -32,7 +35,7 @@ function createLogFile() {
     }
     chkDir(storageDir);
 
-    let filename = path.join(app.getPath("userData"), "backend.log");
+    let filename = path.join(app.getPath('userData'), 'backend.log');
     let f = fs.createWriteStream(filename, {flags: 'w'});
     global.backend.logfile = filename;
     console._stdout = f;
@@ -45,7 +48,7 @@ const logger = process.stderr.isTTY ? process.stderr : createLogFile();
 
 if(process.argv.indexOf('--debug') > 0) {
     DEBUG = true;
-    console.log("DEBUG Mode");
+    console.log('DEBUG Mode');
     // require('electron-reload')(__dirname);
 }
 
@@ -95,14 +98,14 @@ function onDeviceUpdated(deviceInfo) {
     } else {
         if(global.devices[deviceID]) {
             menuManager.removeDevice(deviceInfo.uuid, global.devices[deviceID]);
-            delete global.devices[deviceID]
+            delete global.devices[deviceID];
         }
     }
 
     global.devices[deviceID] = deviceInfo;
 }
 
-require("./src/bootstrap.js");
+require('./src/bootstrap.js');
 
 const backendManager = new BackendManager({
     location: process.env.BACKEND,
@@ -138,7 +141,7 @@ function createWindow () {
         mainWindow = null;
 
         if (process.platform === 'darwin' && DEBUG) {
-            console.log("Main window closed.");
+            console.log('Main window closed.');
         } else {
             app.quit();
         }
@@ -148,7 +151,7 @@ function createWindow () {
         event.preventDefault();
     });
 
-    menuManager.on("DEBUG-RELOAD", () => {
+    menuManager.on('DEBUG-RELOAD', () => {
         mainWindow.loadURL(url.format({
             pathname: path.join(__dirname, 'public/index.html'),
             protocol: 'file:',
@@ -156,10 +159,10 @@ function createWindow () {
         }));
     });
 
-    menuManager.on("DEBUG-INSPECT", () => {
+    menuManager.on('DEBUG-INSPECT', () => {
         mainWindow.webContents.openDevTools();
     });
-    ipcMain.on("DEBUG-INSPECT", () => {
+    ipcMain.on('DEBUG-INSPECT', () => {
         mainWindow.webContents.openDevTools();
     });
     if(process.defaultApp || DEBUG) {
@@ -176,6 +179,44 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
     } else {
         console.error('Recv async-status request but main window not exist');
     }
+});
+
+ipcMain.on(events.GET_AVAILABLE_FONTS , (event, arg) => {
+    const fonts = FontManager.getAvailableFontsSync();
+    event.returnValue = fonts;
+});
+
+ipcMain.on(events.FIND_FONTS , (event, arg) => {
+    // FontManager.findFontsSync({ family: 'Arial' });
+    const fonts = FontManager.findFontsSync(arg);
+    event.returnValue = fonts;
+});
+
+ipcMain.on(events.FIND_FONT , (event, arg) => {
+    // FontManager.findFontSync({ family: 'Arial', weight: 700 })
+    const font = FontManager.findFontSync(arg);
+    event.returnValue = font;
+});
+
+ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing}) => {
+    const font = FontManager.findFontSync({
+        family: fontFamily,
+        style: fontStyle
+    });
+    let fontPath = font.path;
+
+    if(fontPath.endsWith('.ttc') || fontPath.endsWith('.ttcf')) {
+        fontPath = await TTC2TTF(fontPath, font.postscriptName);
+    }
+    const pathD = TextToSVG.loadSync(fontPath).getD(text, {
+        fontSize: Number(fontSize),
+        anchor: 'left baseline',
+        x: x,
+        y: y,
+        letterSpacing: letterSpacing
+    });
+
+    event.sender.send(events.RESOLVE_PATH_D_OF_TEXT, pathD);
 });
 
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
@@ -209,7 +250,7 @@ app.on('activate', function () {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
-      createWindow();
+        createWindow();
     }
 });
 

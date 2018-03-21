@@ -994,6 +994,7 @@ define(function() {
                 layer_by_layer: 'By Layer',
                 layer_by_color: 'By Color',
                 nolayer: 'No Layer',
+                no_support_text: 'FLUX Studio not support <text> tag currently. Please transfer text to path before importing.',
                 should_update_firmware_to_continue: 'Please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
             },
             left_panel: {
@@ -1040,6 +1041,11 @@ define(function() {
                 rounded_corner: 'Rounded Corner',
                 radius: 'Radius',
                 points: 'Points',
+                text: 'Text',
+                font_size: 'Size',
+                letter_spacing: 'Letter Spacing',
+                convert_to_path: 'Convert to path',
+                wait_for_parsing_font: 'Parsing font... Please wait a second',
                 laser_config: 'Laser Config',
                 shading: 'Shading',
                 threshold: 'Threshold',

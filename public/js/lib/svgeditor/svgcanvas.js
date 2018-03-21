@@ -30,12 +30,14 @@
 define([
     'helpers/i18n',
     'helpers/api/config',
+    'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
 
 ], function (
     i18n,
     ConfigHelper,
+    AlertActions,
     ObjectPanelsController,
     PreviewModeController
 ) {
@@ -162,7 +164,7 @@ define([
 
         all_properties.text = $.extend(true, {}, all_properties.shape);
         $.extend(all_properties.text, {
-            fill: '#000000',
+            fill: '#fff',
             stroke_width: curConfig.text.stroke_width,
             font_size: curConfig.text.font_size,
             font_family: curConfig.text.font_family
@@ -955,7 +957,7 @@ define([
                     len = selectedElements.length;
                 for (i = 0; i < len; ++i) {
                     elem = selectedElements[i];
-                    if (elem == null) {
+                    if (!elem) {
                         break;
                     }
                     selectorManager.releaseSelector(elem);
@@ -1356,7 +1358,6 @@ define([
                         if (mouse_target !== svgroot) {
                             // if this element is not yet selected, clear selection and select it
                             if (selectedElements.indexOf(mouse_target) === -1) {
-                                console.log('Reselect');
                                 // only clear selection if shift is not pressed (otherwise, add
                                 // element to selection)
                                 if (!evt.shiftKey) {
@@ -1612,7 +1613,7 @@ define([
                                 'stroke-width': cur_text.stroke_width,
                                 'font-size': cur_text.font_size,
                                 'font-family': cur_text.font_family,
-                                'text-anchor': 'middle',
+                                'text-anchor': cur_text.text_anchor,
                                 'xml:space': 'preserve',
                                 opacity: cur_shape.opacity
                             }
@@ -1880,7 +1881,9 @@ define([
 
                         call('transition', selectedElements);
                         ObjectPanelsController.setEditable(false);
-
+                        if (svgedit.utilities.getElem('text_cursor')) {
+                            svgCanvas.textActions.init();
+                        }
                         break;
                     case 'zoom':
                         real_x *= current_zoom;
@@ -5065,6 +5068,12 @@ define([
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
             function parseSvg(svg, type) {
+                function _removeSvgText() {
+                    if($(svg).find('text').length) {
+                        AlertActions.showPopupInfo('', LANG.popup.no_support_text);
+                        $(svg).find('text').remove();
+                    }
+                }
                 function _symbolWrapper(symbolContents) {
                     const rootViewBox = svg.getAttribute('viewBox');
                     const rootWidth = unit2Pixel(svg.getAttribute('width'));
@@ -5100,7 +5109,7 @@ define([
 
                     return wrappedSymbolContent;
                 }
-                function _parseSvgByLayer(svg) {
+                function _parseSvgByLayer() {
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
                     defNodes.map(def => {
@@ -5121,7 +5130,7 @@ define([
 
                     return symbols;
                 }
-                function _parseSvgByColor(svg) {
+                function _parseSvgByColor() {
                     function getColorOfElement(node) {
                         let color;
                         color = node.getAttribute('stroke');
@@ -5204,7 +5213,7 @@ define([
                     });
                     return symbols;
                 }
-                function _parseSvgByNolayer(svg) {
+                function _parseSvgByNolayer() {
                     //this is same as parseByLayer .....
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
@@ -5219,6 +5228,7 @@ define([
                     return [symbol];
                 }
                 // return symbols
+                _removeSvgText(svg);
                 switch (type) {
                     case 'color':
                         return {
@@ -6717,6 +6727,57 @@ define([
             if (selected != null && selected.tagName === 'text' &&
                 selectedElements[1] == null) {
                 changeSelectedAttribute('font-style', i ? 'italic' : 'normal');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
+        this.getFontWeight = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                return selected.getAttribute('font-weight') || 0;
+            }
+            return false;
+        };
+
+        this.setFontWeight = function (i) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('font-weight', i ? i : 'normal');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
+        this.getLetterSpacing = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                let val = selected.getAttribute('letter-spacing');
+                if(val) {
+                    if (val.endsWith('em')) {
+                        return val.slice(0, -2);
+                    } else {
+                        console.warn('letter-spacing should be em!');
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+                return val;
+            }
+            return false;
+        };
+
+        this.setLetterSpacing = function (val) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('letter-spacing', val ? (val.toString() + 'em') : '0em');
             }
             if (!selectedElements[0].textContent) {
                 textActions.setCursor();
