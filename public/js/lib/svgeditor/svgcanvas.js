@@ -30,12 +30,14 @@
 define([
     'helpers/i18n',
     'helpers/api/config',
+    'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
 
 ], function (
     i18n,
     ConfigHelper,
+    AlertActions,
     ObjectPanelsController,
     PreviewModeController
 ) {
@@ -5066,6 +5068,12 @@ define([
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
             function parseSvg(svg, type) {
+                function _removeSvgText() {
+                    if($(svg).find('text').length) {
+                        AlertActions.showPopupInfo('', LANG.popup.no_support_text);
+                        $(svg).find('text').remove();
+                    }
+                }
                 function _symbolWrapper(symbolContent) {
                     const rootViewBox = svg.getAttribute('viewBox');
                     const rootWidth = unit2Pixel(svg.getAttribute('width'));
@@ -5095,7 +5103,7 @@ define([
 
                     return wrappedSymbolContent;
                 }
-                function _parseSvgByLayer(svg) {
+                function _parseSvgByLayer() {
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
                     defNodes.map(def => {
@@ -5116,7 +5124,7 @@ define([
 
                     return symbols;
                 }
-                function _parseSvgByColor(svg) {
+                function _parseSvgByColor() {
                     function getColorOfElement(node) {
                         let color;
                         color = node.getAttribute('stroke');
@@ -5199,7 +5207,7 @@ define([
                     });
                     return symbols;
                 }
-                function _parseSvgByNolayer(svg) {
+                function _parseSvgByNolayer() {
                     //this is same as parseByLayer .....
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
@@ -5217,6 +5225,7 @@ define([
                     return symbols;
                 }
                 // return symbols
+                _removeSvgText(svg);
                 switch (type) {
                     case 'color':
                         return {

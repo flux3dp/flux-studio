@@ -992,6 +992,7 @@ define(function() {
                 layer_by_layer: '依圖層分層',
                 layer_by_color: '依顏色分層',
                 nolayer: '不分層',
+                no_support_text: 'FLUX Studio 目前不支援匯入<text>、<tspan>標籤，請由向量繪圖軟體將文字轉成路徑後再匯入。',
                 should_update_firmware_to_continue: '請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)'
             },
             left_panel: {
