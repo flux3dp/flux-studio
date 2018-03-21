@@ -90,7 +90,7 @@ define([
         path.setAttribute('fill', '#fff');
         path.setAttribute('fill-opacity', 0);
         path.setAttribute('stroke', '#000');
-        path.setAttribute('stroke-width', '1px');
+        path.setAttribute('stroke-width', 1);
         path.setAttribute('stroke-opacity', 1);
         path.setAttribute('stroke-dasharray', 'none');
         path.setAttribute('vector-effect', 'non-scaling-stroke');

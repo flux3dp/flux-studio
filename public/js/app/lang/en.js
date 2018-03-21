@@ -994,7 +994,7 @@ define(function() {
                 layer_by_layer: 'By Layer',
                 layer_by_color: 'By Color',
                 nolayer: 'No Layer',
-                no_support_text: 'FLUX Studio not support <text> tag currently. Please transfer text to path before importing.',
+                no_support_text: 'FLUX Studio does not support text tag currently. Please transfer text to path before importing.',
                 should_update_firmware_to_continue: 'Please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
             },
             left_panel: {
