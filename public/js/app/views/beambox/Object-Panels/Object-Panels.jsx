@@ -55,15 +55,15 @@ define([
             validPanels.forEach(function(panelName) {
                 let panel;
                 switch (panelName) {
-                    case 'position':            panel = <PositionPanel key={panelName} x={data.position.x} y={data.position.y} type={type}/>; break;
-                    case 'rotation':            panel = <RotationPanel key={panelName} angle={data.rotation.angle}/>; break;
-                    case 'size':                panel = <SizePanel key={panelName} width={data.size.width} height={data.size.height} type={type}/>; break;
-                    case 'ellipsePosition':     panel = <EllipsePositionPanel key={panelName} cx={data.ellipsePosition.cx} cy={data.ellipsePosition.cy}/>; break;
-                    case 'ellipseRadius':       panel = <EllipseRadiusPanel key={panelName} rx={data.ellipseRadius.rx} ry={data.ellipseRadius.ry}/>; break;
-                    case 'rectRoundedCorner':   panel = <RectRoundedCorner key={panelName} rx={data.rectRoundedCorner.rx}/>; break;
-                    case 'line':                panel = <LinePanel key={panelName} x1={data.line.x1} y1={data.line.y1} x2={data.line.x2} y2={data.line.y2}/>; break;
-                    case 'shadingThreshold':    panel = <ShadingThresholdPanel key={panelName} shading={data.image.shading} threshold={data.image.threshold} $me={$me}/>; break;
-                    case 'text':                panel = <TextPanel key={panelName} fontFamily={data.font.fontFamily} fontWeight={data.font.fontWeight} italic={data.font.italic} fontSize={data.font.fontSize} letterSpacing={data.font.letterSpacing} $me={$me}/>; break;
+                    case 'position':            panel = <PositionPanel key={panelName} {...data.position} type={type}/>; break;
+                    case 'rotation':            panel = <RotationPanel key={panelName} {...data.rotation}/>; break;
+                    case 'size':                panel = <SizePanel key={panelName} {...data.size} type={type}/>; break;
+                    case 'ellipsePosition':     panel = <EllipsePositionPanel key={panelName} {...data.ellipsePosition}/>; break;
+                    case 'ellipseRadius':       panel = <EllipseRadiusPanel key={panelName} {...data.ellipseRadius}/>; break;
+                    case 'rectRoundedCorner':   panel = <RectRoundedCorner key={panelName} {...data.rectRoundedCorner}/>; break;
+                    case 'line':                panel = <LinePanel key={panelName} {...data.line}/>; break;
+                    case 'shadingThreshold':    panel = <ShadingThresholdPanel key={panelName} {...data.image} $me={$me}/>; break;
+                    case 'text':                panel = <TextPanel key={panelName} {...(data.font)} $me={$me}/>; break;
                 }
                 panelsToBeRender.push(panel);
             });

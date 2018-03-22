@@ -118,6 +118,10 @@ define([
             svgCanvas.setLetterSpacing(val);
             window.updateContextPanel();
         },
+        update_font_is_fill: function(val) {
+            svgCanvas.setFontIsFill(val);
+            window.updateContextPanel();
+        },
         write_image_data_shading: function(elem, val) {
             elem.attr('data-shading', val);
         },

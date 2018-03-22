@@ -55,7 +55,7 @@ define([
                     threshold:undefined, shading:undefined
                 },
                 font: {
-                    fontFamily:undefined, fontSize:undefined, fontWeight:undefined, italic:undefined, leterSpacing: undefined
+                    fontFamily:undefined, fontSize:undefined, fontWeight:undefined, italic:undefined, leterSpacing: undefined, isFill: undefined
                 }
             };
 
@@ -154,6 +154,9 @@ define([
         }
         setLetterSpacing(val) {
             this.data.font.letterSpacing = val;
+        }
+        setFontIsFill(val) {
+            this.data.font.isFill = val;
         }
 
         isResizeFixed() {

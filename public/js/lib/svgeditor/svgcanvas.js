@@ -164,7 +164,8 @@ define([
 
         all_properties.text = $.extend(true, {}, all_properties.shape);
         $.extend(all_properties.text, {
-            fill: '#fff',
+            fill: curConfig.text.fill,
+            fill_opacity: curConfig.text.fill_opacity,
             stroke_width: curConfig.text.stroke_width,
             font_size: curConfig.text.font_size,
             font_family: curConfig.text.font_family
@@ -1610,6 +1611,7 @@ define([
                                 y: y,
                                 id: getNextId(),
                                 fill: cur_text.fill,
+                                'fill-opacity': cur_text.fill_opacity,
                                 'stroke-width': cur_text.stroke_width,
                                 'font-size': cur_text.font_size,
                                 'font-family': cur_text.font_family,
@@ -6747,6 +6749,28 @@ define([
             if (selected != null && selected.tagName === 'text' &&
                 selectedElements[1] == null) {
                 changeSelectedAttribute('font-weight', i ? i : 'normal');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
+        this.getFontIsFill = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                if (['#fff', '#ffffff', 'none', null].includes(selected.getAttribute('fill'))) {
+                    return true;
+                }
+            }
+            return false;
+        };
+
+        this.setFontIsFill = function (isFill) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('fill', isFill ? '#000' : '#fff');
             }
             if (!selectedElements[0].textContent) {
                 textActions.setCursor();

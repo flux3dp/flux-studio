@@ -150,6 +150,8 @@ define([
                     stroke_width: 1,
                     font_size: 100,
                     font_family: 'Arial',
+                    fill: '#fff',
+                    fill_opacity: '1',
                     text_anchor: 'start'
                 },
                 initOpacity: 1,
@@ -1864,6 +1866,7 @@ define([
                                 italic: svgCanvas.getItalic()
                             });
                             ObjectPanelsController.setLetterSpacing(svgCanvas.getLetterSpacing());
+                            ObjectPanelsController.setFontIsFill(svgCanvas.getFontIsFill());
                         } // text
                         else if (el_name === 'image') {
                             if (svgCanvas.getMode() === 'image') {

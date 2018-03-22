@@ -8,6 +8,7 @@ define([
     'jsx!views/beambox/Object-Panels/text/FontStyle',
     'jsx!views/beambox/Object-Panels/text/FontSize',
     'jsx!views/beambox/Object-Panels/text/LetterSpacing',
+    'jsx!views/beambox/Object-Panels/text/FontFill',
     'helpers/i18n',
 ], function(
     React,
@@ -19,6 +20,7 @@ define([
     FontStyleSelector,
     FontSizeInput,
     LetterSpacingInput,
+    IsFillCheckbox,
     i18n
 ) {
 
@@ -139,7 +141,8 @@ define([
                         italic: props.italic
                     }).style,
                     fontSize: props.fontSize,
-                    letterSpacing: props.letterSpacing
+                    letterSpacing: props.letterSpacing,
+                    isFill: props.isFill
                 };
             }
         }
@@ -179,6 +182,12 @@ define([
                 letterSpacing: val
             });
         }
+        handleIsFillChange(val) {
+            FnWrapper.update_font_is_fill(val);
+            this.setState({
+                isFill: val
+            });
+        }
         async convertToPath() {
             const path = await requestToConvertTextToPath({
                 text: this.props.$me.text(),
@@ -211,7 +220,7 @@ define([
         render() {
             const fontStyles = requestFontStylesOfTheFontFamily(this.state.fontFamily);
             return (
-                <div className='object-panel'>
+                <div className='object-panel text-panel'>
                     <label className='controls accordion'>
                         <input type='checkbox' className='accordion-switcher' defaultChecked={true} />
                         <p className='caption'>
@@ -226,22 +235,36 @@ define([
                                         fontFamilyOptions={requestAvailableFontFamilies()}
                                         onChange={val => this.handleFontFamilyChange(val)}
                                     />
+                                </div>
+                                <div className='control'>
                                     <FontStyleSelector
                                         currentFontStyle={this.state.fontStyle}
                                         fontStyleOptions={fontStyles}
                                         onChange={val => this.handleFontStyleChange(val)}
                                     />
-                                    <br/>
+                                </div>
+                                <div className='control'>
                                     <div className='text-center header' style={{fontSize: '16px'}}>{LANG.font_size}</div>
                                     <FontSizeInput
                                         currentFontSize={this.state.fontSize}
                                         onChange={val => this.handleFontSizeChange(val)}
                                     />
+                                </div>
+                                <div className='control'>
                                     <div className='text-center header' style={{fontSize: '16px'}}>{LANG.letter_spacing}</div>
                                     <LetterSpacingInput
                                         currentLetterSpacing={this.state.letterSpacing}
                                         onChange={val => this.handleLetterSpacingChange(val)}
                                     />
+                                </div>
+                                <div className='control'>
+                                    <div className='text-center header' style={{fontSize: '16px'}}>{LANG.fill}</div>
+                                    <IsFillCheckbox
+                                        currentIsFill={this.state.isFill}
+                                        onChange={val => this.handleIsFillChange(val)}
+                                    />
+                                </div>
+                                <div className='control'>
                                     <button
                                         className='btn-default'
                                         onClick={async () => {

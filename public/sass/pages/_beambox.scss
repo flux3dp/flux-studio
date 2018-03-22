@@ -187,6 +187,20 @@
                 line-height: 30px;
                 justify-content: space-between;
             }
+            &.text-panel {
+                .controls {
+                    padding-bottom: 10px;
+                    .control {
+                        margin-bottom: 0;
+                        .fill-checkbox {
+                            color: #666;
+                            margin-left: 17px;
+                            font-size: 22px;
+                            cursor: pointer;
+                        }
+                    }
+                }
+            }
         }
     }
     #svg_editor {
