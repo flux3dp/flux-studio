@@ -2,6 +2,7 @@ define([
     'react',
     'reactPropTypes',
     'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/beambox/font-funcs',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'jsx!views/beambox/Object-Panels/text/FontFamily',
@@ -14,6 +15,7 @@ define([
     React,
     PropTypes,
     FnWrapper,
+    FontFuncs,
     ProgressActions,
     ProgressConstants,
     FontFamilySelector,
@@ -23,82 +25,12 @@ define([
     IsFillCheckbox,
     i18n
 ) {
-
     if (!window.electron) {
         console.log('font is not supported in web browser');
         return () => null;
     }
-    const ipc = electron.ipc;
-    const events = electron.events;
 
     const LANG = i18n.lang.beambox.object_panels;
-
-    const requestAvailableFontFamilies = () => {
-        // get all available fonts in user PC
-        const fonts = ipc.sendSync(events.GET_AVAILABLE_FONTS);
-
-        // make it unique
-        const fontFamilySet = new Set();
-        fonts.map(font => fontFamilySet.add(font.family));
-
-        // transfer to array and sort!
-        return Array.from(fontFamilySet).sort((a, b) => {
-            if (a < b) {
-                return -1;
-            }
-            if (a > b) {
-                return 1;
-            }
-            return 0;
-        });
-    };
-    const requestFontStylesOfTheFontFamily = (family) => {
-        // if you don't specify italic, it will just return fonts that are not italic
-        const fontsNoItalic = ipc.sendSync(events.FIND_FONTS, { family: family, italic: false });
-        const fontsItalic = ipc.sendSync(events.FIND_FONTS, { family: family, italic: true });
-        const fonts = fontsNoItalic.concat(fontsItalic);
-        const fontStyles = Array.from(fonts).map(font => font.style);
-
-        return fontStyles;
-    };
-    const requestFontByFamilyAndStyle = ({family, style, weight, italic}) => {
-        const font = ipc.sendSync(events.FIND_FONT, {
-            family: family,
-            style: style,
-            weight: weight,
-            italic: italic
-        });
-        return font;
-    };
-    const requestToConvertTextToPath = async ({text, x, y, fontFamily, fontSize, fontStyle, transform, letterSpacing}) => {
-        const d = $.Deferred();
-        ipc.once(events.RESOLVE_PATH_D_OF_TEXT, (sender, pathD) => {
-            d.resolve(pathD);
-        });
-
-        ipc.send(events.REQUEST_PATH_D_OF_TEXT, {
-            text: text,
-            x: x,
-            y: y,
-            fontFamily: fontFamily,
-            fontSize: fontSize,
-            fontStyle: fontStyle,
-            letterSpacing: letterSpacing
-        });
-        const pathD = await d;
-        const path = document.createElementNS(window.svgedit.NS.SVG, 'path');
-        path.setAttribute('d', pathD);
-        path.setAttribute('transform', transform);
-        path.setAttribute('fill', '#fff');
-        path.setAttribute('fill-opacity', 0);
-        path.setAttribute('stroke', '#000');
-        path.setAttribute('stroke-width', 1);
-        path.setAttribute('stroke-opacity', 1);
-        path.setAttribute('stroke-dasharray', 'none');
-        path.setAttribute('vector-effect', 'non-scaling-stroke');
-
-        return path;
-    };
     class Text extends React.Component {
         constructor(props) {
             super(props);
@@ -135,7 +67,7 @@ define([
             } else {
                 this.state = {
                     fontFamily: props.fontFamily,
-                    fontStyle: requestFontByFamilyAndStyle({
+                    fontStyle: FontFuncs.requestFontByFamilyAndStyle({
                         family: props.fontFamily,
                         weight: props.fontWeight,
                         italic: props.italic
@@ -152,7 +84,7 @@ define([
             FnWrapper.update_font_family(newFamily);
 
             // new style
-            const newStyle = requestFontStylesOfTheFontFamily(newFamily)[0];
+            const newStyle = FontFuncs.requestFontStylesOfTheFontFamily(newFamily)[0];
 
             // set fontFamily and change fontStyle
             this.setState({
@@ -160,7 +92,7 @@ define([
             }, this.handleFontStyleChange(newStyle));
         }
         handleFontStyleChange(val) {
-            const font = requestFontByFamilyAndStyle({
+            const font = FontFuncs.requestFontByFamilyAndStyle({
                 family: this.state.fontFamily,
                 style: val
             });
@@ -188,19 +120,21 @@ define([
                 isFill: val
             });
         }
-        async convertToPath() {
-            const path = await requestToConvertTextToPath({
-                text: this.props.$me.text(),
-                x: this.props.$me.attr('x'),
-                y: this.props.$me.attr('y'),
-                fontFamily: this.state.fontFamily,
-                fontSize: this.state.fontSize,
-                fontStyle: this.state.fontStyle,
-                letterSpacing: this.state.letterSpacing,
-                transform: (this.props.$me.attr('transform')||'')
-            });
-            svgCanvas.setMode('select');
 
+        async convertToPath() {
+            ProgressActions.open(ProgressConstants.WAITING, LANG.wait_for_parsing_font);
+            //delay FontFuncs.requestToConvertTextToPath() to ensure ProgressActions has already popup
+            await new Promise(resolve => {
+                setTimeout(async () => {
+                    await FontFuncs.requestToConvertTextToPath(this.props.$me);
+                    resolve();
+                }, 50);
+            });
+            ProgressActions.close();
+
+            // simulate user click on empty area of canvas.
+            svgCanvas.textActions.clear();
+            svgCanvas.setMode('select');
             $(svgroot).trigger({
                 type: 'mousedown',
                 pageX: 0,
@@ -211,14 +145,11 @@ define([
                 pageX: 0,
                 pageY: 0
             });
-            $(path).insertAfter(this.props.$me);
-            this.props.$me.remove();
-            svgCanvas.textActions.clear();
-            window.updateContextPanel();
+
         }
 
         render() {
-            const fontStyles = requestFontStylesOfTheFontFamily(this.state.fontFamily);
+            const fontStyles = FontFuncs.requestFontStylesOfTheFontFamily(this.state.fontFamily);
             return (
                 <div className='object-panel text-panel'>
                     <label className='controls accordion'>
@@ -232,7 +163,7 @@ define([
                                 <div className='control'>
                                     <FontFamilySelector
                                         currentFontFamily={this.state.fontFamily}
-                                        fontFamilyOptions={requestAvailableFontFamilies()}
+                                        fontFamilyOptions={FontFuncs.availableFontFamilies}
                                         onChange={val => this.handleFontFamilyChange(val)}
                                     />
                                 </div>
@@ -267,17 +198,7 @@ define([
                                 <div className='control'>
                                     <button
                                         className='btn-default'
-                                        onClick={async () => {
-                                            ProgressActions.open(ProgressConstants.WAITING, LANG.wait_for_parsing_font);
-                                            //delay this.convertToPath() to ensure ProgressActions has already popup
-                                            await new Promise(resolve => {
-                                                setTimeout(async () => {
-                                                    await this.convertToPath();
-                                                    resolve();
-                                                }, 50);
-                                            });
-                                            ProgressActions.close();
-                                        }}
+                                        onClick={() => this.convertToPath()}
                                         style={{
                                             width: '100%',
                                             lineHeight: '1.5em'

@@ -6739,7 +6739,7 @@ define([
             var selected = selectedElements[0];
             if (selected != null && selected.tagName === 'text' &&
                 selectedElements[1] == null) {
-                return selected.getAttribute('font-weight') || 0;
+                return selected.getAttribute('font-weight');
             }
             return false;
         };
@@ -6759,8 +6759,13 @@ define([
             var selected = selectedElements[0];
             if (selected != null && selected.tagName === 'text' &&
                 selectedElements[1] == null) {
-                if (['#fff', '#ffffff', 'none', null].includes(selected.getAttribute('fill'))) {
+                const fillAttr = selected.getAttribute('fill');
+                if (['#fff', '#ffffff', 'none'].includes(fillAttr)) {
+                    return false;
+                } else if(fillAttr || fillAttr === null) {
                     return true;
+                } else {
+                    return false;
                 }
             }
             return false;
