@@ -26,7 +26,7 @@ define([
             super();
             this.state = {
                 isPrinterSelectorOpen: false
-            }
+            };
 
             this._handleExportClick = this._handleExportClick.bind(this);
             this._handleStartClick = this._handleStartClick.bind(this);
@@ -43,7 +43,7 @@ define([
         _renderPrinterSelectorWindow() {
             const onGettingPrinter = async (selected_item) => {
                 //export fcode
-                if (selected_item == 'export_fcode') {
+                if (selected_item === 'export_fcode') {
                     BottomRightFuncs.exportFcode();
                     this.setState({
                         isPrinterSelectorOpen: false
@@ -54,7 +54,7 @@ define([
                 //check firmware
                 if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
                     console.log('not valid version');
-                    AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
+                    AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
                     this.setState({
                         isPrinterSelectorOpen: false
                     });

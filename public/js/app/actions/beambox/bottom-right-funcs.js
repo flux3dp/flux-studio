@@ -3,6 +3,7 @@ define([
     'helpers/i18n',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
+    'app/actions/beambox/font-funcs',
     'helpers/api/svg-laser-parser',
     'app/actions/alert-actions',
     'app/actions/global-actions',
@@ -11,6 +12,7 @@ define([
     i18n,
     ProgressActions,
     ProgressConstants,
+    FontFuncs,
     svgLaserParser,
     AlertActions,
     GlobalActions
@@ -106,6 +108,9 @@ define([
     };
 
     const fetchFcode = async () => {
+        ProgressActions.open(ProgressConstants.WAITING, lang.beambox.bottom_right_panel.convert_text_to_path_before_export);
+        await FontFuncs.convertTextToPathAmoungSvgroot();
+        ProgressActions.close();
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
         await svgeditorParser.uploadToSvgeditorAPI([uploadFile]);
         const fcodeBlob = await new Promise((resolve) => {

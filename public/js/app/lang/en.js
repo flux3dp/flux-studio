@@ -1030,6 +1030,9 @@ define(function() {
                     engrave: 'Engrave'
                 },
             },
+            bottom_right_panel: {
+                convert_text_to_path_before_export: 'Convert Text to Path...'
+            },
             object_panels: {
                 position: 'Position',
                 rotation: 'Rotation',

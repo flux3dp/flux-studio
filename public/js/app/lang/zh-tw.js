@@ -1028,6 +1028,9 @@ define(function() {
                     engrave: '雕刻'
                 },
             },
+            bottom_right_panel: {
+                convert_text_to_path_before_export: '轉換文字至路徑中...'
+            },
             object_panels: {
                 position: '位置',
                 rotation: '旋轉',

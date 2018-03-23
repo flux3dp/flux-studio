@@ -198,7 +198,7 @@ ipcMain.on(events.FIND_FONT , (event, arg) => {
     event.returnValue = font;
 });
 
-ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing}) => {
+ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
     const font = FontManager.findFontSync({
         family: fontFamily,
         style: fontStyle
@@ -216,7 +216,7 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
         letterSpacing: letterSpacing
     });
 
-    event.sender.send(events.RESOLVE_PATH_D_OF_TEXT, pathD);
+    event.sender.send(events.RESOLVE_PATH_D_OF_TEXT + key, pathD);
 });
 
 app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');

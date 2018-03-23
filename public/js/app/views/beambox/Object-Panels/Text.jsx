@@ -132,19 +132,7 @@ define([
             });
             ProgressActions.close();
 
-            // simulate user click on empty area of canvas.
-            svgCanvas.textActions.clear();
-            svgCanvas.setMode('select');
-            $(svgroot).trigger({
-                type: 'mousedown',
-                pageX: 0,
-                pageY: 0
-            });
-            $(svgroot).trigger({
-                type: 'mouseup',
-                pageX: 0,
-                pageY: 0
-            });
+            FnWrapper.reset_select_mode();
 
         }
 

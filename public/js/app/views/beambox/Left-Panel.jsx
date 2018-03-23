@@ -86,7 +86,7 @@ define([
         _renderInsertObject() {
             return {
                 label: (
-                    <div onClick={FnWrapper.useSelectTool}>
+                    <div onClick={FnWrapper.reset_select_mode}>
                         <span>{LANG.insert_object}</span>
                     </div>
                 ),

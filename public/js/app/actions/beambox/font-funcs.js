@@ -1,5 +1,7 @@
 define([
+    'app/actions/beambox/svgeditor-function-wrapper',
 ], function(
+    FnWrapper
 ) {
 
     if (!window.electron) {
@@ -9,7 +11,15 @@ define([
     const ipc = electron.ipc;
     const events = electron.events;
 
-
+    const hashCode = function(s) {
+        var h = 0, l = s.length, i = 0;
+        if ( l > 0 ){
+            while (i < l) {
+                h = (h << 5) - h + s.charCodeAt(i++) | 0;
+            }
+        }
+        return Math.abs(h);
+    };
     const availableFontFamilies = (function requestAvailableFontFamilies() {
         // get all available fonts in user PC
         const fonts = ipc.sendSync(events.GET_AVAILABLE_FONTS);
@@ -67,7 +77,9 @@ define([
             }
         })();
 
-        ipc.once(events.RESOLVE_PATH_D_OF_TEXT, (sender, pathD) => {
+        // use key (which hash from $textElement html string) to prevent ipc event confliction
+        const key = hashCode($textElement.prop('outerHTML'));
+        ipc.once(events.RESOLVE_PATH_D_OF_TEXT + key, (sender, pathD) => {
             d.resolve(pathD);
         });
 
@@ -78,7 +90,8 @@ define([
             fontFamily: $textElement.attr('font-family'),
             fontSize: $textElement.attr('font-size'),
             fontStyle: fontStyle,
-            letterSpacing: letterSpacing
+            letterSpacing: letterSpacing,
+            key: key
         });
         const pathD = await d;
 
@@ -96,6 +109,7 @@ define([
         })();
 
         $(path).attr({
+            'id': svgCanvas.getNextId(),
             'd': pathD,
             'transform': transform,
             'fill': isFill ? '#000' : '#fff',
@@ -112,8 +126,15 @@ define([
 
         return;
     };
-    const convertTextToPathAmoungSvgcontent = async () => {
-
+    const convertTextToPathAmoungSvgroot = async () => {
+        FnWrapper.reset_select_mode();
+        const allPromises = $('#svgroot')
+            .find('text')
+            .toArray()
+            .map(
+                el => requestToConvertTextToPath($(el))
+            );
+        await Promise.all(allPromises);
     };
 
     return {
@@ -121,6 +142,6 @@ define([
         requestFontStylesOfTheFontFamily: requestFontStylesOfTheFontFamily,
         requestFontByFamilyAndStyle: requestFontByFamilyAndStyle,
         requestToConvertTextToPath: requestToConvertTextToPath,
-        convertTextToPathAmoungSvgcontent: convertTextToPathAmoungSvgcontentG
+        convertTextToPathAmoungSvgroot: convertTextToPathAmoungSvgroot
     };
 });
