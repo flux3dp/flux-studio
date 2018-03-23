@@ -1544,6 +1544,7 @@ define([
                                 width: 0,
                                 height: 0,
                                 id: getNextId(),
+                                'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
                             }
                         });
@@ -1597,6 +1598,7 @@ define([
                                 rx: 0,
                                 ry: 0,
                                 id: getNextId(),
+                                'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
                             }
                         });
