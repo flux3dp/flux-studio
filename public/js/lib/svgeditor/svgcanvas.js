@@ -5289,6 +5289,8 @@ define([
 
                 $(use_el).data('symbol', symbol).data('ref', symbol);
 
+                use_el.setAttribute('data-symbol', symbol);
+                use_el.setAttribute('data-ref', symbol);
 
                 batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 
