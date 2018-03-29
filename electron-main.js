@@ -199,8 +199,38 @@ ipcMain.on(events.FIND_FONT , (event, arg) => {
 });
 
 ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
+
+    const substitutedFamily = (function(){
+        const originFont = FontManager.findFontSync({
+            family: fontFamily,
+            style: fontStyle
+        });
+
+        // array of used family which are in the text
+        const familyList = (function(){
+            const originPostscriptName = originFont.postscriptName;
+            const list = Array.from(text).map(char =>
+                FontManager.substituteFontSync(originPostscriptName, char).family
+            );
+            // make unique
+            return [...new Set(list)];
+        })();
+
+        if (familyList.length === 1) {
+            return familyList[0];
+        } else if (familyList.length === 2) {
+            // consider mixing Chinese with English. For example: '甲乙丙ABC' with font Arial.
+            // we choose to use Chinese font instead of English font, which make English characters differ form what it should be.
+            // This is not the best solution, just a quick fix.
+            return (familyList.filter(family => family !== fontFamily))[0];
+        } else {
+            console.log('Unexpected case in convert text to path: text contain more than 2 font-family!');
+            return familyList[0];
+        }
+    })();
+
     const font = FontManager.findFontSync({
-        family: fontFamily,
+        family: substitutedFamily,
         style: fontStyle
     });
     let fontPath = font.path;
