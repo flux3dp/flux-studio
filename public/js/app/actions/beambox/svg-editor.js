@@ -151,7 +151,7 @@ define([
                     font_size: 100,
                     font_family: 'Arial',
                     fill: '#fff',
-                    fill_opacity: '1',
+                    fill_opacity: '0',
                     text_anchor: 'start'
                 },
                 initOpacity: 1,
