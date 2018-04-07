@@ -145,8 +145,8 @@ define([
                     content.devices.map(device => {
                         console.log(device.alias, device.ip_addr);
                         if (device.ip_addr) {
-                            console.log("Start poking cloud device IP:", device.ip_addr);
-                            SmartUpnp.startPoke(device.ip_addr);
+                            // console.log("Start poking cloud device IP:", device.ip_addr);
+                            SmartUpnp.startPoke(device.ip_addr.trim().replace(/\u0000/g, ''));
                         }
                     });
                 }

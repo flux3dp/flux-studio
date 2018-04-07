@@ -1,5 +1,4 @@
 define(function() {
-    'use strict';
     // 1.7.0 > 1.5.0 > 1.5b12 > 1.5a12
     return function(sourceVersion) {
         const currentVersion = sourceVersion.split('.');
@@ -14,8 +13,8 @@ define(function() {
             // Crashes when beta / alpha version number exceed 40000
             if (parseInt(targetVersion[1] || 0) >= 40000) throw new Error("Second version number overflow, should be < 40000");
             if (parseInt(currentMinorVersion[1] || 0) >= 40000) throw new Error("Second version number overflow, should be < 40000");
-            const targetMinorScore = parseInt(targetMinorVersion[0]) * 120000 - parseInt(targetMinorVersion[1] || 0);
-            const currentMinorScore = parseInt(currentMinorVersion[0]) * 120000 - parseInt(currentMinorVersion[1] || 0);
+            let targetMinorScore = parseInt(targetMinorVersion[0]) * 120000 - parseInt(targetMinorVersion[1] || 0);
+            let currentMinorScore = parseInt(currentMinorVersion[0]) * 120000 - parseInt(currentMinorVersion[1] || 0);
             if (targetVersion[1].indexOf('a') > -1) targetMinorScore -= 80000; // Alpha Version => Score -80000
             if (targetVersion[1].indexOf('b') > -1) targetMinorScore -= 40000; // Beta Version => Score -40000
             if (currentVersion[1].indexOf('a') > -1) currentMinorScore -= 80000;
