@@ -6780,6 +6780,7 @@ define([
             if (selected != null && selected.tagName === 'text' &&
                 selectedElements[1] == null) {
                 changeSelectedAttribute('fill', isFill ? '#000' : '#fff');
+                changeSelectedAttribute('fill-opacity', isFill ? 1 : 0);
             }
             if (!selectedElements[0].textContent) {
                 textActions.setCursor();
