@@ -18,7 +18,7 @@
     "nan": "^2.4.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
-    "text-to-svg": "jeffontheground/text-to-svg#94e50f5da1d29f74d03685925154cc11e43510ca",
+    "text-to-svg": "jeffontheground/text-to-svg#3b16a5f58cac6a26b0c8d518c81df77ef7405856",
     "websocket": "~1.0.24"
   },
   "devDependencies": {
@@ -88,10 +88,11 @@
       "icon": "public/logo.icns"
     },
     "linux": {
-      "category": "Utility",
-      "description": "",
+      "category": "Graphics",
+      "description": "FLUX Studio",
+      "vendor": "FLUX Inc.",
       "target": "deb",
-      "icon": "app-icons"
+      "icon": "app-icons/32x32.png"
     },
     "win": {
       "icon": "app-icons/win-icon.ico",

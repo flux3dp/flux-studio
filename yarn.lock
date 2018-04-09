@@ -6414,9 +6414,9 @@ text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
-text-to-svg@jeffontheground/text-to-svg#94e50f5da1d29f74d03685925154cc11e43510ca:
+text-to-svg@jeffontheground/text-to-svg#3b16a5f58cac6a26b0c8d518c81df77ef7405856:
   version "3.1.3"
-  resolved "https://codeload.github.com/jeffontheground/text-to-svg/tar.gz/94e50f5da1d29f74d03685925154cc11e43510ca"
+  resolved "https://codeload.github.com/jeffontheground/text-to-svg/tar.gz/3b16a5f58cac6a26b0c8d518c81df77ef7405856"
   dependencies:
     commander "^2.11.0"
     opentype.js jeffontheground/opentype.js#41021df0d50158af8061976a4241a0234c7427ec
