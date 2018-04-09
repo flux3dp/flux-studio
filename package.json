@@ -91,7 +91,8 @@
       "category": "Utility",
       "description": "",
       "target": "deb",
-      "icon": "app-icons"
+      "icon": "app-icons",
+      "fpm": ["--depends", "libfontconfig1-dev"]
     },
     "win": {
       "icon": "app-icons/win-icon.ico",
