@@ -92,7 +92,7 @@
       "description": "",
       "target": "deb",
       "icon": "app-icons",
-      "fpm": ["--depends", "libfontconfig1-dev"]
+      "depends": "libfontconfig1-dev"
     },
     "win": {
       "icon": "app-icons/win-icon.ico",
