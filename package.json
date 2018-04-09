@@ -91,8 +91,7 @@
       "category": "Utility",
       "description": "",
       "target": "deb",
-      "icon": "app-icons",
-      "buildPackages": ["libfontconfig1-dev"]
+      "icon": "app-icons"
     },
     "win": {
       "icon": "app-icons/win-icon.ico",
@@ -100,6 +99,9 @@
     },
     "dmg": {
       "artifactName": "FLUX Studio ${version}.${ext}"
+    },
+    "deb": {
+        "depends": ["libfontconfig1-dev"]
     },
     "nsis": {
       "include": "win-install.nsh",
