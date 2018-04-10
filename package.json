@@ -96,7 +96,7 @@
     },
     "win": {
       "icon": "app-icons/win-icon.ico",
-      "certificateSubjectName": "FLUX TECHNOLOGY CORP."
+      "publisherName": "FLUX TECHNOLOGY CORP."
     },
     "dmg": {
       "artifactName": "FLUX Studio ${version}.${ext}"
