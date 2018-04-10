@@ -1,12 +1,16 @@
 define([
     'react',
-], function(React) {
+    'app/actions/beambox/font-funcs',
+], function(
+    React,
+    FontFuncs
+) {
 
     const FontFamily = ({currentFontFamily, fontFamilyOptions, onChange}) => {
         const options = fontFamilyOptions.map(
             option => (
                 <option value={option} key={option}>
-                    {option}
+                    {FontFuncs.fontNameMap.get(option)}
                 </option>
             )
         );

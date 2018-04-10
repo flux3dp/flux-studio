@@ -37,46 +37,45 @@ define([
 
             //should handle imported unusable font in other place,
             //font should e sanitized when user import new file
-            const i_am_sure_i_want_to_sanitize_font_family_here = false;
-            if (i_am_sure_i_want_to_sanitize_font_family_here) {
 
-                // const sanitizedDefaultFontFamily = (() => {
-                //     const availableFontFamilies = requestAvailableFontFamilies();
+            const sanitizedDefaultFontFamily = (() => {
+                // use these font if props.fontFamily cannot find in user PC
+                const fontFamilyFallback = ['PingFang TC', 'Arial', 'Times New Roman', 'Ubuntu', FontFuncs.availableFontFamilies[0]];
 
-                //     // use these font if props.fontFamily cannot find in user PC
-                //     const fontFamilyFallback = ['TimeNewRoman', 'PingFang TC', 'Arial', availableFontFamilies[0]];
+                const sanitizedFontFamily = [props.fontFamily, ...fontFamilyFallback].find(
+                    f => FontFuncs.availableFontFamilies.includes(f)
+                );
 
-                //     const sanitizedFontFamily = [props.fontFamily, ...fontFamilyFallback].find(
-                //         f => availableFontFamilies.includes(f)
-                //     );
+                return sanitizedFontFamily;
+            })();
 
-                //     return sanitizedFontFamily;
-                // })();
-
-                // if (sanitizedDefaultFontFamily !== props.fontFamily) {
-                //     console.log(`unsupported font ${props.fontFamily}, fallback to ${sanitizedDefaultFontFamily}`);
-                //     FnWrapper.update_font_family(sanitizedDefaultFontFamily);
-                // }
-
-                // this.state = {
-                //     fontFamily: sanitizedDefaultFontFamily,
-                //     fontStyle: props.fontStyle,
-                //     fontSize: props.fontSize,
-                //     letterSpacing: props.letterSpacing
-                // };
-            } else {
-                this.state = {
-                    fontFamily: props.fontFamily,
-                    fontStyle: FontFuncs.requestFontByFamilyAndStyle({
-                        family: props.fontFamily,
-                        weight: props.fontWeight,
-                        italic: props.italic
-                    }).style,
-                    fontSize: props.fontSize,
-                    letterSpacing: props.letterSpacing,
-                    isFill: props.isFill
-                };
+            if (sanitizedDefaultFontFamily !== props.fontFamily) {
+                console.log(`unsupported font ${props.fontFamily}, fallback to ${sanitizedDefaultFontFamily}`);
+                FnWrapper.update_font_family(sanitizedDefaultFontFamily);
             }
+
+            this.state = {
+                fontFamily: sanitizedDefaultFontFamily,
+                fontStyle: FontFuncs.requestFontByFamilyAndStyle({
+                    family: props.fontFamily,
+                    weight: props.fontWeight,
+                    italic: props.italic
+                }).style,
+                fontSize: props.fontSize,
+                letterSpacing: props.letterSpacing,
+                isFill: props.isFill
+            };
+            // this.state = {
+            //     fontFamily: props.fontFamily,
+            //     fontStyle: FontFuncs.requestFontByFamilyAndStyle({
+            //         family: props.fontFamily,
+            //         weight: props.fontWeight,
+            //         italic: props.italic
+            //     }).style,
+            //     fontSize: props.fontSize,
+            //     letterSpacing: props.letterSpacing,
+            //     isFill: props.isFill
+            // };
         }
 
         handleFontFamilyChange(newFamily) {
@@ -144,7 +143,7 @@ define([
                         <input type='checkbox' className='accordion-switcher' defaultChecked={true} />
                         <p className='caption'>
                             {LANG.text}
-                            <span className='value'>{this.state.fontFamily}, {this.state.fontStyle}</span>
+                            <span className='value'>{FontFuncs.fontNameMap.get(this.state.fontFamily)}, {this.state.fontStyle}</span>
                         </p>
                         <label className='accordion-body'>
                             <div>
@@ -187,6 +186,7 @@ define([
                                     <button
                                         className='btn-default'
                                         onClick={() => this.convertToPath()}
+                                        title={LANG.convert_to_path_to_get_precise_result}
                                         style={{
                                             width: '100%',
                                             lineHeight: '1.5em'

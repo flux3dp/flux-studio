@@ -1049,6 +1049,7 @@ define(function() {
                 fill: 'Fill',
                 letter_spacing: 'Letter Spacing',
                 convert_to_path: 'Convert to Path',
+                convert_to_path_to_get_precise_result: 'Some fonts can\'t be parsed correctly. Please convert text to path before submitting to Beambox',
                 wait_for_parsing_font: 'Parsing font... Please wait a second',
                 laser_config: 'Laser Config',
                 shading: 'Shading',

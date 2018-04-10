@@ -1047,6 +1047,7 @@ define(function() {
                 fill: '填充',
                 letter_spacing: '字距',
                 convert_to_path: '轉換為路徑',
+                convert_to_path_to_get_precise_result: '部分字型在不同系統間有差異，輸出前請將字體轉換成路徑，以確保文字正確顯示',
                 wait_for_parsing_font: '解析字體中... 請稍待 10 秒',
                 laser_config: '雷射設定',
                 shading: '漸層',
