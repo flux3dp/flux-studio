@@ -92,7 +92,7 @@
       "description": "FLUX Studio",
       "vendor": "FLUX Inc.",
       "target": "deb",
-      "icon": "app-icons/32x32.png"
+      "icon": "app-icons"
     },
     "win": {
       "icon": "app-icons/win-icon.ico",
