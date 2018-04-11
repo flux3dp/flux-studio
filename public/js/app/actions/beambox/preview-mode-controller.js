@@ -7,6 +7,7 @@ define([
     'app/actions/global-actions',
     'helpers/sprintf',
     'helpers/check-device-status',
+    'helpers/firmware-version-checker',
     'app/actions/beambox/constant'
 ], function (
     DeviceMaster,
@@ -17,6 +18,7 @@ define([
     GlobalActions,
     sprintf,
     checkDeviceStatus,
+    FirmwareVersionChecker,
     Constant
 ) {
     const LANG = i18n.lang.beambox.left_panel;
@@ -49,6 +51,9 @@ define([
                 await checkDeviceStatus(selectedPrinter);
                 await this._retrieveCameraOffset();
                 await DeviceMaster.enterMaintainMode();
+                if (await FirmwareVersionChecker.check(selectedPrinter, 'CLOSE_FAN')) {
+                    await DeviceMaster.maintainCloseFan();
+                }
                 this.storedPrinter = selectedPrinter;
                 this.errorCallback = errCallback;
                 this.isPreviewModeOn = true;

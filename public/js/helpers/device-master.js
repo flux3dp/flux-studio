@@ -757,19 +757,12 @@ define([
             });
         };
 
-        const operation = () => {
-            initOperation().then(() => {
-                return waitForTemperature();
-            })
-                .then(() => {
-                    return startOperation();
-                })
-                .then(() => {
-                    return monitorStatus();
-                })
-                .then(() => {
-                    d.resolve();
-                });
+        const operation = async () => {
+            await initOperation();
+            await waitForTemperature();
+            await startOperation();
+            await monitorStatus();
+            d.resolve();
         };
 
         operation();
@@ -810,6 +803,11 @@ define([
                 }
             });
         return d.promise();
+    }
+
+    function maintainCloseFan() {
+        console.log('addTask maintainCloseFan');
+        return SocketMaster.addTask('maintainCloseFan');
     }
 
     function enterMaintainMode() {
@@ -1658,6 +1656,7 @@ define([
             this.stopChangingFilament = stopChangingFilament;
             this.existDevice = existDevice;
             this.maintainMove = maintainMove;
+            this.maintainCloseFan = maintainCloseFan;
 
             Discover(
                 'device-master',

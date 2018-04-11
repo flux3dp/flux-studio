@@ -33,7 +33,9 @@ define([
         UPGRADE_KIT_PROFILE_SETTING : '1.6.20',
         SCAN_CALIBRATION            : '1.6.25',
         M666R_MMTEST                : '1.6.40',
-        CLOUD                       : '1.5.0'
+        CLOUD                       : '1.5.0',
+
+        CLOSE_FAN                   : '1.4.1',
     };
 
     return {
