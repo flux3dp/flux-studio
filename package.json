@@ -18,7 +18,7 @@
     "nan": "^2.4.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
-    "text-to-svg": "jeffontheground/text-to-svg#3b16a5f58cac6a26b0c8d518c81df77ef7405856",
+    "text-to-svg": "jeffontheground/text-to-svg#e4fb3dc1ac9c8e5a2440373e7e018f07653ad574",
     "websocket": "~1.0.24"
   },
   "devDependencies": {

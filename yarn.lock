@@ -5003,9 +5003,9 @@ open@^0.0.5:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/open/-/open-0.0.5.tgz#42c3e18ec95466b6bf0dc42f3a2945c3f0cad8fc"
 
-opentype.js@jeffontheground/opentype.js#41021df0d50158af8061976a4241a0234c7427ec:
+opentype.js@jeffontheground/opentype.js#0ba92d8da4340d01974d7c5e4f50f5acdda6ee97:
   version "0.7.3"
-  resolved "https://codeload.github.com/jeffontheground/opentype.js/tar.gz/41021df0d50158af8061976a4241a0234c7427ec"
+  resolved "https://codeload.github.com/jeffontheground/opentype.js/tar.gz/0ba92d8da4340d01974d7c5e4f50f5acdda6ee97"
   dependencies:
     tiny-inflate "^1.0.2"
 
@@ -6414,12 +6414,12 @@ text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
 
-text-to-svg@jeffontheground/text-to-svg#3b16a5f58cac6a26b0c8d518c81df77ef7405856:
+text-to-svg@jeffontheground/text-to-svg#e4fb3dc1ac9c8e5a2440373e7e018f07653ad574:
   version "3.1.3"
-  resolved "https://codeload.github.com/jeffontheground/text-to-svg/tar.gz/3b16a5f58cac6a26b0c8d518c81df77ef7405856"
+  resolved "https://codeload.github.com/jeffontheground/text-to-svg/tar.gz/e4fb3dc1ac9c8e5a2440373e7e018f07653ad574"
   dependencies:
     commander "^2.11.0"
-    opentype.js jeffontheground/opentype.js#41021df0d50158af8061976a4241a0234c7427ec
+    opentype.js jeffontheground/opentype.js#0ba92d8da4340d01974d7c5e4f50f5acdda6ee97
 
 throttleit@0.0.2:
   version "0.0.2"
