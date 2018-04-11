@@ -5508,8 +5508,8 @@ define([
                         return;
                     }
                     const fileType = (function() {
-                        if (file.type.includes('image')) {
-                            if (file.type.includes('svg')) {
+                        if (file.type.toLowerCase().includes('image')) {
+                            if (file.type.toLowerCase().includes('svg')) {
                                 return 'svg';
                             } else {
                                 return 'bitmap';
@@ -5518,7 +5518,7 @@ define([
                         if (file.name.toLowerCase().includes('.dxf')) {
                             return 'dxf';
                         }
-                        if (file.name.endsWith('.ai') || (file.path && file.path.endsWith('.ai'))) {
+                        if (file.name.toLowerCase().endsWith('.ai') || (file.path && file.path.toLowerCase().endsWith('.ai'))) {
                             return 'ai';
                         }
                         return 'unknown';

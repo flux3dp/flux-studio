@@ -235,7 +235,7 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
     });
     let fontPath = font.path;
 
-    if(fontPath.endsWith('.ttc') || fontPath.endsWith('.ttcf')) {
+    if(fontPath.toLowerCase().endsWith('.ttc') || fontPath.toLowerCase().endsWith('.ttcf')) {
         fontPath = await TTC2TTF(fontPath, font.postscriptName);
     }
     const pathD = TextToSVG.loadSync(fontPath).getD(text, {

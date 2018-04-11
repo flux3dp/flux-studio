@@ -6781,6 +6781,7 @@ define([
                 selectedElements[1] == null) {
                 changeSelectedAttribute('fill', isFill ? '#000' : '#fff');
                 changeSelectedAttribute('fill-opacity', isFill ? 1 : 0);
+                changeSelectedAttribute('stroke', isFill ? 'none' : '#000');
             }
             if (!selectedElements[0].textContent) {
                 textActions.setCursor();
@@ -6793,7 +6794,7 @@ define([
                 selectedElements[1] == null) {
                 let val = selected.getAttribute('letter-spacing');
                 if(val) {
-                    if (val.endsWith('em')) {
+                    if (val.toLowerCase().endsWith('em')) {
                         return val.slice(0, -2);
                     } else {
                         console.warn('letter-spacing should be em!');
