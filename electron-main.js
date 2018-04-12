@@ -14,6 +14,7 @@ const TextToSVG = require('text-to-svg');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+const os = require('os');
 
 let mainWindow;
 let menuManager;
@@ -260,7 +261,13 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
     event.sender.send(events.RESOLVE_PATH_D_OF_TEXT + key, pathD);
 });
 
-app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
+console.log("Running FLUX Studio on ", os.arch());
+
+if  (os.arch() == 'ia32' || os.arch() == 'x32') {
+    app.commandLine.appendSwitch('js-flags', '--max-old-space-size=2048');
+} else {
+    app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
+}
 
 app.on('ready', () => {
     app.makeSingleInstance((commandLine, workingDirectory) => {
