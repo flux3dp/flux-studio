@@ -206,8 +206,8 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
         //if only contain basic character (123abc!@#$...), don't substitute.
         //because my Mac cannot substituteFont properly handing font like 'Windings'
         //but we have to subsittue text if text contain both English and Chinese
-        const textOnlyContainBasicLatin = Array.from(text).some(char => {
-            return char.charCodeAt(0) > 0x007F;
+        const textOnlyContainBasicLatin = Array.from(text).every(char => {
+            return char.charCodeAt(0) <= 0x007F;
         });
         if (textOnlyContainBasicLatin) {
             return fontFamily;
