@@ -1,6 +1,7 @@
 define([
     'helpers/device-master',
     'helpers/i18n',
+    'helpers/api/config',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/beambox/font-funcs',
@@ -10,6 +11,7 @@ define([
 ], function (
     DeviceMaster,
     i18n,
+    Config,
     ProgressActions,
     ProgressConstants,
     FontFuncs,
@@ -127,7 +129,8 @@ define([
                         ProgressActions.updating(lang.message.uploading_fcode, 100);
                         resolve(blob);
                     },
-                    fileMode: '-f'
+                    fileMode: '-f',
+                    model: Config().read('beambox-preference')['model']
                 }
             );
         });

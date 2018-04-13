@@ -308,6 +308,10 @@ define([
                     total_length = 0,
                     blob;
 
+                if (opts.model === 'fbb1p') {
+                    args.push('-pro');
+                }
+
                 events.onMessage = function(data) {
 
                     if ('computing' === data.status) {
@@ -329,7 +333,7 @@ define([
                 };
 
                 ws.send(args.join(' '));
-            }, 
+            },
             divideSVG: function() {
                 var $deferred = $.Deferred();
                 opts = opts || {};
