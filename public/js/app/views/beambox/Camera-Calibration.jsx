@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 define([
     'jquery',
     'react',
@@ -15,7 +16,7 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'helpers/api/camera-calibration',
     'helpers/sprintf',
-    'app/actions/beambox/constant',    
+    'app/actions/beambox/constant',
 ], function(
     $,
     React,
@@ -35,14 +36,12 @@ define([
     sprintf,
     Constant
 ) {
-    'use strict';
-
     const lang = i18n.get();
     const LANG = lang.camera_calibration;
     const Config = ConfigHelper();
 
-    const cameraCalibrationWebSocket = CameraCalibration();    
-    
+    const cameraCalibrationWebSocket = CameraCalibration();
+
     let imgBlobUrl = '';
 
     //View render the following steps
@@ -60,7 +59,7 @@ define([
                 [STEP_BEFORE_ANALYZE_PICTURE, StepBeforeAnalyzePicture],
                 [STEP_FINISH, StepFinish]
             ]);
-            
+
             this.state = {
                 currentStep: STEP_REFOCUS
             };
@@ -80,14 +79,14 @@ define([
         render() {
             const currentStep = this.state.currentStep;
             const TheStep = this.stepsMap.get(currentStep);
-            const content = (<TheStep 
+            const content = (<TheStep
                 gotoNextStep={this.changeCurrentStep}
                 onClose={this.onClose}
                 device={this.props.device}
             />);
             return (
-                <div className="always-top" ref="modal">
-                    <Modal className={{"modal-camera-calibration": true}} content={content} disabledEscapeOnBackground={false}/>
+                <div className='always-top' ref='modal'>
+                    <Modal className={{'modal-camera-calibration': true}} content={content} disabledEscapeOnBackground={false}/>
                 </div>
             );
         }
@@ -115,11 +114,11 @@ define([
                             onClick: this.props.onClose
                         }]
                     }
-                    />
+                />
             );
         }
     }
-    
+
     class StepBeforeCut extends React.Component {
         async cutThenCapture() {
             await this._doCuttingTask();
@@ -133,8 +132,8 @@ define([
         };
         async _doCaptureTask() {
             const device = this.props.device;
-            await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode')});
-            ProgressActions.open(ProgressConstants.NONSTOP, LANG.taking_picture); 
+            await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode');});
+            ProgressActions.open(ProgressConstants.NONSTOP, LANG.taking_picture);
             try {
                 const movementX = Constant.camera.calibrationPicture.centerX - Constant.camera.offsetX_ideal;
                 const movementY = Constant.camera.calibrationPicture.centerY - Constant.camera.offsetY_ideal;
@@ -154,30 +153,30 @@ define([
         render() {
             return (
                 <Alert
-                caption={LANG.camera_calibration}
-                message={LANG.please_place_paper}
-                buttons={
-                    [{
-                        label: LANG.start_engrave,
-                        className: 'btn-default btn-alone-right',
-                        onClick: async ()=>{
-                            try {
-                                await this.cutThenCapture();
-                                this.props.gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
-                            } catch (error) {
-                                console.log(error);
-                                AlertActions.showPopupError('menu-item', error.message);                                
+                    caption={LANG.camera_calibration}
+                    message={LANG.please_place_paper}
+                    buttons={
+                        [{
+                            label: LANG.start_engrave,
+                            className: 'btn-default btn-alone-right',
+                            onClick: async ()=>{
+                                try {
+                                    await this.cutThenCapture();
+                                    this.props.gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
+                                } catch (error) {
+                                    console.log(error);
+                                    AlertActions.showPopupError('menu-item', error.message || 'Fail to cut and capture');
+                                }
                             }
-                        }
-                    },
-                    {
-                        label: LANG.cancel,
-                        className: 'btn-default btn-alone-left',
-                        onClick: this.props.onClose
-                    }]
-                }
+                        },
+                        {
+                            label: LANG.cancel,
+                            className: 'btn-default btn-alone-left',
+                            onClick: this.props.onClose
+                        }]
+                    }
                 />
-            ); 
+            );
         };
     }
 
@@ -194,23 +193,23 @@ define([
         async _doSendPictureTask() {
             const d = $.Deferred();
             fetch(imgBlobUrl)
-            .then(res => res.blob())
-            .then((blob) => {
-                var fileReader = new FileReader();
-                fileReader.onloadend = (e) => {
-                    cameraCalibrationWebSocket.upload(e.target.result)
-                    .done((resp)=>{
-                        d.resolve(resp);
-                    })
-                    .fail((resp)=>{
-                        d.reject(resp.toString());
-                    })
-                };
-                fileReader.readAsArrayBuffer(blob);
-            })
-            .catch((err) => {
-                d.reject(err);
-            });
+                .then(res => res.blob())
+                .then((blob) => {
+                    var fileReader = new FileReader();
+                    fileReader.onloadend = (e) => {
+                        cameraCalibrationWebSocket.upload(e.target.result)
+                            .done((resp)=>{
+                                d.resolve(resp);
+                            })
+                            .fail((resp)=>{
+                                d.reject(resp.toString());
+                            });
+                    };
+                    fileReader.readAsArrayBuffer(blob);
+                })
+                .catch((err) => {
+                    d.reject(err);
+                });
             return await d.promise();
         }
 
@@ -226,7 +225,7 @@ define([
 
             const offsetX = -deviationX * scaleRatio / Constant.dpmm + offsetX_ideal;
             const offsetY = -deviationY * scaleRatio / Constant.dpmm + offsetY_ideal;
-            
+
             if ((0.8 > scaleRatio/scaleRatio_ideal) || (scaleRatio/scaleRatio_ideal > 1.2)) {
                 return false;
             }
@@ -241,7 +240,7 @@ define([
                 Y: offsetY,
                 R: -angle,
                 S: scaleRatio
-            }
+            };
         }
 
         async _doSetConfigTask(X, Y, R, S) {
@@ -263,7 +262,7 @@ define([
                                     this.props.gotoNextStep(STEP_FINISH);
                                 } catch (error) {
                                     console.log(error);
-                                    AlertActions.showPopupError('menu-item', error.message);                                        
+                                    AlertActions.showPopupError('menu-item', error.message);
                                     this.props.gotoNextStep(STEP_REFOCUS);
                                 }
                             }

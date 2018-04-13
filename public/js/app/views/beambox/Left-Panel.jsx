@@ -139,7 +139,7 @@ define([
 
             } catch (error) {
                 console.log(error);
-                AlertActions.showPopupError('menu-item', error);
+                AlertActions.showPopupError('menu-item', 'Fail to start preview mode');
                 FnWrapper.useSelectTool();
             }
         }

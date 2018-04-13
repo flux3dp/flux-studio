@@ -7,24 +7,18 @@ define([
     VersionChecker,
     DeviceMaster
 ) {
-    const check = (device, key) => {
-        let d = $.Deferred();
+    const check = async (device, key) => {
         if(device.version) {
-            DeviceMaster.selectDevice(device);
+            await DeviceMaster.selectDevice(device);
             let vc = VersionChecker(device.version);
-            d.resolve(vc.meetVersion(requirement[key]));
+            return vc.meetVersion(requirement[key]);
         }
         else {
-            DeviceMaster.selectDevice(device).then(() => {
-                return DeviceMaster.getDeviceInfo();
-            })
-            .then(deviceInfo => {
-                let vc = VersionChecker(deviceInfo.version);
-                d.resolve(vc.meetVersion(requirement[key]));
-            });
+            await DeviceMaster.selectDevice(device);
+            const deviceInfo = await DeviceMaster.getDeviceInfo();
+            const vc = VersionChecker(deviceInfo.version);
+            return vc.meetVersion(requirement[key]);
         }
-
-        return d.promise();
     };
 
     const requirement = {
