@@ -29,7 +29,7 @@ define([
             imgWidth: 1280, //pixel
             imgHeight: 720, //pixel
             offsetX_ideal: 20,    //mm
-            offsetY_ideal: 41.5,    //mm
+            offsetY_ideal: 38,    //mm
             scaleRatio_ideal: (585 / 720), // pixel on studio / pixel on beambox machine; 與焦距成正比
             calibrationPicture: {
                 centerX: 70, //mm
