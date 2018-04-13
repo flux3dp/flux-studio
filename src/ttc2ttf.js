@@ -1,4 +1,5 @@
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const bufferpack = require('bufferpack');
 const fontkit = require('fontkit');
@@ -6,11 +7,14 @@ const fontkit = require('fontkit');
 const unpack = bufferpack.unpack.bind(bufferpack);
 const packTo = bufferpack.packTo.bind(bufferpack);
 
+const tmpFontCachePath = os.tmpdir();
+console.log('tmpFontCachePath: ', tmpFontCachePath);
+
 const ttc2ttf = async (_ttcFontPath, _postscriptName = '') => {
     if (!isTTC(_ttcFontPath)) {
         return false;
     }
-    const hashPath = path.join('font-cache/', getHashCode(_ttcFontPath, _postscriptName) + '.ttf');
+    const hashPath = path.join(tmpFontCachePath, getHashCode(_ttcFontPath, _postscriptName) + '.ttf');
     try {
         fs.accessSync(hashPath);
     } catch (error) {
@@ -78,7 +82,7 @@ const devideTTC = async (_ttcFontPath) => {
 
         const ttfFont = fontkit.create(new_buf);
         const postscriptName = ttfFont.postscriptName.toString();
-        const ttfPath = path.join('font-cache/', `${getHashCode(_ttcFontPath, postscriptName)}.ttf`);
+        const ttfPath = path.join(tmpFontCachePath, `${getHashCode(_ttcFontPath, postscriptName)}.ttf`);
 
         console.log('fullName: ', ttfFont.fullName.toString());
         console.log('\tpostscriptName: ', postscriptName);
