@@ -10,16 +10,15 @@ define([
     Modal,
     ButtonGroup,
     initializeMachine,
-    config,
+    Config,
     i18n
 ) {
-    'use strict';
-
     const LANG = i18n.lang.initialize.connect_beambox;
 
     return function () {
         return React.createClass({
             onStart: function() {
+                Config().write('default-app', 'beambox');
                 initializeMachine.completeSettingUp(true);
             },
             onOpenTutorialLink: function() {
