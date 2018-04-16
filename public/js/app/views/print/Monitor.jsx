@@ -156,7 +156,7 @@ define([
             _history = [];
             messageViewed = false;
 
-            DeviceMaster.stopStreamCamera();
+            DeviceMaster.disconnectCamera();
             GlobalActions.monitorClosed();
 
             clearInterval(this.reporter);
@@ -244,7 +244,7 @@ define([
         },
 
         _stopCamera: function() {
-            DeviceMaster.stopStreamCamera();
+            DeviceMaster.disconnectCamera();
         },
 
         _refreshDirectory: function() {

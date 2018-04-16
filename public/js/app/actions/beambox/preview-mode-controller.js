@@ -27,7 +27,6 @@ define([
             this.storedPrinter = null;
             this.isPreviewModeOn = false;
             this.isPreviewBlocked = false;
-            this.cameraStream = null;
             this.cameraOffset = null;
             this.canvas = document.createElement('canvas');
             this.cameraCanvasUrl = '';
@@ -48,17 +47,16 @@ define([
             ProgressActions.open(ProgressConstants.NONSTOP, sprintf(i18n.lang.message.connectingMachine, selectedPrinter.name));
 
             try {
-                await checkDeviceStatus(selectedPrinter);
                 await this._retrieveCameraOffset();
                 await DeviceMaster.enterMaintainMode();
                 if (await FirmwareVersionChecker.check(selectedPrinter, 'CLOSE_FAN')) {
-                    await DeviceMaster.maintainCloseFan();
+                    DeviceMaster.maintainCloseFan(); // this is async function, but we don't have to wait it
                 }
                 this.storedPrinter = selectedPrinter;
                 this.errorCallback = errCallback;
                 this.isPreviewModeOn = true;
                 this._drawBoundary();
-                this._initCameraStream();
+                await DeviceMaster.connectCamera(this.storedPrinter);
             } catch (error) {
                 throw error;
             } finally {
@@ -74,7 +72,7 @@ define([
             await DeviceMaster.endMaintainMode();
         }
 
-        preview(x, y) {
+        async preview(x, y) {
             if (this.isPreviewBlocked) {
                 return;
             }
@@ -85,18 +83,17 @@ define([
 
             $(workarea).css('cursor', 'wait');
 
-            this._getPhotoAfterMove(x, y)
-                .then((imgUrl)=>{
-                    $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
-                    this._drawIntoBackground(imgUrl, x, y);
-                    this.isPreviewBlocked = false;
-                    $('.left-panel .preview-btns .clear-preview').show();// bad practice ~~~~
-                })
-                .catch((error)=>{
-                    console.log(error);
-                    this.errorCallback(error.message);
-                    this.isPreviewBlocked = false;
-                });
+            try {
+                const imgUrl = await this._getPhotoAfterMove(x, y)
+                $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
+                this._drawIntoBackground(imgUrl, x, y);
+                this.isPreviewBlocked = false;
+                $('.left-panel .preview-btns .clear-preview').show();// bad practice ~~~~
+            } catch (error) {
+                console.log(error);
+                this.errorCallback(error.message);
+                this.isPreviewBlocked = false;
+            }
         }
 
         // x, y in mm
@@ -129,10 +126,15 @@ define([
         //helper functions
 
         async _retrieveCameraOffset() {
+            // cannot getDeviceSetting during maintainMode. So we force to end it.
             try {
                 await DeviceMaster.endMaintainMode();
             } catch (error) {
-                console.log(error);
+                if ( (error.status === 'error') && (error.error && error.error[0] === 'OPERATION_ERROR') ) {
+                    // do nothing.
+                } else {
+                    console.log(error);
+                }
             }
 
             const resp = await DeviceMaster.getDeviceSetting('camera_offset');
@@ -156,29 +158,12 @@ define([
             return this.cameraOffset;
         }
 
-        _clearData() {
+        async _reset() {
             this.storedPrinter = null;
             this.isPreviewModeOn = false;
             this.cameraOffset = null;
             this.isPreviewBlocked = false;
-        }
-
-        async _reset() {
-            this._clearData();
-            if(this.cameraStream) {
-                await DeviceMaster.stopStreamCamera();
-            }
-        }
-
-        _initCameraStream() {
-            this.cameraStream = DeviceMaster.streamCamera(this.storedPrinter.uuid);
-            this.cameraStream.subscribe(
-                ()=>{},
-                (err)=>{
-                    this.end();
-                    this.errorCallback('Camera Error: ' + err.error);
-                }
-            );
+            await DeviceMaster.disconnectCamera();
         }
 
         _constrainPreviewXY(x, y) {
@@ -216,25 +201,18 @@ define([
             };
 
             await DeviceMaster.select(this.storedPrinter);
-            await checkDeviceStatus(this.storedPrinter);
             await DeviceMaster.maintainMove(movement);
-            const imgUrl = await this._getPhotoFromStream();
+            const imgUrl = await this._getPhotoFromMachine();
             return imgUrl;
         }
 
         //just fot _getPhotoAfterMoveTo()
-        _getPhotoFromStream() {
-            const d = $.Deferred();
-
-            const waitTimeForMovementStop = Constant.camera.waitTimeForMovementStop; //millisecond. this value need optimized
-            setTimeout(() => {
-                this.cameraStream.take(1).subscribe((imageBlob) => {
-                    const imgUrl = URL.createObjectURL(imageBlob);
-                    d.resolve(imgUrl);
-                });
-            }, waitTimeForMovementStop);
-
-            return d.promise();
+        async _getPhotoFromMachine() {
+            // wait for moving camera to take a stable picture, this value need optimized
+            await new Promise(resolve => setTimeout(resolve, Constant.camera.waitTimeForMovementStop));
+            const imgBlob = await DeviceMaster.takeOnePicture();
+            const imgUrl = URL.createObjectURL(imgBlob);
+            return imgUrl;
         }
 
         //just for preview()

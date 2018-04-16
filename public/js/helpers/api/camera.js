@@ -3,89 +3,72 @@
  * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-control
  */
 define([
-    'jquery',
     'helpers/websocket',
-    'app/constants/device-constants',
     'helpers/rsa-key',
     'Rx'
-], function($, Websocket, DeviceConstants, rsaKey) {
-    'use strict';
+], function(Websocket, rsaKey, Rx) {
 
-    return function(uuid, opts) {
-        opts = opts || {};
-        opts.onError = opts.onError || function() {};
-        opts.onConnect = opts.onConnect || function() {};
+    const TIMEOUT = 10000;
+    const TIMEOUT_ERROR = new Error({
+        'status': 'error',
+        'error': 'TIMEOUT',
+        'info': 'connection timeoout'
+    });
 
-        var timeout = 10000,
-            timmer,
-            ws,
-            events = {
-                onMessage: function() {},
-                onError: opts.onError
-            },
-            isTimeout = function() {
-                var error = {
-                    'status': 'error',
-                    'error': 'TIMEOUT',
-                    'info': 'connection timeoout'
-                };
-                opts.onError(error);
-                ws.close();
-            };
-
-        function createWs() {
-            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
-            let _ws = new Websocket({
-                method: `camera/${url}`,
-                onMessage: function(data) {
-                    if(data instanceof Blob) {
-                        events.onMessage(data);
-                    }
-                    else {
-                        switch (data.status) {
-                        case 'connecting':
-                            opts.onConnect(data);
-                            clearTimeout(timmer);
-                            timmer = setTimeout(isTimeout, timeout);
-                            break;
-                        case 'connected':
-                            clearTimeout(timmer);
-                            opts.onConnect(data);
-                            break;
-                        default:
-                            events.onMessage(data);
-                            break;
-                        }
-                    }
-                },
-                onError: function(response) {
-                    events.onError(response);
-                },
-                onFatal: function(response) {
-                    clearTimeout(timmer);
-                    events.onError(response);
-                },
-                onClose: function(response) {
-                    clearTimeout(timmer);
-                },
-                autoReconnect: false
-            });
-            _ws.send(rsaKey());
-            return _ws;
+    class Camera {
+        constructor() {
+            this._ws = null;
+            this._wsSubject = new Rx.Subject();
+            this._source = this._wsSubject
+                .asObservable()
+                .filter(x => x instanceof Blob);
         }
 
-        return {
-            connection: ws,
-            startStream: function(callback) {
-                events.onMessage = function(result) {
-                    callback(result);
-                };
-                ws = createWs();
+        // let subject get response from websocket
+        async createWs(device) {
+            const method = (() => {
+                const isUsb = device.source === 'h2h';
+                const uuid = device.uuid;
+                return isUsb ? `camera/usb/${parseInt(uuid)}` : `camera/${uuid}`;
+            })();
 
-            },
-            closeStream: function() {
-                ws.close(false);
-            }
-        };
-    };
+            this._ws = new Websocket({
+                method: method,
+                onOpen: () => this._ws.send(rsaKey()),
+                onMessage: (res) => this._wsSubject.onNext(res),
+                onError: (res) => this._wsSubject.onError(res),
+                onFatal: (res) => this._wsSubject.onError(res),
+                onClose: () => this._wsSubject.onCompleted(),
+                autoReconnect: false
+            });
+
+            return await this._wsSubject
+                .filter(res => res.status === 'connected')
+                .take(1)
+                .timeout(TIMEOUT, TIMEOUT_ERROR)
+                .toPromise();
+        }
+
+        async oneShot() {
+            this._ws.send('require_frame');
+            return await this._source
+                .take(1)
+                .timeout(TIMEOUT, TIMEOUT_ERROR)
+                .toPromise();
+        }
+
+        getLiveStreamSource() {
+            this._ws.send('enable_streaming');
+            return this._source
+                .timeout(TIMEOUT, TIMEOUT_ERROR)
+                .asObservable();
+        }
+
+        closeWs() {
+            this._ws.close(false);
+        }
+    }
+
+    return Camera;
+
 });

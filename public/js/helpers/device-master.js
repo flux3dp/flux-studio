@@ -57,7 +57,6 @@ define([
         _deviceNameMap = {},
         _actionMap = {},
         _device,
-        _cameraTimeoutTracker,
         _wasKilled = false,
         nwConsole,
         usbDeviceReport = {},
@@ -979,48 +978,28 @@ define([
         return _devices[index];
     }
 
-    function streamCamera(uuid) {
-        let cameraStream = new Rx.Subject(),
-            timeToReset = 20000,
-            opts;
-
-        opts = {
-            availableUsbChannel: _device.source === 'h2h' ? parseInt(_device.uuid) : -1,
-            onError: function (message) {
-                console.log('error from camera ws', message);
-                cameraStream.onError(message);
-            }
-        };
-
-        const initCamera = () => {
-            _device.camera = Camera(uuid, opts);
-            _device.camera.startStream((imageBlob) => {
-                processCameraResult(imageBlob);
-            });
-        };
-
-        const resetCamera = () => {
-            _device.camera.closeStream();
-            initCamera();
-        };
-
-        const processCameraResult = (imageBlob) => {
-            clearTimeout(_cameraTimeoutTracker);
-            _cameraTimeoutTracker = setTimeout(resetCamera, timeToReset);
-            cameraStream.onNext(imageBlob);
-        };
-
-        initCamera();
-        _cameraTimeoutTracker = setTimeout(resetCamera, timeToReset);
-
-        return cameraStream;
+    async function connectCamera(device) {
+        _device.camera = new Camera();
+        await _device.camera.createWs(device);
     }
 
-    function stopStreamCamera() {
-        if (_device.camera) {
-            clearTimeout(_cameraTimeoutTracker);
-            _device.camera.closeStream();
+    async function takeOnePicture() {
+        return await _device.camera.oneShot();
+    }
+
+    async function streamCamera(device) {
+        await this.connectCamera(device);
+
+        // return an instance of RxJS Observable.
+        return await _device.camera.getLiveStreamSource();
+    }
+
+    function disconnectCamera() {
+        if (!_device.camera) {
+            return;
         }
+        _device.camera.closeWs();
+        _device.camera = null;
     }
 
     async function showOutline(object_height, positions) {
@@ -1617,8 +1596,10 @@ define([
             this.updateToolhead = updateToolhead;
             this.headInfo = headInfo;
             this.closeConnection = closeConnection;
+            this.connectCamera = connectCamera;
             this.streamCamera = streamCamera;
-            this.stopStreamCamera = stopStreamCamera;
+            this.takeOnePicture = takeOnePicture;
+            this.disconnectCamera = disconnectCamera;
             this.calibrate = calibrate;
             this.showOutline = showOutline;
             this.zprobe = zprobe;

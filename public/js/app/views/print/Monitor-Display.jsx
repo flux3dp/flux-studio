@@ -187,8 +187,12 @@ define([
         _streamCamera: function() {
             if(!this.cameraStream) {
                 let { selectedDevice } = this.props;
-                this.cameraStream = DeviceMaster.streamCamera(selectedDevice.uuid);
-                this.cameraStream.subscribe(this._processImage);
+                DeviceMaster.streamCamera(selectedDevice).then(
+                    stream => {
+                        this.cameraStream = stream;
+                        this.cameraStream.subscribe(this._processImage);
+                    }
+                );
             }
 
             let cameraClass = ClassNames(

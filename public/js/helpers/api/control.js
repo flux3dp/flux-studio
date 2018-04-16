@@ -662,7 +662,6 @@ define([
                 if (typeof args.z !== 'undefined') {
                     command += ' z:' + args.z;
                 };
-                console.log('maintainMove', command);
                 return useDefaultResponse(`maintain move${command}`);
             },
 
