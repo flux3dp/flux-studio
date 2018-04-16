@@ -4,6 +4,7 @@ define([
     'app/actions/beambox/bottom-right-funcs',
     'jsx!widgets/Button-Group',
     'helpers/i18n',
+    'helpers/api/config',
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
@@ -14,6 +15,7 @@ define([
     BottomRightFuncs,
     ButtonGroup,
     i18n,
+    Config,
     Modal,
     PrinterSelector,
     AlertActions,
@@ -36,6 +38,19 @@ define([
             BottomRightFuncs.exportFcode();
         }
         _handleStartClick() {
+            const isPowerTooHigh = $('#svgcontent > g.layer')
+                .toArray()
+                .map(layer => layer.getAttribute('data-strength'))
+                .some(strength => Number(strength) > 80);
+
+            console.log('Config()', Config().read('beambox-preference')['should_remind_power_too_high_countdown']);
+            if (isPowerTooHigh) {
+                if(Config().read('beambox-preference')['should_remind_power_too_high_countdown'] > 0) {
+                    AlertActions.showPopupInfo('', lang.beambox.popup.power_too_high_damage_laser_tube);
+                    Config().update('beambox-preference', 'should_remind_power_too_high_countdown', Config().read('beambox-preference')['should_remind_power_too_high_countdown'] - 1);
+                }
+            }
+
             this.setState({
                 isPrinterSelectorOpen: true
             });

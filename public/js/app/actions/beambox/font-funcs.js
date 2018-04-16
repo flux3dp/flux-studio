@@ -8,7 +8,7 @@ define([
 
     if (!window.electron) {
         console.log('font is not supported in web browser');
-        return () => null;
+        return {};
     }
     const ipc = electron.ipc;
     const events = electron.events;
@@ -137,7 +137,7 @@ define([
             .map(
                 el => requestToConvertTextToPath($(el))
             );
-        await Promise.all(allPromises);
+        return await Promise.all(allPromises);
     };
 
     // <Map> family -> fullName

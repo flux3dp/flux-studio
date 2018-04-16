@@ -109,7 +109,7 @@ define([
         };
     };
 
-    const fetchFcode = async () => {
+    const fetchFcode = async (model) => {
         ProgressActions.open(ProgressConstants.WAITING, lang.beambox.bottom_right_panel.convert_text_to_path_before_export);
         await FontFuncs.convertTextToPathAmoungSvgroot();
         ProgressActions.close();
@@ -130,7 +130,7 @@ define([
                         resolve(blob);
                     },
                     fileMode: '-f',
-                    model: Config().read('beambox-preference')['model']
+                    model: model
                 }
             );
         });
@@ -143,7 +143,7 @@ define([
 
     return {
         uploadFcode: async function (device) {
-            const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
+            const { fcodeBlob, thumbnailBlobURL } = await fetchFcode(device.model);
             await DeviceMaster.select(device)
                 .done(() => {
                     GlobalActions.showMonitor(device, fcodeBlob, thumbnailBlobURL, 'LASER');
