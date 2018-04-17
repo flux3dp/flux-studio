@@ -46,22 +46,17 @@ function(
         return (
             <div>
                 <div className='caption'>
-                    {lang.message.please_select_dpi}
+                    {lang.message.please_enter_dpi}
+                    <br/>
+                    2.54, 25.4, 72, 96 etc.
                 </div>
                 <div className="message" style={{textAlign: 'center'}}>
                     <input
-                        list='suggest-dpi'
                         id='dpi-input'
                         onClick={clearInputValue}
                         onKeyDown={_handleKeyDown}
                         style={style}
                     />
-                    <datalist id='suggest-dpi'>
-                        <option value='2.54'/>
-                        <option value='25.4'/>
-                        <option value='72'/>
-                        <option value='96'/>
-                    </datalist>
                 </div>
 
                 <ButtonGroup buttons={buttons}/>

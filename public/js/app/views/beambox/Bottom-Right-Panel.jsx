@@ -2,6 +2,7 @@ define([
     'react',
     'reactClassset',
     'app/actions/beambox/bottom-right-funcs',
+    'app/actions/beambox/preview-mode-controller',
     'jsx!widgets/Button-Group',
     'helpers/i18n',
     'helpers/api/config',
@@ -13,6 +14,7 @@ define([
     React,
     ReactCx,
     BottomRightFuncs,
+    PreviewModeController,
     ButtonGroup,
     i18n,
     Config,
@@ -37,7 +39,10 @@ define([
         _handleExportClick() {
             BottomRightFuncs.exportFcode();
         }
-        _handleStartClick() {
+        async _handleStartClick() {
+            if (PreviewModeController.isPreviewMode()) {
+                await PreviewModeController.end();
+            }
             const isPowerTooHigh = $('#svgcontent > g.layer')
                 .toArray()
                 .map(layer => layer.getAttribute('data-strength'))

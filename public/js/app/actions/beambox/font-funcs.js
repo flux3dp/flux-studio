@@ -129,9 +129,9 @@ define([
 
         return;
     };
-    const convertTextToPathAmoungSvgroot = async () => {
+    const convertTextToPathAmoungSvgcontent = async () => {
         FnWrapper.reset_select_mode();
-        const allPromises = $('#svgroot')
+        const allPromises = $('#svgcontent')
             .find('text')
             .toArray()
             .map(
@@ -250,6 +250,6 @@ define([
         requestFontStylesOfTheFontFamily: requestFontStylesOfTheFontFamily,
         requestFontByFamilyAndStyle: requestFontByFamilyAndStyle,
         requestToConvertTextToPath: requestToConvertTextToPath,
-        convertTextToPathAmoungSvgroot: convertTextToPathAmoungSvgroot
+        convertTextToPathAmoungSvgcontent: convertTextToPathAmoungSvgcontent
     };
 });

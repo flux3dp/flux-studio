@@ -84,7 +84,7 @@ define([
             $(workarea).css('cursor', 'wait');
 
             try {
-                const imgUrl = await this._getPhotoAfterMove(x, y)
+                const imgUrl = await this._getPhotoAfterMove(x, y);
                 $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
                 this._drawIntoBackground(imgUrl, x, y);
                 this.isPreviewBlocked = false;

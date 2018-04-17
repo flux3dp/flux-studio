@@ -23,6 +23,7 @@ TODOS
 1. JSDoc
 */
 define([
+    'react',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
     'app/actions/beambox/preview-mode-controller',
@@ -37,6 +38,7 @@ define([
     'app/constants/keycode-constants',
     'helpers/api/svg-laser-parser'
 ], function (
+    React,
     ObjectPanelsController,
     LaserPanelController,
     PreviewModeController,

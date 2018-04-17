@@ -80,7 +80,6 @@ define([
     const prepareFileWrappedFromSvgStringAndThumbnail = async () => {
         const [thumbnail, thumbnailBlobURL] = await fetchThumbnail();
         const svgString = svgCanvas.getSvgString();
-        console.log('svgString: ', svgString);
 
         const blob = new Blob([thumbnail, svgString], { type: 'application/octet-stream' });
         const reader = new FileReader();
@@ -111,7 +110,7 @@ define([
 
     const fetchFcode = async (model) => {
         ProgressActions.open(ProgressConstants.WAITING, lang.beambox.bottom_right_panel.convert_text_to_path_before_export);
-        await FontFuncs.convertTextToPathAmoungSvgroot();
+        await FontFuncs.convertTextToPathAmoungSvgcontent();
         ProgressActions.close();
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
         await svgeditorParser.uploadToSvgeditorAPI([uploadFile]);
@@ -156,7 +155,7 @@ define([
         },
 
         exportFcode: async function () {
-            const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
+            const { fcodeBlob } = await fetchFcode();
             const defaultFCodeName = svgCanvas.getLatestImportFileName() || 'untitled';
             ProgressActions.close();
             saveAs(fcodeBlob,  defaultFCodeName + '.fc');
