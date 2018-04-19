@@ -1748,6 +1748,16 @@ define([
                             }
                         }
                         break;
+                    case 'preview':
+                        real_x *= current_zoom;
+                        real_y *= current_zoom;
+                        svgedit.utilities.assignAttributes(rubberBox, {
+                            'x': Math.min(r_start_x, real_x),
+                            'y': Math.min(r_start_y, real_y),
+                            'width': Math.abs(real_x - r_start_x),
+                            'height': Math.abs(real_y - r_start_y)
+                        }, 100);
+                        break;
                     case 'multiselect':
                         real_x *= current_zoom;
                         real_y *= current_zoom;
