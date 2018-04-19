@@ -1,5 +1,6 @@
 define([
     'react',
+    'reactClassset',
     'app/actions/initialize-machine',
     'helpers/api/discover',
     'helpers/api/usb-config',
@@ -12,6 +13,7 @@ define([
     'helpers/device-master'
 ], function(
     React,
+    ReactCx,
     initializeMachine,
     discover,
     usbConfig,
@@ -32,7 +34,7 @@ define([
 
         return React.createClass({
             // Lifecycle
-            
+
             componentWillMount: function() {
             },
 
@@ -191,7 +193,7 @@ define([
 
             _renderConnectionStep : function() {
                 const lang = this.state.lang;
-                const usbButtonClass = React.addons.classSet({
+                const usbButtonClass = ReactCx.cx({
                     'btn': true,
                     'btn-action': true,
                     'btn-large': true,

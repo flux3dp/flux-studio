@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
     'reactDOM',
     'app/actions/initialize-machine',
     'jsx!widgets/Modal',
@@ -16,6 +17,7 @@ define([
 ], function(
     $,
     React,
+    ReactCx,
     ReactDOM,
     initializeMachine,
     Modal,
@@ -440,7 +442,7 @@ define([
                             openJoinNetworkForm: false
                         });
                     },
-                    classSet = React.addons.classSet,
+                    classSet = ReactCx.cx,
                     nameClass = classSet({
                         'error': false === self.state.apModeNameIsVaild
                     }),
@@ -511,7 +513,7 @@ define([
                             openJoinNetworkForm: false
                         });
                     },
-                    classSet = React.addons.classSet,
+                    classSet = ReactCx.cx,
                     nameClass = classSet({
                         'error': false === self.state.apModeNameIsVaild
                     }),
