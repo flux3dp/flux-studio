@@ -96,6 +96,44 @@ define([
             }
         }
 
+        async previewRegion(x1, y1, x2, y2) {
+            const points = (() => {
+                const size = (() => {
+                    const h = Constant.camera.imgHeight;
+                    const a = this._getCameraOffset().angle;
+                    const s = this._getCameraOffset().scaleRatio;
+                    const c = h / (Math.cos(a) + Math.sin(a));
+                    return c * s ;
+                })();
+
+                const {left, right, top, bottom} = (() => {
+                    const l = Math.min(x1, x2) + size/2;
+                    const r = Math.max(x1, x2) - size/2;
+                    const t = Math.min(y1, y2) + size/2;
+                    const b = Math.max(y1, y2) - size/2;
+
+                    return {
+                        left: this._constrainPreviewXY(l, 0).x,
+                        right: this._constrainPreviewXY(r, 0).x,
+                        top: this._constrainPreviewXY(0, t).y,
+                        bottom: this._constrainPreviewXY(0, b).y
+                    };
+                })();
+
+                const pointsArray = [];
+                for(let curY = top; curY < (bottom + size); curY += size){
+                    for(let curX = left; curX < (right + size); curX += size) {
+                        pointsArray.push([curX, curY]);
+                    }
+                }
+                return pointsArray;
+            })();
+
+            for(let i=0; i<points.length; i++) {
+                await this.preview(points[i][0], points[i][1]);
+            }
+        }
+
         // x, y in mm
         takePictureAfterMoveTo(movementX, movementY) {
             return this._getPhotoAfterMoveTo(movementX, movementY);
@@ -170,10 +208,6 @@ define([
             const maxWidth = Constant.dimension.width;
             const maxHeight = Constant.dimension.height;
 
-            // Align grid
-            x = Math.round(x / 100) * 100;
-            y = Math.round(y / 100) * 100;
-
             x = Math.max(x, this._getCameraOffset().x * 10);
             x = Math.min(x, maxWidth);
             y = Math.max(y, this._getCameraOffset().y * 10);
@@ -202,14 +236,14 @@ define([
 
             await DeviceMaster.select(this.storedPrinter);
             await DeviceMaster.maintainMove(movement);
+            // wait for moving camera to take a stable picture, this value need optimized
+            await new Promise(resolve => setTimeout(resolve, Constant.camera.waitTimeForMovementStop));
             const imgUrl = await this._getPhotoFromMachine();
             return imgUrl;
         }
 
         //just fot _getPhotoAfterMoveTo()
         async _getPhotoFromMachine() {
-            // wait for moving camera to take a stable picture, this value need optimized
-            await new Promise(resolve => setTimeout(resolve, Constant.camera.waitTimeForMovementStop));
             const imgBlob = await DeviceMaster.takeOnePicture();
             const imgUrl = URL.createObjectURL(imgBlob);
             return imgUrl;
@@ -241,8 +275,7 @@ define([
 
         //just for _drawIntoBackground()
         _cropAndRotateImg(imageObj) {
-            const angle = this._getCameraOffset().angle;
-            const scaleRatio = this._getCameraOffset().scaleRatio;
+            const {angle, scaleRatio} = this._getCameraOffset();
 
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');

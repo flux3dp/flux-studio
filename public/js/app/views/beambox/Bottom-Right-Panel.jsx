@@ -48,10 +48,9 @@ define([
                 .map(layer => layer.getAttribute('data-strength'))
                 .some(strength => Number(strength) > 80);
 
-            console.log('Config()', Config().read('beambox-preference')['should_remind_power_too_high_countdown']);
             if (isPowerTooHigh) {
                 if(Config().read('beambox-preference')['should_remind_power_too_high_countdown'] > 0) {
-                    AlertActions.showPopupInfo('', lang.beambox.popup.power_too_high_damage_laser_tube);
+                    AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
                     Config().update('beambox-preference', 'should_remind_power_too_high_countdown', Config().read('beambox-preference')['should_remind_power_too_high_countdown'] - 1);
                 }
             }

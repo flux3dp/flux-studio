@@ -2151,7 +2151,9 @@ define([
                         } else {
                             if (start_x === real_x && start_y === real_y) {
                                 PreviewModeController.preview(real_x, real_y);
-                            };
+                            } else {
+                                PreviewModeController.previewRegion(start_x, start_y, real_x, real_y);
+                            }
                         };
                         current_mode = 'select';
                         // intentionally fall-through to select here
