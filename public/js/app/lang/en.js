@@ -168,7 +168,7 @@ define(function() {
             no_machine: 'I don\'t have a machine now.',
 
             // specific caption/content
-            invalid_device_name: 'The name can only contains chinese, alphabet, numbers, blanks, and special characters  “(”, “)”, “-”, “_”, “’”, “\'”.',
+            invalid_device_name: 'The name can only contains chinese, alphabet, numbers, blanks, and special characters  ( ) - _ ’ \'',
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: {

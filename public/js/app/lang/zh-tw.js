@@ -168,7 +168,7 @@ define(function() {
             no_machine : '目前沒有機器或已設定過連線，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '機器名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
+            invalid_device_name: '機器名稱只能使用中文，英文、數字、空格以及特殊字元 ( ) - _ ’ \'',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: {
@@ -410,7 +410,7 @@ define(function() {
                 check_email: '相關信進已寄出到您的電子信箱，請確認',
                 email_exists: '電子信箱已被使用',
                 not_verified: '請於您的電子信箱開啟確認信件',
-                user_not_found: '登入訊息錯誤',
+                user_not_found: '使用者帳號密碼錯誤',
                 resend_verification: '重新寄送確認信件',
                 contact_us: '請與 FLUX 客服聯絡',
                 confirm_reset_password: '需要重新設定密碼嗎？',
