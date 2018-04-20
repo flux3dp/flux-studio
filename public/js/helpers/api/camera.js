@@ -9,11 +9,7 @@ define([
 ], function(Websocket, rsaKey, Rx) {
 
     const TIMEOUT = 10000;
-    const TIMEOUT_ERROR = new Error({
-        'status': 'error',
-        'error': 'TIMEOUT',
-        'info': 'connection timeoout'
-    });
+    const TIMEOUT_ERROR = undefined;
 
     class Camera {
         constructor() {

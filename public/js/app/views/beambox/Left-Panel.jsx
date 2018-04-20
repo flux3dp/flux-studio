@@ -98,7 +98,7 @@ define([
         }
 
         _renderPreview() {
-            const clearPreviewStyle = PreviewModeController.isGraffitied() ? { display: 'none' } : {};
+            const clearPreviewStyle = PreviewModeController.isGraffitied() ? {} : { display: 'none' };
             return {
                 label: (
                     <div>

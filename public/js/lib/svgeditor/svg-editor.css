@@ -1,5 +1,5 @@
 ﻿body {
-	background: #e2e1e0;
+	background: #e7e6e5;
 }
 
 html, body, div{
@@ -80,8 +80,7 @@ select {
 
 #rulers > div {
 	position: absolute;
-	background: #E0E0E0;
-	z-index: 1;
+	background: #E7E6E5;
 	overflow: hidden;
 }
 
@@ -111,7 +110,7 @@ select {
 }
 
 #ruler_x canvas:first-child {
-	margin-left: -17px;
+	margin-left: -2px;
 }
 
 #ruler_x canvas {
@@ -996,7 +995,7 @@ span.zoom_tool {
 	}
 	#tools_top {
 		height: 90px;
-		background: #E0E0E0;
+		background: #E2E1E0;
 	}
 	#workarea, #sidepanels {
 		top: 70px;
