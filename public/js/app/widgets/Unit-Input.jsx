@@ -53,7 +53,7 @@ define([
                 return val;
             }
             else {
-                val = round(parseFloat(this.refs.unitInput.findDOMNode().value), -2);
+                val = round(parseFloat(ReactDOM.findDOMNode(this.refs.unitInput).value), -2);
 
                 return val;
             }
@@ -90,7 +90,7 @@ define([
         _confirmValue: function(addValue) {
             addValue = parseFloat(addValue, 10) || 0;
 
-            var el = this.refs.unitInput.findDOMNode(),
+            var el = ReactDOM.findDOMNode(this.refs.unitInput),
                 value = el.value.replace(/\s+/g, ''),
                 value = el.value.replace('/s', 's'),
                 isNegative = /^-.*/.test(value),
@@ -146,10 +146,10 @@ define([
         // UI Events
         _onBlur: function(e) {
             e.preventDefault();
-            let textboxValue = this.refs.unitInput.findDOMNode().value;
+            let textboxValue = ReactDOM.findDOMNode(this.refs.unitInput).value;
             var value = this._confirmValue();
             if(textboxValue === '') {
-                this.refs.unitInput.findDOMNode().value = this.props.defaultValue + this.props.defaultUnit;
+                ReactDOM.findDOMNode(this.refs.unitInput).value = this.props.defaultValue + this.props.defaultUnit;
             }
             else {
                 this.props.getValue(e, value);
