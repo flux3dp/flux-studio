@@ -9,24 +9,16 @@ define([
     'app/stores/alert-store',
     'helpers/duration-formatter'
 ], function($, React, ReactCx, PropTypes, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore, DurationFormatter) {
-    'use strict';
 
     return React.createClass({
         propTypes: {
             lang                    : PropTypes.object,
             hasObject               : PropTypes.bool,
             hasOutOfBoundsObject    : PropTypes.bool,
-            onPreviewClick          : PropTypes.func,
             onDownloadGCode         : PropTypes.func,
             onDownloadFCode         : PropTypes.func,
             onGoClick               : PropTypes.func,
             onCameraPositionChange  : PropTypes.func,
-        },
-
-        getInitialState: function() {
-            return {
-                previewOn: false
-            };
         },
 
         componentDidMount: function() {
@@ -77,19 +69,19 @@ define([
         _renderActionButtons: function(lang) {
             let { hasObject, hasOutOfBoundsObject, disableGoButtons } = this.props,
                 buttons = [{
-                        label: lang.monitor.start,
-                        className: ReactCx.cx({
-                            'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
-                            'btn-default': true,
-                            'btn-hexagon': true,
-                            'btn-go': true
-                        }),
-                        title: lang.print.goTitle,
-                        dataAttrs: {
-                            'ga-event': 'print-goto-monitor'
-                        },
-                        onClick: this._handleGo
-                    }
+                    label: lang.monitor.start,
+                    className: ReactCx.cx({
+                        'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
+                        'btn-default': true,
+                        'btn-hexagon': true,
+                        'btn-go': true
+                    }),
+                    title: lang.print.goTitle,
+                    dataAttrs: {
+                        'ga-event': 'print-goto-monitor'
+                    },
+                    onClick: this._handleGo
+                }
                 ];
 
             return (

@@ -866,7 +866,7 @@ define([
                 );
 
                 return (
-                    <ul key={Math.random()}>{list}</ul>
+                    <ul>{list}</ul>
                 );
             },
 

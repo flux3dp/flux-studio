@@ -16,8 +16,6 @@ function(
     ReactCx,
     List
 ) {
-    'use strict';
-
     return React.createClass({
         propTypes: {
             arrowDirection: PropTypes.oneOf(['LEFT', 'RIGHT', 'UP', 'BOTTOM']),
@@ -32,100 +30,83 @@ function(
                 items: []
             };
         },
+        getInitialState: function() {
+            return {
+                isItemsChecked: Array(this.props.items.length).fill(false)
+            };
+        },
 
-        toggleSubPopup: function(disable, e) {
-            var $wrapper = $(ReactDOM.findDOMNode(this.refs.uiDialogMenu)),
-                $me,
-                $popupOpen;
 
-            if (1 === arguments.length) {
-                e = disable;
-                disable = false;
-            }
-
-            if (disable === false) {
-                $me = $(e.currentTarget).find('.dialog-opener');
-                $popupOpen = $wrapper.find('.dialog-opener:checked').not($me);
-
-                $popupOpen.removeAttr('checked');
-            }
+        toggleSubPopup: function(itemIndex, isChecked) {
+            const newIsItemsCheckedState = Array(...this.state.isItemsChecked); //copy array
+            newIsItemsCheckedState[itemIndex] = isChecked;
+            this.setState({
+                isItemsChecked: newIsItemsCheckedState
+            });
         },
 
         _renderItem: function() {
-            var self = this,
-                items = self.props.items,
-                arrowClassName = ReactCx.cx({
-                    'arrow': true,
-                    'arrow-left': 'LEFT' === self.props.arrowDirection,
-                    'arrow-right': 'RIGHT' === self.props.arrowDirection,
-                    'arrow-up': 'UP' === self.props.arrowDirection,
-                    'arrow-bottom': 'BOTTOM' === self.props.arrowDirection,
-                }),
-                listItems = [],
-                disablePopup = false,
-                itemLabelClassName;
+            const arrowClassName = ReactCx.cx({
+                'arrow': true,
+                'arrow-left': 'LEFT' === this.props.arrowDirection,
+                'arrow-right': 'RIGHT' === this.props.arrowDirection,
+                'arrow-up': 'UP' === this.props.arrowDirection,
+                'arrow-bottom': 'BOTTOM' === this.props.arrowDirection,
+            });
 
-            items.forEach(function(opt, i) {
-                opt.labelClass = opt.labelClass || {};
+            return this.props.items
+                .filter(item => !!item.label)
+                .map((item, index) => {
+                    let disablePopup = false;
+                    if(item.disable || !item.content) {
+                        disablePopup = true;
+                    }
 
-                if (opt.content) {
-                    disablePopup = false;
-                }
-                else {
-                    disablePopup = true;
-                }
-
-                if(opt.disable === true) {
-                    disablePopup = true;
-                }
-
-                itemLabelClassName = {
-                    'dialog-label': true,
-                    'disable': opt.disable === true
-                };
-
-                itemLabelClassName = Object.assign(itemLabelClassName, opt.labelClass);
-                if (opt.label) {
-                    listItems.push({
+                    let itemLabelClassName = {
+                        'dialog-label': true,
+                        'disable': item.disable === true
+                    };
+                    itemLabelClassName = Object.assign(itemLabelClassName, item.labelClass || {});
+                    const checked = item.forceKeepOpen || (this.state.isItemsChecked[index] && !disablePopup);
+                    return {
                         label: (
-                            <label className="ui-dialog-menu-item" onClick={self.toggleSubPopup.bind(null, opt.disable)}>
+                            <label className='ui-dialog-menu-item'>
                                 <input
-                                    name="dialog-opener"
-                                    className="dialog-opener"
-                                    type="checkbox"
+                                    name='dialog-opener'
+                                    className='dialog-opener'
+                                    type='checkbox'
                                     disabled={disablePopup}
+                                    checked={checked}
+                                    onClick={e => {
+                                        if (!item.forceKeepOpen) {
+                                            this.toggleSubPopup(index, e.target.checked);
+                                        }
+                                    }}
                                 />
                                 <div className={ReactCx.cx(itemLabelClassName)}>
-                                    {opt.label}
+                                    {item.label}
                                 </div>
-                                <label className="dialog-window">
+                                <label className='dialog-window'>
                                     <div className={arrowClassName}/>
-                                    <div className="dialog-window-content">
-                                        {opt.content}
+                                    <div className='dialog-window-content'>
+                                        {item.content}
                                     </div>
                                 </label>
                             </label>
                         )
-                    });
-                }
-            });
-
-            return listItems;
+                    };
+                });
         },
 
         // Lifecycle
         render: function() {
-            var self = this,
-                props = self.props,
-                className = props.className,
-                items = this._renderItem();
-
+            const className = this.props.className;
             className['ui ui-dialog-menu'] = true;
 
             return (
                 <List
                     ref="uiDialogMenu"
-                    items={items}
+                    items={this._renderItem()}
                     className={ReactCx.cx(className)}
                 />
             );

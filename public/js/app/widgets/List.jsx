@@ -20,7 +20,7 @@ define(['react'], function(React){
             var list_items = this.props.items.map(function(opt, i){
                 var metadata = JSON.stringify(opt.data);
 
-                return <li key={Math.random()} data-meta={metadata} data-value={opt.value}>{opt.label}</li>;
+                return <li data-meta={metadata} data-value={opt.value}>{opt.label}</li>;
             }, this);
 
             return  (

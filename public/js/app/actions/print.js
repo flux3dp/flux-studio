@@ -1433,9 +1433,9 @@ define([
     function setAdvanceParameter(settings) {
         let deferred = $.Deferred(),
             updateTask = null;
-        
+
         updateTask = sliceMaster.addTask('setParameter', 'advancedSettingsCura2', settings.configStr);
-        
+
         updateTask.then(() => {
             Object.assign(fullSliceParameters.settings, settings);
             slicingStatus.showProgress = false;
@@ -1576,7 +1576,7 @@ define([
                     objectDialogueStyle: {
                         'left': leftOffset + 'px',
                         'top': topOffset + 'px',
-                        'margin-left': objectDialogueDistance + 'px'
+                        'marginLeft': objectDialogueDistance + 'px'
                     }
                 });
 
