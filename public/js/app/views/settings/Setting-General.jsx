@@ -1,3 +1,4 @@
+/* eslint-disable react/no-multi-comp */
 define([
     'jquery',
     'react',
@@ -13,13 +14,13 @@ define([
         const style = { width: 'calc(100% / 10 * 3 - 10px)' };
         const innerHtml = {__html: props.label};
         return (
-            <div className="row-fluid">
-                <div className="span3 no-left-margin" style={style}>
-                    <label className="font2"
+            <div className='row-fluid'>
+                <div className='span3 no-left-margin' style={style}>
+                    <label className='font2'
                         dangerouslySetInnerHTML={innerHtml}
                     />
                 </div>
-                <div className="span8 font3">
+                <div className='span8 font3'>
                     {props.children}
                 </div>
 
@@ -103,14 +104,6 @@ define([
                 tableStyle = {width: '70%'},
                 pokeIP = config().read('poke-ip-addr'),
                 lang = this.state.lang,
-                notificationOptions = [],
-                defaultAppOptions = [],
-                projectionOptions = [],
-                antialiasingOptions = [],
-                autoSlicingOptions = [],
-                lockSelectionOptions = [],
-                defaultModelOptions = [],
-                defaultBeamboxModelOptions = [],
                 options = [];
 
             Object.keys(supported_langs).map(l => {
@@ -121,7 +114,7 @@ define([
                 });
             });
 
-            notificationOptions = [
+            const notificationOptions = [
                 {
                     value: 0,
                     label: lang.settings.notification_off,
@@ -134,7 +127,7 @@ define([
                 }
             ];
 
-            defaultAppOptions = [
+            const defaultAppOptions = [
                 {
                     value: 'print',
                     label: lang.menu.print,
@@ -167,7 +160,7 @@ define([
                 },
             ];
 
-            projectionOptions = [
+            const projectionOptions = [
                 {
                     value: 'Perspective',
                     label: lang.settings.projection_perspective,
@@ -180,7 +173,7 @@ define([
                 }
             ];
 
-            antialiasingOptions = [
+            const antialiasingOptions = [
                 {
                     value: 0,
                     label: lang.settings.off,
@@ -193,7 +186,7 @@ define([
                 }
             ];
 
-            autoSlicingOptions = [
+            const autoSlicingOptions = [
                 {
                     value: 'true',
                     label: lang.settings.on,
@@ -206,7 +199,7 @@ define([
                 }
             ];
 
-            lockSelectionOptions = [
+            const lockSelectionOptions = [
                 {
                     value: 'true',
                     label: lang.settings.on,
@@ -219,7 +212,7 @@ define([
                 }
             ];
 
-            defaultModelOptions = [
+            const defaultModelOptions = [
                 {
                     value: '',
                     label: lang.settings.none,
@@ -237,7 +230,7 @@ define([
                 }
             ];
 
-            defaultBeamboxModelOptions = [
+            const defaultBeamboxModelOptions = [
                 {
                     value: 'fbb1b',
                     label: 'Beambox',
@@ -250,21 +243,24 @@ define([
                 }
             ];
 
-            if (printer.name != undefined) {
-              default_machine_button = <a className="font3"
-                          onClick={this._removeDefaultMachine}
-                        >{lang.settings.remove_default_machine_button}</a>
+            if (printer.name !== undefined) {
+                default_machine_button = (
+                    <a className='font3'
+                        onClick={this._removeDefaultMachine}
+                    >
+                        {lang.settings.remove_default_machine_button}
+                    </a>);
             } else {
-              default_machine_button = <span>{lang.settings.default_machine_button}</span>
+                default_machine_button = (<span>{lang.settings.default_machine_button}</span>);
             }
 
             return (
-                <div className="form general">
+                <div className='form general'>
 
                     <Controls label={lang.settings.language}>
                         <SelectView
-                            id="select-lang"
-                            className="font3"
+                            id='select-lang'
+                            className='font3'
                             options={options}
                             onChange={this._changeActiveLang}
                         />
@@ -272,7 +268,7 @@ define([
 
                     <Controls label={lang.settings.notifications}>
                         <SelectView
-                            className="font3"
+                            className='font3'
                             options={notificationOptions}
                             onChange={this._updateOptions.bind(null, 'notification')}
                         />
@@ -280,38 +276,38 @@ define([
 
                     <Controls label={lang.settings.default_app}>
                         <SelectView
-                            className="font3"
+                            className='font3'
                             options={defaultAppOptions}
                             onChange={this._updateOptions.bind(null, 'default-app')}
                         />
                     </Controls>
 
                     <Controls label={lang.settings.default_machine}>
-                      <table style={tableStyle}>
-                        <tr>
-                          <td>{printer.name}</td>
-                          <td>
-                            {default_machine_button}
-                          </td>
-                        </tr>
-                      </table>
+                        <table style={tableStyle}>
+                            <tr>
+                                <td>{printer.name}</td>
+                                <td>
+                                    {default_machine_button}
+                                </td>
+                            </tr>
+                        </table>
                     </Controls>
 
                     <Controls label={lang.settings.ip}>
                         <input
-                            type="text"
-                            autoComplete="false"
+                            type='text'
+                            autoComplete='false'
                             defaultValue={pokeIP}
                             onBlur={this._checkIPFormat}
                         />
                     </Controls>
 
-                    <div className="subtitle">{lang.settings.delta_series}</div>
+                    <div className='subtitle'>{lang.settings.delta_series}</div>
 
                     <Controls label={lang.settings.projection}>
                         <SelectView
-                            id="select-lang"
-                            className="font3"
+                            id='select-lang'
+                            className='font3'
                             options={projectionOptions}
                             onChange={this._updateOptions.bind(null, 'camera-projection')}
                         />
@@ -319,8 +315,8 @@ define([
 
                     <Controls label={lang.settings.antialiasing}>
                         <SelectView
-                            id="select-lang"
-                            className="font3"
+                            id='select-lang'
+                            className='font3'
                             options={antialiasingOptions}
                             onChange={this._updateOptions.bind(null, 'antialiasing')}
                         />
@@ -328,8 +324,8 @@ define([
 
                     <Controls label={lang.settings.auto_slice}>
                         <SelectView
-                            id="select-lang"
-                            className="font3"
+                            id='select-lang'
+                            className='font3'
                             options={autoSlicingOptions}
                             onChange={this._updateOptions.bind(null, 'auto-slicing')}
                         />
@@ -337,8 +333,8 @@ define([
 
                     <Controls label={lang.settings.lock_selection}>
                         <SelectView
-                            id="select-lang"
-                            className="font3"
+                            id='select-lang'
+                            className='font3'
                             options={lockSelectionOptions}
                             onChange={this._updateOptions.bind(null, 'lock-selected')}
                         />
@@ -346,25 +342,25 @@ define([
 
                     <Controls label={lang.settings.default_model}>
                         <SelectView
-                            id="select-lang"
-                            className="font3"
+                            id='select-lang'
+                            className='font3'
                             options={defaultModelOptions}
                             onChange={this._updateOptions.bind(null, 'default-model')}
                         />
                     </Controls>
 
-                    <div className="subtitle">{lang.settings.beambox_series}</div>
+                    <div className='subtitle'>{lang.settings.beambox_series}</div>
 
                     <Controls label={lang.settings.default_beambox_model}>
                         <SelectView
-                            className="font3"
+                            className='font3'
                             options={defaultBeamboxModelOptions}
                             onChange={this._updateBeamboxPreference.bind(null, 'model')}
                         />
                     </Controls>
 
-                    <Controls label="">
-                        <a className="font3"
+                    <Controls label=''>
+                        <a className='font3'
                             onClick={this._resetFS}
                         ><b>{lang.settings.reset_now}</b></a>
                     </Controls>
