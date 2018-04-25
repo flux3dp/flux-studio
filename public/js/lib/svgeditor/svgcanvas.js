@@ -5090,6 +5090,15 @@ define([
                         $(svg).find('text').remove();
                     }
                 }
+                function _removeComments() {
+                    // only remove comment which level is svg.children.
+                    // should traverse all svg level and remove all comments if you have time
+                    $(svg).contents().each(function() {
+                        if(this.nodeType === Node.COMMENT_NODE) {
+                            $(this).remove();
+                        }
+                    });
+                }
                 function _symbolWrapper(symbolContents) {
                     const rootViewBox = svg.getAttribute('viewBox');
                     const rootWidth = unit2Pixel(svg.getAttribute('width'));
@@ -5244,7 +5253,8 @@ define([
                     return [symbol];
                 }
                 // return symbols
-                _removeSvgText(svg);
+                _removeSvgText();
+                _removeComments();
                 switch (type) {
                     case 'color':
                         return {
