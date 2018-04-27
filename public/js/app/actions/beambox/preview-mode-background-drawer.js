@@ -119,82 +119,47 @@ define([
         _getPreviewBoundary() {
             const previewBoundaryId = 'previewBoundary';
             const color = 'rgba(200,200,200,0.8)';
-
-            const boundaryGroup = svgCanvas.addSvgElementFromJson({
-                'element': 'g',
-                'attr': {
-                    'id': previewBoundaryId,
-                    'width': '100%',
-                    'height': '100%',
-                    'x': 0,
-                    'y': 0,
-                    'style': 'pointer-events:none'
-                }
-            });
             const uncapturabledHeight = (this.cameraOffset.y * Constant.dpmm) - (Constant.camera.imgHeight * this.cameraOffset.scaleRatio / 2);
-            const uncapturabledHeightRatio = uncapturabledHeight / Constant.dimension.height;
 
-            const descText = svgCanvas.addSvgElementFromJson({
-                'element': 'text',
-                'attr': {
-                    'font-size': '14px',
-                    'x': 10,
-                    'y': 15,
-                    'fill': '#fff',
-                    'style': 'pointer-events:none'
-                }
+            const svgdoc = document.getElementById('svgcanvas').ownerDocument;
+            const NS = svgedit.NS;
+            const boundaryGroup = svgdoc.createElementNS(NS.SVG, 'svg');
+            const borderTop = svgdoc.createElementNS(NS.SVG, 'rect');
+            const descText = svgdoc.createElementNS(NS.SVG, 'text');
+
+            svgedit.utilities.assignAttributes(boundaryGroup, {
+                'id': previewBoundaryId,
+                'width': '100%',
+                'height': '100%',
+                'viewBox': `0 0 ${Constant.dimension.width} ${Constant.dimension.height}`,
+                'x': 0,
+                'y': 0,
+                'style': 'pointer-events:none'
+            });
+
+            svgedit.utilities.assignAttributes(borderTop, {
+                'width': Constant.dimension.width,
+                'height': uncapturabledHeight,
+                'x': 0,
+                'y': 0,
+                'fill': color,
+                'style': 'pointer-events:none'
+            });
+
+            svgedit.utilities.assignAttributes(descText, {
+                'font-size': 30,
+                'x': 10,
+                'y': 30,
+                'fill': '#fff',
+                'style': 'pointer-events:none'
             });
             const textNode = document.createTextNode(LANG.unpreviewable_area);
             descText.appendChild(textNode);
-            const borderTop = svgCanvas.addSvgElementFromJson({
-                'element': 'rect',
-                'attr': {
-                    'width': '100%',
-                    'height': `${uncapturabledHeightRatio*100}%`,
-                    'x': 0,
-                    'y': 0,
-                    'fill': color,
-                    'style': 'pointer-events:none'
-                }
-            });
-            // const borderBottom = svgCanvas.addSvgElementFromJson({
-            //     'element': 'rect',
-            //     'attr': {
-            //         'width': '100%',
-            //         'height': '2.597%',
-            //         'x': 0,
-            //         'y': '97.403%',
-            //         'fill': color,
-            //         'style': 'pointer-events:none'
-            //     }
-            // });
-            // const borderLeft = svgCanvas.addSvgElementFromJson({
-            //     'element': 'rect',
-            //     'attr': {
-            //         'width': '2.381%',
-            //         'height': '100%',
-            //         'x': 0,
-            //         'y': 0,
-            //         'fill': color,
-            //         'style': 'pointer-events:none'
-            //     }
-            // });
-            // const borderRight = svgCanvas.addSvgElementFromJson({
-            //     'element': 'rect',
-            //     'attr': {
-            //         'width': '2.381%',
-            //         'height': '100%',
-            //         'x': '97.619%',
-            //         'y': 0,
-            //         'fill': color,
-            //         'style': 'pointer-events:none'
-            //     }
-            // });
+
+
             boundaryGroup.appendChild(borderTop);
             boundaryGroup.appendChild(descText);
-            // boundaryGroup.appendChild(borderBottom);
-            // boundaryGroup.appendChild(borderLeft);
-            // boundaryGroup.appendChild(borderRight);
+
             return boundaryGroup;
         }
     }
