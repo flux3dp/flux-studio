@@ -30,6 +30,7 @@ define([
             $clonedSvg.find('#selectorParentGroup').remove();
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
+            $clonedSvg.find('#canvasBackground #guidesLines').remove();
 
             return $clonedSvg;
         }

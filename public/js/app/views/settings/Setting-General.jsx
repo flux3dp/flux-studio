@@ -5,10 +5,12 @@ define([
     'helpers/i18n',
     'helpers/api/config',
     'jsx!widgets/Select',
+    'jsx!widgets/Unit-Input-v2',
     'app/actions/alert-actions',
     'helpers/local-storage',
+    'app/actions/beambox/constant',
     'app/actions/initialize-machine',
-], function($, React, i18n, config, SelectView, AlertActions, LocalStorage, initializeMachine) {
+], function($, React, i18n, Config, SelectView, UnitInput, AlertActions, LocalStorage, BeamboxConstant, initializeMachine) {
 
     const Controls = props => {
         const style = { width: 'calc(100% / 10 * 3 - 10px)' };
@@ -46,7 +48,7 @@ define([
         _checkIPFormat: function(e) {
             var me = e.currentTarget,
                 lang = this.state.lang,
-                originalIP = config().read('poke-ip-addr'),
+                originalIP = Config().read('poke-ip-addr'),
                 ips = me.value.split(','),
                 ipv4Pattern = /^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/g,
                 isCorrectFormat = true;
@@ -62,7 +64,7 @@ define([
 
 
             if(isCorrectFormat) {
-                config().write('poke-ip-addr', me.value);
+                Config().write('poke-ip-addr', me.value);
             }
         },
 
@@ -75,11 +77,16 @@ define([
         },
 
         _updateOptions: function(id, e) {
-            config().write(id, e.target.value);
+            Config().write(id, e.target.value);
         },
 
-        _updateBeamboxPreference: function(item_key, e) {
-            config().update('beambox-preference', item_key, e.target.value);
+        _updateBeamboxPreference: function(item_key, val) {
+            if (val === 'true') {
+                val = true;
+            } else if (val === 'false') {
+                val = false;
+            }
+            Config().update('beambox-preference', item_key, val);
         },
 
         _removeDefaultMachine: function() {
@@ -102,7 +109,7 @@ define([
                 printer = initializeMachine.defaultPrinter.get(),
                 default_machine_button,
                 tableStyle = {width: '70%'},
-                pokeIP = config().read('poke-ip-addr'),
+                pokeIP = Config().read('poke-ip-addr'),
                 lang = this.state.lang,
                 options = [];
 
@@ -118,12 +125,12 @@ define([
                 {
                     value: 0,
                     label: lang.settings.notification_off,
-                    selected: config().read('notification') === '0'
+                    selected: Config().read('notification') === '0'
                 },
                 {
                     value: 1,
                     label: lang.settings.notification_on,
-                    selected: config().read('notification') === '1'
+                    selected: Config().read('notification') === '1'
                 }
             ];
 
@@ -131,32 +138,32 @@ define([
                 {
                     value: 'print',
                     label: lang.menu.print,
-                    selected: config().read('default-app') === 'print'
+                    selected: Config().read('default-app') === 'print'
                 },
                 {
                     value: 'laser',
                     label: lang.menu.laser,
-                    selected: config().read('default-app') === 'laser'
+                    selected: Config().read('default-app') === 'laser'
                 },
                 {
                     value: 'scan',
                     label: lang.menu.scan,
-                    selected: config().read('default-app') === 'scan'
+                    selected: Config().read('default-app') === 'scan'
                 },
                 {
                     value: 'draw',
                     label: lang.menu.draw,
-                    selected: config().read('default-app') === 'draw'
+                    selected: Config().read('default-app') === 'draw'
                 },
                 {
                     value: 'cut',
                     label: lang.menu.cut,
-                    selected: config().read('default-app') === 'cut'
+                    selected: Config().read('default-app') === 'cut'
                 },
                 {
                     value: 'beambox',
                     label: lang.menu.beambox,
-                    selected: config().read('default-app') === 'beambox'
+                    selected: Config().read('default-app') === 'beambox'
                 },
             ];
 
@@ -164,12 +171,12 @@ define([
                 {
                     value: 'Perspective',
                     label: lang.settings.projection_perspective,
-                    selected: config().read('camera-projection') === 'Perspective'
+                    selected: Config().read('camera-projection') === 'Perspective'
                 },
                 {
                     value: 'Orthographic',
                     label: lang.settings.projection_orthographic,
-                    selected: config().read('camera-projection') === 'Orthographic'
+                    selected: Config().read('camera-projection') === 'Orthographic'
                 }
             ];
 
@@ -177,12 +184,12 @@ define([
                 {
                     value: 0,
                     label: lang.settings.off,
-                    selected: config().read('antialiasing') === '0'
+                    selected: Config().read('antialiasing') === '0'
                 },
                 {
                     value: 1,
                     label: lang.settings.on,
-                    selected: config().read('antialiasing') === '1'
+                    selected: Config().read('antialiasing') === '1'
                 }
             ];
 
@@ -190,12 +197,12 @@ define([
                 {
                     value: 'true',
                     label: lang.settings.on,
-                    selected: config().read('auto-slicing') !== 'false'
+                    selected: Config().read('auto-slicing') !== 'false'
                 },
                 {
                     value: 'false',
                     label: lang.settings.off,
-                    selected: config().read('auto-slicing') === 'false'
+                    selected: Config().read('auto-slicing') === 'false'
                 }
             ];
 
@@ -203,12 +210,25 @@ define([
                 {
                     value: 'true',
                     label: lang.settings.on,
-                    selected: config().read('lock-selection') !== 'false'
+                    selected: Config().read('lock-selection') !== 'false'
                 },
                 {
                     value: 'false',
                     label: lang.settings.off,
-                    selected: config().read('lock-selection') === 'false'
+                    selected: Config().read('lock-selection') === 'false'
+                }
+            ];
+
+            const guideSelectionOptions = [
+                {
+                    value: 'false',
+                    label: lang.settings.off,
+                    selected: Config().read('beambox-preference')['show_guides'] === false
+                },
+                {
+                    value: 'true',
+                    label: lang.settings.on,
+                    selected: Config().read('beambox-preference')['show_guides'] !== false
                 }
             ];
 
@@ -216,17 +236,17 @@ define([
                 {
                     value: '',
                     label: lang.settings.none,
-                    selected: config().read('default-model') === ''
+                    selected: Config().read('default-model') === ''
                 },
                 {
                     value: 'fd1',
                     label: lang.settings.fd1,
-                    selected: config().read('default-model') === 'fd1'
+                    selected: Config().read('default-model') === 'fd1'
                 },
                 {
                     value: 'fd1p',
                     label: lang.settings.fd1p,
-                    selected: config().read('default-model') === 'fd1p'
+                    selected: Config().read('default-model') === 'fd1p'
                 }
             ];
 
@@ -234,12 +254,12 @@ define([
                 {
                     value: 'fbb1b',
                     label: 'Beambox',
-                    selected: config().read('beambox-preference')['model'] === 'fbb1b'
+                    selected: Config().read('beambox-preference')['model'] === 'fbb1b'
                 },
                 {
                     value: 'fbb1p',
                     label: 'Beambox Pro',
-                    selected: config().read('beambox-preference')['model'] === 'fbb1p'
+                    selected: Config().read('beambox-preference')['model'] === 'fbb1p'
                 }
             ];
 
@@ -355,7 +375,36 @@ define([
                         <SelectView
                             className='font3'
                             options={defaultBeamboxModelOptions}
-                            onChange={this._updateBeamboxPreference.bind(null, 'model')}
+                            onChange={e => this._updateBeamboxPreference('model', e.target.value)}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.guides}>
+                        <SelectView
+                            id='select-lang'
+                            className='font3'
+                            options={guideSelectionOptions}
+                            onChange={e => this._updateBeamboxPreference('show_guides', e.target.value)}
+                        />
+                    </Controls>
+                    <Controls label={lang.settings.guides_origin}>
+                        <span className='font2' style={{marginRight: '10px'}}>X</span>
+                        <UnitInput
+                            unit='mm'
+                            min={0}
+                            max={BeamboxConstant.dimension.width/10}
+                            defaultValue={Config().read('beambox-preference')['guide_x0']}
+                            getValue={val => this._updateBeamboxPreference('guide_x0', val)}
+                            className={{half: true}}
+                        />
+                        <span className='font2' style={{marginRight: '10px'}}>Y</span>
+                        <UnitInput
+                            unit='mm'
+                            min={0}
+                            max={BeamboxConstant.dimension.height/10}
+                            defaultValue={Config().read('beambox-preference')['guide_y0']}
+                            getValue={val => this._updateBeamboxPreference('guide_y0', val)}
+                            className={{half: true}}
                         />
                     </Controls>
 

@@ -124,7 +124,19 @@
             margin-bottom: 15px;
             width: 200px;
         }
-
+        .ui.ui-control-unit-input-v2 {
+            &.half {
+                display: inline;
+                input {
+                    width: 91px;
+                }
+                span.unit {
+                    margin-left: -30px;
+                    margin-right: 30px;
+                    font-size: 10px;
+                }
+            }
+        }
         .controls {
             padding-bottom: 5px;
             .label {

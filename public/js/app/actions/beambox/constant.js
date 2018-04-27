@@ -1,9 +1,9 @@
 define([
     'helpers/api/config',
-    'app/actions/beambox/default-config',
+    'app/actions/beambox/default-preference',
 ], function(
     Config,
-    DefaultConfig
+    DefaultPreference
 ){
     const workareaMap = new Map();
     workareaMap.set('fbb1b', [4000, 3750]);
@@ -13,7 +13,7 @@ define([
         if (Config().read('beambox-preference') && workareaMap.get(Config().read('beambox-preference')['model'])) {
             //pass
         } else {
-            Config().update('beambox-preference', 'model', DefaultConfig.model);
+            Config().update('beambox-preference', 'model', DefaultPreference.model);
         }
         return workareaMap.get(Config().read('beambox-preference')['model']);
     })();

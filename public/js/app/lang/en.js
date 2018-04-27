@@ -336,6 +336,8 @@ define(function() {
             beambox_series: 'Beambox Family',
             default_model: 'Default Model<br />(For Print Settings)',
             default_beambox_model: 'Default Model',
+            guides_origin: 'Guides Origin',
+            guides: 'Guides',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: 'None',
