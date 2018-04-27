@@ -43,8 +43,8 @@ define([
 
             svgedit.utilities.assignAttributes(lineHorizontal, {
                 'id': 'horizontal_guide',
-                'x1': - Constant.dimension.width,
-                'x2': Constant.dimension.width * 2,
+                'x1': 0,
+                'x2': Constant.dimension.width,
                 'y1': Config.read('beambox-preference')['guide_y0'] * 10,
                 'y2': Config.read('beambox-preference')['guide_y0'] * 10,
                 'stroke': '#000',
@@ -60,8 +60,8 @@ define([
                 'id': 'vertical_guide',
                 'x1': Config.read('beambox-preference')['guide_x0'] * 10,
                 'x2': Config.read('beambox-preference')['guide_x0'] * 10,
-                'y1': - Constant.dimension.height,
-                'y2': Constant.dimension.height * 2 + 600,
+                'y1': 0,
+                'y2': Constant.dimension.height,
                 'stroke': '#000',
                 'stroke-width': '2',
                 'stroke-opacity': 0.8,
