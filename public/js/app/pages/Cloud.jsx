@@ -1,6 +1,6 @@
 define([
-    'jquery',
     'react',
+    'helpers/i18n',
     'jsx!views/cloud/sign-in',
     'jsx!views/cloud/sign-up',
     'jsx!views/cloud/sign-up-success',
@@ -16,8 +16,8 @@ define([
     'jsx!views/cloud/terms',
     'jsx!views/cloud/privacy',
 ], function(
-    $,
     React,
+    i18n,
     SignIn,
     SignUp,
     SignUpSuccess,
@@ -33,18 +33,10 @@ define([
     Terms,
     Privacy
 ) {
-    'use strict';
-
-    return function(args) {
-        args = args || {};
-
-        var HomeView;
-
-        HomeView = React.createClass({
-
+    return function({child}) {
+        return React.createClass({
             getInitialState: function() {
                 return {
-                    lang: args.state.lang
                 };
             },
 
@@ -64,23 +56,23 @@ define([
             },
 
             renderContent: function() {
-                var content = {},
-                    view = this.state.view || args.child;
+                const content = {};
+                let view = this.state.view || child;
 
-                content['sign-in']          = () => <SignIn lang={this.state.lang} />;
-                content['sign-up']          = () => <SignUp lang={this.state.lang} />;
-                content['sign-up-success']  = () => <SignUpSuccess lang={this.state.lang} />;
-                content['sign-up-fail']     = () => <SignUpFail lang={this.state.lang} />;
-                content['forgot-password']  = () => <ForgotPassword lang={this.state.lang} />;
-                content['email-sent']       = () => <EmailSent lang={this.state.lang} />;
-                content['bind-machine']     = () => <BindMachine lang={this.state.lang} onError={this.logError} />;
-                content['bind-success']     = () => <BindSuccess lang={this.state.lang} />;
-                content['bind-fail']        = () => <BindFail lang={this.state.lang} error={this.state.error} clear={this.clear} />;
-                content['bind-error']       = () => <BindError lang={this.state.lang} />;
-                content['change-password']  = () => <ChangePassword lang={this.state.lang} />;
+                content['sign-in']          = () => <SignIn />;
+                content['sign-up']          = () => <SignUp />;
+                content['sign-up-success']  = () => <SignUpSuccess />;
+                content['sign-up-fail']     = () => <SignUpFail />;
+                content['forgot-password']  = () => <ForgotPassword />;
+                content['email-sent']       = () => <EmailSent />;
+                content['bind-machine']     = () => <BindMachine lang={i18n.lang} onError={this.logError} />;
+                content['bind-success']     = () => <BindSuccess />;
+                content['bind-fail']        = () => <BindFail error={this.state.error} clear={this.clear} />;
+                content['bind-error']       = () => <BindError />;
+                content['change-password']  = () => <ChangePassword lang={i18n.lang} />;
                 content['sign-out']         = () => <SignOut />;
-                content['terms']            = () => <Terms lang={this.state.lang} />;
-                content['privacy']          = () => <Privacy lang={this.state.lang} />;
+                content['terms']            = () => <Terms />;
+                content['privacy']          = () => <Privacy />;
 
                 if(typeof content[view] === 'undefined') { view = 'sign-in'; }
                 return content[view]();
@@ -97,7 +89,5 @@ define([
             }
 
         });
-
-        return HomeView;
     };
 });

@@ -1,17 +1,13 @@
 define([
-    'jquery',
     'react',
-    'helpers/sprintf',
+    'helpers/i18n',
     'helpers/api/cloud',
 ], function(
-    $,
     React,
-    Sprintf,
+    i18n,
     CloudApi
 ) {
-    'use strict';
-
-    let Controls = React.createClass({
+    const Controls = React.createClass({
         _handleEntered: function(e) {
             this.props.onEntered(this.props.id, e.target.value);
         },
@@ -44,11 +40,11 @@ define([
                 userNameError: false,
                 emailError: false,
                 passwordMismatch: false
-            }
+            };
         },
 
         _checkValue: function(id, value) {
-            let lang = this.props.lang.settings.flux_cloud,
+            let lang = i18n.lang.settings.flux_cloud,
                 f = {};
 
             f['nickname'] = () => {
@@ -84,15 +80,15 @@ define([
             };
 
             f['agreeToTerms'] = () => {
-                this.values[id] = value
-            }
+                this.values[id] = value;
+            };
 
             if(typeof f[id] !== 'undefined') {
                 f[id]();
             };
 
             if(this.values.password !== '' && this.values.rePassword !== '') {
-                let mismatch = this.values.password !== this.values.rePassword
+                let mismatch = this.values.password !== this.values.rePassword;
                 this.setState({ passwordMismatch: mismatch});
             }
         },
@@ -100,7 +96,7 @@ define([
         _allValid: function() {
             let { nickname, email, password, rePassword, agreeToTerms } = this.values,
                 { emailError } = this.state,
-                lang = this.props.lang.settings.flux_cloud;
+                lang = i18n.lang.settings.flux_cloud;
 
             this.setState({ errorMessage: agreeToTerms ? '' : lang.agree_to_terms });
 
@@ -118,28 +114,26 @@ define([
             this._checkValue(e.target.id, e.target.checked);
         },
 
-        _handleSignUp: function() {
+        _handleSignUp: async function() {
             if(this._allValid()) {
                 this.setState({ processing: true });
                 let { nickname, email, password } = this.values;
-                let lang = this.props.lang.settings.flux_cloud;
+                let lang = i18n.lang.settings.flux_cloud;
 
-                CloudApi.signUp(nickname, email, password).then(response => {
-                    if(response.ok) {
-                        this.setState({ processing: false });
-                        alert(lang.check_email);
-                        location.hash = '#studio/cloud/sign-in';
-                    }
-                    else {
-                        response.json().then(error => {
-                            this.setState({
-                                processing: false,
-                                emailError: true,
-                                emailErrorMessage: lang[error.message.toLowerCase()]
-                            });
-                        });
-                    }
-                });
+                const response = await CloudApi.signUp(nickname, email, password);
+                if(response.ok) {
+                    this.setState({ processing: false });
+                    alert(lang.check_email);
+                    location.hash = '#studio/cloud/sign-in';
+                }
+                else {
+                    const error = await response.json();
+                    this.setState({
+                        processing: false,
+                        emailError: true,
+                        emailErrorMessage: lang[error.message.toLowerCase()]
+                    });
+                }
             }
         },
 
@@ -148,7 +142,7 @@ define([
         },
 
         render: function() {
-            let lang = this.props.lang.settings.flux_cloud,
+            let lang = i18n.lang.settings.flux_cloud,
                 message = '';
 
             if(this.state.processing) {
@@ -195,7 +189,7 @@ define([
                         <div className="controls">
                             <div className="control">
                                 <input id="agreeToTerms" className="pointer" type="checkbox" onChange={this._handleAgreementChange} />
-                                <label dangerouslySetInnerHTML={{ __html: lang.agreement }}></label>
+                                <label dangerouslySetInnerHTML={{ __html: lang.agreement }} />
                             </div>
                         </div>
                         <div className="processing-error">

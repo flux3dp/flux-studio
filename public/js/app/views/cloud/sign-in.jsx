@@ -56,17 +56,16 @@ define([
             location.hash = '#/studio/print';
         },
 
-        _handleResendVerificationEmail: function() {
+        _handleResendVerificationEmail: async function() {
             let { email } = this.state;
 
-            CloudApi.resendVerification(email).then(response => {
-                if(response.ok) {
-                    location.hash = '#studio/cloud/email-sent';
-                }
-                else {
-                    alert(LANG.contact_us);
-                }
-            });
+            const response = await CloudApi.resendVerification(email);
+            if(response.ok) {
+                location.hash = '#studio/cloud/email-sent';
+            }
+            else {
+                alert(LANG.contact_us);
+            }
         },
 
         _handleSignIn: async function(e) {
