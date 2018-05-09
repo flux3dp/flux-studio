@@ -5542,6 +5542,10 @@ define([
                             $.alert(LANG.svg_editor.unnsupported_file_type);
                             break;
                     }
+
+                    // let file input import same file again.
+                    // Beacause function 'importImage' is triggered by onChange event, so we remove the value to ensure onChange event fire
+                    $(this).attr('value', '');
                 };
 
                 workarea[0].addEventListener('dragenter', onDragEnter, false);
