@@ -5141,9 +5141,22 @@ define([
                         defChildren = defChildren.concat(Array.from(def.childNodes));
                     });
 
-                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
+                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style', 'metadata', 'sodipodi:namedview'].includes(node.tagName));
 
-                    const isValidLayeredSvg = layerNodes.every(node => (node.tagName === 'g' && node.id !== null));
+                    const isValidLayeredSvg = layerNodes.every(node => {
+                        // if svg draw some object at first level, return false
+                        if(['a', 'circle', 'clipPath', 'ellipse', 'feGaussianBlur', 'foreignObject', 'image', 'line', 'linearGradient', 'marker', 'mask', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tspan', 'use'].includes(node.tagName)) {
+                            return false;
+                        }
+
+                        // if it is a group, it need to have an id to ensure it is a layer
+                        if (node.tagName === 'g' && node.id === null) {
+                            return false;
+                        }
+
+                        // svg software like inkscape may add additioal tag like "sodipodi:namedview", so we return true as default
+                        return true;
+                    });
                     if(!isValidLayeredSvg) {
                         return false;
                     }
@@ -5246,7 +5259,7 @@ define([
                         defChildren = defChildren.concat(Array.from(def.childNodes));
                     });
 
-                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
+                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style', 'metadata', 'sodipodi:namedview'].includes(node.tagName));
 
                     const symbol = svgCanvas.makeSymbol(_symbolWrapper(layerNodes), [], batchCmd, defChildren);
 

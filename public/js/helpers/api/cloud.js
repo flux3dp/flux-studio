@@ -13,8 +13,9 @@ define([], function() {
     const deviceUrl = (name) => { return `${ip}${deviceProtocol}/${name}`; };
 
     const constructBody = (obj) => {
-        let body = Object.keys(obj).map(key => `${key}=${encodeURIComponent(obj[key])}&`).join('');
-	   return body.slice(0, body.length - 1);
+        return Object.keys(obj)
+            .map(key => `${key}=${encodeURIComponent(obj[key])}`)
+            .join('&');
     };
 
     const post = (targetUrl, body) => {
