@@ -8,7 +8,7 @@ define([
 
     const Controls = (props) => {
         const _handleEntered = e => props.onEntered(props.id, e.target.value);
-        const {label, errorMessage, errorOn, type} = this.props;
+        const {label, errorMessage, errorOn, type} = props;
         return (
             <div className="controls">
                 <div className="label">{label}</div>
