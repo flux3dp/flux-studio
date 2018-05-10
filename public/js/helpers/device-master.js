@@ -119,9 +119,9 @@ define([
 
             InputLightboxActions.open('auth', callback);
         };
-        const createDeviceActions = (availableUsbChannel = -1, success) => {
+        const createDeviceActions = (uuid, availableUsbChannel = -1, success) => {
             return DeviceController(device.uuid, {
-                availableUsbChannel,
+                availableUsbChannel: availableUsbChannel,
                 onConnect: function (response, options) {
                     d.notify(response);
 
@@ -251,7 +251,7 @@ define([
                     typeof self.availableUsbChannel !== 'undefined' &&
                     device.source === 'h2h'
             ) {
-                _device.actions = createDeviceActions(this.availableUsbChannel, (success) => {
+                _device.actions = createDeviceActions(null, this.availableUsbChannel, (success) => {
                     console.log('_device.actions', _device.actions);
                     console.log('success', success);
                     if (success) {
@@ -263,7 +263,7 @@ define([
                 });
             }
             else {
-                _device.actions = createDeviceActions(device.uuid, (success) => {
+                _device.actions = createDeviceActions(device.uuid, null, (success) => {
                     if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
