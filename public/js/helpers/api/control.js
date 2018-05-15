@@ -40,7 +40,7 @@ define([
             };
 
         const createWs = (wsOptions) => {
-            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
+            let url = opts.availableUsbChannel >= 0  && opts.availableUsbChannel !==null ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
                 method: `control/${url}`,
                 onMessage: (data) => {
