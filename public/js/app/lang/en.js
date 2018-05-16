@@ -374,6 +374,7 @@ define(function() {
                 username: 'Username',
                 nickname: 'Nickname',
                 email: 'Email',
+                phone: 'Phone',
                 password: 'Password',
                 re_enter_password: 'Re-Enter Password',
                 forgot_password: 'Forgot your password?',

@@ -8,131 +8,108 @@ define([
     CloudApi
 ) {
     const LANG = i18n.lang.settings.flux_cloud;
-    const Controls = ({id, value, label, errorOn, errorMessage, type, onChange, onBlur}) => {
+
+    const Controls = ({label, children, errorMessage}) => {
+        const labelField = label ? <div className="label">{label}</div> : '';
+        const errorField = errorMessage ? <div className="error">{errorMessage}</div> : '';
         return (
             <div className="controls">
-                <div className="label">{label}</div>
-                <div className="control">
-                    <input
-                        type={type || 'text'}
-                        onChange={e => {
-                            onChange(id, e.target.value);
-                        }}
-                        onBlur={e => {
-                            // somehow pressing delete key in my mac did delete input field but not trigger onChange event. So wierd..
-                            onChange(id, e.target.value);
-                            onBlur(id);
-                        }}
-                        value={value} />
-                </div>
-                <div className="error">
-                    {errorOn ? errorMessage : ' '}
-                </div>
+                {labelField}
+                <div className="control">{children}</div>
+                {errorField}
             </div>
         );
     };
 
-    return React.createClass({
-        getInitialState: function() {
-            return {
-                nickname: '',
-                email: '',
+    return class SignUp extends React.Component {
+        constructor() {
+            super();
+            this.state = {
+                // input field:
+                phonePrefix: '+86',
+                phoneNumber: '',
+                realName: '',
                 password: '',
                 rePassword: '',
+                shopName: '',
+                address: '',
                 agreeToTerms: false,
-                userNameError: false,
-                emailError: false,
-                agreeToTermError: false,
-                passwordMismatch: false
+
+                //error message:
+                showPhoneNumberMissingError: false,
+                showRealNameMissingError: false,
+                showPasswordMissingError: false,
+                showRePasswordUnmatchError: false,
+                showShopNameMissingError: false,
+                showAddressMissingError: false,
+                showAgreeToTermsMissingError: false,
+
+                //is communicate with cloud
+                isProcessing: false,
             };
-        },
+        }
 
-        _handleControlChange: function(id, val) {
+        handleInputChange(field, value) {
             this.setState({
-                [id]: val
+                [field]: value
             });
-        },
+        }
 
-        _checkValue: function(id) {
-            switch (id) {
-                case 'nickname':
-                    this.setState({ userNameError: this.state.nickname === '' });
-                    break;
-                case 'email':
-                    if(this.state.email === '') {
-                        this.setState({
-                            emailError: true,
-                            emailErrorMessage: LANG.error_blank_email
-                        });
-                        break;
-                    }
-                    let emailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
-                    if(!emailRegex.test(this.state.email)) {
-                        this.setState({
-                            emailError: true,
-                            emailErrorMessage: LANG.error_email_format
-                        });
-                        break;
-                    }
-                    this.setState({
-                        emailError: false,
-                        emailErrorMessage: ''
-                    });
-                    break;
-                case 'password':
-                case 'rePassword':
-                    if(this.state.password !== '' || this.state.rePassword !== '') {
-                        let mismatch = this.state.password !== this.state.rePassword;
-                        this.setState({ passwordMismatch: mismatch});
-                    }
-                    break;
-            }
-        },
+        checkValidation() {
+            const isPhoneNumberMissing = () => this.state.phoneNumber === '';
+            const isRealNameMissing = () => this.state.realName === '';
+            const isPasswordMissing = () => this.state.password === '';
+            const isRePasswordUnmatch = () => this.state.password !== this.state.rePassword;
+            const isShopNameMissing = () => this.state.shopName === '';
+            const isAddressMissing = () => this.state.address === '';
+            const isAgreeToTermsMissing = () => this.state.agreeToTerms === false;
 
-        _allValid: function() {
-            const { userNameError, emailError, passwordMismatch, password, agreeToTerms } = this.state;
             this.setState({
-                agreeToTermError: !agreeToTerms
+                showPhoneNumberMissingError: isPhoneNumberMissing(),
+                showRealNameMissingError: isRealNameMissing(),
+                showPasswordMissingError: isPasswordMissing(),
+                showRePasswordUnmatchError: isRePasswordUnmatch(),
+                showShopNameMissingError: isShopNameMissing(),
+                showAddressMissingError: isAddressMissing(),
+                showAgreeToTermsMissingError: isAgreeToTermsMissing()
             });
-    		return (
-                !userNameError &&
-                !emailError &&
-                !passwordMismatch &&
-                password !== '' &&
-    			agreeToTerms === true
-    		);
-        },
 
-        _handleAgreementChange: function(e) {
-            this.setState({agreeToTerms: e.target.checked});
-        },
+            return (
+                !isPhoneNumberMissing() &&
+                !isRealNameMissing() &&
+                !isPasswordMissing() &&
+                !isRePasswordUnmatch() &&
+                !isShopNameMissing() &&
+                !isAddressMissing() &&
+                !isAgreeToTermsMissing()
+            );
+        }
 
-        _handleSignUp: async function() {
-            if(this._allValid()) {
-                this.setState({ processing: true });
-                let { nickname, email, password } = this.state;
-
-                const response = await CloudApi.signUp(nickname, email, password);
-                if(response.ok) {
-                    this.setState({ processing: false });
-                    alert(LANG.check_email);
-                    location.hash = '#studio/cloud/sign-in';
-                } else {
-                    const error = await response.json();
-                    this.setState({
-                        processing: false,
-                        emailError: true,
-                        emailErrorMessage: LANG[error.message.toLowerCase()]
-                    });
-                }
+        async handleSignUpClick() {
+            if(this.checkValidation()) {
+                this.setState({ isProcessing: true });
+                const {phonePrefix, phoneNumber, realName, password, shopName, address} = this.state;
+                // const response = await CloudApi.signUp(fullName, email, password);
+                // if(response.ok) {
+                //     this.setState({ processing: false });
+                //     alert(LANG.check_email);
+                location.hash = '#studio/cloud/sign-up-captcha';
+                // } else {
+                //     const error = await response.json();
+                //     this.setState({
+                //         processing: false,
+                //         emailError: true,
+                //         emailErrorMessage: LANG[error.message.toLowerCase()]
+                //     });
+                // }
             }
-        },
+        }
 
-        _handleCancel: function() {
+        handleCancelClick() {
             location.hash = '#studio/cloud/sign-in';
-        },
+        }
 
-        render: function() {
+        render() {
             return(
                 <div className="cloud">
                     <div className="container">
@@ -140,71 +117,110 @@ define([
                             <h3>{LANG.sign_up}</h3>
                             <h2>{LANG.flux_cloud}</h2>
                         </div>
-                        <div className="row">
-                            <Controls
-                                id="nickname"
-                                label={LANG.nickname}
-                                errorMessage={LANG.error_blank_username}
-                                errorOn={this.state.userNameError}
-                                value={this.state.nickname}
-                                onChange={this._handleControlChange}
-                                onBlur={this._checkValue} />
-                            <Controls
-                                id="email"
-                                label={LANG.email}
-                                errorMessage={this.state.emailErrorMessage}
-                                errorOn={this.state.emailError}
-                                value={this.state.email}
-                                onChange={this._handleControlChange}
-                                onBlur={this._checkValue} />
-                        </div>
-                        <div className="row">
-                            <Controls
-                                id="password"
-                                type="password"
-                                label={LANG.password}
-                                value={this.state.password}
-                                onChange={this._handleControlChange}
-                                onBlur={this._checkValue} />
-                            <Controls
-                                id="rePassword"
-                                type="password"
-                                label={LANG.re_enter_password}
-                                errorMessage={LANG.error_password_not_match}
-                                errorOn={this.state.passwordMismatch}
-                                value={this.state.rePassword}
-                                onChange={this._handleControlChange}
-                                onBlur={this._checkValue} />
-                        </div>
-                        <div className="controls">
-                            <div className="control">
+                        <div className='row'>
+                            <Controls label={'帳號(手機號)'} errorMessage={this.state.showPhoneNumberMissingError ? '請輸入手機號' : ' '}>
+                                <select
+                                    value={this.state.phonePrefix}
+                                    onChange={e => this.handleInputChange('phonePrefix', e.target.value)}
+                                    style={{display: 'inline-block', width: '100px', height: '41px', marginLeft: '10px', backgroundPosition: 'calc(100% - 6px) center'}}
+                                >
+                                    <option value='+86'>+86 中國</option>
+                                    <option value='+852'>+852 香港</option>
+                                    <option value='+853'>+853 澳門</option>
+                                    <option value='+886'>+886 台灣</option>
+                                </select>
                                 <input
-                                    id="agreeToTerms"
-                                    className="pointer"
-                                    type="checkbox"
-                                    checked={this.state.agreeToTerms}
-                                    onChange={this._handleAgreementChange} />
-                                <label dangerouslySetInnerHTML={{ __html: LANG.agreement }} />
-                            </div>
+                                    type='text'
+                                    value={this.state.phoneNumber}
+                                    onChange={e => this.handleInputChange('phoneNumber', e.target.value)}
+                                    onBlur={e => this.handleInputChange('phoneNumber', e.target.value)}
+                                    placeholder={'手機號'}
+                                    style={{display: 'inline-block', width: '190px'}}
+                                />
+                            </Controls>
+                            <Controls label={'真實姓名'} errorMessage={this.state.showRealNameMissingError ? '請輸入真實姓名' : ' '}>
+                                <input
+                                    type='text'
+                                    value={this.state.realName}
+                                    onChange={e => this.handleInputChange('realName', e.target.value)}
+                                    onBlur={e => this.handleInputChange('realName', e.target.value)}
+                                    placeholder={'真實姓名'}
+                                />
+                            </Controls>
                         </div>
+
+                        <div className="row">
+                            <Controls label={LANG.password} errorMessage={this.state.showPasswordMissingError ? '請輸入密碼' : ' '}>
+                                <input
+                                    type='password'
+                                    value={this.state.password}
+                                    onChange={e => this.handleInputChange('password', e.target.value)}
+                                    onBlur={e => this.handleInputChange('password', e.target.value)}
+                                    placeholder={LANG.password}
+                                />
+                            </Controls>
+                            <Controls label={LANG.rePassword} errorMessage={this.state.showRePasswordUnmatchError ? '密碼不符合' : ' '}>
+                                <input
+                                    type='password'
+                                    value={this.state.rePassword}
+                                    onChange={e => this.handleInputChange('rePassword', e.target.value)}
+                                    onBlur={e => this.handleInputChange('rePassword', e.target.value)}
+                                    placeholder={LANG.rePassword}
+                                />
+                            </Controls>
+                        </div>
+
+                        <div className="row">
+                            <Controls label={'店家名'} errorMessage={this.state.showShopNameMissingError ? '請輸入店家名' : ' '}>
+                                <input
+                                    type='text'
+                                    value={this.state.shopName}
+                                    onChange={e => this.handleInputChange('shopName', e.target.value)}
+                                    onBlur={e => this.handleInputChange('shopName', e.target.value)}
+                                    placeholder={'店家名'}
+                                />
+                            </Controls>
+                            <Controls label={'地址'} errorMessage={this.state.showAddressMissingError ? '請輸入地址' : ' '}>
+                                <input
+                                    type='text'
+                                    value={this.state.address}
+                                    onChange={e => this.handleInputChange('address', e.target.value)}
+                                    onBlur={e => this.handleInputChange('address', e.target.value)}
+                                    placeholder={'地址'}
+                                />
+                            </Controls>
+                        </div>
+
+                        <Controls>
+                            <input
+                                type='checkbox'
+                                className='pointer'
+                                checked={this.state.agreeToTerms}
+                                onChange={e => this.handleInputChange('agreeToTerms', e.target.checked)}
+                            />
+                            <label>
+                                同意<a href="http://">用戶使用條款</a>
+                            </label>
+                        </Controls>
                         <div className="processing-error">
-                            <label>{this.state.agreeToTermError ? LANG.agree_to_terms : ''}</label><br/>
+                            <label>{this.state.showAgreeToTermsMissingError ? LANG.agree_to_terms : ''}</label>
+                            <br/>
                         </div>
                     </div>
                     <div className="processing">
-                        <label>{this.state.processing ? LANG.processing : ''}</label>
+                        <label>{this.state.isProcessing ? LANG.processing : ''}</label>
                     </div>
                     <div className="footer">
                         <div className="divider">
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel" onClick={this._handleCancel}>{LANG.cancel}</button>
-                            <button className="btn btn-default" onClick={this._handleSignUp}>{LANG.sign_up}</button>
+                            <button className="btn btn-cancel" onClick={() => this.handleCancelClick()}>{LANG.cancel}</button>
+                            <button className="btn btn-default" onClick={() => this.handleSignUpClick()}>{LANG.sign_up}</button>
                         </div>
                     </div>
                 </div>
             );
         }
-    });
+    };
 });

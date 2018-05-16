@@ -387,6 +387,7 @@ define(function() {
                 username: '使用者名稱',
                 nickname: '使用者別名',
                 email: '電子信箱',
+                phone: '手機號',
                 password: '密碼',
                 re_enter_password: '重新輸入密碼',
                 forgot_password: '忘記密碼?',

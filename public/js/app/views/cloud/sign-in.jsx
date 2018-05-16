@@ -18,10 +18,10 @@ define([
 
         getInitialState: function() {
             return {
-                email: '',
+                phonePrefix: '+86',
+                phoneNumber: '',
                 password: '',
                 processing: false,
-                showResendVerificationEmail: false
             };
         },
 
@@ -35,14 +35,21 @@ define([
             }
         },
 
-        _handleForgotPassword: function() {
-            location.hash = '#/studio/cloud/forgot-password';
+        _handlePasswordChange: function(e) {
+            this.setState({
+                password: e.target.value
+            });
         },
 
-        _handleEditValue: function(e) {
-            let { id, value } = e.target;
+        _handlePhonePrefixChange: function(e) {
             this.setState({
-                [id]: value
+                phonePrefix: e.target.value
+            });
+        },
+
+        _handlePhoneNumberChange: function(e) {
+            this.setState({
+                phoneNumber: e.target.value
             });
         },
 
@@ -53,55 +60,35 @@ define([
         },
 
         _handleCancel: function() {
-            location.hash = '#/studio/print';
-        },
-
-        _handleResendVerificationEmail: async function() {
-            let { email } = this.state;
-
-            const response = await CloudApi.resendVerification(email);
-            if(response.ok) {
-                location.hash = '#studio/cloud/email-sent';
-            }
-            else {
-                alert(LANG.contact_us);
-            }
+            location.hash = '#/studio/beambox';
         },
 
         _handleSignIn: async function(e) {
             e.preventDefault();
-            let { email, password } = this.state;
-
+            const { phonePrefix, phoneNumber, password } = this.state;
+            const phone = phonePrefix + phoneNumber;
             this.setState({
                 errorMessage: '',
                 processing: true
             });
 
-            const response = await CloudApi.signIn(email, password);
+            const response = await CloudApi.signIn(phone, password);
             const responseBody = await response.json();
             if(response.ok) {
                 const { nickname } = responseBody;
-                const displayName = nickname || email;
+                const displayName = nickname || phone;
                 menuFactory.methods.updateAccountDisplay(displayName);
                 location.hash = '#/studio/cloud/bind-machine';
             } else {
-                if (response.status !== 200) {
-                    this.setState({
-                        errorMessage: LANG[responseBody.message.toLowerCase()] || LANG.SERVER_INTERNAL_ERROR,
-                        processing: false
-                    });
-                    return;
-                }
                 this.setState({
-                    showResendVerificationEmail: responseBody.message === 'NOT_VERIFIED',
-                    errorMessage: LANG[responseBody.message.toLowerCase()],
+                    errorMessage: LANG[responseBody.message.toLowerCase()] || LANG.SERVER_INTERNAL_ERROR,
                     processing: false
                 });
+                return;
             }
         },
 
         render: function() {
-            const verificationClass = ClassNames('resend', {hide: !this.state.showResendVerificationEmail });
             const message = (this.state.processing) ? LANG.processing : '';
 
             return(
@@ -113,10 +100,36 @@ define([
                         </div>
                         <div className='controls'>
                             <div>
-                                <input id='email' type='text' placeholder='Email' onChange={this._handleEditValue} />
+                                <select
+                                    style={{
+                                        display: 'inline-block',
+                                        width: '100px',
+                                        height: '41px',
+                                        marginLeft: '10px',
+                                        backgroundPosition: 'calc(100% - 6px) center'
+                                    }}
+                                    value={this.state.phonePrefix}
+                                    onChange={this._handlePhonePrefixChange}
+                                >
+                                    <option value='+86'>+86 中國</option>
+                                    <option value='+852'>+852 香港</option>
+                                    <option value='+853'>+853 澳門</option>
+                                    <option value='+886'>+886 台灣</option>
+                                </select>
+                                <input
+                                    value={this.state.phoneNumber}
+                                    onChange={this._handlePhoneNumberChange}
+                                    type='text'
+                                    placeholder={LANG.phone}
+                                    style={{display: 'inline-block', width: '190px'}} />
                             </div>
                             <div>
-                                <input id='password' type='password' placeholder='Password' onChange={this._handleEditValue} onKeyPress={this._handleDetectEnterKey} />
+                                <input
+                                    value={this.state.password}
+                                    onChange={this._handlePasswordChange}
+                                    type='password'
+                                    placeholder='Password'
+                                    onKeyPress={this._handleDetectEnterKey} />
                             </div>
                             <div className='forget-password'>
                                 <a href='#/studio/cloud/forgot-password'>{LANG.forgot_password}</a>
@@ -127,7 +140,6 @@ define([
                         </div>
                         <div className='processing-error'>
                             <label>{this.state.errorMessage}</label><br/>
-                            <a className={verificationClass} onClick={this._handleResendVerificationEmail}>{LANG.resend_verification}</a>
                         </div>
                     </div>
                     <div className='processing'>

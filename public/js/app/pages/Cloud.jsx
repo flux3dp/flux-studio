@@ -3,9 +3,7 @@ define([
     'helpers/i18n',
     'jsx!views/cloud/sign-in',
     'jsx!views/cloud/sign-up',
-    'jsx!views/cloud/sign-up-success',
-    'jsx!views/cloud/sign-up-fail',
-    'jsx!views/cloud/forgot-password',
+    'jsx!views/cloud/forgot-password/forgot-password',
     'jsx!views/cloud/email-sent',
     'jsx!views/cloud/bind-machine',
     'jsx!views/cloud/bind-success',
@@ -20,8 +18,6 @@ define([
     i18n,
     SignIn,
     SignUp,
-    SignUpSuccess,
-    SignUpFail,
     ForgotPassword,
     EmailSent,
     BindMachine,
@@ -61,8 +57,6 @@ define([
 
                 content['sign-in']          = () => <SignIn />;
                 content['sign-up']          = () => <SignUp />;
-                content['sign-up-success']  = () => <SignUpSuccess />;
-                content['sign-up-fail']     = () => <SignUpFail />;
                 content['forgot-password']  = () => <ForgotPassword />;
                 content['email-sent']       = () => <EmailSent />;
                 content['bind-machine']     = () => <BindMachine lang={i18n.lang} onError={this.logError} />;

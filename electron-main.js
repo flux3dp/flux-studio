@@ -126,7 +126,8 @@ function createWindow () {
         width: 1024, height: 768,
         title: `FLUX Studio - ${app.getVersion()}`,
         webPreferences: {
-            preload: path.join(__dirname, 'src', 'main-window-entry.js')
+            preload: path.join(__dirname, 'src', 'main-window-entry.js'),
+            // devTools: false
         },
         vibrancy: 'light'});
 

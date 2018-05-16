@@ -5420,15 +5420,9 @@ define([
                         '',
                         '',
                         [
-                            () => {
-                                importAs('layer');
-                            },
-                            () => {
-                                importAs('color');
-                            },
-                            () => {
-                                importAs('nolayer');
-                            }
+                            () => importAs('layer'),
+                            () => importAs('color'),
+                            () => importAs('nolayer')
                         ]
                     );
                 };
