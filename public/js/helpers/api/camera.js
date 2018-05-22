@@ -20,7 +20,7 @@ define([
                 .switchMap(x => {
                     // if stream return extremely small blob (i.e. when camera hardware connection fail)
                     if (x.size < 30) {
-                        return Rx.Observable.throw(new Error('Fail to transmit Blob'));
+                        return Rx.Observable.throw(new Error('Fail to transmit image, try to restart Beambox or contact to us.'));
                     } else {
                         return Rx.Observable.of(x);
                     }

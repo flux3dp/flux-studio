@@ -991,7 +991,7 @@ define([
         await this.connectCamera(device);
 
         // return an instance of RxJS Observable.
-        return await _device.camera.getLiveStreamSource();
+        return _device.camera.getLiveStreamSource();
     }
 
     function disconnectCamera() {
