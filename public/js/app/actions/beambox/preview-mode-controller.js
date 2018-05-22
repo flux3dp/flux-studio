@@ -124,11 +124,20 @@ define([
                     };
                 })();
 
-                const pointsArray = [];
-                for(let curY = top; curY < (bottom + size); curY += size){
+                let pointsArray = [];
+                let shouldRowReverse = false; // let camera 走Ｓ字型
+                for(let curY = top; curY < (bottom + size); curY += size) {
+
+                    const row = [];
                     for(let curX = left; curX < (right + size); curX += size) {
-                        pointsArray.push([curX, curY]);
+                        row.push([curX, curY]);
                     }
+
+                    if(shouldRowReverse) {
+                        row.reverse();
+                    }
+                    pointsArray = pointsArray.concat(row);
+                    shouldRowReverse = !shouldRowReverse;
                 }
                 return pointsArray;
             })();
