@@ -1163,27 +1163,20 @@ define([
                 return selectorManager.selectorParentGroup;
             }
 
-            var targetLayer = svgCanvas.getObjectLayer(mouse_target);
-            if (targetLayer && selectedElements.indexOf(targetLayer.elem) === -1 && targetLayer.elem !== current_layer) {
-                svgCanvas.setCurrentLayer(targetLayer.title);
-                window.populateLayers();
-                selectOnly([mouse_target], true);
-                return mouse_target;
-            }
 
             if (!mouse_target) {
                 return svgroot;
             }
-            //
-            //	// go up until we hit a child of a layer
-            //	while (mouse_target.parentNode.parentNode.tagName === 'g') {
-            //		mouse_target = mouse_target.parentNode;
-            //	}
+
+            // // go up until we hit a child of a layer
+            while (mouse_target.parentNode.parentNode.tagName === 'g') {
+            	mouse_target = mouse_target.parentNode;
+            }
             // Webkit bubbles the mouse event all the way up to the div, so we
             // set the mouse_target to the svgroot like the other browsers
-            //	if (mouse_target.nodeName.toLowerCase() === 'div') {
-            //		mouse_target = svgroot;
-            //	}
+            // if (mouse_target.nodeName.toLowerCase() === 'div') {
+            //     mouse_target = svgroot;
+            // }
 
             return mouse_target;
         };
@@ -2232,6 +2225,14 @@ define([
                                     if (tempJustSelected !== t) {
                                         canvas.removeFromSelection([t]);
                                     }
+                                }
+                                const mouse_target = getMouseTarget(evt);
+                                const current_layer = getCurrentDrawing().getCurrentLayer();
+                                const targetLayer = svgCanvas.getObjectLayer(mouse_target);
+                                if (targetLayer && !selectedElements.includes(targetLayer.elem) && targetLayer.elem !== current_layer) {
+                                    svgCanvas.setCurrentLayer(targetLayer.title);
+                                    window.populateLayers();
+                                    selectOnly([mouse_target], true);
                                 }
                             } // no change in mouse position
 
