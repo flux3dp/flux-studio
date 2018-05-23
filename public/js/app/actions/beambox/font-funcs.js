@@ -8,7 +8,9 @@ define([
 
     if (!window.electron) {
         console.log('font is not supported in web browser');
-        return {};
+        return {
+            convertTextToPathAmoungSvgcontent: ()=>{}
+        };
     }
     const ipc = electron.ipc;
     const events = electron.events;
