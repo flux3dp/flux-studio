@@ -1417,7 +1417,7 @@ define(function() {
             start_engrave: 'START ENGRAVE',
             analyze_result_fail: 'Fail to analyze captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             drawing_calibration_image: 'Drawing calibration image...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.<br/>3. If laser fail to emit, please go to Beambox touch panel "Motion", make sure strength and speed multiplier are 1, then recalibrate again',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.<br/>3. If laser fail to emit, please go to Beambox touch panel "Motion", make sure strength and speed multiplier are 1, then calibrate again',
             calibrate_done: 'Calibration done. Better camera accurency is given when focus precisely.'
         },
         input_machine_password: {
