@@ -1530,12 +1530,13 @@ define([
                         start_y = y;
                         addSvgElementFromJson({
                             element: 'rect',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 x: x,
                                 y: y,
                                 width: 0,
                                 height: 0,
+                                stroke: '#000',
                                 id: getNextId(),
                                 'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
@@ -1544,18 +1545,17 @@ define([
                         break;
                     case 'line':
                         started = true;
-                        stroke_w = cur_shape.stroke_width == 0 ? 1 : cur_shape.stroke_width;
                         addSvgElementFromJson({
                             element: 'line',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 x1: x,
                                 y1: y,
                                 x2: x,
                                 y2: y,
                                 id: getNextId(),
-                                stroke: cur_shape.stroke,
-                                'stroke-width': stroke_w,
+                                stroke: '#000',
+                                'stroke-width': 1,
                                 'stroke-dasharray': cur_shape.stroke_dasharray,
                                 'stroke-linejoin': cur_shape.stroke_linejoin,
                                 'stroke-linecap': cur_shape.stroke_linecap,
@@ -1570,12 +1570,13 @@ define([
                         started = true;
                         addSvgElementFromJson({
                             element: 'circle',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 cx: x,
                                 cy: y,
                                 r: 0,
                                 id: getNextId(),
+                                stroke: '#000',
                                 opacity: cur_shape.opacity / 2
                             }
                         });
@@ -1584,13 +1585,14 @@ define([
                         started = true;
                         addSvgElementFromJson({
                             element: 'ellipse',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 cx: x,
                                 cy: y,
                                 rx: 0,
                                 ry: 0,
                                 id: getNextId(),
+                                stroke: '#000',
                                 'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
                             }

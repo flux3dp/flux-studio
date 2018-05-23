@@ -235,7 +235,7 @@ define([
 
         //movementX, movementY in mm
         async _getPhotoAfterMoveTo(movementX, movementY) {
-            let movement = {
+            const movement = {
                 f: Math.max(Constant.camera.movementSpeed.x, Constant.camera.movementSpeed.y), // firmware will used limited x, y speed still
                 x: movementX, // mm
                 y: movementY  // mm
