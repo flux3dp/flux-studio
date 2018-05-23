@@ -19,15 +19,15 @@ define([
     return React.createClass({
         componentDidMount: function(){
             Shortcuts.on(['esc'], this._closeDialog);
-            $('#svgcanvas').mouseup(this._closeDialog);
         },
         _closeDialog: function() {
-            $('.dialog-opener:checked').removeAttr('checked');
+            console.log('close dialog');
+            $('.dialog-opener:checked').click(); // This is very bad practice
         },
 
         render: function() {
             return (
-                <ul onClick={this._closeDialog}>
+                <ul>
                     <li onClick={FnWrapper.insertRectangle}>
                         {LANG.rectangle}
                     </li>

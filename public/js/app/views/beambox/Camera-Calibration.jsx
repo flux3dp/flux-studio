@@ -132,9 +132,9 @@ define([
         };
         async _doCaptureTask() {
             const device = this.props.device;
-            await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode');});
             ProgressActions.open(ProgressConstants.NONSTOP, LANG.taking_picture);
             try {
+                await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode');});
                 const movementX = Constant.camera.calibrationPicture.centerX - Constant.camera.offsetX_ideal;
                 const movementY = Constant.camera.calibrationPicture.centerY - Constant.camera.offsetY_ideal;
                 const blobUrl = await PreviewModeController.takePictureAfterMoveTo(movementX, movementY);
@@ -165,6 +165,7 @@ define([
                                     this.props.gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
                                 } catch (error) {
                                     console.log(error);
+                                    ProgressActions.close();
                                     AlertActions.showPopupError('menu-item', error.message || 'Fail to cut and capture');
                                 }
                             }
