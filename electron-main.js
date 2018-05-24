@@ -44,7 +44,8 @@ function createLogFile() {
     return f;
 }
 
-var DEBUG = false;
+let DEBUG = false;
+const FORCE_CLOSE_DEVTOOLS = true;
 const logger = process.stderr.isTTY ? process.stderr : createLogFile();
 
 if(process.argv.indexOf('--debug') > 0) {
@@ -127,7 +128,7 @@ function createWindow () {
         title: `FLUX Studio - ${app.getVersion()}`,
         webPreferences: {
             preload: path.join(__dirname, 'src', 'main-window-entry.js'),
-            // devTools: false
+            devTools: FORCE_CLOSE_DEVTOOLS ? false : undefined
         },
         vibrancy: 'light'});
 
@@ -151,6 +152,12 @@ function createWindow () {
 
     mainWindow.on('page-title-updated', function(event) {
         event.preventDefault();
+    });
+
+    mainWindow.webContents.on('devtools-opened', () => {
+        if (FORCE_CLOSE_DEVTOOLS) {
+            mainWindow.webContents.closeDevTools();
+        }
     });
 
     menuManager.on('DEBUG-RELOAD', () => {
