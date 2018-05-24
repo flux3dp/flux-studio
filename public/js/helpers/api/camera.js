@@ -9,7 +9,6 @@ define([
 ], function(Websocket, rsaKey, Rx) {
 
     const TIMEOUT = 10000;
-    const TIMEOUT_ERROR = undefined;
 
     class Camera {
         constructor() {
@@ -17,7 +16,15 @@ define([
             this._wsSubject = new Rx.Subject();
             this._source = this._wsSubject
                 .asObservable()
-                .filter(x => x instanceof Blob);
+                .filter(x => x instanceof Blob)
+                .switchMap(x => {
+                    // if stream return extremely small blob (i.e. when camera hardware connection fail)
+                    if (x.size < 30) {
+                        return Rx.Observable.throw(new Error('Fail to transmit image, try to restart Beambox or contact to us.'));
+                    } else {
+                        return Rx.Observable.of(x);
+                    }
+                });
         }
 
         // let subject get response from websocket
@@ -32,8 +39,8 @@ define([
                 method: method,
                 onOpen: () => this._ws.send(rsaKey()),
                 onMessage: (res) => this._wsSubject.onNext(res),
-                onError: (res) => this._wsSubject.onError(res),
-                onFatal: (res) => this._wsSubject.onError(res),
+                onError: (res) => this._wsSubject.onError(new Error(res.error[0])),
+                onFatal: (res) => this._wsSubject.onError(new Error(res.error[0])),
                 onClose: () => this._wsSubject.onCompleted(),
                 autoReconnect: false
             });
@@ -41,7 +48,7 @@ define([
             return await this._wsSubject
                 .filter(res => res.status === 'connected')
                 .take(1)
-                .timeout(TIMEOUT, TIMEOUT_ERROR)
+                .timeout(TIMEOUT)
                 .toPromise();
         }
 
@@ -49,14 +56,14 @@ define([
             this._ws.send('require_frame');
             return await this._source
                 .take(1)
-                .timeout(TIMEOUT, TIMEOUT_ERROR)
+                .timeout(TIMEOUT)
                 .toPromise();
         }
 
         getLiveStreamSource() {
             this._ws.send('enable_streaming');
             return this._source
-                .timeout(TIMEOUT, TIMEOUT_ERROR)
+                .timeout(TIMEOUT)
                 .asObservable();
         }
 

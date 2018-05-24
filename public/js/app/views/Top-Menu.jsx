@@ -387,6 +387,10 @@ define([
                 };
 
                 _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
+                    if (location.hash !== '#studio/beambox') {
+                        AlertActions.showPopupInfo('', lang.camera_calibration.please_goto_beambox_first);
+                        return;
+                    }
                     ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
                     DeviceMaster.select(device)
                         .done(() => {

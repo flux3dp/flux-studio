@@ -1411,13 +1411,14 @@ define(function() {
             cancel: '取消',
             back: '上一步',
             finish: '完成',
+            please_goto_beambox_first: '請先選擇 Beambox 功能，再進行校正',
             please_place_paper: '請將乾淨 A4 白紙放在工作區域的左上角',
             please_refocus: '請旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             taking_picture: '擷取圖片中...',
             start_engrave: '開始繪製校正圖片',
             analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             drawing_calibration_image: '繪製校正圖片中...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦<br/>3. 若雷射沒成功射出，請至 Beambox 機器面板上選擇"動作"，並將"功率倍率"與"速度倍率"調回正常值，再重新校正一次。',
             calibrate_done: '校正相機完成<br/>使用時請正確對焦以取得良好的預覽效果。'
         },
         input_machine_password: {

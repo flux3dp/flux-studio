@@ -24,8 +24,11 @@ define([
             height: workarea[1]
         },
         camera: {
-            movementSpeed: (300 * 60), // mm/minutes
-            waitTimeForMovementStop: 100, // ms wait for movement stop to make sure camera is not shaking and get nice enough picture, this value need optimized
+            movementSpeed: {
+                // limited by firmware
+                x: 300 * 60, // mm per minutes
+                y: 100 * 60 // mm per minutes
+            },
             imgWidth: 1280, //pixel
             imgHeight: 720, //pixel
             offsetX_ideal: 20,    //mm

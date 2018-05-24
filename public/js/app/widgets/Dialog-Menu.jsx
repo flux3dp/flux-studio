@@ -32,16 +32,14 @@ function(
         },
         getInitialState: function() {
             return {
-                isItemsChecked: Array(this.props.items.length).fill(false)
+                checkedItem: -1
             };
         },
 
 
         toggleSubPopup: function(itemIndex, isChecked) {
-            const newIsItemsCheckedState = Array(...this.state.isItemsChecked); //copy array
-            newIsItemsCheckedState[itemIndex] = isChecked;
             this.setState({
-                isItemsChecked: newIsItemsCheckedState
+                checkedItem: isChecked ? itemIndex : -1
             });
         },
 
@@ -67,7 +65,7 @@ function(
                         'disable': item.disable === true
                     };
                     itemLabelClassName = Object.assign(itemLabelClassName, item.labelClass || {});
-                    const checked = item.forceKeepOpen || (this.state.isItemsChecked[index] && !disablePopup);
+                    const checked = item.forceKeepOpen || ((this.state.checkedItem === index) && !disablePopup);
                     return {
                         label: (
                             <label className='ui-dialog-menu-item'>

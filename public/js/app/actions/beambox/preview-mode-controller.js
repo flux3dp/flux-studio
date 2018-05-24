@@ -32,6 +32,7 @@ define([
             this.isPreviewModeOn = false;
             this.isPreviewBlocked = false;
             this.cameraOffset = null;
+            this.lastPosition = [0, 0]; // in mm
             this.errorCallback = function(){};
         }
 
@@ -124,11 +125,20 @@ define([
                     };
                 })();
 
-                const pointsArray = [];
-                for(let curY = top; curY < (bottom + size); curY += size){
+                let pointsArray = [];
+                let shouldRowReverse = false; // let camera 走Ｓ字型
+                for(let curY = top; curY < (bottom + size); curY += size) {
+
+                    const row = [];
                     for(let curX = left; curX < (right + size); curX += size) {
-                        pointsArray.push([curX, curY]);
+                        row.push([curX, curY]);
                     }
+
+                    if(shouldRowReverse) {
+                        row.reverse();
+                    }
+                    pointsArray = pointsArray.concat(row);
+                    shouldRowReverse = !shouldRowReverse;
                 }
                 return pointsArray;
             })();
@@ -196,8 +206,9 @@ define([
         async _reset() {
             this.storedPrinter = null;
             this.isPreviewModeOn = false;
-            this.cameraOffset = null;
             this.isPreviewBlocked = false;
+            this.cameraOffset = null;
+            this.lastPosition = [0, 0];
             await DeviceMaster.disconnectCamera();
         }
 
@@ -224,19 +235,32 @@ define([
 
         //movementX, movementY in mm
         async _getPhotoAfterMoveTo(movementX, movementY) {
-            // x, y in pixel
-            let movement = {
-                f: Constant.camera.movementSpeed,
+            const movement = {
+                f: Math.max(Constant.camera.movementSpeed.x, Constant.camera.movementSpeed.y), // firmware will used limited x, y speed still
                 x: movementX, // mm
                 y: movementY  // mm
             };
 
             await DeviceMaster.select(this.storedPrinter);
             await DeviceMaster.maintainMove(movement);
-            // wait for moving camera to take a stable picture, this value need optimized
-            await new Promise(resolve => setTimeout(resolve, Constant.camera.waitTimeForMovementStop));
+            await this._waitUntilEstimatedMovementTime(movementX, movementY);
             const imgUrl = await this._getPhotoFromMachine();
             return imgUrl;
+        }
+
+        //movementX, movementY in mm
+        async _waitUntilEstimatedMovementTime(movementX, movementY) {
+            const speed = {
+                x: Constant.camera.movementSpeed.x / 60 / 1000, // speed: mm per millisecond
+                y: Constant.camera.movementSpeed.y / 60 / 1000 // speed: mm per millisecond
+            };
+            let timeToWait = Math.hypot((this.lastPosition[0] - movementX)/speed.x, (this.lastPosition[1] - movementY)/speed.y);
+
+            // wait for moving camera to take a stable picture, this value need to be optimized
+            timeToWait *= 1.2;
+
+            this.lastPosition = [movementX, movementY];
+            await Rx.Observable.timer(timeToWait).toPromise();
         }
 
         //just fot _getPhotoAfterMoveTo()

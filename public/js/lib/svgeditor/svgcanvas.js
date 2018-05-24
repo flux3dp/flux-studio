@@ -1163,27 +1163,20 @@ define([
                 return selectorManager.selectorParentGroup;
             }
 
-            var targetLayer = svgCanvas.getObjectLayer(mouse_target);
-            if (targetLayer && selectedElements.indexOf(targetLayer.elem) === -1 && targetLayer.elem !== current_layer) {
-                svgCanvas.setCurrentLayer(targetLayer.title);
-                window.populateLayers();
-                selectOnly([mouse_target], true);
-                return mouse_target;
-            }
 
             if (!mouse_target) {
                 return svgroot;
             }
-            //
-            //	// go up until we hit a child of a layer
-            //	while (mouse_target.parentNode.parentNode.tagName === 'g') {
-            //		mouse_target = mouse_target.parentNode;
-            //	}
+
+            // // go up until we hit a child of a layer
+            while (mouse_target.parentNode.parentNode.tagName === 'g') {
+            	mouse_target = mouse_target.parentNode;
+            }
             // Webkit bubbles the mouse event all the way up to the div, so we
             // set the mouse_target to the svgroot like the other browsers
-            //	if (mouse_target.nodeName.toLowerCase() === 'div') {
-            //		mouse_target = svgroot;
-            //	}
+            // if (mouse_target.nodeName.toLowerCase() === 'div') {
+            //     mouse_target = svgroot;
+            // }
 
             return mouse_target;
         };
@@ -1537,12 +1530,13 @@ define([
                         start_y = y;
                         addSvgElementFromJson({
                             element: 'rect',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 x: x,
                                 y: y,
                                 width: 0,
                                 height: 0,
+                                stroke: '#000',
                                 id: getNextId(),
                                 'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
@@ -1551,18 +1545,17 @@ define([
                         break;
                     case 'line':
                         started = true;
-                        stroke_w = cur_shape.stroke_width == 0 ? 1 : cur_shape.stroke_width;
                         addSvgElementFromJson({
                             element: 'line',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 x1: x,
                                 y1: y,
                                 x2: x,
                                 y2: y,
                                 id: getNextId(),
-                                stroke: cur_shape.stroke,
-                                'stroke-width': stroke_w,
+                                stroke: '#000',
+                                'stroke-width': 1,
                                 'stroke-dasharray': cur_shape.stroke_dasharray,
                                 'stroke-linejoin': cur_shape.stroke_linejoin,
                                 'stroke-linecap': cur_shape.stroke_linecap,
@@ -1577,12 +1570,13 @@ define([
                         started = true;
                         addSvgElementFromJson({
                             element: 'circle',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 cx: x,
                                 cy: y,
                                 r: 0,
                                 id: getNextId(),
+                                stroke: '#000',
                                 opacity: cur_shape.opacity / 2
                             }
                         });
@@ -1591,13 +1585,14 @@ define([
                         started = true;
                         addSvgElementFromJson({
                             element: 'ellipse',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 cx: x,
                                 cy: y,
                                 rx: 0,
                                 ry: 0,
                                 id: getNextId(),
+                                stroke: '#000',
                                 'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
                             }
@@ -2232,6 +2227,14 @@ define([
                                     if (tempJustSelected !== t) {
                                         canvas.removeFromSelection([t]);
                                     }
+                                }
+                                const mouse_target = getMouseTarget(evt);
+                                const current_layer = getCurrentDrawing().getCurrentLayer();
+                                const targetLayer = svgCanvas.getObjectLayer(mouse_target);
+                                if (targetLayer && !selectedElements.includes(targetLayer.elem) && targetLayer.elem !== current_layer) {
+                                    svgCanvas.setCurrentLayer(targetLayer.title);
+                                    window.populateLayers();
+                                    selectOnly([mouse_target], true);
                                 }
                             } // no change in mouse position
 

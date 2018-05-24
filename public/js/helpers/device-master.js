@@ -301,16 +301,13 @@ define([
         Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred();
 
-
-        ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
-
         if (_existConnection(device.uuid, device.source)) {
-            ProgressActions.close();
             _device = _switchDevice(device.uuid);
             SocketMaster.setWebSocket(_actionMap[device.uuid]);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
+            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
             _device = {};
             _device.uuid = device.uuid;
             _device.source = device.source;
@@ -991,7 +988,7 @@ define([
         await this.connectCamera(device);
 
         // return an instance of RxJS Observable.
-        return await _device.camera.getLiveStreamSource();
+        return _device.camera.getLiveStreamSource();
     }
 
     function disconnectCamera() {
