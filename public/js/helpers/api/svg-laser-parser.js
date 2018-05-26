@@ -79,7 +79,7 @@ define([
              *
              * @return {Promise}
              */
-            upload: function(files) {
+            upload: function(files, opts) {
                 var self = this,
                     $deferred = $.Deferred(),
                     length = files.length,
@@ -116,18 +116,20 @@ define([
                             }
 
                         };
-
                         events.onError = function(data) {
                             warningCollection.push(data.error);
                             file = setMessages(file, true, warningCollection);
                             $deferred.notify('next');
                         };
-
-                        ws.send([
+                        var args = [
                             order_name,
                             file.uploadName,
                             file.size
-                        ].join(' '));
+                        ];
+                        if (opts.model === 'fbb1p') {
+                            args.push('-pro');
+                        }
+                        ws.send(args.join(' '));
                     };
 
                 $deferred.progress(function(action) {
@@ -399,7 +401,7 @@ define([
 
                 return $deferred.promise();
             },
-            uploadToSvgeditorAPI: function(files) {
+            uploadToSvgeditorAPI: function(files, opts) {
                 var $deferred = $.Deferred(),
                     currIndex = 0,
                     order_name = 'svgeditor_upload',
@@ -432,13 +434,16 @@ define([
                             file = setMessages(file, true, warningCollection);
                             $deferred.notify('next');
                         };
-
-                        ws.send([
+                        var args = [
                             order_name,
                             file.uploadName,
                             file.size,
                             file.thumbnailSize
-                        ].join(' '));
+                        ];
+                        if (opts.model === 'fbb1p') {
+                            args.push('-pro');
+                        }
+                        ws.send(args.join(' '));
                     };
 
                 $deferred.progress(function(action) {

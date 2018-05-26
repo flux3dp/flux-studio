@@ -114,7 +114,9 @@ define([
         await FontFuncs.convertTextToPathAmoungSvgcontent();
         ProgressActions.close();
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
-        await svgeditorParser.uploadToSvgeditorAPI([uploadFile]);
+        await svgeditorParser.uploadToSvgeditorAPI([uploadFile], {
+            model: Config().read('beambox-preference')['model']
+        });
         const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for
             svgeditorParser.getTaskCode(
