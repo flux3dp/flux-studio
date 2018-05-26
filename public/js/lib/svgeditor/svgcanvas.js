@@ -8171,7 +8171,7 @@ define([
                         'width': '100%',
                         'height': '100%',
                         'preserveAspectRatio': 'xMinYMin',
-                        'style': 'pointer-events:none; opacity: 0.7;',
+                        'style': 'pointer-events:none; opacity: 0.8;',
                     });
                     bg.appendChild(bg_img);
                 }
