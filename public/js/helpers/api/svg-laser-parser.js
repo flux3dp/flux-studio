@@ -126,7 +126,7 @@ define([
                             file.uploadName,
                             file.size
                         ];
-                        if (opts.model === 'fbb1p') {
+                        if (opts && opts.model === 'fbb1p') {
                             args.push('-pro');
                         }
                         ws.send(args.join(' '));
