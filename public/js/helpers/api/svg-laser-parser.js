@@ -310,7 +310,7 @@ define([
                     total_length = 0,
                     blob;
 
-                if (opts.model === 'fbb1p') {
+                if (opts && opts.model === 'fbb1p') {
                     args.push('-pro');
                 }
 
@@ -440,7 +440,7 @@ define([
                             file.size,
                             file.thumbnailSize
                         ];
-                        if (opts.model === 'fbb1p') {
+                        if (opts && opts.model === 'fbb1p') {
                             args.push('-pro');
                         }
                         ws.send(args.join(' '));
