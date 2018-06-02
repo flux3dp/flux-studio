@@ -8,14 +8,12 @@ define([
     'helpers/convertToTypedArray',
     'helpers/data-history',
     'helpers/api/set-params',
-    'app/actions/alert-actions'
 ], function(
     $,
     Websocket,
     convertToTypedArray,
     history,
-    setParams,
-    AlertActions
+    setParams
 ) {
     'use strict';
 
@@ -442,6 +440,19 @@ define([
                         ];
                         if (opts && opts.model === 'fbb1p') {
                             args.push('-pro');
+                        }
+                        if (opts) {
+                            switch (opts.engraveDpi) {
+                                case 'low':
+                                    args.push('-ldpi');
+                                    break;
+                                case 'medium':
+                                    args.push('-mdpi');
+                                    break;
+                                case 'high':
+                                    args.push('-hdpi');
+                                    break;
+                            }
                         }
                         ws.send(args.join(' '));
                     };
