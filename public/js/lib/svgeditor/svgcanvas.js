@@ -29,20 +29,19 @@
 
 define([
     'helpers/i18n',
-    'helpers/api/config',
+    'app/actions/beambox/beambox-preference',
     'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
 
 ], function (
     i18n,
-    ConfigHelper,
+    BeamboxPreference,
     AlertActions,
     ObjectPanelsController,
     PreviewModeController
 ) {
     const LANG = i18n.lang.beambox;
-    const Config = ConfigHelper();
     // Class: SvgCanvas
     // The main SvgCanvas class that manages all SVG-related functions
     //
@@ -2546,7 +2545,7 @@ define([
                         targetZoom = svgCanvas.getZoom();
                     }
 
-                    const mouseInputDevice = Config.read('beambox-preference')['mouse_input_device'];
+                    const mouseInputDevice = BeamboxPreference.read('mouse_input_device');
                     const isTouchpad = (mouseInputDevice === 'TOUCHPAD');
 
                     if (isTouchpad) {

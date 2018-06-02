@@ -9,8 +9,21 @@ define([
     'app/actions/alert-actions',
     'helpers/local-storage',
     'app/actions/beambox/constant',
+    'app/actions/beambox/beambox-preference',
     'app/actions/initialize-machine',
-], function($, React, i18n, Config, SelectView, UnitInput, AlertActions, LocalStorage, BeamboxConstant, initializeMachine) {
+], function(
+    $,
+    React,
+    i18n,
+    Config,
+    SelectView,
+    UnitInput,
+    AlertActions,
+    LocalStorage,
+    BeamboxConstant,
+    BeamboxPreference,
+    initializeMachine
+) {
 
     const Controls = props => {
         const style = { width: 'calc(100% / 10 * 3 - 10px)' };
@@ -86,7 +99,7 @@ define([
             } else if (val === 'false') {
                 val = false;
             }
-            Config().update('beambox-preference', item_key, val);
+            BeamboxPreference.write(item_key, val);
         },
 
         _removeDefaultMachine: function() {
@@ -223,12 +236,12 @@ define([
                 {
                     value: 'false',
                     label: lang.settings.off,
-                    selected: Config().read('beambox-preference')['show_guides'] === false
+                    selected: BeamboxPreference.read('show_guides') === false
                 },
                 {
                     value: 'true',
                     label: lang.settings.on,
-                    selected: Config().read('beambox-preference')['show_guides'] !== false
+                    selected: BeamboxPreference.read('show_guides') !== false
                 }
             ];
 
@@ -254,12 +267,12 @@ define([
                 {
                     value: 'fbb1b',
                     label: 'Beambox',
-                    selected: Config().read('beambox-preference')['model'] === 'fbb1b'
+                    selected: BeamboxPreference.read('model') === 'fbb1b'
                 },
                 {
                     value: 'fbb1p',
                     label: 'Beambox Pro',
-                    selected: Config().read('beambox-preference')['model'] === 'fbb1p'
+                    selected: BeamboxPreference.read('model') === 'fbb1p'
                 }
             ];
 
@@ -393,7 +406,7 @@ define([
                             unit='mm'
                             min={0}
                             max={BeamboxConstant.dimension.width/10}
-                            defaultValue={Config().read('beambox-preference')['guide_x0']}
+                            defaultValue={BeamboxPreference.read('guide_x0')}
                             getValue={val => this._updateBeamboxPreference('guide_x0', val)}
                             className={{half: true}}
                         />
@@ -402,7 +415,7 @@ define([
                             unit='mm'
                             min={0}
                             max={BeamboxConstant.dimension.height/10}
-                            defaultValue={Config().read('beambox-preference')['guide_y0']}
+                            defaultValue={BeamboxPreference.read('guide_y0')}
                             getValue={val => this._updateBeamboxPreference('guide_y0', val)}
                             className={{half: true}}
                         />

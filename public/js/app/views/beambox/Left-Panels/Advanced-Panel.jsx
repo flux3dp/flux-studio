@@ -1,20 +1,15 @@
 define([
     'react',
     'jsx!widgets/Modal',
-    'jsx!widgets/Button-Group',
-    'helpers/api/config',
-    'plugins/classnames/index',
+    'app/actions/beambox/beambox-preference',
     'helpers/i18n',
 ], function(
     React,
     Modal,
-    ButtonGroup,
-    Config,
-    classNames,
+    BeamboxPreference,
     i18n
 ) {
     const LANG = i18n.lang.beambox.left_panel.advanced_panel;
-    const config = Config();
 
     // value is one of low, medium, high
     // onChange() will get one of low, medium, high
@@ -60,7 +55,7 @@ define([
         constructor() {
             super();
             this.state = {
-                engraveDpi: config.read('beambox-preference')['engrave_dpi'],
+                engraveDpi: BeamboxPreference.read('engrave_dpi'),
             };
         }
 
@@ -71,7 +66,7 @@ define([
         }
 
         save() {
-            config.update('beambox-preference', 'engrave_dpi', this.state.engraveDpi);
+            BeamboxPreference.write('engrave_dpi', this.state.engraveDpi);
         }
 
         render() {

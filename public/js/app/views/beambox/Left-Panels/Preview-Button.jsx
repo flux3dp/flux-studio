@@ -7,6 +7,7 @@ define([
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/beambox-version-master',
+    'app/actions/beambox/beambox-preference',
     'plugins/classnames/index',
     'helpers/api/config',
     'helpers/i18n',
@@ -19,12 +20,12 @@ define([
     FnWrapper,
     PreviewModeController,
     BeamboxVersionMaster,
+    BeamboxPreference,
     classNames,
     ConfigHelper,
     i18n
 ) {
 
-    const Config = ConfigHelper();
     const LANG = i18n.lang.beambox.left_panel;
 
     return class LeftPanel extends React.Component {
@@ -39,12 +40,12 @@ define([
             const tryToStartPreviewMode = async () => {
 
                 const isAlreadyRemindUserToCalibrateCamera = () => {
-                    return !Config.read('beambox-preference')['should_remind_calibrate_camera'];
+                    return !BeamboxPreference.read('should_remind_calibrate_camera');
                 };
 
                 const remindCalibrateCamera = () => {
                     AlertActions.showPopupInfo('what-is-this-parameter-for?', LANG.suggest_calibrate_camera_first);
-                    Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
+                    BeamboxPreference.write('should_remind_calibrate_camera', false);
                 };
 
                 const isFirmwareVersionValid = async (device) => {

@@ -1,22 +1,16 @@
 define([
     'helpers/api/config',
-    'app/actions/beambox/default-preference',
+    'app/actions/beambox/beambox-preference',
 ], function(
     Config,
-    DefaultPreference
+    BeamboxPreference
 ){
     const workareaMap = new Map();
     workareaMap.set('fbb1b', [4000, 3750]);
     workareaMap.set('fbb1p', [6000, 3750]);
 
-    const workarea = (function(){
-        if (Config().read('beambox-preference') && workareaMap.get(Config().read('beambox-preference')['model'])) {
-            //pass
-        } else {
-            Config().update('beambox-preference', 'model', DefaultPreference.model);
-        }
-        return workareaMap.get(Config().read('beambox-preference')['model']);
-    })();
+    const workarea = workareaMap.get(BeamboxPreference.read('model'));
+
     return {
         dpmm: 10, //seem not to be used by all people QQ
         dimension: {

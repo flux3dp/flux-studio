@@ -1,24 +1,17 @@
 define([
     'helpers/api/config',
-    'app/actions/beambox/default-preference',
+    'app/actions/beambox/beambox-preference',
     'app/actions/beambox/constant',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller'
 ], function (
     ConfigHelper,
-    DefaultPreference,
+    BeamboxPreference,
     Constant,
     ObjectPanelsController,
     LaserPanelController
 ) {
-    const Config = ConfigHelper();
-
     const init = () => {
-        //init config
-        const customPreference = Config.read('beambox-preference');
-        const updatedPreference = $.extend({}, DefaultPreference, customPreference);
-        Config.write('beambox-preference', updatedPreference);
-
         ObjectPanelsController.init('object-panels-placeholder');
         LaserPanelController.init('layer-laser-panel-placeholder');
     };
@@ -45,8 +38,8 @@ define([
                 'id': 'horizontal_guide',
                 'x1': 0,
                 'x2': Constant.dimension.width,
-                'y1': Config.read('beambox-preference')['guide_y0'] * 10,
-                'y2': Config.read('beambox-preference')['guide_y0'] * 10,
+                'y1': BeamboxPreference.read('guide_y0') * 10,
+                'y2': BeamboxPreference.read('guide_y0') * 10,
                 'stroke': '#000',
                 'stroke-width': '2',
                 'stroke-opacity': 0.8,
@@ -58,8 +51,8 @@ define([
 
             svgedit.utilities.assignAttributes(lineVertical, {
                 'id': 'vertical_guide',
-                'x1': Config.read('beambox-preference')['guide_x0'] * 10,
-                'x2': Config.read('beambox-preference')['guide_x0'] * 10,
+                'x1': BeamboxPreference.read('guide_x0') * 10,
+                'x2': BeamboxPreference.read('guide_x0') * 10,
                 'y1': 0,
                 'y2': Constant.dimension.height,
                 'stroke': '#000',

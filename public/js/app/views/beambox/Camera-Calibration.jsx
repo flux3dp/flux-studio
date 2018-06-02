@@ -4,7 +4,7 @@ define([
     'react',
     'reactPropTypes',
     'helpers/i18n',
-    'helpers/api/config',
+    'app/actions/beambox/beambox-preference',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'helpers/device-master',
@@ -22,7 +22,7 @@ define([
     React,
     PropTypes,
     i18n,
-    ConfigHelper,
+    BeamboxPreference,
     Modal,
     Alert,
     DeviceMaster,
@@ -37,7 +37,6 @@ define([
     Constant
 ) {
     const LANG = i18n.lang.camera_calibration;
-    const Config = ConfigHelper();
 
     const cameraCalibrationWebSocket = CameraCalibration();
 
@@ -301,7 +300,7 @@ define([
                     label: LANG.finish,
                     className: 'btn-default btn-alone-right',
                     onClick: () => {
-                        Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
+                        BeamboxPreference.write('should_remind_calibrate_camera', false);
                         onClose();
                     }
                 }]
