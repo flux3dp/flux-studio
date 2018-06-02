@@ -3,7 +3,7 @@ define([
     'helpers/api/config',
     'app/actions/beambox/beambox-init',
     'app/actions/beambox/beambox-global-interaction',
-    'jsx!views/beambox/Left-Panel',
+    'jsx!views/beambox/Left-Panels/Left-Panel',
     'jsx!views/beambox/Bottom-Right-Panel',
     'jsx!pages/svg-editor',
 ], function (

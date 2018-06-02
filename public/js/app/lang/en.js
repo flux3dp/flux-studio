@@ -1003,6 +1003,7 @@ define(function() {
             left_panel: {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
+                advanced: 'Advanced',
                 suggest_calibrate_camera_first: 'Please calibrate the camera. (Menu > Machine > [Your Machine] > Calibrate Camera)\nRefocus platform properly everytime using it to perform better preview result.',
                 end_preview: 'End Preview Mode',
                 unpreviewable_area: 'The area is not allowed to preview',
@@ -1017,6 +1018,16 @@ define(function() {
                     line: 'Line',
                     image: 'Image',
                     text: 'Text'
+                },
+                advanced_panel: {
+                    advance_options: 'Advance Options',
+                    engrave_parameters: 'Engrave Parameters',
+                    engrave_dpi: 'Engrave Resolution',
+                    low: 'Low',
+                    medium: 'Medium',
+                    high: 'High',
+                    cancel: 'Cancel',
+                    save: 'Save'
                 }
             },
             right_panel: {
@@ -1330,7 +1341,8 @@ define(function() {
             uploading_fcode: 'Uploading fcode',
             cant_connect_to_device: 'Cannot connect to the machine, please check your connection',
             unable_to_find_machine: 'Unable to find machine ',
-            unable_to_start: 'Unable to start, please try again. If this continue to happen, please contact us with bug report:\n'
+            unable_to_start: 'Unable to start, please try again. If this continue to happen, please contact us with bug report:\n',
+            camera_fail_to_transmit_image: 'Image transmission failed, try to restart Beambox or contact to us.'
         },
         machine_status: {
             '-10': 'Raw mode',

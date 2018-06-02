@@ -6,6 +6,7 @@ define([], function(){
         'model': 'fbb1b',
         'show_guides': false,
         'guide_x0': 0,
-        'guide_y0': 0
+        'guide_y0': 0,
+        'engrave_dpi': 'medium' // low, medium, high
     };
 });

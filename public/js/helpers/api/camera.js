@@ -5,11 +5,12 @@
 define([
     'helpers/websocket',
     'helpers/rsa-key',
-    'Rx'
-], function(Websocket, rsaKey, Rx) {
+    'Rx',
+    'helpers/i18n'
+], function(Websocket, rsaKey, Rx, i18n) {
 
     const TIMEOUT = 10000;
-
+    const LANG = i18n.lang;
     class Camera {
         constructor() {
             this._ws = null;
@@ -20,7 +21,7 @@ define([
                 .switchMap(x => {
                     // if stream return extremely small blob (i.e. when camera hardware connection fail)
                     if (x.size < 30) {
-                        return Rx.Observable.throw(new Error('Fail to transmit image, try to restart Beambox or contact to us.'));
+                        return Rx.Observable.throw(new Error(LANG.message.camera_fail_to_transmit_image));
                     } else {
                         return Rx.Observable.of(x);
                     }

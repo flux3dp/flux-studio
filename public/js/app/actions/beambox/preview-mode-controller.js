@@ -1,6 +1,7 @@
 define([
     'Rx',
     'app/actions/beambox/preview-mode-background-drawer',
+    'jsx!views/beambox/Left-Panels/Clear-Preview-Graffiti-Button',
     'helpers/device-master',
     'app/constants/device-constants',
     'app/actions/progress-actions',
@@ -14,6 +15,7 @@ define([
 ], function (
     Rx,
     PreviewModeBackgroundDrawer,
+    ClearPreviewGraffitiButton,
     DeviceMaster,
     DeviceConstants,
     ProgressActions,
@@ -34,6 +36,8 @@ define([
             this.cameraOffset = null;
             this.lastPosition = [0, 0]; // in mm
             this.errorCallback = function(){};
+
+            ClearPreviewGraffitiButton.init(() => PreviewModeBackgroundDrawer.clear());
         }
 
         //main functions
@@ -90,11 +94,12 @@ define([
                 $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
                 PreviewModeBackgroundDrawer.draw(imgUrl, x, y);
                 this.isPreviewBlocked = false;
-                $('.left-panel .preview-btns .clear-preview').show();// bad practice ~~~~
+                ClearPreviewGraffitiButton.show();
+                return true;
             } catch (error) {
                 console.log(error);
                 this.errorCallback(error.message);
-                this.isPreviewBlocked = false;
+                this.end();
             }
         }
 
@@ -144,7 +149,9 @@ define([
             })();
 
             for(let i=0; i<points.length; i++) {
-                await this.preview(points[i][0], points[i][1]);
+                if (!(await this.preview(points[i][0], points[i][1]))) {
+                    return;
+                }
             }
         }
 
@@ -153,20 +160,10 @@ define([
             return this._getPhotoAfterMoveTo(movementX, movementY);
         }
 
-        clearGraffiti() {
-            PreviewModeBackgroundDrawer.clear();
-
-            // hide 'x' button
-            $('.left-panel .preview-btns .clear-preview').hide();// bad practice ~~~~
-        }
-
         isPreviewMode() {
             return this.isPreviewModeOn;
         }
 
-        isGraffitied() {
-            return !PreviewModeBackgroundDrawer.isClean();
-        }
 
         //helper functions
 
@@ -258,7 +255,7 @@ define([
 
             // wait for moving camera to take a stable picture, this value need to be optimized
             timeToWait *= 1.2;
-
+            timeToWait += 100;
             this.lastPosition = [movementX, movementY];
             await Rx.Observable.timer(timeToWait).toPromise();
         }
