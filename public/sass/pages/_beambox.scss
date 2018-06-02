@@ -47,13 +47,6 @@
             box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
             width: 440px;
             padding: 0px;
-            .header {
-                padding-left: 20px;
-                font-size: 17px;
-                height: 47px;
-                background-color: #666;
-                color: #f0f0f0;
-            }
             .main-content {
                 height: 120px;
                 padding: 20px;
@@ -86,7 +79,12 @@
                 margin-bottom: 0px;
                 border-top: 1px solid #DDD;
                 .btn {
+                    margin-left: 12px;
+                    margin-right: 0px;
                     line-height: 30px;
+                    &:first-of-type {
+                        margin-right: 12px;
+                    }
                 }
             }
         }

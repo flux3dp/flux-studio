@@ -1020,7 +1020,6 @@ define(function() {
                     text: 'Text'
                 },
                 advanced_panel: {
-                    advance_options: 'Advance Options',
                     engrave_parameters: 'Engrave Parameters',
                     engrave_dpi: 'Engrave Resolution',
                     low: 'Low',

@@ -1018,7 +1018,6 @@ define(function() {
                     text: '文字'
                 },
                 advanced_panel: {
-                    advance_options: '進階選項',
                     engrave_parameters: '雕刻參數',
                     engrave_dpi: '雕刻解析度',
                     low: '低',

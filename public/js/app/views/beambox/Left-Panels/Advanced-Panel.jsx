@@ -73,9 +73,6 @@ define([
             return (
                 <Modal onClose={() => this.props.onClose()}>
                     <div className='advanced-panel'>
-                        <section className='header'>
-                            {LANG.advance_options}
-                        </section>
                         <section className='main-content'>
                             <div className='title'>{LANG.engrave_parameters}</div>
                             <EngraveDpiSlider
