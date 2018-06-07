@@ -193,7 +193,7 @@ define([
     const StepBeforeAnalyzePicture = ({imgBlobUrl, gotoNextStep, onClose}) => {
         const sendPictureThenSetConfig = async () => {
             const resp = await _doSendPictureTask();
-            const result = _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
+            const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
             if(!result) {
                 throw new Error(LANG.analyze_result_fail);
             }
@@ -223,15 +223,26 @@ define([
             return await d.promise();
         };
 
-        const _doAnalyzeResult = (x, y, angle, size) => {
+        const _doAnalyzeResult = async (x, y, angle, squareSize) => {
+            const blobImgSize = await new Promise(resolve => {
+                const img = new Image();
+                img.src = imgBlobUrl;
+                img.onload = () => {
+                    resolve({
+                        width:img.width,
+                        height: img.height
+                    });
+                };
+            });
+
             const offsetX_ideal = Constant.camera.offsetX_ideal; // mm
             const offsetY_ideal = Constant.camera.offsetY_ideal; // mm
             const scaleRatio_ideal = Constant.camera.scaleRatio_ideal;
             const square_size = Constant.camera.calibrationPicture.size; // mm
 
-            const scaleRatio = (square_size * Constant.dpmm) / size;
-            const deviationX = x - Constant.camera.imgWidth/2; // pixel
-            const deviationY = y - Constant.camera.imgHeight/2; // pixel
+            const scaleRatio = (square_size * Constant.dpmm) / squareSize;
+            const deviationX = x - blobImgSize.imgWidth/2; // pixel
+            const deviationY = y - blobImgSize.imgHeight/2; // pixel
 
             const offsetX = -deviationX * scaleRatio / Constant.dpmm + offsetX_ideal;
             const offsetY = -deviationY * scaleRatio / Constant.dpmm + offsetY_ideal;

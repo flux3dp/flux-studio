@@ -23,15 +23,15 @@ define([
                 x: 300 * 60, // mm per minutes
                 y: 100 * 60 // mm per minutes
             },
-            imgWidth: 1280, //pixel
-            imgHeight: 720, //pixel
+            imgWidth: 640, //pixel
+            imgHeight: 280, //pixel
             offsetX_ideal: 20,    //mm
-            offsetY_ideal: 38,    //mm
-            scaleRatio_ideal: (585 / 720), // pixel on studio / pixel on beambox machine; 與焦距成正比
+            offsetY_ideal: 30,    //mm
+            scaleRatio_ideal: (585 / 720) * 2, // pixel on studio / pixel on beambox machine; 與焦距成正比
             calibrationPicture: {
                 centerX: 70, //mm
                 centerY: 70, //mm
-                size: 40 //mm
+                size: 25 //mm
             }
         }
     };
