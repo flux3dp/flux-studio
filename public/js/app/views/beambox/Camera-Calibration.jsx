@@ -241,8 +241,8 @@ define([
             const square_size = Constant.camera.calibrationPicture.size; // mm
 
             const scaleRatio = (square_size * Constant.dpmm) / squareSize;
-            const deviationX = x - blobImgSize.imgWidth/2; // pixel
-            const deviationY = y - blobImgSize.imgHeight/2; // pixel
+            const deviationX = x - blobImgSize.width/2; // pixel
+            const deviationY = y - blobImgSize.height/2; // pixel
 
             const offsetX = -deviationX * scaleRatio / Constant.dpmm + offsetX_ideal;
             const offsetY = -deviationY * scaleRatio / Constant.dpmm + offsetY_ideal;
