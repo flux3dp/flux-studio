@@ -29,25 +29,29 @@ svgEditor.addExtension("overview_window", function(S) {
 	$(".left-panel").append(propsWindowHtml);
 
 	// Define dynamic animation of the view box.
+	const elWorkarea = document.getElementById('workarea');
+	const elCanvas = document.getElementById('svgcanvas');
+	const elMiniview = document.getElementById('overviewMiniView');
+	const elOverviewBox = document.getElementById('overview_window_view_box')
 	var updateViewBox = function(){
-		var portHeight=parseFloat($("#workarea").css("height"));
-		var portWidth=parseFloat($("#workarea").css("width"));
-		var portX=$("#workarea").scrollLeft();
-		var portY=$("#workarea").scrollTop();
-		var windowWidth=parseFloat($("#svgcanvas").css("width"));
-		var windowHeight=parseFloat($("#svgcanvas").css("height"));
-		var overviewWidth=$("#overviewMiniView").attr("width");
-		var overviewHeight=$("#overviewMiniView").attr("height");
+		var portHeight=elWorkarea.clientHeight;
+		var portWidth=elWorkarea.clientWidth;
+		var portX=elWorkarea.scrollLeft;
+		var portY=elWorkarea.scrollTop;
+		var windowWidth= elCanvas.clientWidth
+		var windowHeight= elCanvas.clientHeight;
+		var overviewWidth=elMiniview.clientWidth;
+		var overviewHeight=elMiniview.clientHeight;
 		
 		var viewBoxX=portX/windowWidth*overviewWidth;
 		var viewBoxY=portY/windowHeight*overviewHeight;
 		var viewBoxWidth=portWidth/windowWidth*overviewWidth;
 		var viewBoxHeight=portHeight/windowHeight*overviewHeight;
-		
-		$("#overview_window_view_box").css("min-width",viewBoxWidth+"px");
-		$("#overview_window_view_box").css("min-height",viewBoxHeight+"px");
-		$("#overview_window_view_box").css("top",viewBoxY+"px");
-		$("#overview_window_view_box").css("left",viewBoxX+"px");
+
+		elOverviewBox.style.minWidth = viewBoxWidth + "px";
+		elOverviewBox.style.minHeight = viewBoxHeight + "px";
+		elOverviewBox.style.top = viewBoxY + "px";
+		elOverviewBox.style.left = viewBoxX + "px";
 	};
 	$("#workarea").scroll(function(){
 		if(!(overviewWindowGlobals.viewBoxDragging)){
@@ -121,8 +125,8 @@ svgEditor.addExtension("overview_window", function(S) {
 			viewBoxY=overviewHeight-viewBoxHeight;
 		}
 		
-		$("#overview_window_view_box").css("top",viewBoxY+"px");
-		$("#overview_window_view_box").css("left",viewBoxX+"px");
+		$("#overview_window_view_box")[0].style.top = viewBoxY + "px";
+		$("#overview_window_view_box")[0].style.left = viewBoxX + "px";
 		updateViewPortFromViewBox();
 	});
 	
