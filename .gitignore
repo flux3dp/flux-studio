@@ -69,3 +69,4 @@ _test/tests_output/CHROME_57.0.2987.133_MAC_laser.xml
 _test/tests_output/CHROME_57.0.2987.133_MAC_printing.xml
 
 font-cache/
+build/config.gypi
