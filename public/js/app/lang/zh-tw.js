@@ -997,11 +997,12 @@ define(function() {
                 nolayer: '不分層',
                 no_support_text: 'FLUX Studio 目前不支援由外部匯入文字標籤，請由向量繪圖軟體將文字轉成路徑後再匯入。',
                 power_too_high_damage_laser_tube: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命',
-                should_update_firmware_to_continue: '請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)'
+                should_update_firmware_to_continue: '您的韌體版本不支援最新的軟體改善。為了更良好的使用經驗與雕刻品質，請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)'
             },
             left_panel: {
                 insert_object: '插入物件',
                 preview: '相機預覽',
+                advanced: '進階選項',
                 suggest_calibrate_camera_first: '提醒您：\n第一次使用相機，請先進行相機校正。並在每次使用時將平台對焦，以取得最好的效果。',
                 end_preview: '結束預覽模式',
                 unpreviewable_area: '非相機預覽範圍',
@@ -1016,6 +1017,15 @@ define(function() {
                     line: '線段',
                     image: '圖片',
                     text: '文字'
+                },
+                advanced_panel: {
+                    engrave_parameters: '雕刻參數',
+                    engrave_dpi: '雕刻解析度',
+                    low: '低',
+                    medium: '中',
+                    high: '高',
+                    cancel: '取消',
+                    save: '儲存'
                 }
             },
             right_panel: {
@@ -1332,7 +1342,8 @@ define(function() {
             uploading_fcode: '正在上傳 fcode',
             cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式',
             unable_to_find_machine: '無法連接到機器 ',
-            unable_to_start: '無法開始工作，如果持續發生，請附上錯誤回報，與我們聯絡:\n'
+            unable_to_start: '無法開始工作，如果持續發生，請附上錯誤回報，與我們聯絡:\n',
+            camera_fail_to_transmit_image: '相機傳輸照片異常，請將 Beamox 重新開機。如果問題持續發生，請與我們聯絡。'
         },
         machine_status: {
             '-10': '原生模式',

@@ -3,9 +3,9 @@ define([
     'reactClassset',
     'app/actions/beambox/bottom-right-funcs',
     'app/actions/beambox/preview-mode-controller',
+    'app/actions/beambox/beambox-preference',
     'jsx!widgets/Button-Group',
     'helpers/i18n',
-    'helpers/api/config',
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
@@ -15,9 +15,9 @@ define([
     ReactCx,
     BottomRightFuncs,
     PreviewModeController,
+    BeamboxPreference,
     ButtonGroup,
     i18n,
-    Config,
     Modal,
     PrinterSelector,
     AlertActions,
@@ -49,9 +49,9 @@ define([
                 .some(strength => Number(strength) > 80);
 
             if (isPowerTooHigh) {
-                if(Config().read('beambox-preference')['should_remind_power_too_high_countdown'] > 0) {
+                if(BeamboxPreference.read('should_remind_power_too_high_countdown') > 0) {
                     AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
-                    Config().update('beambox-preference', 'should_remind_power_too_high_countdown', Config().read('beambox-preference')['should_remind_power_too_high_countdown'] - 1);
+                    BeamboxPreference.write('should_remind_power_too_high_countdown', BeamboxPreference.read('should_remind_power_too_high_countdown') - 1);
                 }
             }
 

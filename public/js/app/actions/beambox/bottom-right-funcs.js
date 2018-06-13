@@ -1,7 +1,7 @@
 define([
     'helpers/device-master',
     'helpers/i18n',
-    'helpers/api/config',
+    'app/actions/beambox/beambox-preference',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/beambox/font-funcs',
@@ -11,7 +11,7 @@ define([
 ], function (
     DeviceMaster,
     i18n,
-    Config,
+    BeamboxPreference,
     ProgressActions,
     ProgressConstants,
     FontFuncs,
@@ -114,7 +114,10 @@ define([
         await FontFuncs.convertTextToPathAmoungSvgcontent();
         ProgressActions.close();
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
-        await svgeditorParser.uploadToSvgeditorAPI([uploadFile]);
+        await svgeditorParser.uploadToSvgeditorAPI([uploadFile], {
+            model: BeamboxPreference.read('model'),
+            engraveDpi: BeamboxPreference.read('engrave_dpi')
+        });
         const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for
             svgeditorParser.getTaskCode(
@@ -130,7 +133,7 @@ define([
                         resolve(blob);
                     },
                     fileMode: '-f',
-                    model: Config().read('beambox-preference')['model']
+                    model: BeamboxPreference.read('model')
                 }
             );
         });

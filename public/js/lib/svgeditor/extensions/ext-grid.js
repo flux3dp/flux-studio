@@ -110,7 +110,7 @@ svgEditor.addExtension('view_grid', function() { 'use strict';
 		}
 		ctx.stroke();
 		ctx.beginPath();
-		ctx.strokeStyle = '#AAA';
+		ctx.strokeStyle = 'rgba(0,0,0,0.5)';
 		ctx.moveTo(cur_d, big_int);
 		ctx.lineTo(cur_d, 0);
 

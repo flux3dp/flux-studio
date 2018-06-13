@@ -1,24 +1,18 @@
 define([
-    'jquery',
     'react',
-    'jsx!widgets/Dialog-Menu',
     'app/actions/beambox/svgeditor-function-wrapper',
     'helpers/i18n',
-    'helpers/shortcuts',
 ], function(
-    $,
     React,
-    DialogMenu,
     FnWrapper,
-    i18n,
-    Shortcuts
+    i18n
 ){
 
     const LANG = i18n.lang.beambox.left_panel.insert_object_submenu;
 
     return React.createClass({
         componentDidMount: function(){
-            Shortcuts.on(['esc'], this._closeDialog);
+            $('#svgcanvas').mouseup(this._closeDialog);
         },
         _closeDialog: function() {
             console.log('close dialog');
@@ -28,19 +22,34 @@ define([
         render: function() {
             return (
                 <ul>
-                    <li onClick={FnWrapper.insertRectangle}>
+                    <li onClick={() => {
+                        FnWrapper.insertRectangle();
+                        this._closeDialog();
+                    }}>
                         {LANG.rectangle}
                     </li>
-                    <li onClick={FnWrapper.insertEllipse}>
+                    <li onClick={() => {
+                        FnWrapper.insertEllipse();
+                        this._closeDialog();
+                    }}>
                         {LANG.ellipse}
                     </li>
-                    <li onClick={FnWrapper.insertLine}>
+                    <li onClick={() => {
+                        FnWrapper.insertLine();
+                        this._closeDialog();
+                    }}>
                         {LANG.line}
                     </li>
-                    <li onClick={FnWrapper.importImage}>
+                    <li onClick={() => {
+                        FnWrapper.importImage();
+                        this._closeDialog();
+                    }}>
                         {LANG.image}
                     </li>
-                    <li onClick={FnWrapper.insertText}>
+                    <li onClick={() => {
+                        FnWrapper.insertText();
+                        this._closeDialog();
+                    }}>
                         {LANG.text}
                     </li>
                 </ul>

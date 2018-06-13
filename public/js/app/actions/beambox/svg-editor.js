@@ -175,7 +175,7 @@ define([
                 // EDITOR OPTIONS
                 // Change the following to preferences (already in the Editor Options dialog)?
                 gridSnapping: false,
-                gridColor: '#ddd',
+                gridColor: 'rgba(0,0,0,0.18)',
                 baseUnit: 'px',
                 snappingStep: 10,
                 showRulers: true,

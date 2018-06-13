@@ -1,16 +1,16 @@
 define([
     'react',
-    'helpers/api/config',
     'app/actions/beambox/beambox-init',
     'app/actions/beambox/beambox-global-interaction',
-    'jsx!views/beambox/Left-Panel',
+    'app/actions/beambox/beambox-preference',
+    'jsx!views/beambox/Left-Panels/Left-Panel',
     'jsx!views/beambox/Bottom-Right-Panel',
     'jsx!pages/svg-editor',
 ], function (
     React,
-    Config,
     BeamboxInit,
     BeamboxGlobalInteraction,
+    BeamboxPreference,
     LeftPanel,
     BottomRightPanel,
     SvgEditor
@@ -22,7 +22,7 @@ define([
             BeamboxGlobalInteraction.attach();
 
             // need to run after svgedit packages loaded, so place it at componentDidMouont
-            if (Config().read('beambox-preference')['show_guides']) {
+            if (BeamboxPreference.read('show_guides')) {
                 BeamboxInit.displayGuides();
             }
         }

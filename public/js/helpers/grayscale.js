@@ -36,7 +36,7 @@ define(function() {
                     binary[binaryIndex] = data[i + 3] === 0 ? WHITE : grayscale;
                 }
                 else {
-                    binary[i] = binary[i + 1] = binary[i + 2] = grayscale; 
+                    binary[i] = binary[i + 1] = binary[i + 2] = grayscale;
                     binary[i + 3] = WHITE === grayscale ? 0 : data[i + 3];
                 }
             }
@@ -49,7 +49,7 @@ define(function() {
                         binary[i + j] = 0 < data[i + j] ? WHITE : BLACK;
                     }
 
-                    binary[i + 3] = data[i + 3] > 0 ? 0 : data[i + 3];
+                    binary[i + 3] = data[i + 3] > 0 ? WHITE : BLACK;
                 }
             }
         }

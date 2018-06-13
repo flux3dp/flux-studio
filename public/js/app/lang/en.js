@@ -999,11 +999,12 @@ define(function() {
                 nolayer: 'No Layer',
                 no_support_text: 'FLUX Studio does not support text tag currently. Please transfer text to path before importing.',
                 power_too_high_damage_laser_tube: 'Using lower laser power will extends laser tube\'s lifetime.' ,
-                should_update_firmware_to_continue: 'Please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
+                should_update_firmware_to_continue: 'Your firmware does not support some improvements of FLUX Studio. For better performance and user experience, please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
             },
             left_panel: {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
+                advanced: 'Advanced',
                 suggest_calibrate_camera_first: 'Please calibrate the camera. (Menu > Machine > [Your Machine] > Calibrate Camera)\nRefocus platform properly everytime using it to perform better preview result.',
                 end_preview: 'End Preview Mode',
                 unpreviewable_area: 'The area is not allowed to preview',
@@ -1018,6 +1019,15 @@ define(function() {
                     line: 'Line',
                     image: 'Image',
                     text: 'Text'
+                },
+                advanced_panel: {
+                    engrave_parameters: 'Engrave Parameters',
+                    engrave_dpi: 'Engrave Resolution',
+                    low: 'Low',
+                    medium: 'Medium',
+                    high: 'High',
+                    cancel: 'Cancel',
+                    save: 'Save'
                 }
             },
             right_panel: {
@@ -1331,7 +1341,8 @@ define(function() {
             uploading_fcode: 'Uploading fcode',
             cant_connect_to_device: 'Cannot connect to the machine, please check your connection',
             unable_to_find_machine: 'Unable to find machine ',
-            unable_to_start: 'Unable to start, please try again. If this continue to happen, please contact us with bug report:\n'
+            unable_to_start: 'Unable to start, please try again. If this continue to happen, please contact us with bug report:\n',
+            camera_fail_to_transmit_image: 'Image transmission failed, try to restart Beambox or contact to us.'
         },
         machine_status: {
             '-10': 'Raw mode',
