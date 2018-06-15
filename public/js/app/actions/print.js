@@ -544,8 +544,7 @@ define([
             setDefaultFileName(importedFCode.name);
             if(objects.length === 0) {
                 doFCodeImport(ext);
-            }
-            else {
+            } else {
                 ProgressActions.close();
                 AlertActions.showPopupYesNo(
                     GlobalConstants.IMPORT_FCODE,
@@ -752,8 +751,9 @@ define([
         return d.promise();
     }
 
-    function checkAndReslice(sliceIfChanged = false) {
-        if (localStorage.get('auto-slicing') === 'false' && !sliceIfChanged) return;
+    function checkAndReslice(sliceForSnapshot = false) {
+        if (localStorage.get('auto-slicing') === 'false' && !sliceForSnapshot) return;
+        if (importFromFCode || importFromGCode) return;
         // Check if slicing is necessary
         fullSliceParameters.objs = {};
         objects.forEach((o) => {
@@ -783,6 +783,7 @@ define([
             return;
         } else {
             console.log('Begin Slice:: Remove sliced results');
+            console.trace();
             lastSliceParams = sliceParams;
         }
 
