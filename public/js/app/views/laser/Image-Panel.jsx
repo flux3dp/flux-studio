@@ -1,10 +1,11 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
     'jsx!widgets/Radio-Group',
     'jsx!widgets/Unit-Input',
     'helpers/round'
-], function($, React, RadioGroupView, UnitInput, round) {
+], function($, React, ReactDOM, RadioGroupView, UnitInput, round) {
     'use strict';
 
     return React.createClass({
