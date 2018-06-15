@@ -5340,7 +5340,6 @@ define([
                                             is_svg: false
                                         },
                                         onComplete: function (result) {
-                                            URL.revokeObjectURL(newImage.getAttribute('origImage'));
                                             svgCanvas.setHref(newImage, result.canvas.toDataURL());
                                         }
                                     }
