@@ -990,12 +990,12 @@ define(function() {
         beambox: {
             popup: {
                 select_favor_input_device: 'Better user experience has been optimized<br/>Please select your favorite input device.',
-                select_import_method: 'Select layering method:',
+                select_import_method: 'Select layering style:',
                 touchpad: 'TouchPad',
                 mouse: 'Mouse',
-                layer_by_layer: 'By Layer',
-                layer_by_color: 'By Color',
-                nolayer: 'No Layer',
+                layer_by_layer: 'Layer',
+                layer_by_color: 'Color',
+                nolayer: 'Single Layer',
                 no_support_text: 'FLUX Studio does not support text tag currently. Please transfer text to path before importing.',
                 power_too_high_damage_laser_tube: 'Using lower laser power will extends laser tube\'s lifetime.' ,
                 should_update_firmware_to_continue: 'Your firmware does not support some improvements of FLUX Studio. For better performance and user experience, please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
@@ -1021,7 +1021,7 @@ define(function() {
                 },
                 advanced_panel: {
                     engrave_parameters: 'Engrave Parameters',
-                    engrave_dpi: 'Engrave Resolution',
+                    engrave_dpi: 'Engraving Resolution',
                     low: 'Low',
                     medium: 'Medium',
                     high: 'High',
@@ -1421,7 +1421,7 @@ define(function() {
             cancel: 'CANCEL',
             back: 'BACK',
             finish: 'DONE',
-            please_goto_beambox_first: 'Please go to Beambox Family Engrave App first',
+            please_goto_beambox_first: 'Please switch to Engraving Mode ( Beambox ) in order to use this feature.',
             please_place_paper: 'Please place an A4 white paper at left-top corner of workarea',
             please_refocus: 'Please focus the platform properly',
             taking_picture: 'Taking Picture...',

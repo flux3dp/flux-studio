@@ -5423,12 +5423,15 @@ define([
                         '',
                         [
                             () => {
+                                $('#svg_editor').removeClass('color');
                                 importAs('layer');
                             },
                             () => {
+                                $('#svg_editor').addClass('color');
                                 importAs('color');
                             },
                             () => {
+                                $('#svg_editor').removeClass('color');
                                 importAs('nolayer');
                             }
                         ]
@@ -5685,7 +5688,7 @@ define([
 							0 	   0      0      1  0'
                 });
                 greyscaleFilter.appendChild(greyscaleMatrix);
-                $('#svgroot defs').append(greyscaleFilter);
+                //$('#svgroot defs').append(greyscaleFilter);
                 // $(svgcontent).attr({
                 //     filter: 'url(#greyscaleFilter)'
                 // });
