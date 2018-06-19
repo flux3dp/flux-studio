@@ -3,7 +3,7 @@ define([
     'reactDOM',
     'jsx!widgets/Dialog-Menu',
     'jsx!views/beambox/Left-Panels/Insert-Object-Submenu',
-    'jsx!views/beambox/Left-Panels/Preview-Button',
+    'jsx!views/beambox/Film-Cutter/Download-Films',
     'jsx!views/beambox/Left-Panels/Advanced-Panel',
     'app/actions/beambox/svgeditor-function-wrapper',
     'helpers/i18n',
@@ -12,7 +12,7 @@ define([
     ReactDOM,
     DialogMenu,
     InsertObjectSubmenu,
-    PreviewButton,
+    DownloadFilms,
     AdvancedPanel,
     FnWrapper,
     i18n
@@ -25,6 +25,13 @@ define([
             ReactDOM.render(<AdvancedPanel
                 onClose={() => ReactDOM.unmountComponentAtNode(advancePanelRoot)}
             />, advancePanelRoot);
+        }
+
+        _handleDownloadFilmsClick() {
+            const downloadFilmsRoot = document.getElementById('download-films-panel-placeholder');
+            ReactDOM.render(<DownloadFilms
+                onClose={() => ReactDOM.unmountComponentAtNode(downloadFilmsRoot)}
+            />, downloadFilmsRoot);
         }
 
         _renderInsertObject() {
@@ -43,9 +50,17 @@ define([
             return <DialogMenu ref="dialogMenu" items={[item]}/>;
         }
 
-        _renderPreview() {
+        _renderDownloadFilms() {
             return (
-                <PreviewButton />
+                <div>
+                    <div
+                        className='option'
+                        onClick={() => this._handleDownloadFilmsClick()}
+                    >
+                        {'選擇手機膜'}
+                    </div>
+                    <span id='download-films-panel-placeholder'/>
+                </div>
             );
         }
 
@@ -67,7 +82,7 @@ define([
             return (
                 <div className="left-panel">
                     {this._renderInsertObject()}
-                    {this._renderPreview()}
+                    {this._renderDownloadFilms()}
                     {this._renderAdvanced()}
                 </div>
             );

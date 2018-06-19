@@ -22,18 +22,22 @@ let menuManager;
 global.backend = {alive: false};
 global.devices = {};
 
+// make sure these two files exists
+chkDir(path.join(app.getPath('userData'), 'film-database', 'svg'));
+chkDir(path.join(app.getPath('userData'), 'film-database', 'fcode'));
+
+function chkDir(target) {
+    if (fs.existsSync(target)) {
+        return;
+    } else {
+        chkDir(path.dirname(target));
+        fs.mkdirSync(target);
+    }
+
+}
 function createLogFile() {
     var storageDir = app.getPath('userData');
 
-    function chkDir(target) {
-        if (fs.existsSync(target)) {
-            return;
-        } else {
-            chkDir(path.dirname(target));
-            fs.mkdirSync(target);
-        }
-
-    }
     chkDir(storageDir);
 
     let filename = path.join(app.getPath('userData'), 'backend.log');
@@ -44,8 +48,8 @@ function createLogFile() {
     return f;
 }
 
-let DEBUG = false;
-const FORCE_CLOSE_DEVTOOLS = true;
+let DEBUG = true;
+const FORCE_CLOSE_DEVTOOLS = false;
 const logger = process.stderr.isTTY ? process.stderr : createLogFile();
 
 if(process.argv.indexOf('--debug') > 0) {
@@ -267,6 +271,43 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
     });
 
     event.sender.send(events.RESOLVE_PATH_D_OF_TEXT + key, pathD);
+});
+
+ipcMain.on(events.FILE_WRITE , (event, {filePath, data}) => {
+    const fileAbsPath = path.join(app.getPath('userData'), 'film-database', filePath);
+    chkDir(path.dirname(fileAbsPath));
+    fs.writeFileSync(fileAbsPath, data);
+    event.returnValue = '';
+});
+ipcMain.on(events.FILE_READ , (event, {filePath}) => {
+    const fileAbsPath = path.join(app.getPath('userData'), 'film-database', filePath);
+    const val = fs.readFileSync(fileAbsPath, 'UTF-8');
+    event.returnValue = val;
+});
+ipcMain.on(events.FILE_LS , (event, {dirPath}) => {
+    const dirAbsPath = path.join(app.getPath('userData'), 'film-database', dirPath);
+    const items = fs.readdirSync(dirAbsPath);
+    event.returnValue = items;
+});
+ipcMain.on(events.FILE_RESET , (event) => {
+    const dirAbsPath = path.join(app.getPath('userData'), 'film-database');
+    const rmdir = (dir_path) => {
+        if (fs.existsSync(dir_path)) {
+            fs.readdirSync(dir_path).forEach(function(entry) {
+                var entry_path = path.join(dir_path, entry);
+                if (fs.lstatSync(entry_path).isDirectory()) {
+                    rmdir(entry_path);
+                } else {
+                    fs.unlinkSync(entry_path);
+                }
+            });
+            fs.rmdirSync(dir_path);
+        }
+    };
+    rmdir(dirAbsPath);
+    chkDir(path.join(app.getPath('userData'), 'film-database', 'svg'));
+    chkDir(path.join(app.getPath('userData'), 'film-database', 'fcode'));
+    event.returnValue = '';
 });
 
 console.log('Running FLUX Studio on ', os.arch());

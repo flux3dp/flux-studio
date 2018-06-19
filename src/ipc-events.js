@@ -20,6 +20,9 @@ module.exports = {
     FIND_FONT               : 'FIND_FONT',
     REQUEST_PATH_D_OF_TEXT  : 'REQUEST_PATH_D_OF_TEXT',
     RESOLVE_PATH_D_OF_TEXT  : 'RESOLVE_PATH_D_OF_TEXT',
-
+    FILE_READ               : 'FILE_READ',
+    FILE_WRITE              : 'FILE_WRITE',
+    FILE_LS                 : 'FILE_LS',
+    FILE_RESET              : 'FILE_RESET',
     SET_AS_DEFAULT          : 'SET_AS_DEFAULT'
 };
