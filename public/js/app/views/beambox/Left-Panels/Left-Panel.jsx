@@ -19,28 +19,38 @@ define([
 ) {
     const LANG = i18n.lang.beambox.left_panel;
 
-    class LeftPanel extends React.PureComponent {
-        _handleAdvancedClick() {
-            const advancePanelRoot = document.getElementById('advanced-panel-placeholder');
-            ReactDOM.render(<AdvancedPanel
-                onClose={() => ReactDOM.unmountComponentAtNode(advancePanelRoot)}
-            />, advancePanelRoot);
+    class LeftPanel extends React.Component {
+        constructor() {
+            super();
+            this.state = {
+                isInsertObjectMenuOpen: false,
+                isAdvancedPanelOpen: false
+                // preview button is managed by itself
+            };
+        }
+        _toogleAdvanced(isOpen) {
+            this.setState({
+                isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
+            });
+        }
+        _toogleInsert(isOpen) {
+            this.setState({
+                isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
+            });
         }
 
         _renderInsertObject() {
-            // 歷史的遺骸
-            const item = {
-                label: (
-                    <div>
-                        <span>{LANG.insert_object}</span>
+            const insertObjectPanel = <InsertObjectSubmenu onClose={() => this._toogleInsert(false)}/>;
+            return (
+                <div className='ui ui-dialog-menu'>
+                    <div className='ui-dialog-menu-item'>
+                        <div className='dialog-label' onClick={() => this._toogleInsert(true)}>
+                            {LANG.insert_object}
+                        </div>
+                        {this.state.isInsertObjectMenuOpen ? insertObjectPanel : ''}
                     </div>
-                ),
-                content: (
-                    <InsertObjectSubmenu />
-                ),
-                disable: false
-            };
-            return <DialogMenu ref="dialogMenu" items={[item]}/>;
+                </div>
+            );
         }
 
         _renderPreview() {
@@ -50,15 +60,20 @@ define([
         }
 
         _renderAdvanced() {
+            const advancedPanel = (
+                <AdvancedPanel
+                    onClose={() => this._toogleAdvanced(false)}
+                />
+            );
             return (
                 <div>
                     <div
                         className='option'
-                        onClick={() => this._handleAdvancedClick()}
+                        onClick={() => this._toogleAdvanced(true)}
                     >
                         {LANG.advanced}
                     </div>
-                    <span id='advanced-panel-placeholder'/>
+                    {this.state.isAdvancedPanelOpen ? advancedPanel : ''}
                 </div>
             );
         }
