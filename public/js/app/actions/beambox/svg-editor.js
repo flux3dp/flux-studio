@@ -5392,8 +5392,8 @@ define([
                         reader.readAsText(blob);
                     });
                 }
-                const importSvg = file => {
-                    svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
+                const importSvg = (file, importType, name) => {
+                    svgCanvas.setLatestImportFileName(name || file.name.split('.')[0]);
                     async function importAs(type) {
                         if (type === 'color') {
                             await svgWebSocket.uploadPlainSVG(file);
@@ -5414,28 +5414,31 @@ define([
                             readSVG(file, type);
                         }
                     }
-
-                    AlertActions.showPopupCustomGroup(
-                        'confirm_mouse_input_device',
-                        LANG.popup.select_import_method,
-                        [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
-                        '',
-                        '',
-                        [
-                            () => {
-                                $('#svg_editor').removeClass('color');
-                                importAs('layer');
-                            },
-                            () => {
-                                $('#svg_editor').addClass('color');
-                                importAs('color');
-                            },
-                            () => {
-                                $('#svg_editor').removeClass('color');
-                                importAs('nolayer');
-                            }
-                        ]
-                    );
+                    if (importType) {
+                        importAs(importType);
+                    } else {
+                        AlertActions.showPopupCustomGroup(
+                            'confirm_mouse_input_device',
+                            LANG.popup.select_import_method,
+                            [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
+                            '',
+                            '',
+                            [
+                                () => {
+                                    $('#svg_editor').removeClass('color');
+                                    importAs('layer');
+                                },
+                                () => {
+                                    $('#svg_editor').addClass('color');
+                                    importAs('color');
+                                },
+                                () => {
+                                    $('#svg_editor').removeClass('color');
+                                    importAs('nolayer');
+                                }
+                            ]
+                        );
+                    }
                 };
                 const importBitmap = file => {
                     svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
@@ -5581,6 +5584,9 @@ define([
                 // enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
                 var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
                 $('#tool_import').show().prepend(imgImport);
+
+                //enable phone film chooser to insert image
+                window.importFilmSvg = (svg, name) => importSvg(new Blob([svg]), 'film', name);
 
                 window.populateLayers = populateLayers;
                 window.updateContextPanel = updateContextPanel;

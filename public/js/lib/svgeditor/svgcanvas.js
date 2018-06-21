@@ -5273,18 +5273,22 @@ define([
                 switch (type) {
                     case 'color':
                         return {
-                            symbols: _parseSvgByColor(svg),
+                            symbols: _parseSvgByColor(),
                             confirmedType: 'color'
                         };
-
+                    case 'film':
+                        return {
+                            symbols: _parseSvgByNolayer(),
+                            confirmedType: 'nolayer'
+                        };
                     case 'nolayer':
                         return {
-                            symbols: _parseSvgByNolayer(svg),
+                            symbols: _parseSvgByNolayer(),
                             confirmedType: 'nolayer'
                         };
 
                     case 'layer':
-                        let symbols = _parseSvgByLayer(svg);
+                        let symbols = _parseSvgByLayer();
                         if(symbols) {
                             return {
                                 symbols: symbols,
@@ -5293,7 +5297,7 @@ define([
                         } else {
                             console.log('Not valid layer. Use nolayer parsing option instead');
                             return {
-                                symbols: _parseSvgByNolayer(svg),
+                                symbols: _parseSvgByNolayer(),
                                 confirmedType: 'nolayer'
                             };
                         }
@@ -7324,7 +7328,7 @@ define([
             for (i = 0; i < len && selectedElements[i]; ++i) {
                 var selected = selectedElements[i],
                     selectedRef = selectedElements[i];
-                
+
                 var layerName = $(selected.parentNode).find('title').text();
                 selected.setAttribute("data-origin-layer", layerName);
                 if (!layerDict[layerName]) {

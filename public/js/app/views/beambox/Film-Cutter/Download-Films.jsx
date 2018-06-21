@@ -86,11 +86,13 @@ define([
         handleInsertFile(brand, model, category) {
             try {
                 const content = FilmDatabase.get('svg', brand, model, category, 'enc');
-                // TODO:
-                console.log('content: ', content);
-                console.log('insert', brand, model, category, '!');
             } catch (error) {
                 AlertActions.showPopupError('film-cutter', '檔案解密失敗');
+            }
+            try {
+                window.importFilmSvg(content, `${brand}-${model}-${category}`);
+            } catch (error) {
+                AlertActions.showPopupError('film-cutter', 'SVG 插入發生異常');
             }
             this.props.onClose();
         }
