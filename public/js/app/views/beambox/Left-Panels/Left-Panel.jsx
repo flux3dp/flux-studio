@@ -1,79 +1,85 @@
 define([
     'react',
     'reactDOM',
-    'jsx!widgets/Dialog-Menu',
     'jsx!views/beambox/Left-Panels/Insert-Object-Submenu',
     'jsx!views/beambox/Film-Cutter/Download-Films',
     'jsx!views/beambox/Left-Panels/Advanced-Panel',
-    'app/actions/beambox/svgeditor-function-wrapper',
     'helpers/i18n',
 ], function(
     React,
     ReactDOM,
-    DialogMenu,
     InsertObjectSubmenu,
     DownloadFilms,
     AdvancedPanel,
-    FnWrapper,
     i18n
 ) {
     const LANG = i18n.lang.beambox.left_panel;
 
-    class LeftPanel extends React.PureComponent {
-        _handleAdvancedClick() {
-            const advancePanelRoot = document.getElementById('advanced-panel-placeholder');
-            ReactDOM.render(<AdvancedPanel
-                onClose={() => ReactDOM.unmountComponentAtNode(advancePanelRoot)}
-            />, advancePanelRoot);
-        }
-
-        _handleDownloadFilmsClick() {
-            const downloadFilmsRoot = document.getElementById('download-films-panel-placeholder');
-            ReactDOM.render(<DownloadFilms
-                onClose={() => ReactDOM.unmountComponentAtNode(downloadFilmsRoot)}
-            />, downloadFilmsRoot);
-        }
-
-        _renderInsertObject() {
-            // 歷史的遺骸
-            const item = {
-                label: (
-                    <div>
-                        <span>{LANG.insert_object}</span>
-                    </div>
-                ),
-                content: (
-                    <InsertObjectSubmenu />
-                ),
-                disable: false
+    class LeftPanel extends React.Component {
+        constructor() {
+            super();
+            this.state = {
+                isInsertObjectMenuOpen: false,
+                isAdvancedPanelOpen: false,
+                isDownloadFilmsOpen: false
+                // preview button is managed by itself
             };
-            return <DialogMenu ref="dialogMenu" items={[item]}/>;
+        }
+        componentDidMount() {
+            $('#svgcanvas').mouseup(() => {
+                this._toggleInsert(false);
+            });
+        }
+        _toggleAdvanced(isOpen) {
+            this.setState({
+                isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
+            });
+        }
+        _toggleInsert(isOpen) {
+            this.setState({
+                isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
+            });
+        }
+        _toggleDownloadFilms(isOpen) {
+            this.setState({
+                isDownloadFilmsOpen: isOpen === undefined ? !this.state.isDownloadFilmsOpen : isOpen
+            });
         }
 
         _renderDownloadFilms() {
+            const downloadFilmsPanel = <DownloadFilms onClose={() => this._toggleDownloadFilms(false)}/>;
             return (
                 <div>
-                    <div
-                        className='option'
-                        onClick={() => this._handleDownloadFilmsClick()}
-                    >
+                    <div className='option' onClick={() => this._toggleDownloadFilms()}>
                         {'選擇手機膜'}
                     </div>
-                    <span id='download-films-panel-placeholder'/>
+                    {this.state.isDownloadFilmsOpen ? downloadFilmsPanel : ''}
+                </div>
+            );
+        }
+
+        _renderInsertObject() {
+            const insertObjectPanel = <InsertObjectSubmenu onClose={() => this._toggleInsert(false)}/>;
+            return (
+                <div className='ui ui-dialog-menu'>
+                    <div className='ui-dialog-menu-item'>
+                        <div className='dialog-label' onClick={() => this._toggleInsert()}>
+                            {LANG.insert_object}
+                        </div>
+                        {this.state.isInsertObjectMenuOpen ? insertObjectPanel : ''}
+                    </div>
                 </div>
             );
         }
 
         _renderAdvanced() {
+            const advancedPanel = <AdvancedPanel onClose={() => this._toggleAdvanced(false)}/>;
             return (
                 <div>
-                    <div
-                        className='option'
-                        onClick={() => this._handleAdvancedClick()}
-                    >
+                    <div className='option' onClick={() => this._toggleAdvanced()} style={{display: 'inline-block', width: 'unset'}}>
                         {LANG.advanced}
                     </div>
-                    <span id='advanced-panel-placeholder'/>
+                    {this.state.isAdvancedPanelOpen ? advancedPanel : ''}
                 </div>
             );
         }

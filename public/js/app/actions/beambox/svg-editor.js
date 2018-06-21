@@ -5312,7 +5312,7 @@ define([
                         reader = new FileReader();
                         reader.onloadend = function (e) {
                             // let's insert the new image until we know its dimensions
-                            var insertNewImage = function (width, height) {
+                            var insertNewImage = function (img, width, height) {
                                 var newImage = svgCanvas.addSvgElementFromJson({
                                     element: 'image',
                                     attr: {
@@ -5325,9 +5325,10 @@ define([
                                         preserveAspectRatio: 'none',
                                         'data-threshold': 100,
                                         'data-shading': true,
-                                        origImage: e.target.result
+                                        origImage: img.src
                                     }
                                 });
+
                                 ImageData(
                                     newImage.getAttribute('origImage'), {
                                         height: height,
@@ -5339,7 +5340,7 @@ define([
                                             is_svg: false
                                         },
                                         onComplete: function (result) {
-                                            svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
+                                            svgCanvas.setHref(newImage, result.canvas.toDataURL());
                                         }
                                     }
                                 );
@@ -5355,15 +5356,16 @@ define([
                             var imgWidth = 100;
                             var imgHeight = 100;
                             var img = new Image();
-                            img.src = e.target.result;
+                            var blob = new Blob([reader.result]);
+                            img.src = URL.createObjectURL(blob);
                             img.style.opacity = 0;
                             img.onload = function () {
                                 imgWidth = img.width;
                                 imgHeight = img.height;
-                                insertNewImage(imgWidth, imgHeight);
+                                insertNewImage(img, imgWidth, imgHeight);
                             };
                         };
-                        reader.readAsDataURL(file);
+                        reader.readAsArrayBuffer(file);
                     });
                 }
                 function readSVG(blob, type) {
@@ -5420,9 +5422,18 @@ define([
                         '',
                         '',
                         [
-                            () => importAs('layer'),
-                            () => importAs('color'),
-                            () => importAs('nolayer')
+                            () => {
+                                $('#svg_editor').removeClass('color');
+                                importAs('layer');
+                            },
+                            () => {
+                                $('#svg_editor').addClass('color');
+                                importAs('color');
+                            },
+                            () => {
+                                $('#svg_editor').removeClass('color');
+                                importAs('nolayer');
+                            }
                         ]
                     );
                 };
@@ -5677,10 +5688,10 @@ define([
 							0 	   0      0      1  0'
                 });
                 greyscaleFilter.appendChild(greyscaleMatrix);
-                $('#svgroot defs').append(greyscaleFilter);
-                $(svgcontent).attr({
-                    filter: 'url(#greyscaleFilter)'
-                });
+                //$('#svgroot defs').append(greyscaleFilter);
+                // $(svgcontent).attr({
+                //     filter: 'url(#greyscaleFilter)'
+                // });
             })();
         };
 

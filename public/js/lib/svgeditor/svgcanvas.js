@@ -5519,7 +5519,7 @@ define([
                     fill-opacity: 1 !important;
                     stroke-width: 0 !important;
                 }
-                *[data-wireframe] {
+                #svg_editor:not(.color) *[data-wireframe] {
                     fill-opacity: 0 !important;
                     stroke: #000 !important;
                     stroke-width: 1px !important;
@@ -5529,14 +5529,17 @@ define([
                     vector-effect: non-scaling-stroke !important;
                     filter: none !important;
                 }
-                #${symbol.id} * {
+                #svg_editor:not(.color) #${symbol.id} * {
                     fill-opacity: 0;
                     stroke: #000 !important;
+                    filter: none;
+                }
+                #svg_editor #${symbol.id} * {
                     stroke-width: 1px !important;
+                    vector-effect: non-scaling-stroke !important;
                     stroke-opacity: 1.0;
                     stroke-dasharray: 0;
                     opacity: 1;
-                    vector-effect: non-scaling-stroke !important;
                     filter: none;
                 }
                 #${symbol.id} {
@@ -7316,27 +7319,39 @@ define([
             var batchCmd = new svgedit.history.BatchCommand('Cut Elements');
             var len = selectedElements.length;
             var selectedCopy = []; //selectedElements is being deleted
-            for (i = 0; i < len; ++i) {
-                var selected = selectedElements[i];
-                if (selected == null) {
-                    break;
+            var layerDict = {}, layerCount = 0;
+
+            for (i = 0; i < len && selectedElements[i]; ++i) {
+                var selected = selectedElements[i],
+                    selectedRef = selectedElements[i];
+                
+                var layerName = $(selected.parentNode).find('title').text();
+                selected.setAttribute("data-origin-layer", layerName);
+                if (!layerDict[layerName]) {
+                    layerDict[layerName] = true;
+                    layerCount++;
                 }
 
-                var parent = selected.parentNode;
-                var t = selected;
-
                 // this will unselect the element and remove the selectedOutline
-                selectorManager.releaseSelector(t);
+                selectorManager.releaseSelector(selectedRef);
 
                 // Remove the path if present.
-                svgedit.path.removePath_(t.id);
+                svgedit.path.removePath_(selectedRef.id);
 
-                var nextSibling = t.nextSibling;
-                var elem = parent.removeChild(t);
+                var nextSibling = selectedRef.nextSibling;
+                var elem = parent.removeChild(selectedRef);
                 selectedCopy.push(selected); //for the copy
                 selectedElements[i] = null;
                 batchCmd.addSubCommand(new RemoveElementCommand(elem, nextSibling, parent));
             }
+
+            // If there is only one layer selected, don't force user to paste on the same layer
+            if (layerCount == 1) {
+                for(i = 0; i < selectedCopy.length; i++) {
+                    selectedCopy[i].removeAttribute("data-origin-layer");
+                }
+            }
+
             if (!batchCmd.isEmpty()) {
                 addCommandToHistory(batchCmd);
             }
@@ -7349,6 +7364,25 @@ define([
         // Function: copySelectedElements
         // Remembers the current selected elements on the clipboard
         this.copySelectedElements = function () {
+            var layerDict = {}, layerCount = 0;
+
+            for (var i = 0; i < selectedElements.length && selectedElements[i]; ++i) {
+                var selected = selectedElements[i],
+                    layerName = $(selected.parentNode).find('title').text();
+                selected.setAttribute("data-origin-layer", layerName);
+                if (!layerDict[layerName]) {
+                    layerDict[layerName] = true;
+                    layerCount++;
+                }
+            }
+
+            // If there is only one layer selected, don't force user to paste on the same layer
+            if (layerCount == 1) {
+                for(i = 0; i < selectedElements.length; i++) {
+                    selectedElements[i].removeAttribute("data-origin-layer");
+                }
+            }
+
             canvas.clipBoard = $.merge([], selectedElements);
         };
 
@@ -7377,7 +7411,12 @@ define([
                 }
 
                 pasted.push(copy);
-                (current_group || drawing.getCurrentLayer()).appendChild(copy);
+                if (copy.getAttribute("data-origin-layer") && cb.length > 1) {
+                    var layer = drawing.getLayerByName(copy.getAttribute("data-origin-layer")) || (current_group || drawing.getCurrentLayer());
+                    layer.appendChild(copy);
+                } else {
+                    (current_group || drawing.getCurrentLayer()).appendChild(copy);
+                }
                 batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(copy));
 
                 restoreRefElems(copy);
