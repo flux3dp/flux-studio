@@ -1342,7 +1342,7 @@ define(function() {
             cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式',
             unable_to_find_machine: '無法連接到機器 ',
             unable_to_start: '無法開始工作，如果持續發生，請附上錯誤回報，與我們聯絡:\n',
-            camera_fail_to_transmit_image: '相機傳輸照片異常，請將 Beamox 重新開機。如果問題持續發生，請與我們聯絡。'
+            camera_fail_to_transmit_image: '相機傳輸照片異常，請將 Beambox 重新開機。如果問題持續發生，請與我們聯絡。'
         },
         machine_status: {
             '-10': '原生模式',
