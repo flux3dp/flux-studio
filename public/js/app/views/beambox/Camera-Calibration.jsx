@@ -282,7 +282,7 @@ define([
                                 gotoNextStep(STEP_FINISH);
                             } catch (error) {
                                 console.log(error);
-                                AlertActions.showPopupError('menu-item', error.message);
+                                AlertActions.showPopupError('menu-item', error.toString().replace('Error: ', ''));
                                 gotoNextStep(STEP_REFOCUS);
                             }
                         }
