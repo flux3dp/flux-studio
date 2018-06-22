@@ -96,14 +96,14 @@ define([
                 URL.revokeObjectURL(imgUrl);
                 return img;
             };
-            const resize1280x640ImageTo640x280 = async () => {
+            const resize1280x720ImageTo640x280 = async () => {
                 const img = await imageLoadBlob();
-                console.assert(img.width === 1280 && img.height === 640, 'image should be 1280x640',img.width, img.height);
+                console.assert(img.width === 1280 && img.height === 720, 'image should be 1280x720',img.width, img.height);
 
                 const canvas = document.createElement('canvas');
                 canvas.width = 640;
                 canvas.height = 280;
-                canvas.getContext('2d').drawImage(img, 0, -20, 640, 320); // resize
+                canvas.getContext('2d').drawImage(img, 0, -40, 640, 360); // resize
                 const preprocessedBlob = await new Promise(resolve =>
                     canvas.toBlob(b => resolve(b))
                 );
@@ -127,7 +127,7 @@ define([
             if (VersionChecker(this._device.version).meetRequirement('BEAMBOX_CAMERA_SPEED_UP')) {
                 return await crop640x480ImageTo640x280();
             } else {
-                return await resize1280x640ImageTo640x280();
+                return await resize1280x720ImageTo640x280();
             }
         }
     }
