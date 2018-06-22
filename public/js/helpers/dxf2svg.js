@@ -312,8 +312,8 @@
         var order = entity.degree + 1;
         var knots = entity.knots;
         polyline = [];
-        for (var t = 0; t <= 100; t += 1) {
-          var p = bspline(t / 100, order, controlPoints, knots);
+        for (var t = 0; t <= 500; t += 1) {
+          var p = bspline(t / 500, order, controlPoints, knots);
           polyline.push(p);
         }
       }
