@@ -1,43 +1,43 @@
 define([
     'react',
     'helpers/i18n',
-    'helpers/api/cloud',
+    'jsx!widgets/Control',
+    'jsx!views/cloud/check-sms-verification-code',
+    'app/actions/alert-actions',
+    'app/actions/film-cutter/film-cutter-cloud',
 ], function(
     React,
     i18n,
-    CloudApi
+    Control,
+    CheckSmsVerificationCode,
+    AlertActions,
+    FilmCutterCloud
 ) {
     const LANG = i18n.lang.settings.flux_cloud;
 
-    const Controls = ({label, children, errorMessage}) => {
-        const labelField = label ? <div className="label">{label}</div> : '';
-        const errorField = errorMessage ? <div className="error">{errorMessage}</div> : '';
-        return (
-            <div className="controls">
-                {labelField}
-                <div className="control">{children}</div>
-                {errorField}
-            </div>
-        );
-    };
+    const STEP_SIGN_UP_FORM = Symbol();
+    const STEP_CHECK_SMS_VERIFAICATION_CODE = Symbol();
 
     return class SignUp extends React.Component {
         constructor() {
             super();
             this.state = {
+                currentStep: STEP_SIGN_UP_FORM,
                 // input field:
                 phonePrefix: '+86',
                 phoneNumber: '',
-                realName: '',
+                lastName: '',
+                firstName: '',
                 password: '',
                 rePassword: '',
                 shopName: '',
-                address: '',
+                shopAddress: '',
                 agreeToTerms: false,
 
                 //error message:
                 showPhoneNumberMissingError: false,
-                showRealNameMissingError: false,
+                showLastNameMissingError: false,
+                showFirstNameMissingError: false,
                 showPasswordMissingError: false,
                 showRePasswordUnmatchError: false,
                 showShopNameMissingError: false,
@@ -49,24 +49,30 @@ define([
             };
         }
 
+        getFullPhoneNumber() {
+            return this.state.phonePrefix + this.state.phoneNumber;
+        }
+
         handleInputChange(field, value) {
             this.setState({
                 [field]: value
             });
         }
 
-        checkValidation() {
+        validateForm() {
             const isPhoneNumberMissing = () => this.state.phoneNumber === '';
-            const isRealNameMissing = () => this.state.realName === '';
+            const isLastNameMissing = () => this.state.lastName === '';
+            const isFirstNameMissing = () => this.state.firstName === '';
             const isPasswordMissing = () => this.state.password === '';
             const isRePasswordUnmatch = () => this.state.password !== this.state.rePassword;
             const isShopNameMissing = () => this.state.shopName === '';
-            const isAddressMissing = () => this.state.address === '';
+            const isAddressMissing = () => this.state.shopAddress === '';
             const isAgreeToTermsMissing = () => this.state.agreeToTerms === false;
 
             this.setState({
                 showPhoneNumberMissingError: isPhoneNumberMissing(),
-                showRealNameMissingError: isRealNameMissing(),
+                showLastNameMissingError: isLastNameMissing(),
+                showFirstNameMissingError: isFirstNameMissing(),
                 showPasswordMissingError: isPasswordMissing(),
                 showRePasswordUnmatchError: isRePasswordUnmatch(),
                 showShopNameMissingError: isShopNameMissing(),
@@ -76,7 +82,8 @@ define([
 
             return (
                 !isPhoneNumberMissing() &&
-                !isRealNameMissing() &&
+                !isLastNameMissing() &&
+                !isFirstNameMissing() &&
                 !isPasswordMissing() &&
                 !isRePasswordUnmatch() &&
                 !isShopNameMissing() &&
@@ -86,39 +93,49 @@ define([
         }
 
         async handleSignUpClick() {
-            if(this.checkValidation()) {
-                this.setState({ isProcessing: true });
-                const {phonePrefix, phoneNumber, realName, password, shopName, address} = this.state;
-                // const response = await CloudApi.signUp(fullName, email, password);
-                // if(response.ok) {
-                //     this.setState({ processing: false });
-                //     alert(LANG.check_email);
-                location.hash = '#studio/cloud/sign-up-captcha';
-                // } else {
-                //     const error = await response.json();
-                //     this.setState({
-                //         processing: false,
-                //         emailError: true,
-                //         emailErrorMessage: LANG[error.message.toLowerCase()]
-                //     });
-                // }
+            if(this.validateForm()) {
+                try {
+                    await FilmCutterCloud.sendSMSVerificationCode(this.getFullPhoneNumber(), 'registration');
+                    this.setState({ currentStep: STEP_CHECK_SMS_VERIFAICATION_CODE });
+                } catch (error) {
+                    console.log('error: ', error);
+                    AlertActions.showPopupError('sign-up-form', error.message || error.toString());
+                }
             }
         }
-
         handleCancelClick() {
             location.hash = '#studio/cloud/sign-in';
         }
 
-        render() {
+        async signUpToCloud(verificationCode) {
+            console.log('signUpToCloud');
+            try {
+                await FilmCutterCloud.registration({
+                    phone_number: this.getFullPhoneNumber(),
+                    password: this.state.password,
+                    last_name: this.state.lastName,
+                    first_name: this.state.firstName,
+                    shop_name: this.state.shopName,
+                    shop_address: this.state.shopAddress,
+                    verification_code: verificationCode
+                });
+                AlertActions.showPopupInfo('sign-up-form', '已成功註冊');
+                location.hash = '#studio/cloud/sign-in';
+            } catch (error) {
+                console.log('error: ', error);
+                AlertActions.showPopupError('sign-up-form', error.message || error.toString());
+            }
+        }
+
+        _renderSignUpForm() {
             return(
                 <div className="cloud">
                     <div className="container">
                         <div className="title">
                             <h3>{LANG.sign_up}</h3>
-                            <h2>{LANG.flux_cloud}</h2>
                         </div>
                         <div className='row'>
-                            <Controls label={'帳號(手機號)'} errorMessage={this.state.showPhoneNumberMissingError ? '請輸入手機號' : ' '}>
+                            <Control label={'帳號(手機號)'} errorMessage={this.state.showPhoneNumberMissingError ? '請輸入手機號' : ' '}>
                                 <select
                                     value={this.state.phonePrefix}
                                     onChange={e => this.handleInputChange('phonePrefix', e.target.value)}
@@ -137,20 +154,29 @@ define([
                                     placeholder={'手機號'}
                                     style={{display: 'inline-block', width: '190px'}}
                                 />
-                            </Controls>
-                            <Controls label={'真實姓名'} errorMessage={this.state.showRealNameMissingError ? '請輸入真實姓名' : ' '}>
+                            </Control>
+                            <Control label={'真實姓名'} errorMessage={this.state.showLastNameMissingError || this.state.showFirstNameMissingError ? '請輸入真實姓名' : ' '}>
                                 <input
                                     type='text'
-                                    value={this.state.realName}
-                                    onChange={e => this.handleInputChange('realName', e.target.value)}
-                                    onBlur={e => this.handleInputChange('realName', e.target.value)}
-                                    placeholder={'真實姓名'}
+                                    value={this.state.lastName}
+                                    onChange={e => this.handleInputChange('lastName', e.target.value)}
+                                    onBlur={e => this.handleInputChange('lastName', e.target.value)}
+                                    placeholder={'姓'}
+                                    style={{width: '100px'}}
                                 />
-                            </Controls>
+                                <input
+                                    type='text'
+                                    value={this.state.firstName}
+                                    onChange={e => this.handleInputChange('firstName', e.target.value)}
+                                    onBlur={e => this.handleInputChange('firstName', e.target.value)}
+                                    placeholder={'名'}
+                                    style={{width: '180px'}}
+                                />
+                            </Control>
                         </div>
 
                         <div className="row">
-                            <Controls label={LANG.password} errorMessage={this.state.showPasswordMissingError ? '請輸入密碼' : ' '}>
+                            <Control label={LANG.password} errorMessage={this.state.showPasswordMissingError ? '請輸入密碼' : ' '}>
                                 <input
                                     type='password'
                                     value={this.state.password}
@@ -158,8 +184,8 @@ define([
                                     onBlur={e => this.handleInputChange('password', e.target.value)}
                                     placeholder={LANG.password}
                                 />
-                            </Controls>
-                            <Controls label={LANG.rePassword} errorMessage={this.state.showRePasswordUnmatchError ? '密碼不符合' : ' '}>
+                            </Control>
+                            <Control label={LANG.rePassword} errorMessage={this.state.showRePasswordUnmatchError ? '密碼不符合' : ' '}>
                                 <input
                                     type='password'
                                     value={this.state.rePassword}
@@ -167,11 +193,11 @@ define([
                                     onBlur={e => this.handleInputChange('rePassword', e.target.value)}
                                     placeholder={LANG.rePassword}
                                 />
-                            </Controls>
+                            </Control>
                         </div>
 
                         <div className="row">
-                            <Controls label={'店家名'} errorMessage={this.state.showShopNameMissingError ? '請輸入店家名' : ' '}>
+                            <Control label={'店家名'} errorMessage={this.state.showShopNameMissingError ? '請輸入店家名' : ' '}>
                                 <input
                                     type='text'
                                     value={this.state.shopName}
@@ -179,19 +205,19 @@ define([
                                     onBlur={e => this.handleInputChange('shopName', e.target.value)}
                                     placeholder={'店家名'}
                                 />
-                            </Controls>
-                            <Controls label={'地址'} errorMessage={this.state.showAddressMissingError ? '請輸入地址' : ' '}>
+                            </Control>
+                            <Control label={'店家地址'} errorMessage={this.state.showAddressMissingError ? '請輸入地址' : ' '}>
                                 <input
                                     type='text'
-                                    value={this.state.address}
-                                    onChange={e => this.handleInputChange('address', e.target.value)}
-                                    onBlur={e => this.handleInputChange('address', e.target.value)}
-                                    placeholder={'地址'}
+                                    value={this.state.shopAddress}
+                                    onChange={e => this.handleInputChange('shopAddress', e.target.value)}
+                                    onBlur={e => this.handleInputChange('shopAddress', e.target.value)}
+                                    placeholder={'店家地址'}
                                 />
-                            </Controls>
+                            </Control>
                         </div>
 
-                        <Controls>
+                        <Control>
                             <input
                                 type='checkbox'
                                 className='pointer'
@@ -201,7 +227,7 @@ define([
                             <label>
                                 同意<a href="http://">用戶使用條款</a>
                             </label>
-                        </Controls>
+                        </Control>
                         <div className="processing-error">
                             <label>{this.state.showAgreeToTermsMissingError ? LANG.agree_to_terms : ''}</label>
                             <br/>
@@ -222,5 +248,22 @@ define([
                 </div>
             );
         }
+        _renderCheckSmsVerificationCode() {
+            return (
+                <CheckSmsVerificationCode
+                    phoneNumber={this.getFullPhoneNumber()}
+                    onNext={(code) => this.signUpToCloud(code)}
+                    onBack={() => this.setState({currentStep: STEP_SIGN_UP_FORM})}
+                    reason={'registration'}
+                />);
+        }
+        render() {
+            if (this.state.currentStep === STEP_SIGN_UP_FORM) {
+                return this._renderSignUpForm();
+            } else if (this.state.currentStep === STEP_CHECK_SMS_VERIFAICATION_CODE) {
+                return this._renderCheckSmsVerificationCode();
+            }
+        }
     };
+
 });

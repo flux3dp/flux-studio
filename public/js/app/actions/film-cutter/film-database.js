@@ -59,27 +59,16 @@ define([
         }
         async syncWithCloud() {
             const last_sync_film_data = RecordManager.read('last_sync_film_data');
-            const {info, synchronize_time} = await FilmCutterCloud
-                .get('api/data/new-film-info', {last_sync_film_data})
-                .then(res => res.json());
+            const {info, synchronize_time} = await FilmCutterCloud.newFilmInfo(last_sync_film_data);
 
             const flatIds = info.map(x => x.id);
             const chunkSize = 30;
             // split ids into chunk, will not receive all data once. need to request multiple times
             await Promise.all(
                 chunkArray(flatIds, chunkSize).map(async ids => {
-                    const urlParaStr = ids.map(id => `id=${id}`)
-                        .concat([`modified_before=${synchronize_time}`])
-                        .join('&');
-
-                    const blob = await FilmCutterCloud
-                        .get(`api/data/new-film/?${urlParaStr}`)
-                        .then(res => res.blob());
-
+                    const blob = await FilmCutterCloud.newFilm(ids, synchronize_time);
                     const arrayBuffer = await readBlobAsArrayBuffer(blob);
-
                     const extractedFiles = await Untar(arrayBuffer);
-
                     await Promise.all(
                         extractedFiles.map(async file => {
                             const name = decodeURIComponent(escape(file.name)).replace('film_files/', '');
@@ -98,7 +87,8 @@ define([
             get: () => {},
             set: () => {},
             ls: () => {},
-            reset: () => {}
+            reset: () => {},
+            syncWithCloud: () => {}
         };
     }
     return new FilmDatabase();
