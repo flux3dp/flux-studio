@@ -1,20 +1,27 @@
 define([
     'react',
     'helpers/i18n',
-    'helpers/api/cloud'
+    'helpers/seperate-phone-number',
+    'app/actions/alert-actions',
+    'app/actions/film-cutter/record-manager',
+    'app/actions/film-cutter/film-cutter-cloud',
 ], function(
     React,
     i18n,
-    CloudApi
+    SeperatePhoneNumber,
+    AlertActions,
+    RecordManager,
+    FilmCutterCloud
 ) {
     const LANG = i18n.lang.settings.flux_cloud;
 
     return class StepFillInPhone extends React.Component {
         constructor(props) {
             super(props);
+            const {prefix, number} = SeperatePhoneNumber(this.props.phone || RecordManager.read('account'));
             this.state = {
-                phonePrefix: '+86',
-                phoneNumber: '',
+                phonePrefix: prefix || '+86',
+                phoneNumber: number || '',
             };
         }
 
@@ -34,15 +41,17 @@ define([
             if (this.state.phoneNumber === '') {
                 return;
             }
-            const phone = this.state.phonePrefix + this.state.phoneNumber;
-            this.props.setPhone(phone);
-            this.props.goToNextStep();
-            // const response = await CloudApi.resetPassword(phone);
-            // if(response.ok) {
-            //     location.hash = '#studio/cloud/email-sent';
-            // } else {
-            //     alert(LANG.contact_us);
-            // }
+            const phone = `${this.state.phonePrefix}${this.state.phoneNumber}`;
+            if(this.state.phoneNumber) {
+                try {
+                    await FilmCutterCloud.sendSMSVerificationCode(phone, 'forget-password');
+                    this.props.setPhone(phone);
+                    this.props.gotoNextStep();
+                } catch (error) {
+                    console.log('error: ', error);
+                    AlertActions.showPopupError('forget-password', error.message || error.toString());
+                }
+            }
         }
 
         render() {

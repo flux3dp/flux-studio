@@ -2,38 +2,33 @@ define([
     'react',
     'helpers/i18n',
     'helpers/sprintf',
-    'helpers/api/cloud',
-    'plugins/classnames/index',
-    'helpers/nwjs/menu-factory',
+    'helpers/seperate-phone-number',
+    'app/actions/alert-actions',
+    'app/actions/film-cutter/record-manager',
+    'app/actions/film-cutter/film-cutter-cloud',
 ], function(
     React,
     i18n,
     Sprintf,
-    CloudApi,
-    ClassNames,
-    menuFactory
+    SeperatePhoneNumber,
+    AlertActions,
+    RecordManager,
+    FilmCutterCloud
 ) {
     const LANG = i18n.lang.settings.flux_cloud;
     return React.createClass({
 
         getInitialState: function() {
+            const {prefix, number} = SeperatePhoneNumber(RecordManager.read('account'));
             return {
-                phonePrefix: '+86',
-                phoneNumber: '',
-                password: '',
+                phonePrefix: prefix || '+86',
+                phoneNumber: number || '',
+                password: RecordManager.read('password') || '',
                 processing: false,
+                errorMessage: ''
             };
         },
 
-        componentDidMount: async function() {
-            const response = await CloudApi.getMe();
-            if(response.ok) {
-                const responseBody = response.json();
-                if(responseBody) {
-                    location.hash = '#/studio/cloud/bind-machine';
-                }
-            }
-        },
 
         _handlePasswordChange: function(e) {
             this.setState({
@@ -71,20 +66,20 @@ define([
                 errorMessage: '',
                 processing: true
             });
+            try {
+                await FilmCutterCloud.login(phone, password)
+                    .catch(error => {throw new Error(error.message || '登入失敗');});
+                RecordManager.write('account', phone);
+                RecordManager.write('password', password);
 
-            const response = await CloudApi.signIn(phone, password);
-            const responseBody = await response.json();
-            if(response.ok) {
-                const { nickname } = responseBody;
-                const displayName = nickname || phone;
-                menuFactory.methods.updateAccountDisplay(displayName);
-                location.hash = '#/studio/cloud/bind-machine';
-            } else {
-                this.setState({
-                    errorMessage: LANG[responseBody.message.toLowerCase()] || LANG.SERVER_INTERNAL_ERROR,
-                    processing: false
-                });
-                return;
+                await FilmCutterCloud.sync()
+                    .catch(error => {throw new Error(error.message || '同步資料失敗');});
+
+                location.hash = '#/studio/cloud/my-account';
+            } catch (error) {
+                this.setState({errorMessage: error.message || '異常錯誤'});
+            } finally {
+                this.setState({processing: false});
             }
         },
 

@@ -168,7 +168,7 @@ define([
                 },
 
                 componentWillMount: function() {
-                    if(window["electron"]) {
+                    if(window['electron']) {
                         let { ipc, events } = window.electron;
                         CloudApi.getMe().then(response => {
                             if(response.ok) {
@@ -176,8 +176,8 @@ define([
                                     let { nickname, email } = content || {};
                                     let displayName = (nickname || email || '');
 
-                                    console.log('account is', content);
-                                    ipc.send(events.UPDATE_ACCOUNT, content);
+                                    console.log('account is', displayName);
+                                    ipc.send(events.UPDATE_ACCOUNT, {});
                                 });
                             }
                             else {

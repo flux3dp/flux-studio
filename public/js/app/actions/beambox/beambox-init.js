@@ -2,18 +2,34 @@ define([
     'helpers/api/config',
     'app/actions/beambox/beambox-preference',
     'app/actions/beambox/constant',
+    'app/actions/film-cutter/film-cutter-cloud',
+    'app/actions/film-cutter/record-manager',
+    'app/actions/film-cutter/helper-functions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller'
 ], function (
     ConfigHelper,
     BeamboxPreference,
     Constant,
+    FilmCutterCloud,
+    RecordManager,
+    HelperFunctions,
     ObjectPanelsController,
     LaserPanelController
 ) {
-    const init = () => {
+    const init = async () => {
         ObjectPanelsController.init('object-panels-placeholder');
         LaserPanelController.init('layer-laser-panel-placeholder');
+
+        if (navigator.onLine) {
+            await FilmCutterCloud.login().then(
+                () => HelperFunctions.toggleLoginMenu({signIn: false, myAccount: true, signOut: true}),
+                () => HelperFunctions.toggleLoginMenu({signIn: true, myAccount: false, signOut: false})
+            );
+            await FilmCutterCloud.sync().catch(console.log);
+        } else {
+            HelperFunctions.toggleLoginMenu({myAccount: true, signIn: false, signOut: false});
+        }
     };
 
     const displayGuides = () => {

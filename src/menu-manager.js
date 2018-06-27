@@ -236,23 +236,20 @@ class MenuManager extends EventEmitter {
             this.toggleMenu(ids, true);
         });
 
-        ipcMain.on(events.UPDATE_ACCOUNT, (e, account) => {
-            const toggleSignIn = (nickname) => {
-                this._accountMenu.submenu.items.forEach(item => {
-                    if(item.id === 'SIGN_IN') {
-                        item.visible = !nickname;
-                    }
-                    else if(item.id === 'SIGN_OUT') {
-                        item.visible = !!nickname;
-                    }
-                    else if(item.id === 'MY_ACCOUNT') {
-                        item.visible = !!nickname;
-                        item.label = nickname;
-                    }
-                });
-            };
+        ipcMain.on(events.UPDATE_ACCOUNT, (e, {myAccount, signIn, signOut}) => {
 
-            toggleSignIn(account.nickname);
+            this._accountMenu.submenu.items.map(item => {
+                if(item.id === 'SIGN_IN') {
+                    item.visible = !!signIn;
+                }
+                else if(item.id === 'SIGN_OUT') {
+                    item.visible = !!signOut;
+                }
+                else if(item.id === 'MY_ACCOUNT') {
+                    item.visible = !!myAccount;
+                }
+            });
+
             Menu.setApplicationMenu(this._appmenu);
         });
 

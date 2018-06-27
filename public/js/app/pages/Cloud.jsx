@@ -9,8 +9,8 @@ define([
     'jsx!views/cloud/bind-success',
     'jsx!views/cloud/bind-fail',
     'jsx!views/cloud/bind-error',
-    'jsx!views/cloud/sign-out',
     'jsx!views/cloud/change-password',
+    'jsx!views/cloud/my-account',
     'jsx!views/cloud/terms',
     'jsx!views/cloud/privacy',
 ], function(
@@ -24,8 +24,8 @@ define([
     BindSuccess,
     BindFail,
     BindError,
-    SignOut,
     ChangePassword,
+    MyAccount,
     Terms,
     Privacy
 ) {
@@ -64,7 +64,7 @@ define([
                 content['bind-fail']        = () => <BindFail error={this.state.error} clear={this.clear} />;
                 content['bind-error']       = () => <BindError />;
                 content['change-password']  = () => <ChangePassword lang={i18n.lang} />;
-                content['sign-out']         = () => <SignOut />;
+                content['my-account']       = () => <MyAccount />;
                 content['terms']            = () => <Terms />;
                 content['privacy']          = () => <Privacy />;
 

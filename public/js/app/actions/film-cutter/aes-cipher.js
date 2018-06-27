@@ -7,7 +7,7 @@ define([
 ) {
     class AESCipher {
         encrpyt(str) {
-            const key = RecordManager.read('secret_key');
+            const key = RecordManager.read('film_secret_key');
             var encrypt = CryptoJS.AES.encrypt(str, CryptoJS.enc.Utf8.parse(key), {
                 mode: CryptoJS.mode.ECB,
                 padding: CryptoJS.pad.Pkcs7
@@ -15,7 +15,7 @@ define([
             return encrypt.toString();
         }
         decrypt(str) {
-            const key = RecordManager.read('secret_key');
+            const key = RecordManager.read('film_secret_key');
             var decrypt = CryptoJS.AES.decrypt(str, CryptoJS.enc.Utf8.parse(key), {
                 mode: CryptoJS.mode.ECB,
                 padding: CryptoJS.pad.Pkcs7

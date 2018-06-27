@@ -6,15 +6,20 @@ define([
         // string
         'account': '+886952611152',
         'password': '123',
-        'secret_key': 'd19d47bb5033126e3961084ccb6ed6d6',
+        'film_secret_key': 'd19d47bb5033126e3961084ccb6ed6d6',
         'machine_stm32_serial_number': '',
         'machine_pi_serial_number': '',
+        'last_name': '',
+        'first_name': '',
+        'shop_name': '',
+        'shop_address': '',
         'should_init_usage_cut_from_machine': 'yes',
 
         // int
         'usage_cut_recorded': 0,
         'usage_cut_overall_on_cloud': 0,
         'usage_cut_used_on_cloud': 0,
+
         // time in millisecond
         'usage_download': 1539129600000,
         'last_connect_to_cloud': 0,
@@ -38,9 +43,13 @@ define([
                 // string
                 case 'account':
                 case 'password':
-                case 'secret_key':
+                case 'film_secret_key':
                 case 'machine_stm32_serial_number':
                 case 'machine_pi_serial_number':
+                case 'last_name':
+                case 'first_name':
+                case 'shop_name':
+                case 'shop_address':
                 case 'should_init_usage_cut_from_machine':
                     return val;
 
@@ -64,9 +73,13 @@ define([
                 // string
                 case 'account':
                 case 'password':
-                case 'secret_key':
+                case 'film_secret_key':
                 case 'machine_stm32_serial_number':
                 case 'machine_pi_serial_number':
+                case 'last_name':
+                case 'first_name':
+                case 'shop_name':
+                case 'shop_address':
                 case 'should_init_usage_cut_from_machine':
                     val = value;
                     break;

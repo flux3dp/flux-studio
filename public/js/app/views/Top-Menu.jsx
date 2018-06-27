@@ -24,6 +24,7 @@ define([
     'helpers/device-list',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
+    'app/actions/film-cutter/film-cutter-cloud',
     'app/constants/global-constants',
     'app/actions/initialize-machine'
 ], function(
@@ -52,6 +53,7 @@ define([
     DeviceList,
     ProgressActions,
     ProgressConstants,
+    FilmCutterCloud,
     GlobalConstants,
     InitializeMachine
 ) {
@@ -626,14 +628,13 @@ define([
                     location.hash = '#studio/cloud/sign-in';
                 };
 
-                _action['SIGN_OUT'] = () => {
-                    CloudApi.signOut().then(() => {
-                        location.hash = '#studio/cloud/sign-in';
-                    });
+                _action['SIGN_OUT'] = async () => {
+                    await FilmCutterCloud.signOut();
+                    location.hash = '#studio/cloud/sign-in';
                 };
 
                 _action['MY_ACCOUNT'] = () => {
-                    location.hash = '#studio/cloud/bind-machine';
+                    location.hash = '#studio/cloud/my-account';
                 };
 
                 if(typeof _action[menuItem.id] === 'function') {
