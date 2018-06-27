@@ -84,8 +84,9 @@ define([
         }
 
         handleInsertFile(brand, model, category) {
+            let content;
             try {
-                const content = FilmDatabase.get('svg', brand, model, category, 'enc');
+                content = FilmDatabase.get('svg', brand, model, category, 'enc');
             } catch (error) {
                 AlertActions.showPopupError('film-cutter', '檔案解密失敗');
             }
