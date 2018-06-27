@@ -1,175 +1,126 @@
 define([
     'react',
-    'helpers/api/cloud'
+    'helpers/i18n',
+    'helpers/api/cloud',
+    'jsx!widgets/Control',
+    'app/actions/film-cutter/film-cutter-cloud',
+    'app/actions/film-cutter/record-manager',
+    'app/actions/alert-actions',
 ], function(
     React,
-    CloudApi
+    i18n,
+    CloudApi,
+    Control,
+    FilmCutterCloud,
+    RecordManager,
+    AlertActions
 ) {
+    const LANG = i18n.lang.settings.flux_cloud;
 
-    const Controls = (props) => {
-        const _handleEntered = e => props.onEntered(props.id, e.target.value);
-        const {label, errorMessage, errorOn, type} = props;
-        return (
-            <div className="controls">
-                <div className="label">{label}</div>
-                <div className="control">
-                    <input type={type || 'text'} onBlur={_handleEntered} />
-                </div>
-                <div className="error">
-                    {errorOn ? errorMessage : ' '}
-                </div>
-            </div>
-        );
-    };
+    return class ChangePassword extends React.Component {
+        constructor(props) {
+            super(props);
+            this.state = {
+                // input field
+                oldPassword: '',
+                password: '',
+                rePassword: '',
 
-    return React.createClass({
-
-        values: {
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-        },
-
-        getInitialState: function() {
-            return {
-                currentPasswordError: '',
-                newPasswordError: '',
-                confirmPasswordError: '',
-                passwordMismatch: false,
-                emptyCurrentPassword: false,
-                emptyNewPassword: false,
-                emptyConfirmPassword: false
+                // error message
+                showOldPasswordUnmatchError: false,
+                showPasswordMissingError: false,
+                showRePasswordUnmatchError: false,
             };
-        },
+        }
+        handleInputChange(field, value) {
+            this.setState({
+                [field]: value
+            });
+        }
 
-        componentDidMount: async function() {
-            const resp = await CloudApi.getMe();
-            if(!resp.ok) {
-                location.hash = '#/studio/cloud';
-            }
-        },
+        checkValidation() {
+            const isOldPasswordUnmatch = () => this.state.oldPassword !== RecordManager.read('password');
+            const isPasswordMissing = () => this.state.password === '';
+            const isRePasswordUnmatch = () => this.state.password !== this.state.rePassword;
 
-        _checkValue: function(id, value) {
-            const lang = this.props.lang.settings.flux_cloud,
-                f = {};
+            this.setState({
+                showOldPasswordUnmatchError: isOldPasswordUnmatch(),
+                showPasswordMissingError: isPasswordMissing(),
+                showRePasswordUnmatchError: isRePasswordUnmatch(),
+            });
 
-            f['currentPassword'] = () => {
-                this.values['currentPassword'] = value;
-                this.setState({
-                    emptyCurrentPassword: value === '',
-                    currentPasswordError: value === '' ? lang.empty_password_warning : ''
-                });
-
-            };
-
-            f['newPassword'] = () => {
-                this.values['newPassword'] = value;
-                this.setState({
-                    emptyNewPassword: value === '',
-                    newPasswordError: value === '' ? lang.empty_password_warning : ''
-                });
-            };
-
-            f['confirmPassword'] = () => {
-                this.values['confirmPassword'] = value;
-                this.setState({
-                    emptyConfirmPassword: value === '',
-                    confirmPasswordError: value === '' ? lang.empty_password_warning : ''
-                });
-            };
-
-            if(typeof f[id] !== 'undefined') {
-                f[id]();
-            };
-
-            if(this.values.newPassword !== '' && this.values.confirmPassword !== '') {
-                const mismatch = this.values.newPassword !== this.values.confirmPassword;
-                this.setState({ confirmPasswordError: mismatch ? lang.error_password_not_match : ''});
-            }
-        },
-
-        allValid: function() {
-            const { currentPasswordError, newPasswordError, confirmPasswordError } = this.state;
             return (
-                currentPasswordError === '' &&
-                newPasswordError === '' &&
-                confirmPasswordError === ''
+                !isOldPasswordUnmatch() &&
+                !isPasswordMissing() &&
+                !isRePasswordUnmatch()
             );
-        },
+        }
 
-        _handleCancel: function() {
-            location.hash = '#/studio/cloud/bind-machine';
-        },
-
-        _handleChangePassword: async function() {
-            if(!this.allValid()) { return; }
-            let lang = this.props.lang.settings.flux_cloud;
-
-            const info = {
-                password: this.values.newPassword,
-                oldPassword: this.values.currentPassword
-            };
-
-            const j = (await CloudApi.changePassword(info)).json();
-            if(j.status === 'error') {
-                this.setState({ responseError: lang[j.message] });
-            } else {
-                location.hash = '#/studio/cloud/bind-machine';
+        async handleNextClick() {
+            if(this.checkValidation()) {
+                try {
+                    await FilmCutterCloud.changePassword(this.state.password);
+                    RecordManager.write('password', this.state.password);
+                    AlertActions.showPopupInfo('change-password', '已成功變更密碼');
+                    location.hash = '#studio/cloud/my-account';
+                } catch (error) {
+                    console.log('error: ', error);
+                    AlertActions.showPopupError('change-password', error.message || error.toString());
+                }
             }
-        },
+        }
 
-        render: function() {
-            const lang = this.props.lang.settings.flux_cloud;
-
+        render() {
             return (
                 <div className="cloud">
-                    <div className="change-password container">
+                    <div className="container change-password">
                         <div className="title">
-                            <h3>{lang.change_password.toUpperCase()}</h3>
+                            <h3>重設密碼</h3>
                         </div>
-                        <div className="row">
-                            <Controls
-                                id="currentPassword"
-                                type="password"
-                                label={lang.current_password}
-                                errorMessage={this.state.currentPasswordError}
-                                errorOn={this.state.currentPasswordError !== ''}
-                                onEntered={this._checkValue}
-                            />
+                        <div className='row'>
+                            <Control label={'舊密碼'} errorMessage={this.state.showOldPasswordUnmatchError ? '密碼錯誤' : ' '}>
+                                <input
+                                    type='password'
+                                    value={this.state.oldPassword}
+                                    onChange={e => this.handleInputChange('oldPassword', e.target.value)}
+                                    onBlur={e => this.handleInputChange('oldPassword', e.target.value)}
+                                    placeholder={'舊密碼'}
+                                />
+                            </Control>
                         </div>
-                        <div className="row">
-                            <Controls
-                                id="newPassword"
-                                type="password"
-                                label={lang.new_password}
-                                errorMessage={this.state.newPasswordError}
-                                errorOn={this.state.newPasswordError !== ''}
-                                onEntered={this._checkValue}
-                            />
-                        </div>
-                        <div className="row">
-                            <Controls
-                                id="confirmPassword"
-                                type="password"
-                                label={lang.confirm_password}
-                                errorMessage={this.state.confirmPasswordError}
-                                errorOn={this.state.confirmPasswordError !== ''}
-                                onEntered={this._checkValue}
-                            />
+                        <div className='row'>
+                            <Control label={'新密碼'} errorMessage={this.state.showPasswordMissingError ? '請輸入新密碼' : ' '}>
+                                <input
+                                    type='password'
+                                    value={this.state.password}
+                                    onChange={e => this.handleInputChange('password', e.target.value)}
+                                    onBlur={e => this.handleInputChange('password', e.target.value)}
+                                    placeholder={'新密碼'}
+                                />
+                            </Control>
+                            <Control label={'新密碼確認'} errorMessage={this.state.showRePasswordUnmatchError ? '密碼不符' : ' '}>
+                                <input
+                                    type='password'
+                                    value={this.state.rePassword}
+                                    onChange={e => this.handleInputChange('rePassword', e.target.value)}
+                                    onBlur={e => this.handleInputChange('rePassword', e.target.value)}
+                                    placeholder={'新密碼確認'}
+                                />
+                            </Control>
                         </div>
                     </div>
-                    <div className="change-password footer">
+
+                    <div className="footer">
                         <div className="divider">
-                            <span className="error">{this.state.responseError}</span>
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
-                            <button className="btn btn-default" onClick={this._handleChangePassword}>{lang.submit}</button>
+                            <button className="btn btn-cancel" onClick={() => {location.hash = '#studio/cloud/sign-in'}}>{LANG.back}</button>
+                            <button className="btn btn-default" onClick={() => this.handleNextClick()}>重設密碼</button>
                         </div>
                     </div>
                 </div>
             );
         }
-    });
+    };
 });
