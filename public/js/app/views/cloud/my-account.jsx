@@ -12,12 +12,12 @@ define([
     AlertActions
 ) {
     const Row = ({children}) => (
-        <div className='row' style={{display: 'flex',justifyContent: 'center', width: '500px', marginRight: 'auto', marginLeft: 'auto'}}>
+        <div className='row' style={{display: 'flex',justifyContent: 'center', width: '600px', marginLeft: '150px'}}>
             {children}
         </div>
     );
     const Field = ({title, content}) => (
-        <div style={{color: '#888', minWidth: '250px', width: '100%', textAlign: 'left',}}>
+        <div style={{color: '#888', minWidth: '300px', width: '100%', textAlign: 'left',}}>
             <strong style={{paddingRight: '15px'}}>{title}:</strong>
             <span>{content}</span>
         </div>
@@ -71,8 +71,6 @@ define([
                     </Row>
                     <Row className='row'>
                         <Field title='店名' content={data.shop_name}/>
-                    </Row>
-                    <Row className='row'>
                         <Field title='店址' content={data.shop_address}/>
                     </Row>
                     <Row className='row'>
@@ -80,8 +78,10 @@ define([
                         <Field title='已切割次數' content={`${data.usage_cut_used} 次`}/>
                     </Row>
                     <Row className='row'>
-                        <Field title='機器序號' content={data.machine_pi_serial_number}/>
                         <Field title='數據下載期限' content={data.usage_download}/>
+                    </Row>
+                    <Row className='row'>
+                        <Field title='機器序號' content={data.machine_pi_serial_number}/>
                     </Row>
                     <Row className='row'>
                         <Field title='最後同步時間' content={data.last_connect_to_cloud}/>

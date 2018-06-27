@@ -29,7 +29,6 @@ define([
             };
         },
 
-
         _handlePasswordChange: function(e) {
             this.setState({
                 password: e.target.value
@@ -152,7 +151,5 @@ define([
                 </div>
             );
         }
-
     });
-
 });

@@ -115,7 +115,7 @@ define([
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel" onClick={() => {location.hash = '#studio/cloud/sign-in'}}>{LANG.back}</button>
+                            <button className="btn btn-cancel" onClick={() => {location.hash = '#studio/cloud/my-account'}}>{LANG.back}</button>
                             <button className="btn btn-default" onClick={() => this.handleNextClick()}>重設密碼</button>
                         </div>
                     </div>
