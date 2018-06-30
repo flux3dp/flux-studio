@@ -7379,7 +7379,9 @@ define([
             // If there is only one layer selected, don't force user to paste on the same layer
             if (layerCount == 1) {
                 for(i = 0; i < selectedElements.length; i++) {
-                    selectedElements[i].removeAttribute("data-origin-layer");
+                    if (selectedElements[i]) {
+                        selectedElements[i].removeAttribute("data-origin-layer");
+                    }
                 }
             }
 
