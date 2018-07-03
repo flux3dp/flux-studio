@@ -16,7 +16,7 @@ define([
                         electron.trigger_file_input_click('import_image');
                     }
                 },
-                'SAVE_SCENE': () => {},
+                'SAVE_SCENE': () => FnWrapper.saveFile(),
                 'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
                 'UNDO': () => FnWrapper.undo(),
                 'DUPLICATE': () => FnWrapper.cloneSelectedElement(),
@@ -24,12 +24,12 @@ define([
                 'SCALE': () => {},
                 'RESET': () => {},
                 'ALIGN_CENTER': () => {},
-                'CLEAR_SCENE': () => {},
+                'CLEAR_SCENE': () => {window.svgEditorClearScene()},
                 'TUTORIAL': () => {}
             };
         }
         attach() {
-            super.attach(['IMPORT', 'UNDO', 'EXPORT_FLUX_TASK']);
+            super.attach(['IMPORT', 'SAVE_SCENE', 'UNDO', 'EXPORT_FLUX_TASK', 'CLEAR_SCENE']);
         }
         onObjectFocus() {
             this.enableMenuItems(['DUPLICATE']);

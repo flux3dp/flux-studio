@@ -50,6 +50,11 @@ define([
             $('#tool_text').click();
             $('#workarea').css('cursor', 'text');
         },
+        saveFile: function() {
+            const output = svgCanvas.getSvgString();
+            const defaultFileName = svgCanvas.getLatestImportFileName() || 'untitled';
+            saveAs(new Blob([output], {type: 'text/plain'}), defaultFileName + ".bvg");
+        },
 
         //top panel
         update_image_width: function(val) {

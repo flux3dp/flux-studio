@@ -68,9 +68,9 @@ define([
         }
 
         initConfig(name) {
-            writeSpeed(name, _defaultConfig.speed);
-            writeStrength(name, _defaultConfig.strength);
-            writeRepeat(name, _defaultConfig.repeat);
+            _getSpeed(name, _defaultConfig.speed);
+            _getStrength(name, _defaultConfig.strength);
+            _getRepeat(name, _defaultConfig.repeat);
         }
 
         cloneConfig(name, baseName) {
