@@ -840,7 +840,7 @@ define([
         this.getObjectLayer = function(elem) {
             while (elem) {
                 elem = elem.parentNode;
-                if (elem && elem.getAttribute('class') === 'layer') {
+                if (elem && elem.getAttribute && elem.getAttribute('class') === 'layer') {
                     var title = $(elem).find('title')[0];
                     if (title) {
                         return { elem: elem, title: title.innerHTML };
@@ -5519,7 +5519,8 @@ define([
                     fill-opacity: 1 !important;
                     stroke-width: 0 !important;
                 }
-                #svg_editor:not(.color) *[data-wireframe] {
+                
+                *[data-wireframe] {
                     fill-opacity: 0 !important;
                     stroke: #000 !important;
                     stroke-width: 1px !important;
@@ -5529,12 +5530,11 @@ define([
                     vector-effect: non-scaling-stroke !important;
                     filter: none !important;
                 }
+                
                 #svg_editor:not(.color) #${symbol.id} * {
                     fill-opacity: 0;
                     stroke: #000 !important;
                     filter: none;
-                }
-                #svg_editor #${symbol.id} * {
                     stroke-width: 1px !important;
                     vector-effect: non-scaling-stroke !important;
                     stroke-opacity: 1.0;
@@ -7297,10 +7297,14 @@ define([
                 }
 
                 var nextSibling = t.nextSibling;
-                var elem = parent.removeChild(t);
-                selectedCopy.push(selected); //for the copy
-                selectedElements[i] = null;
-                batchCmd.addSubCommand(new RemoveElementCommand(elem, nextSibling, parent));
+                if (parent == null) {
+                    console.log("The element has no parent", elem);
+                } else {
+                    var elem = parent.removeChild(t);
+                    selectedCopy.push(selected); //for the copy
+                    selectedElements[i] = null;
+                    batchCmd.addSubCommand(new RemoveElementCommand(elem, nextSibling, parent));
+                }
             }
             if (!batchCmd.isEmpty()) {
                 addCommandToHistory(batchCmd);
@@ -7339,6 +7343,7 @@ define([
                 svgedit.path.removePath_(selectedRef.id);
 
                 var nextSibling = selectedRef.nextSibling;
+                var parent = selectedRef.parentNode;
                 var elem = parent.removeChild(selectedRef);
                 selectedCopy.push(selected); //for the copy
                 selectedElements[i] = null;
