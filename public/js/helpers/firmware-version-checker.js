@@ -7,33 +7,18 @@ define([
     VersionChecker,
     DeviceMaster
 ) {
-    const check = (device, key) => {
-        let d = $.Deferred();
+    const check = async (device, key) => {
         if(device.version) {
-            DeviceMaster.selectDevice(device);
+            await DeviceMaster.selectDevice(device);
             let vc = VersionChecker(device.version);
-            d.resolve(vc.meetVersion(requirement[key]));
+            return vc.meetRequirement(key);
         }
         else {
-            DeviceMaster.selectDevice(device).then(() => {
-                return DeviceMaster.getDeviceInfo();
-            })
-            .then(deviceInfo => {
-                let vc = VersionChecker(deviceInfo.version);
-                d.resolve(vc.meetVersion(requirement[key]));
-            });
+            await DeviceMaster.selectDevice(device);
+            const deviceInfo = await DeviceMaster.getDeviceInfo();
+            const vc = VersionChecker(deviceInfo.version);
+            return vc.meetRequirement(key);
         }
-
-        return d.promise();
-    };
-
-    const requirement = {
-        BACKLASH                    : '1.5b12',
-        OPERATE_DURING_PAUSE        : '1.6.20',
-        UPGRADE_KIT_PROFILE_SETTING : '1.6.20',
-        SCAN_CALIBRATION            : '1.6.25',
-        M666R_MMTEST                : '1.6.40',
-        CLOUD                       : '1.5.0'
     };
 
     return {

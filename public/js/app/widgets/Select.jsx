@@ -1,6 +1,6 @@
 // refer to: https://gist.github.com/jbottigliero/7982340,
 //           https://github.com/JedWatson/react-select
-define(['react'], function(React){
+define(['react', 'reactPropTypes'], function(React, PropTypes){
     'use strict';
 
     return React.createClass({
@@ -8,8 +8,11 @@ define(['react'], function(React){
         getDefaultProps: function(){
             return {
                 multiple: false,
-                onChange: React.PropTypes.func
             };
+        },
+
+        PropTypes: {
+            onChange: PropTypes.func
         },
 
         render: function() {

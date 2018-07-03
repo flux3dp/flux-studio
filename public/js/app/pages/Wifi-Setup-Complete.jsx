@@ -64,7 +64,7 @@ define([
             },
 
             render: function() {
-                this.props.other = this.props.other || 'with-wifi';
+                const method = this.props.other || 'with-wifi';
                 var wrapperClassName = {
                         'initialization': true
                     },
@@ -76,12 +76,12 @@ define([
                 }
 
                 var startText = (
-                        'with-usb' === this.props.other ?
+                        'with-usb' === method ?
                         lang.initialize.setting_completed.ok :
                         lang.initialize.setting_completed.start
                     ),
                     backToWifiSelect = (
-                        'with-usb' === this.props.other ?
+                        'with-usb' === method ?
                         <button className="btn btn-link btn-large" data-ga-event="back" onClick={this._goBack}>
                             {lang.initialize.setting_completed.back}
                         </button> :

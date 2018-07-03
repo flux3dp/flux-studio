@@ -1,17 +1,18 @@
 define([
     'react',
+    'reactPropTypes',
     'plugins/classnames/index'
-], function(React, ClassNames) {
+], function(React, PropTypes, ClassNames) {
     'use strict';
 
     return React.createClass({
 
         propTypes: {
-            id: React.PropTypes.string,
-            label: React.PropTypes.string,
-            default: React.PropTypes.string,
-            options: React.PropTypes.array.isRequired,
-            onChange: React.PropTypes.func.isRequired
+            id: PropTypes.string,
+            label: PropTypes.string,
+            default: PropTypes.string,
+            options: PropTypes.array.isRequired,
+            onChange: PropTypes.func.isRequired
         },
 
         getInitialState: function() {
@@ -43,7 +44,7 @@ define([
                     {'selected': this.state.selected === option.id}
                 );
                 return (
-                    <div className={`radio ${option.id}`} onClick={this._handleChange.bind(null, option.id, option.disable)}>
+                    <div key={option.id} className={`radio ${option.id}`} onClick={this._handleChange.bind(null, option.id, option.disable)}>
                         <div className={radioClass}></div>
                         <span>{option.name}</span>
                     </div>

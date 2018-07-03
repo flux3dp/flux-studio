@@ -1,6 +1,9 @@
 define([
     'react',
+    'reactClassset',
     'app/actions/beambox/bottom-right-funcs',
+    'app/actions/beambox/preview-mode-controller',
+    'app/actions/beambox/beambox-preference',
     'jsx!widgets/Button-Group',
     'helpers/i18n',
     'jsx!widgets/Modal',
@@ -9,7 +12,10 @@ define([
     'app/actions/beambox/beambox-version-master'
 ], function (
     React,
+    ReactCx,
     BottomRightFuncs,
+    PreviewModeController,
+    BeamboxPreference,
     ButtonGroup,
     i18n,
     Modal,
@@ -24,7 +30,7 @@ define([
             super();
             this.state = {
                 isPrinterSelectorOpen: false
-            }
+            };
 
             this._handleExportClick = this._handleExportClick.bind(this);
             this._handleStartClick = this._handleStartClick.bind(this);
@@ -33,7 +39,22 @@ define([
         _handleExportClick() {
             BottomRightFuncs.exportFcode();
         }
-        _handleStartClick() {
+        async _handleStartClick() {
+            if (PreviewModeController.isPreviewMode()) {
+                await PreviewModeController.end();
+            }
+            const isPowerTooHigh = $('#svgcontent > g.layer')
+                .toArray()
+                .map(layer => layer.getAttribute('data-strength'))
+                .some(strength => Number(strength) > 80);
+
+            if (isPowerTooHigh) {
+                if(BeamboxPreference.read('should_remind_power_too_high_countdown') > 0) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
+                    BeamboxPreference.write('should_remind_power_too_high_countdown', BeamboxPreference.read('should_remind_power_too_high_countdown') - 1);
+                }
+            }
+
             this.setState({
                 isPrinterSelectorOpen: true
             });
@@ -41,7 +62,7 @@ define([
         _renderPrinterSelectorWindow() {
             const onGettingPrinter = async (selected_item) => {
                 //export fcode
-                if (selected_item == 'export_fcode') {
+                if (selected_item === 'export_fcode') {
                     BottomRightFuncs.exportFcode();
                     this.setState({
                         isPrinterSelectorOpen: false
@@ -52,7 +73,7 @@ define([
                 //check firmware
                 if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
                     console.log('not valid version');
-                    AlertActions.showPopupError('', i18n.lang.beambox.popup.should_update_firmware_to_continue);
+                    AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
                     this.setState({
                         isPrinterSelectorOpen: false
                     });
@@ -84,11 +105,10 @@ define([
             );
         }
         _renderActionButtons() {
-            const cx = React.addons.classSet;
             const buttons = [
                 {
                     label: lang.monitor.start,
-                    className: cx({
+                    className: ReactCx.cx({
                         'btn-disabled': false,
                         'btn-default': true,
                         'btn-hexagon': true,

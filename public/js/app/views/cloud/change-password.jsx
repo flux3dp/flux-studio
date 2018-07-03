@@ -1,33 +1,26 @@
 define([
-    'jquery',
     'react',
     'helpers/api/cloud'
 ], function(
-    $,
     React,
     CloudApi
 ) {
-    'use strict';
 
-    let Controls = React.createClass({
-        _handleEntered: function(e) {
-            this.props.onEntered(this.props.id, e.target.value);
-        },
-        render: function() {
-            let {label, errorMessage, errorOn, type} = this.props;
-            return (
-                <div className="controls">
-                    <div className="label">{label}</div>
-                    <div className="control">
-                        <input type={type || 'text'} onBlur={this._handleEntered.bind(this)} />
-                    </div>
-                    <div className="error">
-                        {errorOn ? errorMessage : ' '}
-                    </div>
+    const Controls = (props) => {
+        const _handleEntered = e => props.onEntered(props.id, e.target.value);
+        const {label, errorMessage, errorOn, type} = props;
+        return (
+            <div className="controls">
+                <div className="label">{label}</div>
+                <div className="control">
+                    <input type={type || 'text'} onBlur={_handleEntered} />
                 </div>
-            );
-        }
-    });
+                <div className="error">
+                    {errorOn ? errorMessage : ' '}
+                </div>
+            </div>
+        );
+    };
 
     return React.createClass({
 
@@ -46,19 +39,18 @@ define([
                 emptyCurrentPassword: false,
                 emptyNewPassword: false,
                 emptyConfirmPassword: false
+            };
+        },
+
+        componentDidMount: async function() {
+            const resp = await CloudApi.getMe();
+            if(!resp.ok) {
+                location.hash = '#/studio/cloud';
             }
         },
 
-        componentDidMount: function() {
-             CloudApi.getMe().then(r => {
-                 if(!r.ok) {
-                     location.hash = '#/studio/cloud';
-                 }
-             });
-        },
-
         _checkValue: function(id, value) {
-            let lang = this.props.lang.settings.flux_cloud,
+            const lang = this.props.lang.settings.flux_cloud,
                 f = {};
 
             f['currentPassword'] = () => {
@@ -91,13 +83,13 @@ define([
             };
 
             if(this.values.newPassword !== '' && this.values.confirmPassword !== '') {
-                let mismatch = this.values.newPassword !== this.values.confirmPassword
+                const mismatch = this.values.newPassword !== this.values.confirmPassword;
                 this.setState({ confirmPasswordError: mismatch ? lang.error_password_not_match : ''});
             }
         },
 
         allValid: function() {
-            let { currentPasswordError, newPasswordError, confirmPasswordError } = this.state;
+            const { currentPasswordError, newPasswordError, confirmPasswordError } = this.state;
             return (
                 currentPasswordError === '' &&
                 newPasswordError === '' &&
@@ -109,29 +101,25 @@ define([
             location.hash = '#/studio/cloud/bind-machine';
         },
 
-        _handleChangePassword: function() {
+        _handleChangePassword: async function() {
             if(!this.allValid()) { return; }
-            let lang = this.props.lang.settings.flux_cloud,
-                info;
+            let lang = this.props.lang.settings.flux_cloud;
 
-            info = {
+            const info = {
                 password: this.values.newPassword,
                 oldPassword: this.values.currentPassword
-            }
+            };
 
-            CloudApi.changePassword(info).then(r => {
-                return r.json();
-            }).then(j => {
-                if(j.status === 'error') {
-                    this.setState({ responseError: lang[j.message] })
-                } else {
-                    location.hash = "#/studio/cloud/bind-machine";
-                }
-            });
+            const j = (await CloudApi.changePassword(info)).json();
+            if(j.status === 'error') {
+                this.setState({ responseError: lang[j.message] });
+            } else {
+                location.hash = '#/studio/cloud/bind-machine';
+            }
         },
 
         render: function() {
-            let lang = this.props.lang.settings.flux_cloud;
+            const lang = this.props.lang.settings.flux_cloud;
 
             return (
                 <div className="cloud">
@@ -181,7 +169,7 @@ define([
                         </div>
                     </div>
                 </div>
-            )
+            );
         }
     });
 });

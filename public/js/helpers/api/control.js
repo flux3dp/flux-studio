@@ -40,7 +40,7 @@ define([
             };
 
         const createWs = (wsOptions) => {
-            let url = opts.availableUsbChannel >= 0 ? `usb/${opts.availableUsbChannel}` : uuid;
+            let url = opts.availableUsbChannel >= 0  && opts.availableUsbChannel !==null ? `usb/${opts.availableUsbChannel}` : uuid;
             let _ws = new Websocket({
                 method: `control/${url}`,
                 onMessage: (data) => {
@@ -662,8 +662,11 @@ define([
                 if (typeof args.z !== 'undefined') {
                     command += ' z:' + args.z;
                 };
-                console.log('maintainMove', command);
                 return useDefaultResponse(`maintain move${command}`);
+            },
+
+            maintainCloseFan: () => {
+                return useDefaultResponse('maintain close_fan');
             },
 
             endMaintainMode: () => {
@@ -705,7 +708,7 @@ define([
             changeFilament: (type, flexible) => {
                 let d = $.Deferred(),
                     timeout;
-                
+
                 const getType = (t) => {
                     if (flexible) return 'load_flexible_filament';
                     return t === DeviceConstants.LOAD_FILAMENT ? 'load_filament' : 'unload_filament';

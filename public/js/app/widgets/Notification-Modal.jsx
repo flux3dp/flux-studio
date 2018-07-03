@@ -1,11 +1,12 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'helpers/shortcuts',
     'app/constants/alert-constants',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert'
-], function($, React, shortcuts, AlertConstants, Modal, Alert) {
+], function($, React, PropTypes, shortcuts, AlertConstants, Modal, Alert) {
     'use strict';
 
     var lang,
@@ -21,22 +22,22 @@ define([
         View = React.createClass({
 
             propTypes: {
-                open        : React.PropTypes.bool,
-                lang        : React.PropTypes.object,
-                type        : React.PropTypes.oneOf(acceptableTypes),
-                customText  : React.PropTypes.string,
-                customTextGroup : React.PropTypes.array,
-                escapable   : React.PropTypes.bool,
-                caption     : React.PropTypes.string,
-                message     : React.PropTypes.string,
-                onRetry     : React.PropTypes.func,
-                onAbort     : React.PropTypes.func,
-                onYes       : React.PropTypes.func,
-                onNo        : React.PropTypes.func,
-                onCustom    : React.PropTypes.func,
-                onClose     : React.PropTypes.func,
-                displayImages   : React.PropTypes.bool,
-                images   : React.PropTypes.array
+                open        : PropTypes.bool,
+                lang        : PropTypes.object,
+                type        : PropTypes.oneOf(acceptableTypes),
+                customText  : PropTypes.string,
+                customTextGroup : PropTypes.array,
+                escapable   : PropTypes.bool,
+                caption     : PropTypes.string,
+                message     : PropTypes.string,
+                onRetry     : PropTypes.func,
+                onAbort     : PropTypes.func,
+                onYes       : PropTypes.func,
+                onNo        : PropTypes.func,
+                onCustom    : PropTypes.func,
+                onClose     : PropTypes.func,
+                displayImages   : PropTypes.bool,
+                images   : PropTypes.array
             },
 
             getDefaultProps: function() {

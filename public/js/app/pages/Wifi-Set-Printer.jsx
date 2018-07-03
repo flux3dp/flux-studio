@@ -1,5 +1,7 @@
 define([
     'react',
+    'reactDOM',
+    'reactClassset',
     'app/actions/initialize-machine',
     'helpers/api/usb-config',
     'jsx!widgets/Modal',
@@ -13,6 +15,8 @@ define([
     'helpers/device-error-handler'
 ], function(
     React,
+    ReactDOM,
+    ReactCx,
     initializeMachine,
     usbConfig,
     Modal,
@@ -60,12 +64,12 @@ define([
                 e.preventDefault();
 
                 var self        = this,
-                    name        = self.refs.name.getDOMNode().value,
-                    password    = self.refs.password.getDOMNode().value,
+                    name        = ReactDOM.findDOMNode(self.refs.name).value,
+                    password    = ReactDOM.findDOMNode(self.refs.password).value,
                     oldPasswordExists = ('undefined' !== typeof self.refs.old_password),
                     oldPassword = (
                         'WIFI' === self.state.settingPrinter.from && true === oldPasswordExists ?
-                        self.refs.old_password.getDOMNode().value :
+                        ReactDOM.findDOMNode(self.refs.old_password).value :
                         self.state.settingPrinter.plaintext_password || ''
                     ),
                     usb,
@@ -206,7 +210,6 @@ define([
                     wrapperClassName = {
                         'initialization': true
                     },
-                    cx = React.addons.classSet,
                     invalidPrinterNameMessage = lang.initialize.invalid_device_name,
                     oldPassword,
                     printerNameClass,
@@ -214,15 +217,15 @@ define([
                     printerPasswordClass,
                     content;
 
-                printerNameClass = cx({
+                printerNameClass = ReactCx.cx({
                     'error': !this.state.validPrinterName
                 });
 
-                printerPasswordClass = cx({
+                printerPasswordClass = ReactCx.cx({
                     'error': !this.state.validPrinterPassword
                 });
 
-                invalidPrinterNameClass = cx({
+                invalidPrinterNameClass = ReactCx.cx({
                     'error-message': true,
                     'hide': this.state.validPrinterName
                 });

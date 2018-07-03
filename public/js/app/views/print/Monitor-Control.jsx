@@ -1,10 +1,12 @@
 define([
     'react',
+    'reactPropTypes',
     'app/constants/global-constants',
     'app/constants/device-constants',
     'plugins/classnames/index',
 ], (
     React,
+    PropTypes,
     GlobalConstants,
     DeviceConstants,
     ClassNames
@@ -24,8 +26,8 @@ define([
         },
 
         contextTypes: {
-            store: React.PropTypes.object,
-            lang: React.PropTypes.object
+            store: PropTypes.object,
+            lang: PropTypes.object
         },
 
         componentWillMount: function() {

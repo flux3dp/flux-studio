@@ -1,24 +1,19 @@
 define([
     'jquery',
     'react',
-    'app/actions/print',
+    'reactPropTypes',
     'plugins/classnames/index',
-    'helpers/device-master',
-    'helpers/api/config',
     'jsx!widgets/Dialog-Menu',
     'app/constants/global-constants',
     'app/actions/alert-actions'
-], function($, React, printController, ClassNames, DeviceMaster, Config, DialogMenu, GlobalConstants, AlertActions) {
-    'use strict';
+], function($, React, PropTypes, ClassNames, DialogMenu, GlobalConstants, AlertActions) {
 
-    var DEFAULT_QUALITY = 'high',
+    const DEFAULT_QUALITY = 'high',
         DEFAULT_MODEL  = 'fd1';
 
-    var lang,
-        constants,
-        displayModelControl;
+    let lang;
 
-    constants = {
+    const constants = {
         MODEL       : 'MODEL',
         QUALITY     : 'QUALITY',
         RAFT_ON     : 'RAFT_ON',
@@ -30,38 +25,30 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang                        : React.PropTypes.object,
-            enable                      : React.PropTypes.bool,
-            previewMode                 : React.PropTypes.bool,
-            previewModeOnly             : React.PropTypes.bool,
-            disablePreview              : React.PropTypes.bool,
-            displayModelControl         : React.PropTypes.bool,
-            hasObject                   : React.PropTypes.bool,
-            hasOutOfBoundsObject        : React.PropTypes.bool,
-            previewLayerCount           : React.PropTypes.number,
-            raftLayers                  : React.PropTypes.number,
-            supportOn                   : React.PropTypes.bool,
-            raftOn                      : React.PropTypes.bool,
-            onQualitySelected           : React.PropTypes.func,
-            onRaftClick                 : React.PropTypes.func,
-            onSupportClick              : React.PropTypes.func,
-            onPreviewClick              : React.PropTypes.func,
-            onPreviewLayerChange        : React.PropTypes.func,
-            onShowAdvancedSettingPanel  : React.PropTypes.func,
-            onValueChange               : React.PropTypes.func
+            lang                        : PropTypes.object,
+            enable                      : PropTypes.bool,
+            previewMode                 : PropTypes.bool,
+            previewModeOnly             : PropTypes.bool,
+            disablePreview              : PropTypes.bool,
+            displayModelControl         : PropTypes.bool,
+            hasObject                   : PropTypes.bool,
+            previewLayerCount           : PropTypes.number,
+            supportOn                   : PropTypes.bool,
+            raftOn                      : PropTypes.bool,
+            onRaftClick                 : PropTypes.func,
+            onSupportClick              : PropTypes.func,
+            onPreviewClick              : PropTypes.func,
+            onPreviewLayerChange        : PropTypes.func,
+            onShowAdvancedSettingPanel  : PropTypes.func,
         },
 
         getInitialState: function() {
             return {
-                raftOn              : true,
-                supportOn           : true,
                 previewOn           : false,
                 previewCurrentLayer : 0,
                 previewLayerCount   : this.props.previewLayerCount,
-                displayModelControl : true,
                 quality             : DEFAULT_QUALITY,
                 model               : DEFAULT_MODEL,
-                color               : 'WHITE'
             };
         },
 
@@ -69,9 +56,6 @@ define([
             lang = this.props.lang.print.left_panel;
             lang.quality = this.props.lang.print.quality;
             lang.model = this.props.lang.print.model;
-        },
-
-        componentDidMount: function() {
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -87,20 +71,9 @@ define([
 
             this.setState({ quality: nextProps.quality });
             this.setState({ model: nextProps.model });
-            this.setState({ displayModelControl: nextProps.displayModelControl });
-
             if(nextProps.previewMode !== this.state.previewOn) {
                 this.setState({ previewOn: nextProps.previewMode });
             }
-        },
-
-        _closePopup: function() {
-            $('.popup-open:checked').removeAttr('checked');
-        },
-
-        _handleSetColor: function(color) {
-            this.setState({ color: color.toUpperCase() });
-            this._closePopup();
         },
 
         _handleActions: function(source, arg, e) {
@@ -116,12 +89,10 @@ define([
                 actions = {
                     'MODEL': function() {
                         self.props.onQualityModelSelected(self.state.quality, arg);
-                        $('.dialog-opener').prop('checked', false);
                     },
 
                     'QUALITY': function() {
                         self.props.onQualityModelSelected(arg, self.state.model);
-                        $('.dialog-opener').prop('checked', false);
                     },
 
                     'RAFT_ON': function() {
@@ -133,7 +104,6 @@ define([
                     },
 
                     'ADVANCED': function() {
-                        self._closePopup();
                         self.props.onShowAdvancedSettingPanel();
                     },
 
@@ -142,6 +112,7 @@ define([
                             e.preventDefault();
                             return;
                         }
+
                         if(self.props.hasObject) {
                             self.setState({ previewOn: !self.state.previewOn }, function() {
                                 self.props.onPreviewClick(self.state.previewOn);
@@ -151,44 +122,32 @@ define([
                 };
 
             if(source !== constants.PREVIEW) {
-                self._closePreview();
+                this.setState({ previewOn: false }, () => {
+                    this.props.onPreviewClick(false);
+                });
             }
 
-            self._closePopup();
             actions[source]();
         },
 
         _handlePreviewLayerChange: function(e) {
-            this.props.onPreviewLayerChange(e.target.value);
             this.setState({
                 previewCurrentLayer: e.target.value
             });
-        },
-
-        _onOpenSubPopup: function(e) {
-            var $me = $(e.currentTarget),
-                $popupOpen = $('.popup-open:checked').not($me);
-
-            $popupOpen.removeAttr('checked');
-        },
-
-        _closePreview: function() {
-            this.setState({ previewOn: false });
-            this.props.onPreviewClick(false);
+            this.props.onPreviewLayerChange(e.target.value);
         },
 
         _renderQuality: function() {
-            var _quality = ['high', 'med', 'low'],
-                _class = ClassNames('display-text quality-select', {'disable': this.props.previewModeOnly}),
-                qualitySelection;
+            const _quality = ['high', 'med', 'low'];
+            const _class = ClassNames('display-text quality-select', {'disable': this.props.previewModeOnly});
 
-            qualitySelection = _quality.map(function(quality) {
+            const qualitySelection = _quality.map(quality => {
                 return (
-                    <li onClick={this._handleActions.bind(null, constants.QUALITY, quality)}>
+                    <li key={quality} onClick={e => this._handleActions(constants.QUALITY, quality, e)}>
                         {lang.quality[quality]}
                     </li>
                 );
-            }.bind(this));
+            });
 
             return {
                 label: (
@@ -206,16 +165,15 @@ define([
         },
 
         _renderModel: function() {
-            var _class = ClassNames('display-text model-select', {'disable': this.props.previewModeOnly}),
-                modelSelection;
+            const _class = ClassNames('display-text model-select', {'disable': this.props.previewModeOnly});
 
-            modelSelection = ['fd1', 'fd1p'].map(function(model) {
+            const modelSelection = ['fd1', 'fd1p'].map(model => {
                 return (
-                    <li onClick={this._handleActions.bind(null, constants.MODEL, model)}>
+                    <li key={model} onClick={e => this._handleActions(constants.MODEL, model, e)}>
                         {lang.model[model]}
                     </li>
                 );
-            }.bind(this));
+            });
 
             return {
                 label: (
@@ -233,10 +191,10 @@ define([
         },
 
         _renderRaft: function() {
-            var _class = ClassNames('raft', {'disable': !this.props.enable});
+            const _class = ClassNames('raft', {'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} title={lang.raftTitle} onClick={this._handleActions.bind(null, constants.RAFT_ON, '')}>
+                    <div className={_class} title={lang.raftTitle} onClick={e => this._handleActions(constants.RAFT_ON, '', e)}>
                         <div>{this.props.raftOn ? lang.raft_on : lang.raft_off}</div>
                     </div>
                 ),
@@ -245,10 +203,10 @@ define([
         },
 
         _renderSupport: function() {
-            var _class = ClassNames('support', {'disable': !this.props.enable});
+            const _class = ClassNames('support', {'disable': !this.props.enable});
             return {
                 label: (
-                    <div className={_class} title={lang.supportTitle} onClick={this._handleActions.bind(null, constants.SUPPORT_ON, '')}>
+                    <div className={_class} title={lang.supportTitle} onClick={e => this._handleActions(constants.SUPPORT_ON, '', e)}>
                         <div>{this.props.supportOn ? lang.support_on : lang.support_off}</div>
                     </div>
                 ),
@@ -257,10 +215,10 @@ define([
         },
 
         _renderAdvanced: function() {
-            var _class = ClassNames('advanced', {'disable': !this.props.enable || this.props.previewModeOnly});
+            const _class = ClassNames('advanced', {'disable': !this.props.enable || this.props.previewModeOnly});
             return {
                 label: (
-                    <div className={_class} title={lang.advancedTitle} onClick={this._handleActions.bind(null, constants.ADVANCED, '')}>
+                    <div className={_class} title={lang.advancedTitle} onClick={e => this._handleActions(constants.ADVANCED, '', e)}>
                         <div>{this.props.lang.print.left_panel.advanced}</div>
                     </div>
                 ),
@@ -269,35 +227,38 @@ define([
         },
 
         _renderPreview: function() {
-            var _class = ClassNames('display-text preview', {'disable': !this.props.enable && !this.props.previewModeOnly});
+            const _class = ClassNames('display-text preview', {'disable': !this.props.enable && !this.props.previewModeOnly});
             return {
                 label: (
-                    <div id="preview" className={_class} onClick={this._handleActions.bind(null, constants.PREVIEW, '')}>
+                    <div id="preview" className={_class} onClick={e => this._handleActions(constants.PREVIEW, '', e)}>
                         <span>{lang.preview}</span>
                     </div>
                 ),
                 content: (
                     <div className="preview-panel">
-                        <input ref="preview" className="range" type="range" min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
+                        <input ref="preview" className="range" type="range" value={this.state.previewCurrentLayer} min="0" max={this.state.previewLayerCount} onChange={this._handlePreviewLayerChange} />
                         <div className="layer-count">
                             {this.state.previewCurrentLayer}
                         </div>
                     </div>
-                )
+                ),
+                forceKeepOpen: this.props.previewModeOnly
             };
         },
 
         render: function() {
-            let items = [
-                    this._renderQuality(),
-                    this._renderRaft(),
-                    this._renderSupport(),
-                    this._renderAdvanced(),
-                    this._renderPreview()
-                ],
-                mask = this.props.enable || this.props.previewModeOnly ? '' : (<div className="mask"></div>);
+            const items = [
+                this._renderQuality(),
+                this._renderRaft(),
+                this._renderSupport(),
+                this._renderAdvanced(),
+                this._renderPreview()
+            ];
+            const mask = this.props.enable || this.props.previewModeOnly ? '' : (<div className='mask' />);
 
-            if (this.state.displayModelControl) items.unshift(this._renderModel());
+            if (this.props.displayModelControl) {
+                items.unshift(this._renderModel());
+            }
 
             return (
                 <div className='leftPanel'>

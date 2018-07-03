@@ -1,7 +1,8 @@
 define([
     'react',
+    'reactPropTypes',
     'plugins/classnames/index'
-], function(React, ClassNames) {
+], function(React, PropTypes, ClassNames) {
     'use strict';
 
     return React.createClass({
@@ -13,7 +14,8 @@ define([
             max: React.PropTypes.number.isRequired,
             step: React.PropTypes.number.isRequired,
             default: React.PropTypes.number,
-            onChange: React.PropTypes.func.isRequired
+            onChange: React.PropTypes.func.isRequired,
+            unit: React.PropTypes.string
         },
 
         getInitialState: function() {
@@ -72,10 +74,12 @@ define([
         },
 
         render: function() {
+            let unitClass = "control pull-right unit-" + this.props.unit;
+
             return (
                 <div className="controls">
                     <div className="label pull-left">{this.props.label}</div>
-                    <div className="control pull-right">
+                    <div className={unitClass}>
 
                         <div className="slider-container">
                             <input className="slider" type="range"

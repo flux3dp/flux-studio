@@ -1,5 +1,6 @@
 define([
     'react',
+    'reactDOM',
     'helpers/i18n',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
@@ -8,6 +9,7 @@ define([
     'app/actions/alert-actions'
 ], function(
     React,
+    ReactDOM,
     i18n,
     Modal,
     Alert,
@@ -110,7 +112,7 @@ define([
             }
 
             this.setState({ targetTemperature: t });
-            this.refs.temperature.getDOMNode().value = t;
+            ReactDOM.findDOMNode(this.refs.temperature).value = t;
 
             if(this.operateDuringPause) {
                 DeviceMaster.setHeadTemperatureDuringPause(t);

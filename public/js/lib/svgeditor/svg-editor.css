@@ -1,5 +1,5 @@
 ﻿body {
-	background: #D0D0D0;
+	background: #e7e6e5;
 }
 
 html, body, div{
@@ -24,6 +24,11 @@ html, body, div{
 	-o-transform-origin: 0 0;
 	-webkit-transform-origin: 0 0;
 }
+
+#svg_editor g {
+	cursor: move;
+}
+
 
 #svg_editor {
 	font-size: 10pt;
@@ -75,8 +80,7 @@ select {
 
 #rulers > div {
 	position: absolute;
-	background: #E0E0E0;
-	z-index: 1;
+	background: #E7E6E5;
 	overflow: hidden;
 }
 
@@ -106,7 +110,7 @@ select {
 }
 
 #ruler_x canvas:first-child {
-	margin-left: -17px;
+	margin-left: -2px;
 }
 
 #ruler_x canvas {
@@ -286,7 +290,7 @@ select {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background: white;
-	height: calc(100vh - 490px);
+	height: calc(100vh - 510px);
 }
 #layerlist_container::-webkit-scrollbar {
 	-webkit-appearance: none;
@@ -522,46 +526,6 @@ div.palette_item:first-child {
 	margin-top: -2px;
 	padding-left: 2px;
 	z-index: 4;
-}
-
-#workarea.wireframe #svgcontent ellipse[stroke=none],
-#workarea.wireframe #svgcontent rect[stroke=none],
-#workarea.wireframe #svgcontent path[stroke=none],
-#workarea.wireframe #svgcontent polygon[stroke=none],
-#workarea.wireframe #svgcontent ellipse:not([stroke]),
-#workarea.wireframe #svgcontent rect:not([stroke]),
-#workarea.wireframe #svgcontent path:not([stroke]),
-#workarea.wireframe #svgcontent polygon:not([stroke]) {
-	fill-opacity: 1 !important;
-	stroke-width: 0 !important;
-	/* TODO:
-	Better way to do object selection:
-		Duplicate the origina object, and use invisible outline with stroke width: 5px,
-		so that object can be selected with some error tolerance.
-	*/
-	/* pointer-events: stroke; */
-}
-
-#workarea.wireframe #svgcontent * {
-	fill-opacity: 0;
-	stroke: #000;
-	stroke-width: 1px;
-	stroke-opacity: 1.0;
-	stroke-dasharray: 0;
-	opacity: 1;
-	vector-effect: non-scaling-stroke;
-	filter: none;
-	/* TODO:
-	Better way to do object selection:
-		Duplicate the origina object, and use invisible outline with stroke width: 5px,
-		so that object can be selected with some error tolerance.
-	*/
-	/* pointer-events: stroke; */
-}
-
-#workarea.wireframe #svgcontent text {
-	fill: #000;
-	stroke: none;
 }
 
 #workarea.wireframe #canvasBackground > rect {
@@ -1031,7 +995,7 @@ span.zoom_tool {
 	}
 	#tools_top {
 		height: 90px;
-		background: #E0E0E0;
+		background: #E2E1E0;
 	}
 	#workarea, #sidepanels {
 		top: 70px;

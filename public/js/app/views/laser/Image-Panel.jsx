@@ -1,11 +1,11 @@
 define([
     'jquery',
     'react',
+    'reactDOM',
     'jsx!widgets/Radio-Group',
-    'jsx!widgets/Select',
     'jsx!widgets/Unit-Input',
     'helpers/round'
-], function($, React, RadioGroupView, SelectView, UnitInput, round) {
+], function($, React, ReactDOM, RadioGroupView, UnitInput, round) {
     'use strict';
 
     return React.createClass({
@@ -69,7 +69,7 @@ define([
             console.log('refs', this.refs);
             console.log('newParams', newParams);
             if ('undefined' !== typeof this.refs.threshold) {
-                newParams['threshold'] = parseInt(this.refs.threshold.getDOMNode().value, 10);
+                newParams['threshold'] = parseInt(ReactDOM.findDOMNode(this.refs.threshold).value, 10);
             }
 
             if (true === this.state.sizeLock) {

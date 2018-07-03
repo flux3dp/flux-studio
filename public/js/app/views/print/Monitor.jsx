@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'plugins/classnames/index',
     'helpers/device-master',
     'app/actions/alert-actions',
@@ -22,6 +23,7 @@ define([
 ], function(
     $,
     React,
+    PropTypes,
     ClassNames,
     DeviceMaster,
     AlertActions,
@@ -94,13 +96,13 @@ define([
     return React.createClass({
 
         propTypes: {
-            lang                : React.PropTypes.object,
-            selectedDevice      : React.PropTypes.object,
-            fCode               : React.PropTypes.object,
-            slicingStatus       : React.PropTypes.object,
-            previewUrl          : React.PropTypes.string,
-            opener              : React.PropTypes.string,
-            onClose             : React.PropTypes.func
+            lang                : PropTypes.object,
+            selectedDevice      : PropTypes.object,
+            fCode               : PropTypes.object,
+            slicingStatus       : PropTypes.object,
+            previewUrl          : PropTypes.string,
+            opener              : PropTypes.string,
+            onClose             : PropTypes.func
         },
 
         componentWillMount: function() {
@@ -154,7 +156,7 @@ define([
             _history = [];
             messageViewed = false;
 
-            DeviceMaster.stopStreamCamera();
+            DeviceMaster.disconnectCamera();
             GlobalActions.monitorClosed();
 
             clearInterval(this.reporter);
@@ -162,9 +164,9 @@ define([
         },
 
         childContextTypes: {
-            store: React.PropTypes.object,
-            slicingResult: React.PropTypes.object,
-            lang: React.PropTypes.object
+            store: PropTypes.object,
+            slicingResult: PropTypes.object,
+            lang: PropTypes.object
         },
 
         getChildContext: function() {
@@ -242,7 +244,7 @@ define([
         },
 
         _stopCamera: function() {
-            DeviceMaster.stopStreamCamera();
+            DeviceMaster.disconnectCamera();
         },
 
         _refreshDirectory: function() {
@@ -380,7 +382,8 @@ define([
             return d.promise();
         },
 
-        _handleFolderclick: function(folderName) {
+        _handleFolderclick: function(event) {
+            const folderName = event.currentTarget.dataset.foldername;
             this.unsubscribeEnterKey = shortcuts.on(['RETURN'], e => {
                 // if a folder is selected
                 if(folderName) {
@@ -394,7 +397,8 @@ define([
             }));
         },
 
-        _handleFolderDoubleClick: function(folderName) {
+        _handleFolderDoubleClick: function(event) {
+            const folderName = event.currentTarget.dataset.foldername;
             this._addHistory();
             this._dispatchFolderContent(store.getState().Monitor.currentPath + '/' + folderName);
         },
@@ -431,8 +435,17 @@ define([
             }
         },
 
-        _handleFileClick: function(fileName, action, e) {
-            e.stopPropagation();
+        _handleFileClick: function(event) {
+            const { filename } = event.currentTarget.dataset;
+            store.dispatch(MonitorActionCreator.selectItem({
+                name: filename,
+                type: type.FILE
+            }));
+        },
+
+        _handleFileDoubleClick: function(event) {
+            const { filename } = event.currentTarget.dataset;
+            event.stopPropagation();
 
             const handlePreviewFile = () => {
                 this._addHistory();
@@ -440,7 +453,7 @@ define([
                 start = 0;
                 currentDirectoryContent.files.length = 0; // clear folder content
 
-                DeviceMaster.fileInfo(Monitor.currentPath, fileName).then((info) => {
+                DeviceMaster.fileInfo(Monitor.currentPath, filename).then((info) => {
                     if(info[1] instanceof Blob) {
                         previewUrl = info[1].size === 0 ? 'img/ph_l.png' : URL.createObjectURL(info[1]);
                     }
@@ -457,20 +470,12 @@ define([
 
             this.unsubscribeEnterKey = shortcuts.on(['RETURN'], e => {
                 e.preventDefault();
-                if(fileName) {
+                if(filename) {
                     handlePreviewFile();
                     this.unsubscribeEnterKey();
                 }
             });
-            if(action === DeviceConstants.SELECT) {
-                store.dispatch(MonitorActionCreator.selectItem({
-                    name: fileName,
-                    type: type.FILE
-                }));
-            }
-            else {
-                handlePreviewFile();
-            }
+            handlePreviewFile();
         },
 
         _handleUpload: function(e) {
@@ -899,7 +904,7 @@ define([
                             onFolderClick = {this._handleFolderclick}
                             onFolderDoubleClick = {this._handleFolderDoubleClick}
                             onFileClick = {this._handleFileClick}
-                            onFileDoubleClick = {this._handleFileClick}
+                            onFileDoubleClick = {this._handleFileDoubleClick}
                             onFileCrossIconClick = {this._handleFileCrossIconClick} />
                         <MonitorControl
                             source = {openedFrom}

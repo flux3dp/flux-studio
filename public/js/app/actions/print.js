@@ -1,6 +1,5 @@
 define([
     'jquery',
-    'helpers/display',
     'helpers/websocket',
     'helpers/api/3d-print-slicing',
     'helpers/api/fcode-reader',
@@ -35,7 +34,6 @@ define([
     'helpers/object-assign',
 ], function(
     $,
-    display,
     websocket,
     printSlicing,
     fcodeReader,
@@ -99,10 +97,10 @@ define([
             }
         }
         onSceneImport() {
-            this.enableMenuItems(["CLEAR_SCENE"]);
+            this.enableMenuItems(["CLEAR_SCENE", "SAVE_SCENE", "EXPORT_FLUX_TASK"]);
         }
         onSceneClear() {
-            this.disableMenuItems(["CLEAR_SCENE"]);
+            this.disableMenuItems(["CLEAR_SCENE", "SAVE_SCENE", "EXPORT_FLUX_TASK"]);
         }
     }
 
@@ -387,6 +385,7 @@ define([
 
             uploadStl(mesh.uuid, file, ext).then(() => {
                 addToScene();
+                globalInteraction.onSceneImport();
                 callback();
             }).progress((steps, total) => {
                 console.log(steps, total);
@@ -525,7 +524,9 @@ define([
                         if(files.length > index + 1) {
                             appendModels(files, index + 1, callback);
                         } else {
-                            startSlicing(slicingType.F);
+                            if (localStorage.get('auto-slicing') !== 'false') {
+                                startSlicing(slicingType.F);
+                            }
                             callback();
                         }
                     }
@@ -543,8 +544,7 @@ define([
             setDefaultFileName(importedFCode.name);
             if(objects.length === 0) {
                 doFCodeImport(ext);
-            }
-            else {
+            } else {
                 ProgressActions.close();
                 AlertActions.showPopupYesNo(
                     GlobalConstants.IMPORT_FCODE,
@@ -710,6 +710,7 @@ define([
         let d = $.Deferred(),
             wasInPreviewMode = false;
 
+        checkAndReslice(true);
         _checkNeedToShowProgress();
         if(importFromGCode || importFromFCode) {
             d.resolve();
@@ -750,7 +751,9 @@ define([
         return d.promise();
     }
 
-    function doSlicing() {
+    function checkAndReslice(sliceForSnapshot = false) {
+        if (localStorage.get('auto-slicing') === 'false' && !sliceForSnapshot) return;
+        if (importFromFCode || importFromGCode) return;
         // Check if slicing is necessary
         fullSliceParameters.objs = {};
         objects.forEach((o) => {
@@ -769,6 +772,10 @@ define([
 
         let sliceParams = JSON.stringify(fullSliceParameters, (key, val) => {
             // Fix precision to .00001
+            if (val === undefined) {
+                console.warn("Empty Parameter:" , key);
+                return val;
+            }
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
         if (sliceParams === lastSliceParams) {
@@ -776,6 +783,7 @@ define([
             return;
         } else {
             console.log('Begin Slice:: Remove sliced results');
+            console.trace();
             lastSliceParams = sliceParams;
         }
 
@@ -1092,13 +1100,15 @@ define([
 
             if (!allOutOfBound()) {
                 //set the OrbitControls target to move around.
-                _orbitTargetMesh(SELECTED);
+                if (localStorage.get('lock-selected') !== 'false') {
+                    _orbitTargetMesh(SELECTED);
+                }
             }
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
 
                 setObjectDialoguePosition(SELECTED);
-                doSlicing();
+                checkAndReslice();
             }
         });
         render();
@@ -1399,7 +1409,7 @@ define([
 
             slicingStatus.showProgress = false;
 
-            doSlicing();
+            checkAndReslice();
             syncObjectOutline(src);
             setObjectDialoguePosition(src);
         }
@@ -1424,18 +1434,14 @@ define([
     function setAdvanceParameter(settings) {
         let deferred = $.Deferred(),
             updateTask = null;
-        switch(settings.engine) {
-            case 'cura2':
-                updateTask = sliceMaster.addTask('setParameter', 'advancedSettingsCura2', settings.customCura2);
-                break;
-            default:
-                updateTask = sliceMaster.addTask('setParameter', 'advancedSettings', settings.custom);
-        }
+
+        updateTask = sliceMaster.addTask('setParameter', 'advancedSettingsCura2', settings.configStr);
+
         updateTask.then(() => {
             Object.assign(fullSliceParameters.settings, settings);
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
-                doSlicing();
+                checkAndReslice();
             }
             deferred.resolve('');
         }).fail((error) => {
@@ -1459,7 +1465,7 @@ define([
             fullSliceParameters.settings[name] = value;
             slicingStatus.showProgress = false;
             if(objects.length > 0) {
-                doSlicing();
+                checkAndReslice();
             }
             d.resolve('');
         }).fail((error) => {
@@ -1475,7 +1481,7 @@ define([
         hasPreviewImage = false;
         lastSliceParams = '';
         if(objects.length > 0) {
-            doSlicing();
+            checkAndReslice();
         }
         return sliceMaster.addTask('setParameters', keyValueObject);
     }
@@ -1501,7 +1507,7 @@ define([
             reactSrc.setState({
                 modelsrc: src.uuid ? src : null
             }, () => {
-                doSlicing();
+                checkAndReslice();
             });
             src.plane_boundary = planeBoundary(src);
             groundIt(src);
@@ -1571,7 +1577,7 @@ define([
                     objectDialogueStyle: {
                         'left': leftOffset + 'px',
                         'top': topOffset + 'px',
-                        'margin-left': objectDialogueDistance + 'px'
+                        'marginLeft': objectDialogueDistance + 'px'
                     }
                 });
 
@@ -1715,7 +1721,7 @@ define([
                 });
             }
             else {
-                doSlicing();
+                checkAndReslice();
             }
 
             _clearPath();
@@ -1760,7 +1766,7 @@ define([
                         objects.push(mesh);
                         addHistory('ADD', mesh);
 
-                        doSlicing();
+                        checkAndReslice();
                         syncObjectOutline(mesh);
                         setObjectDialoguePosition(mesh);
                         render();
@@ -1783,6 +1789,10 @@ define([
     function planeBoundary(sourceMesh) {
         let transformation = JSON.stringify({ p: sourceMesh.position, s: sourceMesh.scale, r: sourceMesh.rotation}, (key, val) => {
             // Fix precision to .00001
+            if (val === undefined) {
+                console.warn("Empty Parameter:" , key);
+                return val;
+            }
             return val.toFixed ? Number(val.toFixed(5)) : val;
         });
         if (sourceMesh.jTransformation === transformation) {
@@ -2194,6 +2204,7 @@ define([
     }
 
     function togglePreview() {
+        checkAndReslice(true);
         if (objects.length === 0 || allOutOfBound()) {
             _closePreview();
             return;
@@ -2646,7 +2657,7 @@ define([
             reactSrc.setState({ hasObject: !allOutOfBound()});
             if(blobExpired && objects.length > 0 && !allOutOfBound()) {
                 slicingStatus.showProgress = false;
-                doSlicing();
+                checkAndReslice();
             }
         });
         render();
@@ -2726,22 +2737,26 @@ define([
         }
 
         if(blobExpired) {
+            console.log("Blob Expired");
             let progress;
             slicingStatus.showProgress = true;
             slicingStatus.needToCloseWait = true;
 
             if(willReslice) {
+                console.log("Will Reslice");
                 progress = lang.print.reRendering;
                 if(!slicingStatus.isComplete) {
                     _showWait(progress, !showStopButton);
                 }
             }
             else {
+                console.log("Update Slice Progress");
                 updateSlicingProgressFromReport(slicingStatus.lastReport);
             }
         }
         else {
             if(!printPath || printPath.length === 0) {
+                console.log("Getting Path");
                 _showWait(lang.print.drawingPreview, !showStopButton);
                 sliceMaster.addTask('getPath').then((result) => {
                     if(result.error) {
@@ -2759,6 +2774,7 @@ define([
                 });
             }
             else {
+                console.log("Drawing Path");
                 _drawPath().then(function() {
                     changePreviewLayer(getCurrentPreviewLayer());
                     _closeWait();

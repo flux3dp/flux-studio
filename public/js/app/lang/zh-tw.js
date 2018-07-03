@@ -1,5 +1,5 @@
 define(function() {
-    'use strict';
+
 
     return {
         general: {
@@ -14,14 +14,15 @@ define(function() {
             osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         generic_error: {
-            UNKNOWN_ERROR: "[UE] 請重啟 FLUX Studio",
-            OPERATION_ERROR: "[OE] 機器發生狀態衝突，請再試一次",
-            SUBSYSTEM_ERROR: "[SE] 請重啟機器",
-            UNKNOWN_COMMAND: "[UC] 請更新機器韌體",
-            RESOURCE_BUSY: "[RB] 請重新啟動 Delta, 或再試一次"
+            UNKNOWN_ERROR: '[UE] 請重啟 FLUX Studio',
+            OPERATION_ERROR: '[OE] 機器發生狀態衝突，請再試一次',
+            SUBSYSTEM_ERROR: '[SE] 請重啟機器',
+            UNKNOWN_COMMAND: '[UC] 請更新機器韌體',
+            RESOURCE_BUSY: '[RB] 請重新啟動 Delta, 或再試一次'
         },
         device_selection: {
             no_printers: '無法透過 Wi-Fi 偵測到機器，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215394548">暸解更多</a>',
+            no_beambox: '無法透過 Wi-Fi 偵測到機器，請檢查您與機器的網路連線是否在同個網路下 <a target="_blank" href="https://tw.flux3dp.com/beambox-tutorial/">暸解更多</a>',
             module: 'MODULE',
             status: 'STATUS'
         },
@@ -167,7 +168,7 @@ define(function() {
             no_machine : '目前沒有機器或已設定過連線，跳過此步驟',
 
             // specific caption/content
-            invalid_device_name: '機器名稱只能使用中文字，英文字母、數字、空格以及特殊字元  “(”, “)”, “-”, “_”, “’”, “\'”',
+            invalid_device_name: '機器名稱只能使用中文，英文、數字、空格以及特殊字元 ( ) - _ ’ \'',
             require_device_name: '名稱欄位為必填',
             select_language: '請選擇你想使用的語言',
             change_password: {
@@ -177,7 +178,7 @@ define(function() {
             connect_flux: '連接機器',
             via_usb: '使用 USB',
             via_wifi: '使用 WiFi',
-            select_machine_type: '請選擇您的機種',            
+            select_machine_type: '請選擇您的機種',
             name_your_flux: '為你的機器取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
@@ -319,6 +320,8 @@ define(function() {
             projection_perspective: '透視投影',
             projection_orthographic: '正投影',
             antialiasing: '反鋸齒',
+            auto_slice: '自動切片',
+            lock_selection: '鎖定選取目標',
             reset: '重置所有設定',
             default_machine: '預設機器',
             default_machine_button: '無',
@@ -333,6 +336,8 @@ define(function() {
             beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',
             default_beambox_model: '預設型號',
+            guides_origin: '參考線座標',
+            guides: '參考線',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: '無',
@@ -407,7 +412,7 @@ define(function() {
                 check_email: '相關信進已寄出到您的電子信箱，請確認',
                 email_exists: '電子信箱已被使用',
                 not_verified: '請於您的電子信箱開啟確認信件',
-                user_not_found: '登入訊息錯誤',
+                user_not_found: '使用者帳號密碼錯誤',
                 resend_verification: '重新寄送確認信件',
                 contact_us: '請與 FLUX 客服聯絡',
                 confirm_reset_password: '需要重新設定密碼嗎？',
@@ -442,13 +447,13 @@ define(function() {
                 infill: '填充',
                 support: '支撐',
                 speed: '速度',
-                custom: '專家',
+                custom: '文字',
                 slicingEngine: '切片引擎',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
                 cura2: 'Cura2',
                 filament: '線料',
-                temperature: '溫度',
+                temperature: '溫度與材料',
                 detect_filament_runout: '偵測線料',
                 flux_calibration: '自動校正',
                 detect_head_tilt: '偵測工具頭傾斜',
@@ -466,6 +471,11 @@ define(function() {
                 rectilinear: '直線',         // do not change
                 rectilinearGrid: '直線格狀',// do not change
                 honeycomb: '蜂巢狀',             // do not change
+                offset: '位移',
+                xyOffset: '水平擴張',
+                zOffset: 'Z 軸位移',
+                cutBottom: '移除底部',
+
                 curaInfill: {
                     automatic: '自動',
                     grid: '格狀',
@@ -628,7 +638,7 @@ define(function() {
                 raft_off: '底座 OFF',
                 support_on: '支撐 ON',
                 support_off: '支撐 OFF',
-                advanced: '進階選項',
+                advanced: '更多選項',
                 preview: '預覽路徑',
                 plaTitle: 'PICK THE COLOR OF THE FILAMENT',
                 transparent: 'TRANSPARENT',
@@ -984,11 +994,14 @@ define(function() {
                 layer_by_layer: '依圖層分層',
                 layer_by_color: '依顏色分層',
                 nolayer: '不分層',
-                should_update_firmware_to_continue: '請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)'
+                no_support_text: 'FLUX Studio 目前不支援由外部匯入文字標籤，請由向量繪圖軟體將文字轉成路徑後再匯入。',
+                power_too_high_damage_laser_tube: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命',
+                should_update_firmware_to_continue: '您的韌體版本不支援最新的軟體改善。為了更良好的使用經驗與雕刻品質，請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)'
             },
             left_panel: {
                 insert_object: '插入物件',
                 preview: '相機預覽',
+                advanced: '進階選項',
                 suggest_calibrate_camera_first: '提醒您：\n第一次使用相機，請先進行相機校正。並在每次使用時將平台對焦，以取得最好的效果。',
                 end_preview: '結束預覽模式',
                 unpreviewable_area: '非相機預覽範圍',
@@ -1003,6 +1016,15 @@ define(function() {
                     line: '線段',
                     image: '圖片',
                     text: '文字'
+                },
+                advanced_panel: {
+                    engrave_parameters: '雕刻參數',
+                    engrave_dpi: '雕刻解析度',
+                    low: '低',
+                    medium: '中',
+                    high: '高',
+                    cancel: '取消',
+                    save: '儲存'
                 }
             },
             right_panel: {
@@ -1013,9 +1035,14 @@ define(function() {
                 laser_panel: {
                     strength: '功率',
                     speed: '速度',
+                    repeat: '執行次數',
+                    times: '次',
                     cut: '切割',
                     engrave: '雕刻'
                 },
+            },
+            bottom_right_panel: {
+                convert_text_to_path_before_export: '部分字型在不同系統間有差異，輸出前請將字體轉換成路徑，以確保文字正確顯示。轉換文字至路徑中...'
             },
             object_panels: {
                 position: '位置',
@@ -1025,7 +1052,16 @@ define(function() {
                 height: '長',
                 center: '圓心',
                 ellipse_radius: '大小',
+                rounded_corner: '圓角',
+                radius: '半徑',
                 points: '端點',
+                text: '文字',
+                font_size: '字級',
+                fill: '填充',
+                letter_spacing: '字距',
+                convert_to_path: '轉換為路徑',
+                convert_to_path_to_get_precise_result: '部分字型在不同系統間有差異，輸出前請將字體轉換成路徑，以確保文字正確顯示',
+                wait_for_parsing_font: '解析字體中... 請稍待 10 秒',
                 laser_config: '雷射設定',
                 shading: '漸層',
                 threshold: '曝光閾值',
@@ -1296,6 +1332,7 @@ define(function() {
             new_app_download_canceled: 'FLUX Studio 下載已被取消',
             new_app_downloaded: '新版FLUX Studio 下載完畢',
             ask_for_upgrade: '馬上升級嗎?',
+            please_enter_dpi: '請輸入該檔案的 dpi',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
             empty_file: '檔案內容不存在',
@@ -1304,7 +1341,8 @@ define(function() {
             uploading_fcode: '正在上傳 fcode',
             cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式',
             unable_to_find_machine: '無法連接到機器 ',
-            unable_to_start: '無法開始工作，如果持續發生，請附上錯誤回報，與我們聯絡:\n'
+            unable_to_start: '無法開始工作，如果持續發生，請附上錯誤回報，與我們聯絡:\n',
+            camera_fail_to_transmit_image: '相機傳輸照片異常，請將 Beambox 重新開機。如果問題持續發生，請與我們聯絡。'
         },
         machine_status: {
             '-10': '原生模式',
@@ -1383,14 +1421,15 @@ define(function() {
             cancel: '取消',
             back: '上一步',
             finish: '完成',
+            please_goto_beambox_first: '請先選擇 Beambox 功能，再進行校正',
             please_place_paper: '請將乾淨 A4 白紙放在工作區域的左上角',
-            please_refocus: '請將工作平台對焦',
+            please_refocus: '請旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             taking_picture: '擷取圖片中...',
             start_engrave: '開始繪製校正圖片',
-            analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
+            analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             drawing_calibration_image: '繪製校正圖片中...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已將平台正確對焦',
-            calibrate_done: '校正相機完成<br/>使用時請正確對焦已取得良好的預覽效果。'
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦<br/>3. 若雷射沒成功射出，請至 Beambox 機器面板上選擇"動作"，並將"功率倍率"與"速度倍率"調回正常值，再重新校正一次。',
+            calibrate_done: '校正相機完成<br/>使用時請正確對焦以取得良好的預覽效果。'
         },
         input_machine_password: {
             require_password: '"%s" 需要密碼',
@@ -1451,7 +1490,8 @@ define(function() {
             USED                : '使用時間',
             HARDWARE_VERSION    : '硬體版本',
             FOCAL_LENGTH        : '焦距調整',
-            hour                : '小時'
+            hours               : '小時',
+            cannot_get_info     : '無法讀取工具頭資訊'
         }
     };
 });

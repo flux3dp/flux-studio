@@ -23,26 +23,34 @@ TODOS
 1. JSDoc
 */
 define([
+    'react',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
     'app/actions/beambox/preview-mode-controller',
+    'jsx!app/actions/announcement',
+    'jsx!app/views/beambox/DxfDpiSelector',
     'app/actions/alert-actions',
     'helpers/image-data',
     'helpers/shortcuts',
     'helpers/i18n',
     'app/actions/beambox/constant',
     'helpers/dxf2svg',
+    'app/constants/keycode-constants',
     'helpers/api/svg-laser-parser'
 ], function (
+    React,
     ObjectPanelsController,
     LaserPanelController,
     PreviewModeController,
+    Announcement,
+    DxfDpiSelector,
     AlertActions,
     ImageData,
     Shortcuts,
     i18n,
     Constant,
     Dxf2Svg,
+    KeycodeConstants,
     SvgLaserParser
 ) {
     const LANG = i18n.lang.beambox;
@@ -121,6 +129,7 @@ define([
                 'ext-polygon.js',
                 'ext-star.js',
                 'ext-panning.js',
+                'ext-multiselect.js',
                 // 'ext-storage.js',
 
                 'ext-closepath.js',
@@ -140,9 +149,12 @@ define([
                     opacity: 1
                 },
                 text: {
-                    stroke_width: 0,
-                    font_size: 24,
-                    font_family: 'monospace'
+                    stroke_width: 1,
+                    font_size: 100,
+                    font_family: 'Arial',
+                    fill: '#fff',
+                    fill_opacity: '0',
+                    text_anchor: 'start'
                 },
                 initOpacity: 1,
                 colorPickerCSS: null, // Defaults to 'left' with a position equal to that of the fill_color or stroke_color element minus 140, and a 'bottom' equal to 40
@@ -163,7 +175,7 @@ define([
                 // EDITOR OPTIONS
                 // Change the following to preferences (already in the Editor Options dialog)?
                 gridSnapping: false,
-                gridColor: '#ddd',
+                gridColor: 'rgba(0,0,0,0.18)',
                 baseUnit: 'px',
                 snappingStep: 10,
                 showRulers: true,
@@ -1764,7 +1776,7 @@ define([
                     var panels = {
                         g: [],
                         a: [],
-                        rect: ['width', 'height'],
+                        rect: ['rx', 'width', 'height'],
                         image: ['width', 'height'],
                         circle: ['cx', 'cy', 'r'],
                         ellipse: ['cx', 'cy', 'rx', 'ry'],
@@ -1777,7 +1789,7 @@ define([
                         height: ObjectPanelsController.setHeight,
                         cx: ObjectPanelsController.setEllipsePositionX,
                         cy: ObjectPanelsController.setEllipsePositionY,
-                        rx: ObjectPanelsController.setEllipseRadiusX,
+                        rx: (elem.tagName === 'rect') ? ObjectPanelsController.setRectRoundedCornerRadiusX : ObjectPanelsController.setEllipseRadiusX,
                         ry: ObjectPanelsController.setEllipseRadiusY,
                         x1: ObjectPanelsController.setLineX1,
                         y1: ObjectPanelsController.setLineY1,
@@ -1812,11 +1824,11 @@ define([
                     }
 
                     if (panels[el_name]) {
-                        var cur_panel = panels[el_name];
+                        const cur_panels = panels[el_name];
 
                         $('#' + el_name + '_panel').show();
 
-                        $.each(cur_panel, function (i, item) {
+                        $.each(cur_panels, function (i, item) {
                             var attrVal = elem.getAttribute(item);
                             if (curConfig.baseUnit !== 'px' && elem[item]) {
                                 var bv = elem[item].baseVal.value;
@@ -1848,6 +1860,15 @@ define([
                                     $('#text').focus().select();
                                 }, 100);
                             }
+                            ObjectPanelsController.setFontFamily(svgCanvas.getFontFamily());
+                            ObjectPanelsController.setFontSize(Number(svgCanvas.getFontSize()));
+
+                            ObjectPanelsController.setFontStyle({
+                                weight: Number(svgCanvas.getFontWeight()),
+                                italic: svgCanvas.getItalic()
+                            });
+                            ObjectPanelsController.setLetterSpacing(svgCanvas.getLetterSpacing());
+                            ObjectPanelsController.setFontIsFill(svgCanvas.getFontIsFill());
                         } // text
                         else if (el_name === 'image') {
                             if (svgCanvas.getMode() === 'image') {
@@ -3161,8 +3182,15 @@ define([
                 svgCanvas.setSegType($(this).val());
             });
 
-            $('#text').bind('keyup input', function () {
+            $('#text').bind('keyup input', function (evt) {
+                evt.stopPropagation();
                 svgCanvas.setTextContent(this.value);
+            });
+            $('#text').bind('keydown', function(evt) {
+                evt.stopPropagation();
+                if (evt.keyCode === KeycodeConstants.KEY_RETURN) {
+                    svgCanvas.textActions.toSelectMode(true);
+                }
             });
 
             $('#image_url').change(function () {
@@ -4120,7 +4148,7 @@ define([
                         $('#ruler_x')[0].scrollLeft = workarea[0].scrollLeft;
                     }
                     if ($('#ruler_y').length !== 0) {
-                        $('#ruler_y')[0].scrollTop = workarea[0].scrollTop;
+                        $('#ruler_y')[0].scrollTop = workarea[0].scrollTop - workarea[0].offsetTop;
                     }
                 });
 
@@ -4473,7 +4501,7 @@ define([
             }
 
             function mergeLayer() {
-                if ($('#layerlist tr.layersel').index() === 0) {
+                if ($('#layerlist tr.layersel').index() === $('#layerlist tr.layer').length - 1) {
                     return;
                 }
                 svgCanvas.mergeLayer();
@@ -5284,7 +5312,7 @@ define([
                         reader = new FileReader();
                         reader.onloadend = function (e) {
                             // let's insert the new image until we know its dimensions
-                            var insertNewImage = function (width, height) {
+                            var insertNewImage = function (img, width, height) {
                                 var newImage = svgCanvas.addSvgElementFromJson({
                                     element: 'image',
                                     attr: {
@@ -5297,9 +5325,10 @@ define([
                                         preserveAspectRatio: 'none',
                                         'data-threshold': 100,
                                         'data-shading': true,
-                                        origImage: e.target.result
+                                        origImage: img.src
                                     }
                                 });
+
                                 ImageData(
                                     newImage.getAttribute('origImage'), {
                                         height: height,
@@ -5311,7 +5340,7 @@ define([
                                             is_svg: false
                                         },
                                         onComplete: function (result) {
-                                            svgCanvas.setHref(newImage, result.canvas.toDataURL('image/png'));
+                                            svgCanvas.setHref(newImage, result.canvas.toDataURL());
                                         }
                                     }
                                 );
@@ -5327,15 +5356,16 @@ define([
                             var imgWidth = 100;
                             var imgHeight = 100;
                             var img = new Image();
-                            img.src = e.target.result;
+                            var blob = new Blob([reader.result]);
+                            img.src = URL.createObjectURL(blob);
                             img.style.opacity = 0;
                             img.onload = function () {
                                 imgWidth = img.width;
                                 imgHeight = img.height;
-                                insertNewImage(imgWidth, imgHeight);
+                                insertNewImage(img, imgWidth, imgHeight);
                             };
                         };
-                        reader.readAsDataURL(file);
+                        reader.readAsArrayBuffer(file);
                     });
                 }
                 function readSVG(blob, type) {
@@ -5362,113 +5392,165 @@ define([
                         reader.readAsText(blob);
                     });
                 }
+                const importSvg = file => {
+                    svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
+                    async function importAs(type) {
+                        if (type === 'color') {
+                            await svgWebSocket.uploadPlainSVG(file);
+                            const outputs = await svgWebSocket.divideSVG();
+
+                            await readSVG(outputs['strokes'], type);
+                            console.log('Loading colors');
+
+                            await readSVG(outputs['colors'], type);
+                            console.log('Loading bitmap', outputs['bitmap']);
+
+                            if (outputs['bitmap'].size > 0) {
+                                svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                                await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+                            }
+                            console.log('Load complete');
+                        } else {
+                            readSVG(file, type);
+                        }
+                    }
+
+                    AlertActions.showPopupCustomGroup(
+                        'confirm_mouse_input_device',
+                        LANG.popup.select_import_method,
+                        [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
+                        '',
+                        '',
+                        [
+                            () => {
+                                $('#svg_editor').removeClass('color');
+                                importAs('layer');
+                            },
+                            () => {
+                                $('#svg_editor').addClass('color');
+                                importAs('color');
+                            },
+                            () => {
+                                $('#svg_editor').removeClass('color');
+                                importAs('nolayer');
+                            }
+                        ]
+                    );
+                };
+                const importBitmap = file => {
+                    svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
+                    readImage(file);
+                };
+                const importDxf = async file => {
+                    const parsedSvg = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onloadend = evt => {
+                            const parsed = Dxf2Svg.parseString(evt.target.result);
+                            console.log('Parsed DXF', parsed);
+                            const svg = Dxf2Svg.toSVG(parsed);
+                            console.log('svg: ', svg);
+                            resolve(svg);
+                        };
+                        reader.readAsText(file);
+                    });
+                    const dpi = await new Promise((resolve, reject) => {
+                        // I would like to use jsx expression, but I don't know how to make jsx compatible with requirejs's shim and dep feature
+                        Announcement.post(
+                            React.createElement(
+                                DxfDpiSelector,
+                                {
+                                    onSubmit: val => {
+                                        Announcement.unpost('DXF_DPI_SELECTOR');
+                                        resolve(val);
+                                    },
+                                    onCancel: () => {
+                                        Announcement.unpost('DXF_DPI_SELECTOR');
+                                        $('#dialog_box').hide();
+                                        reject();
+                                    }
+                                }
+                            ), 'DXF_DPI_SELECTOR',
+                            null
+                        );
+                    });
+
+                    const resizedSvg = (function(){
+                        const xml = (new window.DOMParser()).parseFromString(parsedSvg, 'text/xml');
+                        const $svgBase = $(xml).find('svg');
+                        const originWidth = $svgBase.attr('width');
+                        const originHeight = $svgBase.attr('height');
+
+                        // 72 is default dpi which is the same as svgcanvas.importSvgString()
+                        $svgBase.attr('width', originWidth * 72 / dpi);
+                        $svgBase.attr('height', originHeight * 72 / dpi);
+
+                        return new XMLSerializer().serializeToString($svgBase.get(0));
+                    })();
+
+                    const newElement = svgCanvas.importSvgString(resizedSvg, 'layer');
+
+                    svgCanvas.ungroupSelectedElement();
+                    svgCanvas.ungroupSelectedElement();
+                    svgCanvas.groupSelectedElements();
+                    svgCanvas.alignSelectedElements('m', 'page');
+                    svgCanvas.alignSelectedElements('c', 'page');
+                    // highlight imported element, otherwise we get strange empty selectbox
+                    try {
+                        svgCanvas.selectOnly([newElement]);
+                    } catch (e) {
+                        console.log(e);
+                    }
+                    // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+                    $('#dialog_box').hide();
+                };
                 var importImage = function (e) {
                     $.process_cancel(uiStrings.notification.loadingImage);
                     e.stopPropagation();
                     e.preventDefault();
                     $('#workarea').removeAttr('style');
                     $('#main_menu').hide();
-                    var file = (e.type === 'drop') ? e.dataTransfer.files[0] : this.files[0];
+                    const file = (e.type === 'drop') ? e.dataTransfer.files[0] : this.files[0];
                     if (!file) {
                         $('#dialog_box').hide();
                         return;
                     }
-                    /* if (file.type === 'application/pdf') { // Todo: Handle PDF imports
-
-                        }
-                        else */
-                    if (file.type.indexOf('image') > -1) {
-                        // Detected an image
-                        // svg handling
-                        if (file.type.indexOf('svg') > -1) {
-                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
-                            async function importAs(type) {
-                                if (type === 'color') {
-                                    await svgWebSocket.uploadPlainSVG(file);
-                                    const outputs = await svgWebSocket.divideSVG();
-                                    await readSVG(outputs['strokes'], type);
-                                    console.log('Loading colors');
-                                    await readSVG(outputs['colors'], type);
-                                    console.log('Loading bitmap', outputs['bitmap']);
-                                    if (outputs['bitmap'].size > 0) {
-                                        svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                        await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
-                                    }
-                                    console.log('Load complete');
-                                } else {
-                                    readSVG(file, type);
-                                }
-                            }
-
-                            AlertActions.showPopupCustomGroup(
-                                'confirm_mouse_input_device',
-                                LANG.popup.select_import_method,
-                                [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
-                                '',
-                                '',
-                                [
-                                    () => {
-                                        importAs('layer');
-                                    },
-                                    () => {
-                                        importAs('color');
-                                    },
-                                    () => {
-                                        importAs('nolayer');
-                                    }
-                                ]
-                            );
-
-                        } else {
-                            //handle bitmap
-                            svgCanvas.setLatestImportFileName(file.name.split('.')[0])
-                            readImage(file);
-                        }
-                    } else if (file.name.toLowerCase().indexOf('.dxf') > 0) {
-                        console.log('Load DXF');
-                        reader = new FileReader();
-                        let divideLayer = false;
-                        reader.onloadend = function (evt) {
-                            var parsed = Dxf2Svg.parseString(evt.target.result);
-                            console.log('Parsed DXF', parsed);
-                            let svg = Dxf2Svg.toSVG(parsed);
-                            let newElement;
-
-                            if (divideLayer) {
-                                // Seperate layers
-                                Object.keys(svg).map((key) => {
-                                    if (svg[key] === '') {
-                                        return;
-                                    }
-                                    svgCanvas.createLayer(key);
-                                    newElement = svgCanvas.importSvgString(svg[key], true);
-                                });
+                    const fileType = (function() {
+                        if (file.type.toLowerCase().includes('image')) {
+                            if (file.type.toLowerCase().includes('svg')) {
+                                return 'svg';
                             } else {
-                                svgCanvas.importSvgString(svg, 'layer');
+                                return 'bitmap';
                             }
-
-                            svgCanvas.ungroupSelectedElement();
-                            svgCanvas.ungroupSelectedElement();
-                            svgCanvas.groupSelectedElements();
-                            svgCanvas.alignSelectedElements('m', 'page');
-                            svgCanvas.alignSelectedElements('c', 'page');
-                            // highlight imported element, otherwise we get strange empty selectbox
-                            try {
-                                svgCanvas.selectOnly([newElement]);
-                            } catch (e) {
-                                console.log(e);
-                            }
-                            // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-                            $('#dialog_box').hide();
-                        };
-                        reader.readAsText(file);
-                    } else {
-                        if (file.name.endsWith('.ai') || (file.path && file.path.endsWith('.ai'))) {
-                            $.alert(LANG.svg_editor.unnsupport_ai_file_directly);
-                        } else {
-                            $.alert(LANG.svg_editor.unnsupported_file_type);
                         }
+                        if (file.name.toLowerCase().includes('.dxf')) {
+                            return 'dxf';
+                        }
+                        if (file.name.toLowerCase().endsWith('.ai') || (file.path && file.path.toLowerCase().endsWith('.ai'))) {
+                            return 'ai';
+                        }
+                        return 'unknown';
+                    })();
+                    switch (fileType) {
+                        case 'svg':
+                            importSvg(file);
+                            break;
+                        case 'bitmap':
+                            importBitmap(file);
+                            break;
+                        case 'dxf':
+                            importDxf(file);
+                            break;
+                        case 'ai':
+                            $.alert(LANG.svg_editor.unnsupport_ai_file_directly);
+                            break;
+                        case 'unknown':
+                            $.alert(LANG.svg_editor.unnsupported_file_type);
+                            break;
                     }
+
+                    // let file input import same file again.
+                    // Beacause function 'importImage' is triggered by onChange event, so we remove the value to ensure onChange event fire
+                    $(this).attr('value', '');
                 };
 
                 workarea[0].addEventListener('dragenter', onDragEnter, false);
@@ -5606,10 +5688,10 @@ define([
 							0 	   0      0      1  0'
                 });
                 greyscaleFilter.appendChild(greyscaleMatrix);
-                $('#svgroot defs').append(greyscaleFilter);
-                $(svgcontent).attr({
-                    filter: 'url(#greyscaleFilter)'
-                });
+                //$('#svgroot defs').append(greyscaleFilter);
+                // $(svgcontent).attr({
+                //     filter: 'url(#greyscaleFilter)'
+                // });
             })();
         };
 

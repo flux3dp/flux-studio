@@ -1,7 +1,6 @@
 define([
     'jquery',
     'react',
-    'jsx!widgets/Select',
     'jsx!widgets/List',
     'jsx!widgets/Modal',
     'jsx!views/laser/Advanced-Panel',
@@ -17,7 +16,6 @@ define([
 ], function(
     $,
     React,
-    SelectView,
     List,
     Modal,
     AdvancedPanel,

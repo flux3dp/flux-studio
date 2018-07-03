@@ -1,6 +1,8 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
+    'reactDOM',
     'app/actions/initialize-machine',
     'jsx!widgets/Modal',
     'jsx!widgets/List',
@@ -15,6 +17,8 @@ define([
 ], function(
     $,
     React,
+    ReactCx,
+    ReactDOM,
     initializeMachine,
     Modal,
     ListView,
@@ -291,7 +295,7 @@ define([
                 var self = this,
                     wifi = initializeMachine.settingWifi.get();
 
-                wifi.plain_password = self.refs.password.getDOMNode().value;
+                wifi.plain_password = ReactDOM.findDOMNode(self.refs.password).value;
                 initializeMachine.settingWifi.set(wifi);
                 self._stopScan(actionMap.BACK_TO_SET_PASSWARD);
             },
@@ -335,8 +339,8 @@ define([
             },
 
             _checkApModeSetting: function(e) {
-                var name = this.refs.ap_mode_name.getDOMNode().value,
-                    pass = this.refs.ap_mode_password.getDOMNode().value,
+                var name = ReactDOM.findDOMNode(this.refs.ap_mode_name).value,
+                    pass = ReactDOM.findDOMNode(this.refs.ap_mode_password).value,
                     apModeNameIsVaild = /^[a-zA-Z0-9 \-\.\_\!\,\[\]\(\)]+$/g.test(name),
                     apModePassIsVaild = /^[a-zA-Z0-9 \-\.\_\!\,\[\]\(\)]{8,}$/g.test(pass);
 
@@ -363,9 +367,9 @@ define([
             _joinNetwork: function(e) {
                 e.preventDefault();
 
-                var ssid = this.refs.network_name.getDOMNode().value,
-                    wepkey = this.refs.network_password.getDOMNode().value,
-                    security = this.refs.network_security.getDOMNode().value;
+                var ssid = ReactDOM.findDOMNode(this.refs.network_name).value,
+                    wepkey = ReactDOM.findDOMNode(this.refs.network_password).value,
+                    security = ReactDOM.findDOMNode(this.refs.network_security).value;
 
                 let wifi = { ssid, security };
                 initializeMachine.settingWifi.set(wifi);
@@ -438,7 +442,7 @@ define([
                             openJoinNetworkForm: false
                         });
                     },
-                    classSet = React.addons.classSet,
+                    classSet = ReactCx.cx,
                     nameClass = classSet({
                         'error': false === self.state.apModeNameIsVaild
                     }),
@@ -509,7 +513,7 @@ define([
                             openJoinNetworkForm: false
                         });
                     },
-                    classSet = React.addons.classSet,
+                    classSet = ReactCx.cx,
                     nameClass = classSet({
                         'error': false === self.state.apModeNameIsVaild
                     }),

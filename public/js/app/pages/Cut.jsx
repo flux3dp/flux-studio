@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'jsx!views/cutter/Setup-Panel',
     'jsx!pages/Holder',
     'helpers/api/config',
@@ -8,6 +9,7 @@ define([
 ], function(
     $,
     React,
+    PropTypes,
     HolderSetupPanel,
     HolderGenerator,
     ConfigHelper,
@@ -25,10 +27,8 @@ define([
         let Holder = HolderGenerator(args);
 
         let view = React.createClass({
-                getDefaultProps: function() {
-                    return {
-                        page: React.PropTypes.string
-                    };
+                propTypes: {
+                    page: PropTypes.string
                 },
 
                 getInitialState: function() {

@@ -15,5 +15,11 @@ module.exports = {
 
     UPDATE_ACCOUNT          : 'UPDATE_ACCOUNT',
 
+    GET_AVAILABLE_FONTS     : 'GET_AVAILABLE_FONTS',
+    FIND_FONTS              : 'FIND_FONTS',
+    FIND_FONT               : 'FIND_FONT',
+    REQUEST_PATH_D_OF_TEXT  : 'REQUEST_PATH_D_OF_TEXT',
+    RESOLVE_PATH_D_OF_TEXT  : 'RESOLVE_PATH_D_OF_TEXT',
+
     SET_AS_DEFAULT          : 'SET_AS_DEFAULT'
 };

@@ -20,47 +20,41 @@ define([
     ProgressActions,
     ProgressConstants
 ) {
-    'use strict';
 
-    var lang = i18n.get();
+    const lang = i18n.get();
 
     return function(printer, allowPause, forceAbort) {
         if(!printer) { return; }
-        var deferred = $.Deferred(),
-            onYes = function(id) {
-                var timer;
+        const deferred = $.Deferred();
 
-                DeviceMaster.selectDevice(printer).then(function() {
-                    switch (id) {
-                    case 'kick':
-                        DeviceMaster.kick().then(function() {
-                            deferred.resolve('ok');
-                        });
-                        break;
-                    case 'abort':
-                        ProgressActions.open(ProgressConstants.NONSTOP);
-                        DeviceMaster.stop().then(function() {
-                            timer = setInterval(function() {
-                                DeviceMaster.getReport().then(function(report) {
-                                    if (report.st_id === DeviceConstants.status.ABORTED) {
-                                        setTimeout(function() {
-                                            DeviceMaster.quit();
-                                        }, 500);
-                                    }
-                                    else if(report.st_id === DeviceConstants.status.IDLE) {
-                                        clearInterval(timer);
-                                        ProgressActions.close();
-                                        deferred.resolve('ok', report.st_id);
-                                    }
-                                });
-                            }, 1000);
-                        });
-                        break;
-                    }
-                });
+        const onYes = async (id) => {
+            let timer;
+            await DeviceMaster.selectDevice(printer);
+            switch (id) {
+                case 'kick':
+                    await DeviceMaster.kick();
+                    deferred.resolve('ok');
+                    break;
+                case 'abort':
+                    ProgressActions.open(ProgressConstants.NONSTOP);
+                    await DeviceMaster.stop();
+                    timer = setInterval(async () => {
+                        const report = await DeviceMaster.getReport();
+                        if (report.st_id === DeviceConstants.status.ABORTED) {
+                            setTimeout(function() {
+                                DeviceMaster.quit();
+                            }, 500);
+                        } else if (report.st_id === DeviceConstants.status.IDLE) {
+                            clearInterval(timer);
+                            ProgressActions.close();
+                            deferred.resolve('ok', report.st_id);
+                        }
+                    }, 1000);
+                    break;
+            }
 
-                AlertStore.removeYesListener(onYes);
-            };
+            AlertStore.removeYesListener(onYes);
+        };
 
         deferred.always(function() {
             AlertStore.removeYesListener(onYes);
@@ -87,12 +81,12 @@ define([
             case DeviceConstants.status.ABORTED:
                 // quit
                 DeviceMaster.selectDevice(printer)
-                .then(() => {
-                    return DeviceMaster.quit();
-                })
-                .then(() => {
-                    deferred.resolve('ok');
-                });
+                    .then(() => {
+                        DeviceMaster.quit()
+                            .then(() => {
+                                deferred.resolve('ok');
+                            });
+                    });
                 break;
             case DeviceConstants.status.RUNNING:
             case DeviceConstants.status.PAUSED:

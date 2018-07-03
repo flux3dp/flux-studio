@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'jsx!views/holder/Setup-Panel',
     'jsx!pages/Holder',
     'helpers/api/config',
@@ -8,6 +9,7 @@ define([
 ], function(
     $,
     React,
+    PropTypes,
     HolderSetupPanel,
     HolderGenerator,
     ConfigHelper,
@@ -18,17 +20,15 @@ define([
         lang = i18n.lang;
 
     'use strict';
-    
+
     return function(args) {
         args = args || {};
 
         let Holder = HolderGenerator(args);
 
         let view = React.createClass({
-                getDefaultProps: function() {
-                    return {
-                        page: React.PropTypes.string
-                    };
+                propTypes: {
+                    page: PropTypes.string
                 },
 
                 getInitialState: function() {
@@ -76,7 +76,7 @@ define([
                 render: function() {
                     console.log('Load Holder', Holder);
                     // return <div />;
-                    
+
                     return <Holder
                         page={this.props.page}
                         acceptFormat={'image/svg'}

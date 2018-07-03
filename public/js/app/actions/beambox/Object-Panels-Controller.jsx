@@ -1,11 +1,13 @@
 define([
     'react',
+    'reactDOM',
     'jsx!views/beambox/Object-Panels/Object-Panels',
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/actions/beambox/constant',
     'app/actions/beambox/beambox-global-interaction',
 ], function(
     React,
+    ReactDOM,
     ObjectPanels,
     FnWrapper,
     Constant,
@@ -43,11 +45,17 @@ define([
                 ellipseRadius: {
                     rx:undefined, ry:undefined
                 },
+                rectRoundedCorner: {
+                    rx: 0
+                },
                 line: {
                     x1:undefined, y1:undefined, x2:undefined, y2:undefined
                 },
                 image: {
                     threshold:undefined, shading:undefined
+                },
+                font: {
+                    fontFamily:undefined, fontSize:undefined, fontWeight:undefined, italic:undefined, leterSpacing: undefined, isFill: undefined
                 }
             };
 
@@ -111,6 +119,9 @@ define([
         setEllipseRadiusY(val) {
             this.data.ellipseRadius.ry = _toFixed(_pixel2mm(val));
         }
+        setRectRoundedCornerRadiusX(val) {
+            this.data.rectRoundedCorner.rx = _toFixed(_pixel2mm(val));
+        }
         setLineX1(val) {
             this.data.line.x1 = _toFixed(_pixel2mm(val));
         }
@@ -127,13 +138,29 @@ define([
         setImageShading(val) {
             this.data.image.shading = val;
         }
-
         setImageThreshold(val) {
-            this.data.image.threshold = val;            
+            this.data.image.threshold = val;
+        }
+
+        setFontFamily(val) {
+            this.data.font.fontFamily = val;
+        }
+        setFontSize(val) {
+            this.data.font.fontSize = val;
+        }
+        setFontStyle({weight, italic}) {
+            this.data.font.fontWeight = weight;
+            this.data.font.italic = italic;
+        }
+        setLetterSpacing(val) {
+            this.data.font.letterSpacing = val;
+        }
+        setFontIsFill(val) {
+            this.data.font.isFill = val;
         }
 
         isResizeFixed() {
-            const useSizePanel = ['rect', 'image', 'use']; // 'use'
+            const useSizePanel = ['rect', 'image', 'use'];
             const useRadiusPanel = ['ellipse'];
 
             if(useSizePanel.includes(this.type) || useRadiusPanel.includes(this.type)) {
@@ -152,18 +179,18 @@ define([
         }
 
         unmount() {
-            React.unmountComponentAtNode(document.getElementById(this.reactRoot));
+            ReactDOM.unmountComponentAtNode(document.getElementById(this.reactRoot));
         }
 
-        
+
 
         _render() {
-            React.render(
+            ReactDOM.render(
                 <ObjectPanels
-                isEditable={this.isEditable}
-                type={this.type}
-                data={this.data}
-                $me={this.$me}
+                    isEditable={this.isEditable}
+                    type={this.type}
+                    data={this.data}
+                    $me={this.$me}
                 />, document.getElementById(this.reactRoot)
             );
         }

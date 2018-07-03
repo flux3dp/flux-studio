@@ -1,30 +1,24 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
+    'reactPropTypes',
     'app/actions/perspective-camera',
     'jsx!widgets/Button-Group',
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'helpers/duration-formatter'
-], function($, React, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore, DurationFormatter) {
-    'use strict';
+], function($, React, ReactCx, PropTypes, PerspectiveCamera, ButtonGroup, AlertActions, AlertStore, DurationFormatter) {
 
     return React.createClass({
         propTypes: {
-            lang                    : React.PropTypes.object,
-            hasObject               : React.PropTypes.bool,
-            hasOutOfBoundsObject    : React.PropTypes.bool,
-            onPreviewClick          : React.PropTypes.func,
-            onDownloadGCode         : React.PropTypes.func,
-            onDownloadFCode         : React.PropTypes.func,
-            onGoClick               : React.PropTypes.func,
-            onCameraPositionChange  : React.PropTypes.func,
-        },
-
-        getInitialState: function() {
-            return {
-                previewOn: false
-            };
+            lang                    : PropTypes.object,
+            hasObject               : PropTypes.bool,
+            hasOutOfBoundsObject    : PropTypes.bool,
+            onDownloadGCode         : PropTypes.func,
+            onDownloadFCode         : PropTypes.func,
+            onGoClick               : PropTypes.func,
+            onCameraPositionChange  : PropTypes.func,
         },
 
         componentDidMount: function() {
@@ -74,21 +68,20 @@ define([
 
         _renderActionButtons: function(lang) {
             let { hasObject, hasOutOfBoundsObject, disableGoButtons } = this.props,
-                cx = React.addons.classSet,
                 buttons = [{
-                        label: lang.monitor.start,
-                        className: cx({
-                            'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
-                            'btn-default': true,
-                            'btn-hexagon': true,
-                            'btn-go': true
-                        }),
-                        title: lang.print.goTitle,
-                        dataAttrs: {
-                            'ga-event': 'print-goto-monitor'
-                        },
-                        onClick: this._handleGo
-                    }
+                    label: lang.monitor.start,
+                    className: ReactCx.cx({
+                        'btn-disabled': !hasObject || hasOutOfBoundsObject || disableGoButtons,
+                        'btn-default': true,
+                        'btn-hexagon': true,
+                        'btn-go': true
+                    }),
+                    title: lang.print.goTitle,
+                    dataAttrs: {
+                        'ga-event': 'print-goto-monitor'
+                    },
+                    onClick: this._handleGo
+                }
                 ];
 
             return (

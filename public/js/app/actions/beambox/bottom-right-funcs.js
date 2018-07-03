@@ -1,16 +1,20 @@
 define([
     'helpers/device-master',
     'helpers/i18n',
+    'app/actions/beambox/beambox-preference',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
+    'app/actions/beambox/font-funcs',
     'helpers/api/svg-laser-parser',
     'app/actions/alert-actions',
     'app/actions/global-actions',
 ], function (
     DeviceMaster,
     i18n,
+    BeamboxPreference,
     ProgressActions,
     ProgressConstants,
+    FontFuncs,
     svgLaserParser,
     AlertActions,
     GlobalActions
@@ -26,15 +30,8 @@ define([
             $clonedSvg.find('#selectorParentGroup').remove();
             $clonedSvg.find('#canvasBackground image#background_image').remove();
             $clonedSvg.find('#canvasBackground #previewBoundary').remove();
-            $clonedSvg.find('#svgcontent *').css({
-                // 'fill': '#ffffff',
-                // 'fill-opacity': '0',
-                // 'stroke': '#000',
-                // 'stroke-width': '1px',
-                // 'stroke-opacity': '1.0',
-                // 'stroke-dasharray': '0',
-                'vector-effect': 'non-scaling-stroke'
-            });
+            $clonedSvg.find('#canvasBackground #guidesLines').remove();
+
             return $clonedSvg;
         }
 
@@ -113,8 +110,14 @@ define([
     };
 
     const fetchFcode = async () => {
+        ProgressActions.open(ProgressConstants.WAITING, lang.beambox.bottom_right_panel.convert_text_to_path_before_export);
+        await FontFuncs.convertTextToPathAmoungSvgcontent();
+        ProgressActions.close();
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
-        await svgeditorParser.uploadToSvgeditorAPI([uploadFile]);
+        await svgeditorParser.uploadToSvgeditorAPI([uploadFile], {
+            model: BeamboxPreference.read('model'),
+            engraveDpi: BeamboxPreference.read('engrave_dpi')
+        });
         const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for
             svgeditorParser.getTaskCode(
@@ -129,7 +132,8 @@ define([
                         ProgressActions.updating(lang.message.uploading_fcode, 100);
                         resolve(blob);
                     },
-                    fileMode: '-f'
+                    fileMode: '-f',
+                    model: BeamboxPreference.read('model')
                 }
             );
         });
@@ -155,11 +159,10 @@ define([
         },
 
         exportFcode: async function () {
-            const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
-            let defaultFCodeName = svgCanvas.getLatestImportFileName();
-            if (!defaultFCodeName) { defaultFCodeName = 'untitled' }
-            saveAs(fcodeBlob,  defaultFCodeName + '.fc');
+            const { fcodeBlob } = await fetchFcode();
+            const defaultFCodeName = svgCanvas.getLatestImportFileName() || 'untitled';
             ProgressActions.close();
+            saveAs(fcodeBlob,  defaultFCodeName + '.fc');
         },
     };
 });

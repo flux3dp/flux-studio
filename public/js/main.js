@@ -7,7 +7,11 @@ requirejs.config({
         jquery: 'lib/svgeditor/jquery',
         backbone: 'lib/backbone',
         underscore: 'lib/underscore',
-        react: (Boolean(localStorage.dev) ? 'lib/react/react-with-addons' : 'lib/react/react-with-addons.min'),
+        react: (Boolean(localStorage.dev) ? 'lib/react/react' : 'lib/react/react.min'),
+        reactDOM: (Boolean(localStorage.dev) ? 'lib/react/react-dom' : 'lib/react/react-dom.min'),
+        reactPropTypes: 'lib/react/react-proptypes',
+        reactClassset: 'lib/react/react-classset',
+        reactCreateReactClass: 'lib/react/react-create-react-class',
         views: 'app/views',
         pages: 'app/pages',
         widgets: 'app/widgets',
@@ -94,9 +98,9 @@ requirejs([
     'jquery',
     'backbone',
     'app/router',
+    'jsx!app/actions/announcement',
     'app/actions/global'
-], function($, Backbone, Router, globalEvents) {
-    'use strict';
+], function($, Backbone, Router, Announcement, globalEvents) {
 
     console.log(`Flux-Studio: ${window.FLUX.version}`);
 
@@ -117,5 +121,6 @@ requirejs([
     globalEvents(function() {
         let router = new Router();
         Backbone.history.start();
+        Announcement.init('announcement');
     });
 });

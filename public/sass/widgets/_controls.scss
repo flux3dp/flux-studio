@@ -1,5 +1,12 @@
+
+#support_material_spacing::after {
+    content: "mm/s";
+    color: black;
+    position: relative;
+}
+
 .controls {
-    overflow: hidden;
+    overflow-y: hidden;
 
     .label {
         color: $primaryColor;
@@ -14,12 +21,40 @@
         & > div {
             display: inline-block;
             margin-right: 30px;
-            color: #B3B3B3;
+            color: #888;
             size: 13px;
         }
 
         .error {
             border: 2px solid #F00;
+        }
+
+        &::after {
+            position: absolute;
+            right: 10px;
+            font-size: 12px;
+            color: #CCC;
+            line-height: 45px;
+        }
+
+        &.unit-mm::after{
+            content: "mm";
+        }
+
+        &.unit-mms::after{
+            content: "mm/s";
+        }
+
+        &.unit-degree::after{
+            content: "°C";
+        }
+
+        &.unit-angle::after{
+            content: "°";
+        }
+
+        &.unit-percent::after{
+            content: "%";
         }
     }
 
@@ -98,8 +133,8 @@
             background-position: 245px 9px;
             background-size: 16px 10px;
             height: 30px;
-            border-radius: 0;
-            border: 2px solid #E0E0DF;
+            border-radius: 2px;
+            border: 1px solid #E0E0DF;
         }
     }
     .textarea-container {
@@ -107,18 +142,21 @@
         width: 100%;
         height: 335px;
         textarea {
+            padding: 5px;
             width: 100%;
             height: 100%;
             line-height: 20px;
-            border: 2px solid #E0E0DF;
+            border: 1px solid #DDD;
+            border-radius: 2px;
             resize: none;
+            overflow-y: scroll;
         }
     }
     input {
         width: 90px;
         height: 30px;
         font-size: 15px;
-        color: #B3B3B3;
+        color: #888;
     }
     input.url {
         width: 400px;
@@ -127,7 +165,10 @@
     input[type="password"],
     input[type="number"] {
         padding-left: 10px;
-        border: 2px solid #E0E0DF;
+        border: 1px solid #DDD;
+        border-radius: 2px;
+        // box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        // background: linear-gradient(#FFF,#FEFEFE);
     }
     select {
         border: 1px solid #d8d8d8;
@@ -143,6 +184,9 @@
         -webkit-appearance: none;
         appearance: none;
         padding-left: 10px;
+        &.no-triangle {
+            background-image: none;
+        }
     }
     .slider-container {
         margin-right: 20px;
@@ -175,11 +219,11 @@
     }
     input[type=range]::-webkit-slider-thumb {
         box-shadow: 0 0 0 rgba(0, 0, 0, 0), 0 0 0 rgba(130, 13, 13, 0);
-        border: 2.5px solid #B3B3B3;
+        border: 2.5px solid #AAA;
         height: 13px;
         width: 13px;
         border-radius: 12px;
-        background: #B3B3B3;
+        background: #AAA;
         cursor: pointer;
         -webkit-appearance: none;
         margin-top: -5px;

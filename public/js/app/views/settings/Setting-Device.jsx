@@ -3,10 +3,8 @@ define([
     'react',
     'helpers/i18n',
     'helpers/api/config',
-    'jsx!widgets/Select',
     'app/actions/alert-actions',
     'helpers/device-master',
-    'helpers/version-checker',
     'jsx!widgets/Dropdown-Control',
     'jsx!widgets/Radio-Control',
     'jsx!widgets/Checkbox-Control',
@@ -16,17 +14,15 @@ define([
     React,
     i18n,
     config,
-    SelectView,
     AlertActions,
     DeviceMaster,
-    VersionChecker,
     DropdownControl,
     RadioControl,
     CheckboxControl,
     FirmwareVersionChecker
 ) {
     'use strict';
-    
+
     let lang = i18n.lang;
 
     return React.createClass({
@@ -87,12 +83,12 @@ define([
 
             this.setState({ device }, ()=>{
                 if((['fbb1b', 'fbb1p', 'laser-b1'].includes(device.model))) {
-                    
+
                 } else {
                     this._getDeviceConfig();
                 }
             });
-            
+
 
         },
 
@@ -134,7 +130,7 @@ define([
             config[id] = value;
             this.setState({ config });
         },
-        
+
          _updateBacklash: function(e) {
             if (e.type === 'blur') {
                 let v = parseFloat(e.target.value);
@@ -180,7 +176,7 @@ define([
                 return (
                     <div style={{
                         'margin-top': '20px',
-                        'color': '#333' 
+                        'color': '#333'
                     }}>{lang.device.please_wait}</div>
                 );
             }
@@ -240,13 +236,13 @@ define([
                 .then((config) => {
                     config.head_error_level = config.head_error_level ? mapNumberToTypeArray(parseInt(config.head_error_level)) : null;
                     this.setState({ config });
-    
+
                     if(config['backlash']) {
                         let _value = this.state.config['backlash'];
                         _value = _value.split(' ')[0].split(':')[1];
                         this.setState({ backlash: parseFloat(_value) / 80 });
                     }
-    
+
                     if(config['leveling']) {
                         let _value = this.state.config['leveling'].split(' '),
                             leveling = {};
@@ -593,14 +589,14 @@ define([
             const beamboxPanel = (
                 <div style={{
                     'margin-top': '20px',
-                    'color': '#333' 
+                    'color': '#333'
                 }}>
                     {lang.device.beambox_should_use_touch_panel_to_adjust}
                 </div>
             );
             return (
                 <div className="form general">
-                    {deviceList}                
+                    {deviceList}
                     {this.state.device?isBeamoxSeries?beamboxPanel:deltaPanel:''}
                 </div>
             );

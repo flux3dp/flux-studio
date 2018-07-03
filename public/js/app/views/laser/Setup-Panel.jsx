@@ -1,7 +1,8 @@
 define([
     'jquery',
     'react',
-    'jsx!widgets/Select',
+    'reactDOM',
+    'reactClassset',
     'jsx!widgets/List',
     'jsx!widgets/Modal',
     'jsx!views/laser/Advanced-Panel',
@@ -18,7 +19,8 @@ define([
 ], function(
     $,
     React,
-    SelectView,
+    ReactDOM,
+    ReactCx,
     List,
     Modal,
     AdvancedPanel,
@@ -215,7 +217,7 @@ define([
                         'ga-event': 'apply-custom-laser-preset'
                     },
                     onClick: function(e) {
-                        var elCustomPresets = self.refs.customPresets.getDOMNode();
+                        var elCustomPresets = ReactDOM.findDOMNode(self.refs.customPresets);
 
                         self._saveLastestSet({ material: JSON.parse(elCustomPresets.dataset.selectedMaterial) });
                         self._togglePanel('customPresets', false)();
@@ -223,7 +225,7 @@ define([
                     }
                 }],
                 selectPresetMaterial = function(e) {
-                    var elCustomPresets = self.refs.customPresets.getDOMNode(),
+                    var elCustomPresets = ReactDOM.findDOMNode(self.refs.customPresets),
                         meta;
 
                     if ('undefined' !== typeof e.target.dataset.meta) {
@@ -239,7 +241,7 @@ define([
                     }
                 },
                 handleDelPreset = function(e) {
-                  let elCustomPresets = self.refs.customPresets.getDOMNode(),
+                  let elCustomPresets = ReactDOM.findDOMNode(self.refs.customPresets),
                       customPresets = config().read('laser-custom-presets') || [],
                       selectedPreset = JSON.parse(elCustomPresets.dataset.selectedMaterial),
                       isSelected,
@@ -302,7 +304,7 @@ define([
                             value={this.state.chooseSpeed || 0}
                             className="readonly"
                         />
-                        <span className="value-text" ref="presetSpeedDisplay" data-tail={advancedLang.form.laser_speed.unit}>
+                        <span className="value-text" ref="presetSpeedDisplay" data-tail={' ' + advancedLang.form.laser_speed.unit}>
                             {this.state.chooseSpeed || 0}
                         </span>
                     </div>
@@ -317,7 +319,7 @@ define([
                             value={this.state.choosePower || 0}
                             className="readonly"
                         />
-                        <span className="value-text" ref="presetPowerDisplay" data-tail="%">
+                        <span className="value-text" ref="presetPowerDisplay" data-tail=" %">
                             {round(this.state.choosePower / advancedLang.form.power.max * 100, -2) || 0}
                         </span>
                     </div>
@@ -444,9 +446,8 @@ define([
         },
 
         _renderShading: function() {
-            var cx = React.addons.classSet,
-                checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
-                classes = cx('display-text', 'shading');
+            var checked = ('undefined' !== typeof this.props.imageFormat && 'svg' === this.props.imageFormat ? false : this.state.defaults.isShading),
+                classes = ReactCx.cx('display-text', 'shading');
             return {
                 label: (
                     <TextToggle
@@ -512,8 +513,7 @@ define([
         },
 
         render: function() {
-            var cx = React.addons.classSet,
-                advancedPanel = this._renderAdvancedPanel(this.state.defaults.material),
+            var advancedPanel = this._renderAdvancedPanel(this.state.defaults.material),
                 customPresets = this._renderCustomPresets(),
                 alert = this._renderAlert(),
                 items = [

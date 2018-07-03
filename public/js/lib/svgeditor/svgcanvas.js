@@ -29,18 +29,19 @@
 
 define([
     'helpers/i18n',
-    'helpers/api/config',
+    'app/actions/beambox/beambox-preference',
+    'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
 
 ], function (
     i18n,
-    ConfigHelper,
+    BeamboxPreference,
+    AlertActions,
     ObjectPanelsController,
     PreviewModeController
 ) {
     const LANG = i18n.lang.beambox;
-    const Config = ConfigHelper();
     // Class: SvgCanvas
     // The main SvgCanvas class that manages all SVG-related functions
     //
@@ -162,7 +163,8 @@ define([
 
         all_properties.text = $.extend(true, {}, all_properties.shape);
         $.extend(all_properties.text, {
-            fill: '#000000',
+            fill: curConfig.text.fill,
+            fill_opacity: curConfig.text.fill_opacity,
             stroke_width: curConfig.text.stroke_width,
             font_size: curConfig.text.font_size,
             font_family: curConfig.text.font_family
@@ -218,6 +220,9 @@ define([
                 }, 100);
             }
             svgedit.utilities.assignAttributes(shape, data.attr, 100);
+            svgedit.utilities.assignAttributes(shape, {
+                'vector-effect': 'non-scaling-stroke'
+            }, 100);
             svgedit.utilities.cleanupElement(shape);
 
             // Children
@@ -832,6 +837,18 @@ define([
             return clone;
         };
 
+        this.getObjectLayer = function(elem) {
+            while (elem) {
+                elem = elem.parentNode;
+                if (elem && elem.getAttribute('class') === 'layer') {
+                    var title = $(elem).find('title')[0];
+                    if (title) {
+                        return { elem: elem, title: title.innerHTML };
+                    }
+                }
+            }
+            return null;
+        };
 
         // this.each is deprecated, if any extension used this it can be recreated by doing this:
         // $(canvas.getRootElem()).children().each(...)
@@ -940,7 +957,7 @@ define([
                     len = selectedElements.length;
                 for (i = 0; i < len; ++i) {
                     elem = selectedElements[i];
-                    if (elem == null) {
+                    if (!elem) {
                         break;
                     }
                     selectorManager.releaseSelector(elem);
@@ -1145,35 +1162,20 @@ define([
                 return selectorManager.selectorParentGroup;
             }
 
-            while (mouse_target && mouse_target.parentNode !== (current_group || current_layer)) {
-                if (mouse_target.parentNode && mouse_target.parentNode.getAttribute('class') === 'layer') {
-                    // Select layer of mouse_target
-                    var title = $(mouse_target.parentNode).find('title')[0];
-                    if (title) {
-                        if (selectedElements.indexOf(mouse_target) === -1) {
-                            svgCanvas.setCurrentLayer(title.innerHTML);
-                            window.populateLayers();
-                            selectOnly([mouse_target], true);
-                        }
-                        return mouse_target;
-                    }
-                }
-                mouse_target = mouse_target.parentNode;
-            }
 
             if (!mouse_target) {
                 return svgroot;
             }
-            //
-            //	// go up until we hit a child of a layer
-            //	while (mouse_target.parentNode.parentNode.tagName === 'g') {
-            //		mouse_target = mouse_target.parentNode;
-            //	}
+
+            // // go up until we hit a child of a layer
+            while (mouse_target.parentNode.parentNode.tagName === 'g') {
+            	mouse_target = mouse_target.parentNode;
+            }
             // Webkit bubbles the mouse event all the way up to the div, so we
             // set the mouse_target to the svgroot like the other browsers
-            //	if (mouse_target.nodeName.toLowerCase() === 'div') {
-            //		mouse_target = svgroot;
-            //	}
+            // if (mouse_target.nodeName.toLowerCase() === 'div') {
+            //     mouse_target = svgroot;
+            // }
 
             return mouse_target;
         };
@@ -1349,7 +1351,6 @@ define([
                         if (mouse_target !== svgroot) {
                             // if this element is not yet selected, clear selection and select it
                             if (selectedElements.indexOf(mouse_target) === -1) {
-                                console.log('Reselect');
                                 // only clear selection if shift is not pressed (otherwise, add
                                 // element to selection)
                                 if (!evt.shiftKey) {
@@ -1528,31 +1529,32 @@ define([
                         start_y = y;
                         addSvgElementFromJson({
                             element: 'rect',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 x: x,
                                 y: y,
                                 width: 0,
                                 height: 0,
+                                stroke: '#000',
                                 id: getNextId(),
+                                'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
                             }
                         });
                         break;
                     case 'line':
                         started = true;
-                        stroke_w = cur_shape.stroke_width == 0 ? 1 : cur_shape.stroke_width;
                         addSvgElementFromJson({
                             element: 'line',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 x1: x,
                                 y1: y,
                                 x2: x,
                                 y2: y,
                                 id: getNextId(),
-                                stroke: cur_shape.stroke,
-                                'stroke-width': stroke_w,
+                                stroke: '#000',
+                                'stroke-width': 1,
                                 'stroke-dasharray': cur_shape.stroke_dasharray,
                                 'stroke-linejoin': cur_shape.stroke_linejoin,
                                 'stroke-linecap': cur_shape.stroke_linecap,
@@ -1567,12 +1569,13 @@ define([
                         started = true;
                         addSvgElementFromJson({
                             element: 'circle',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 cx: x,
                                 cy: y,
                                 r: 0,
                                 id: getNextId(),
+                                stroke: '#000',
                                 opacity: cur_shape.opacity / 2
                             }
                         });
@@ -1581,13 +1584,15 @@ define([
                         started = true;
                         addSvgElementFromJson({
                             element: 'ellipse',
-                            curStyles: true,
+                            curStyles: false,
                             attr: {
                                 cx: x,
                                 cy: y,
                                 rx: 0,
                                 ry: 0,
                                 id: getNextId(),
+                                stroke: '#000',
+                                'fill-opacity': 0,
                                 opacity: cur_shape.opacity / 2
                             }
                         });
@@ -1602,10 +1607,11 @@ define([
                                 y: y,
                                 id: getNextId(),
                                 fill: cur_text.fill,
+                                'fill-opacity': cur_text.fill_opacity,
                                 'stroke-width': cur_text.stroke_width,
                                 'font-size': cur_text.font_size,
                                 'font-family': cur_text.font_family,
-                                'text-anchor': 'middle',
+                                'text-anchor': cur_text.text_anchor,
                                 'xml:space': 'preserve',
                                 opacity: cur_shape.opacity
                             }
@@ -1735,6 +1741,16 @@ define([
                                 ObjectPanelsController.setEditable(false);
                             }
                         }
+                        break;
+                    case 'preview':
+                        real_x *= current_zoom;
+                        real_y *= current_zoom;
+                        svgedit.utilities.assignAttributes(rubberBox, {
+                            'x': Math.min(r_start_x, real_x),
+                            'y': Math.min(r_start_y, real_y),
+                            'width': Math.abs(real_x - r_start_x),
+                            'height': Math.abs(real_y - r_start_y)
+                        }, 100);
                         break;
                     case 'multiselect':
                         real_x *= current_zoom;
@@ -1873,7 +1889,9 @@ define([
 
                         call('transition', selectedElements);
                         ObjectPanelsController.setEditable(false);
-
+                        if (svgedit.utilities.getElem('text_cursor')) {
+                            svgCanvas.textActions.init();
+                        }
                         break;
                     case 'zoom':
                         real_x *= current_zoom;
@@ -2137,7 +2155,9 @@ define([
                         } else {
                             if (start_x === real_x && start_y === real_y) {
                                 PreviewModeController.preview(real_x, real_y);
-                            };
+                            } else {
+                                PreviewModeController.previewRegion(start_x, start_y, real_x, real_y);
+                            }
                         };
                         current_mode = 'select';
                         // intentionally fall-through to select here
@@ -2206,6 +2226,14 @@ define([
                                     if (tempJustSelected !== t) {
                                         canvas.removeFromSelection([t]);
                                     }
+                                }
+                                const mouse_target = getMouseTarget(evt);
+                                const current_layer = getCurrentDrawing().getCurrentLayer();
+                                const targetLayer = svgCanvas.getObjectLayer(mouse_target);
+                                if (targetLayer && !selectedElements.includes(targetLayer.elem) && targetLayer.elem !== current_layer) {
+                                    svgCanvas.setCurrentLayer(targetLayer.title);
+                                    window.populateLayers();
+                                    selectOnly([mouse_target], true);
                                 }
                             } // no change in mouse position
 
@@ -2517,7 +2545,7 @@ define([
                         targetZoom = svgCanvas.getZoom();
                     }
 
-                    const mouseInputDevice = Config.read('beambox-preference')['mouse_input_device'];
+                    const mouseInputDevice = BeamboxPreference.read('mouse_input_device');
                     const isTouchpad = (mouseInputDevice === 'TOUCHPAD');
 
                     if (isTouchpad) {
@@ -4166,7 +4194,7 @@ define([
                         res.h = svgedit.units.convertUnit(res.h, unit) + unit;
                     }
 
-                    out.push(' width="' + res.w + '" height="' + res.h + '"' + vb + ' xmlns="' + NS.SVG + '"');
+                    out.push(' id="svgcontent" width="' + res.w + '" height="' + res.h + '"' + vb + ' xmlns="' + NS.SVG + '"');
 
                     var nsuris = {};
 
@@ -5058,7 +5086,22 @@ define([
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
             function parseSvg(svg, type) {
-                function _symbolWrapper(symbolContent) {
+                function _removeSvgText() {
+                    if($(svg).find('text').length) {
+                        AlertActions.showPopupInfo('', LANG.popup.no_support_text);
+                        $(svg).find('text').remove();
+                    }
+                }
+                function _removeComments() {
+                    // only remove comment which level is svg.children.
+                    // should traverse all svg level and remove all comments if you have time
+                    $(svg).contents().each(function() {
+                        if(this.nodeType === Node.COMMENT_NODE) {
+                            $(this).remove();
+                        }
+                    });
+                }
+                function _symbolWrapper(symbolContents) {
                     const rootViewBox = svg.getAttribute('viewBox');
                     const rootWidth = unit2Pixel(svg.getAttribute('width'));
                     const rootHeight = unit2Pixel(svg.getAttribute('height'));
@@ -5081,20 +5124,41 @@ define([
                     }
 
                     const wrappedSymbolContent = svgdoc.createElementNS(NS.SVG, 'g');
-                    wrappedSymbolContent.appendChild(symbolContent);
+                    if (symbolContents.length) {
+                        symbolContents.map(content => {
+                            wrappedSymbolContent.appendChild(content);
+                        });
+                    } else {
+                        wrappedSymbolContent.appendChild(symbolContents);
+                    }
                     wrappedSymbolContent.setAttribute('viewBox', rootViewBox);
                     wrappedSymbolContent.setAttribute('transform', transformList.join(' '));
 
                     return wrappedSymbolContent;
                 }
-                function _parseSvgByLayer(svg) {
+                function _parseSvgByLayer() {
                     const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
                     let defChildren = [];
-                    defNodes.map(def => defChildren.concat(Array.from(def.childNodes)));
+                    defNodes.map(def => {
+                        defChildren = defChildren.concat(Array.from(def.childNodes));
+                    });
 
-                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style'].includes(node.tagName));
+                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style', 'metadata', 'sodipodi:namedview'].includes(node.tagName));
 
-                    const isValidLayeredSvg = layerNodes.every(node => (node.tagName === 'g' && node.id !== null));
+                    const isValidLayeredSvg = layerNodes.every(node => {
+                        // if svg draw some object at first level, return false
+                        if(['a', 'circle', 'clipPath', 'ellipse', 'feGaussianBlur', 'foreignObject', 'image', 'line', 'linearGradient', 'marker', 'mask', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tspan', 'use'].includes(node.tagName)) {
+                            return false;
+                        }
+
+                        // if it is a group, it need to have an id to ensure it is a layer
+                        if (node.tagName === 'g' && node.id === null) {
+                            return false;
+                        }
+
+                        // svg software like inkscape may add additioal tag like "sodipodi:namedview", so we return true as default
+                        return true;
+                    });
                     if(!isValidLayeredSvg) {
                         return false;
                     }
@@ -5106,7 +5170,7 @@ define([
 
                     return symbols;
                 }
-                function _parseSvgByColor(svg) {
+                function _parseSvgByColor() {
                     function getColorOfElement(node) {
                         let color;
                         color = node.getAttribute('stroke');
@@ -5174,37 +5238,38 @@ define([
                             }
                             groupColorMap[strokeColor].appendChild(clonedGroup);
                         });
-                        // child.map(grandChild => {
-                        //     const color = _getColor(grandChild);
-                        //     grandChild.setAttribute('class', 'poly');
-                        //     if(!groupColorMap[color]) {
-                        //         groupColorMap[color] = svgdoc.createElementNS(NS.SVG, 'g').setAttribute('data-color', stroke);
-                        //     }
-                        //     groupColorMap[color].appendChild(grandChild);
-                        // });
                     });
 
                     const coloredLayerNodes = Object.values(groupColorMap);
 
                     const symbols = coloredLayerNodes.map(node => {
                         const wrappedSymbolContent = _symbolWrapper(node);
-                        wrappedSymbolContent.setAttribute('data-color', node.getAttribute('data-color'));
+                        const color = node.getAttribute('data-color');
+                        if (color) {
+                            wrappedSymbolContent.setAttribute('data-color', color);
+                        }
                         const symbol = svgCanvas.makeSymbol(wrappedSymbolContent, [], batchCmd, defChildren);
                         return symbol;
                     });
                     return symbols;
                 }
-                function _parseSvgByNolayer(svg) {
-                    uniquifyElems(svg);
+                function _parseSvgByNolayer() {
+                    //this is same as parseByLayer .....
+                    const defNodes = Array.from(svg.childNodes).filter(node => 'defs' === node.tagName);
+                    let defChildren = [];
+                    defNodes.map(def => {
+                        defChildren = defChildren.concat(Array.from(def.childNodes));
+                    });
 
-                    const svgString = new XMLSerializer().serializeToString(svg);
-                    const clonedSvgXml = svgedit.utilities.text2xml(svgString);
-                    const clonedSvg = svgdoc.adoptNode(clonedSvgXml.documentElement);
-                    clonedSvg.removeAttribute('viewBox');
+                    const layerNodes = Array.from(svg.childNodes).filter(node => !['defs', 'title', 'style', 'metadata', 'sodipodi:namedview'].includes(node.tagName));
 
-                    return [svgCanvas.makeSymbol(_symbolWrapper(clonedSvg), [], batchCmd)];
+                    const symbol = svgCanvas.makeSymbol(_symbolWrapper(layerNodes), [], batchCmd, defChildren);
+
+                    return [symbol];
                 }
                 // return symbols
+                _removeSvgText();
+                _removeComments();
                 switch (type) {
                     case 'color':
                         return {
@@ -5255,10 +5320,16 @@ define([
                 // append ~~~~~ ya
                 getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
-                batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
+                if(type !== 'color') {
+                    use_el.setAttribute('data-wireframe', true);
+                }
 
                 $(use_el).data('symbol', symbol).data('ref', symbol);
 
+                use_el.setAttribute('data-symbol', symbol);
+                use_el.setAttribute('data-ref', symbol);
+
+                batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(use_el));
 
                 return use_el;
             }
@@ -5300,6 +5371,12 @@ define([
                     return false;
                 }
 
+                // is percentage
+                if (val.substr(-1) === '%') {
+                    console.log('unsupported unit "%" for', val);
+                    return;
+                }
+
                 const dpi = 72;
                 const svgUnitScaling = 254 / dpi; //本來 72 個點代表 1 inch, 現在 254 個點代表 1 inch.
                 const unitMap = {
@@ -5309,7 +5386,6 @@ define([
                     'px': svgUnitScaling,
                 };
 
-                // if no unit was given
                 if (!isNaN(val)) {
                     return val * unitMap['px'];
                 }
@@ -5343,65 +5419,76 @@ define([
         };
 
         this.makeSymbol = function (elem, attrs, batchCmd, defs) {
-            var symbol = svgdoc.createElementNS(NS.SVG, 'symbol'),
-                symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
-            var oldLinkMap = {};
+            const symbol = svgdoc.createElementNS(NS.SVG, 'symbol');
+            const symbol_defs = svgdoc.createElementNS(NS.SVG, 'defs');
+            const oldLinkMap = new Map();
 
-            if (defs) {
-                // this is a group color object, copy defs into symbol;
-                defs.map(def => {
-                    this.clipCount = this.clipCount || 1;
-                    const clonedDef = def.cloneNode(true),
-                        newId = 'def' + (this.clipCount++);
-                    oldLinkMap[clonedDef.id] = newId;
+            defs.map(def => {
+                this.clipCount = this.clipCount || 1;
+                const clonedDef = def.cloneNode(true);
+                const oldId = clonedDef.id;
+                if (oldId) {
+                    const newId = 'def' + (this.clipCount++);
+                    oldLinkMap.set(oldId, newId);
                     clonedDef.id = newId;
-                    symbol_defs.appendChild(clonedDef);
-                });
-            }
+                }
+                symbol_defs.appendChild(clonedDef);
+            });
 
             symbol.appendChild(symbol_defs);
 
-            if (elem.tagName !== 'g') {
-                while (elem.firstChild) {
-                    var first = elem.firstChild;
-                    symbol.appendChild(first);
-                }
-            } else {
-                symbol.appendChild(elem);
-            }
+            symbol.appendChild(elem);
 
             function traverseForRemappingId(node) {
                 if (!node.attributes) {
                     return;
                 }
-                for (var i = 0; i < node.attributes.length; i++) {
-                    var attr = node.attributes[i];
-                    var re = /url\(#([^)]+)\)/g;
-                    var urlMatch = re.exec(attr.value);
+                for (let attr of node.attributes) {
+                    const re = /url\(#([^)]+)\)/g;
+                    const linkRe = /\#(.+)/g;
+                    const urlMatch = attr.nodeName === 'xlink:href' ? linkRe.exec(attr.value) : re.exec(attr.value);
+
                     if (urlMatch) {
-                        var oldId = urlMatch[1];
-                        if (oldLinkMap[oldId]) {
-                            node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap[oldId]));
+                        const oldId = urlMatch[1];
+                        if (oldLinkMap.get(oldId)) {
+                            node.setAttribute(attr.nodeName, attr.value.replace('#' + oldId, '#' + oldLinkMap.get(oldId)));
                         }
                     }
                 }
                 if (!node.childNodes) {
                     return;
                 }
-                for (var i = 0; i < node.childNodes.length; i++) {
-                    traverseForRemappingId(node.childNodes[i]);
-                }
+                Array.from(node.childNodes).map( child => traverseForRemappingId(child) );
             }
             traverseForRemappingId(symbol);
 
+            (function remapIdOfStyle(){
+                Array.from(symbol_defs.childNodes).map(child => {
+                    if (child.tagName !== 'style') {
+                        return;
+                    }
+                    const originStyle = child.innerHTML;
+                    const re = /url\(#([^)]+)\)/g;
+                    let mappedStyle = originStyle.replace(re, function replacer(match, p1, offset, string) {
+                        if (oldLinkMap.get(p1)) {
+                            return `url(#${oldLinkMap.get(p1)})`;
+                        }
+                    });
+                    child.innerHTML = mappedStyle;
+                });
+            })();
 
             for (var i = 0; i < attrs.length; i++) {
                 var attr = attrs[i];
                 symbol.setAttribute(attr.nodeName, attr.value);
             }
             symbol.id = getNextId();
-            symbol.setAttribute('data-id', elem.firstChild.id);
-            symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
+            if (elem.firstChild.id) {
+                symbol.setAttribute('data-id', elem.firstChild.id);
+            }
+            if (elem.firstChild.getAttribute('data-color')) {
+                symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
+            }
 
             svgedit.utilities.findDefs().appendChild(symbol);
 
@@ -5411,14 +5498,63 @@ define([
             }).remove();
 
             //add prefix(which constrain css selector to symbol's id) to prevent class style pollution
-            const origionStyle = $(symbol).find('style').text();
+            const originStyle = $(symbol).find('style').text();
             //the regex indicate the css selector, but the selector may contain comma, so we replace it again.
-            let prefixedStyle = origionStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
+            let prefixedStyle = originStyle.replace(/([^{}]+){/g, function replacer(match, p1, offset, string) {
                 const prefix = '#' + symbol.id + ' ';
                 match = match.replace(',', ',' + prefix);
                 return prefix + match;
             });
-            $(symbol).find('style').text(prefixedStyle);
+            prefixedStyle = prefixedStyle + `
+                *[data-color] ellipse[stroke=none],
+                *[data-color] circle[stroke=none],
+                *[data-color] rect[stroke=none],
+                *[data-color] path[stroke=none],
+                *[data-color] polygon[stroke=none],
+                *[data-color] ellipse:not([stroke]),
+                *[data-color] circle:not([stroke]),
+                *[data-color] rect:not([stroke]),
+                *[data-color] path:not([stroke]),
+                *[data-color] polygon:not([stroke]) {
+                    fill-opacity: 1 !important;
+                    stroke-width: 0 !important;
+                }
+                #svg_editor:not(.color) *[data-wireframe] {
+                    fill-opacity: 0 !important;
+                    stroke: #000 !important;
+                    stroke-width: 1px !important;
+                    stroke-opacity: 1.0 !important;
+                    stroke-dasharray: 0 !important;
+                    opacity: 1 !important;
+                    vector-effect: non-scaling-stroke !important;
+                    filter: none !important;
+                }
+                #svg_editor:not(.color) #${symbol.id} * {
+                    fill-opacity: 0;
+                    stroke: #000 !important;
+                    filter: none;
+                }
+                #svg_editor #${symbol.id} * {
+                    stroke-width: 1px !important;
+                    vector-effect: non-scaling-stroke !important;
+                    stroke-opacity: 1.0;
+                    stroke-dasharray: 0;
+                    opacity: 1;
+                    filter: none;
+                }
+                #${symbol.id} {
+                    overflow: visible;
+                }
+
+            `;
+
+            if ($(symbol).find('style').length) {
+                $(symbol).find('style').text(prefixedStyle);
+            } else {
+                $(symbol).find('defs').append(
+                    `<style>${prefixedStyle}</style>`
+                );
+            }
 
             batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(symbol));
 
@@ -6643,6 +6779,86 @@ define([
             }
         };
 
+        this.getFontWeight = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                return selected.getAttribute('font-weight');
+            }
+            return false;
+        };
+
+        this.setFontWeight = function (i) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('font-weight', i ? i : 'normal');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
+        this.getFontIsFill = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                const fillAttr = selected.getAttribute('fill');
+                if (['#fff', '#ffffff', 'none'].includes(fillAttr)) {
+                    return false;
+                } else if(fillAttr || fillAttr === null) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        };
+
+        this.setFontIsFill = function (isFill) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('fill', isFill ? '#000' : '#fff');
+                changeSelectedAttribute('fill-opacity', isFill ? 1 : 0);
+                changeSelectedAttribute('stroke', isFill ? 'none' : '#000');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
+        this.getLetterSpacing = function () {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                let val = selected.getAttribute('letter-spacing');
+                if(val) {
+                    if (val.toLowerCase().endsWith('em')) {
+                        return val.slice(0, -2);
+                    } else {
+                        console.warn('letter-spacing should be em!');
+                        return 0;
+                    }
+                } else {
+                    return 0;
+                }
+                return val;
+            }
+            return false;
+        };
+
+        this.setLetterSpacing = function (val) {
+            var selected = selectedElements[0];
+            if (selected != null && selected.tagName === 'text' &&
+                selectedElements[1] == null) {
+                changeSelectedAttribute('letter-spacing', val ? (val.toString() + 'em') : '0em');
+            }
+            if (!selectedElements[0].textContent) {
+                textActions.setCursor();
+            }
+        };
+
         // Function: getFontFamily
         // Returns the current font family
         this.getFontFamily = function () {
@@ -7103,27 +7319,39 @@ define([
             var batchCmd = new svgedit.history.BatchCommand('Cut Elements');
             var len = selectedElements.length;
             var selectedCopy = []; //selectedElements is being deleted
-            for (i = 0; i < len; ++i) {
-                var selected = selectedElements[i];
-                if (selected == null) {
-                    break;
+            var layerDict = {}, layerCount = 0;
+
+            for (i = 0; i < len && selectedElements[i]; ++i) {
+                var selected = selectedElements[i],
+                    selectedRef = selectedElements[i];
+                
+                var layerName = $(selected.parentNode).find('title').text();
+                selected.setAttribute("data-origin-layer", layerName);
+                if (!layerDict[layerName]) {
+                    layerDict[layerName] = true;
+                    layerCount++;
                 }
 
-                var parent = selected.parentNode;
-                var t = selected;
-
                 // this will unselect the element and remove the selectedOutline
-                selectorManager.releaseSelector(t);
+                selectorManager.releaseSelector(selectedRef);
 
                 // Remove the path if present.
-                svgedit.path.removePath_(t.id);
+                svgedit.path.removePath_(selectedRef.id);
 
-                var nextSibling = t.nextSibling;
-                var elem = parent.removeChild(t);
+                var nextSibling = selectedRef.nextSibling;
+                var elem = parent.removeChild(selectedRef);
                 selectedCopy.push(selected); //for the copy
                 selectedElements[i] = null;
                 batchCmd.addSubCommand(new RemoveElementCommand(elem, nextSibling, parent));
             }
+
+            // If there is only one layer selected, don't force user to paste on the same layer
+            if (layerCount == 1) {
+                for(i = 0; i < selectedCopy.length; i++) {
+                    selectedCopy[i].removeAttribute("data-origin-layer");
+                }
+            }
+
             if (!batchCmd.isEmpty()) {
                 addCommandToHistory(batchCmd);
             }
@@ -7136,6 +7364,27 @@ define([
         // Function: copySelectedElements
         // Remembers the current selected elements on the clipboard
         this.copySelectedElements = function () {
+            var layerDict = {}, layerCount = 0;
+
+            for (var i = 0; i < selectedElements.length && selectedElements[i]; ++i) {
+                var selected = selectedElements[i],
+                    layerName = $(selected.parentNode).find('title').text();
+                selected.setAttribute("data-origin-layer", layerName);
+                if (!layerDict[layerName]) {
+                    layerDict[layerName] = true;
+                    layerCount++;
+                }
+            }
+
+            // If there is only one layer selected, don't force user to paste on the same layer
+            if (layerCount == 1) {
+                for(i = 0; i < selectedElements.length; i++) {
+                    if (selectedElements[i]) {
+                        selectedElements[i].removeAttribute("data-origin-layer");
+                    }
+                }
+            }
+
             canvas.clipBoard = $.merge([], selectedElements);
         };
 
@@ -7164,7 +7413,12 @@ define([
                 }
 
                 pasted.push(copy);
-                (current_group || drawing.getCurrentLayer()).appendChild(copy);
+                if (copy.getAttribute("data-origin-layer") && cb.length > 1) {
+                    var layer = drawing.getLayerByName(copy.getAttribute("data-origin-layer")) || (current_group || drawing.getCurrentLayer());
+                    layer.appendChild(copy);
+                } else {
+                    (current_group || drawing.getCurrentLayer()).appendChild(copy);
+                }
                 batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(copy));
 
                 restoreRefElems(copy);
@@ -7957,7 +8211,7 @@ define([
                         'width': '100%',
                         'height': '100%',
                         'preserveAspectRatio': 'xMinYMin',
-                        'style': 'pointer-events:none; opacity: 0.7;',
+                        'style': 'pointer-events:none; opacity: 0.8;',
                     });
                     bg.appendChild(bg_img);
                 }

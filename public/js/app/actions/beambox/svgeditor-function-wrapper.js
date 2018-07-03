@@ -48,6 +48,7 @@ define([
         },
         insertText: function() {
             $('#tool_text').click();
+            $('#workarea').css('cursor', 'text');
         },
 
         //top panel
@@ -75,6 +76,9 @@ define([
         update_ellipse_cx: function(val) {
             _update_attr_changer('ellipse_cx', _mm2pixel(val));
         },
+        update_rect_rx: function(val) {
+            _update_attr_changer('rect_rx', _mm2pixel(val));
+        },
         update_ellipse_cy: function(val) {
             _update_attr_changer('ellipse_cy', _mm2pixel(val));
         },
@@ -96,12 +100,50 @@ define([
         update_line_y2: function(val) {
             _update_attr_changer('line_y2', _mm2pixel(val));
         },
-
+        update_font_family: function(val) {
+            _update_attr_changer('font_family', val);
+        },
+        update_font_size: function(val) {
+            _update_attr_changer('font_size', val);
+        },
+        update_font_italic: function(val) {
+            svgCanvas.setItalic(val);
+            window.updateContextPanel();
+        },
+        update_font_weight: function(val) {
+            svgCanvas.setFontWeight(val);
+            window.updateContextPanel();
+        },
+        update_letter_spacing: function(val) {
+            svgCanvas.setLetterSpacing(val);
+            window.updateContextPanel();
+        },
+        update_font_is_fill: function(val) {
+            svgCanvas.setFontIsFill(val);
+            window.updateContextPanel();
+        },
         write_image_data_shading: function(elem, val) {
             elem.attr('data-shading', val);
         },
         write_image_data_threshold: function(elem, val) {
             elem.attr('data-threshold', val);
+        },
+
+        // others
+        reset_select_mode: function() {
+            // simulate user click on empty area of canvas.
+            svgCanvas.textActions.clear();
+            svgCanvas.setMode('select');
+            $(svgroot).trigger({
+                type: 'mousedown',
+                pageX: 0,
+                pageY: 0
+            });
+            $(svgroot).trigger({
+                type: 'mouseup',
+                pageX: 0,
+                pageY: 0
+            });
         }
     };
 

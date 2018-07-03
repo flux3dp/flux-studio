@@ -8,14 +8,12 @@ define([
     'helpers/convertToTypedArray',
     'helpers/data-history',
     'helpers/api/set-params',
-    'app/actions/alert-actions'
 ], function(
     $,
     Websocket,
     convertToTypedArray,
     history,
-    setParams,
-    AlertActions
+    setParams
 ) {
     'use strict';
 
@@ -79,7 +77,7 @@ define([
              *
              * @return {Promise}
              */
-            upload: function(files) {
+            upload: function(files, opts) {
                 var self = this,
                     $deferred = $.Deferred(),
                     length = files.length,
@@ -116,18 +114,20 @@ define([
                             }
 
                         };
-
                         events.onError = function(data) {
                             warningCollection.push(data.error);
                             file = setMessages(file, true, warningCollection);
                             $deferred.notify('next');
                         };
-
-                        ws.send([
+                        var args = [
                             order_name,
                             file.uploadName,
                             file.size
-                        ].join(' '));
+                        ];
+                        if (opts && opts.model === 'fbb1p') {
+                            args.push('-pro');
+                        }
+                        ws.send(args.join(' '));
                     };
 
                 $deferred.progress(function(action) {
@@ -308,6 +308,10 @@ define([
                     total_length = 0,
                     blob;
 
+                if (opts && opts.model === 'fbb1p') {
+                    args.push('-pro');
+                }
+
                 events.onMessage = function(data) {
 
                     if ('computing' === data.status) {
@@ -329,7 +333,7 @@ define([
                 };
 
                 ws.send(args.join(' '));
-            }, 
+            },
             divideSVG: function() {
                 var $deferred = $.Deferred();
                 opts = opts || {};
@@ -395,7 +399,7 @@ define([
 
                 return $deferred.promise();
             },
-            uploadToSvgeditorAPI: function(files) {
+            uploadToSvgeditorAPI: function(files, opts) {
                 var $deferred = $.Deferred(),
                     currIndex = 0,
                     order_name = 'svgeditor_upload',
@@ -428,13 +432,29 @@ define([
                             file = setMessages(file, true, warningCollection);
                             $deferred.notify('next');
                         };
-
-                        ws.send([
+                        var args = [
                             order_name,
                             file.uploadName,
                             file.size,
                             file.thumbnailSize
-                        ].join(' '));
+                        ];
+                        if (opts && opts.model === 'fbb1p') {
+                            args.push('-pro');
+                        }
+                        if (opts) {
+                            switch (opts.engraveDpi) {
+                                case 'low':
+                                    args.push('-ldpi');
+                                    break;
+                                case 'medium':
+                                    args.push('-mdpi');
+                                    break;
+                                case 'high':
+                                    args.push('-hdpi');
+                                    break;
+                            }
+                        }
+                        ws.send(args.join(' '));
                     };
 
                 $deferred.progress(function(action) {

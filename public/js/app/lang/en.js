@@ -22,6 +22,7 @@ define(function() {
         },
         device_selection: {
             no_printers: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/articles/215394548">More Info</a>',
+            no_beambox: 'Cannot detect any machine through the Wi-Fi. Please check if your PC and machine are under the same network. <a target="_blank" href="https://flux3dp.com/beambox-tutorial/">More Info</a>',
             module: 'MODULE',
             status: 'STATUS'
         },
@@ -167,7 +168,7 @@ define(function() {
             no_machine: 'I don\'t have a machine now.',
 
             // specific caption/content
-            invalid_device_name: 'The name can only contains chinese, alphabet, numbers, blanks, and special characters  “(”, “)”, “-”, “_”, “’”, “\'”.',
+            invalid_device_name: 'The name can only contains chinese, alphabet, numbers, blanks, and special characters  ( ) - _ ’ \'',
             require_device_name: 'Name is required',
             select_language: 'Select Language',
             change_password: {
@@ -190,7 +191,7 @@ define(function() {
                 please_goto_touchpad: 'Please go to Beambox touchpad',
                 tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".',
                 please_see_tutorial_video: 'Tutorial Video',
-                tutorial_url: 'https://flux3dp.com/beambox-tutorial/'             
+                tutorial_url: 'https://flux3dp.com/beambox-tutorial/'
             },
 
             set_machine_generic: {
@@ -319,6 +320,8 @@ define(function() {
             projection_perspective: 'Perspective',
             projection_orthographic: 'Orthographic',
             antialiasing: 'Anti-aliasing',
+            auto_slice: 'Auto Slice',
+            lock_selection: 'Lock Selection',
             default_machine: 'Default Machine',
             default_machine_button: 'Empty',
             remove_default_machine_button: 'Remove',
@@ -333,6 +336,8 @@ define(function() {
             beambox_series: 'Beambox Family',
             default_model: 'Default Model<br />(For Print Settings)',
             default_beambox_model: 'Default Model',
+            guides_origin: 'Guides Origin',
+            guides: 'Guides',
             fd1: 'FLUX Delta',
             fd1p: 'FLUX Delta+',
             none: 'None',
@@ -375,7 +380,7 @@ define(function() {
                 sign_up_statement: 'If you don\'t have a FLUX ID, please <a href="%s">SIGN UP</a> here',
                 try_sign_up_again: 'Please try <a href="%s">SIGN UP</a> again',
                 agreement: 'Agree to the FLUX <a href="#/studio/cloud/privacy">Privacy</a>, <a href="#/studio/cloud/terms">Terms & Conditions</a>',
-                pleaseSignIn: 'Please Sign In with your FLUX ID',
+                pleaseSignIn: 'Please sign in with your FLUX ID',
                 enter_email: 'Please fill in your email address',
                 check_inbox: 'Go and check your mail box!',
                 error_blank_username: 'Nickname can\'t be blank',
@@ -384,9 +389,9 @@ define(function() {
                 error_email_used: 'The email address has been used',
                 error_password_not_match: 'Password does not match the confirm password.',
                 select_to_bind: 'Select a machine to bind',
-                binding_success: 'Binding Success!',
+                binding_success: 'You have successfully bound your machine!',
                 binding_success_description: 'You can now use FLUX app to check your machine status',
-                binding_fail: 'Binding Fail',
+                binding_fail: 'Binding failed',
                 binding_fail_description: 'May due to network error. Try it again',
                 binding_error_description: 'Unable to turn on cloud feature of the machine. Please contact support with the error log',
                 retrieve_error_log: 'Download error',
@@ -428,13 +433,13 @@ define(function() {
                 infill: 'Infill',
                 support: 'Support',
                 speed: 'Speed',
-                custom: 'Expert',
+                custom: 'Text',
                 slicingEngine: 'Slicing Engine',
                 slic3r: 'Slic3r',
                 cura: 'Cura',
                 cura2: 'Cura2',
                 filament: 'Filament',
-                temperature: 'Temperature',
+                temperature: 'Material & Temperature',
                 detect_filament_runout: 'Filament Detection',
                 flux_calibration: 'Auto Calibration',
                 detect_head_tilt: 'Tilt Detection',
@@ -452,6 +457,10 @@ define(function() {
                 rectilinear: 'Rectilinear',         // do not change
                 rectilinearGrid: 'Rectilinear Grid',// do not change
                 honeycomb: 'Honeycomb',             // do not change
+                offset: 'Offset',
+                xyOffset: 'Horizontal Expansion',
+                zOffset: 'Z Offset',
+                cutBottom: 'Cut Bottom',
                 curaInfill: {
                     automatic: 'Automatic',
                     grid: 'Grid',
@@ -621,7 +630,7 @@ define(function() {
                 raftTitle: 'Raft are layers built under your parts and help them stick to the base plate',
                 supportTitle: 'Support are generated structures to supportt overhanging parts of your object, in order to prevent filament dropping',
                 advancedTitle: 'Detail 3d printing parameters, you may acheive better result than default by adjusting them',
-                confirmExitFcodeMode: 'Exiting preview mode will unload the fcode, are you sure?'
+                confirmExitFcodeMode: 'Exiting preview mode will unload the FCode, are you sure?'
             },
             right_panel: {
                 get: 'Get',
@@ -728,7 +737,7 @@ define(function() {
             name: 'Name',
             go: 'GO',
             showOutline: 'View\nFrame',
-            do_calibrate: 'It seems you\'re using engraving for the first time, you can use the kraft card in the package to find the best focal length. Do you want to load the calibration image? You can also load it later in "Advanced".',
+            do_calibrate: 'It seems you\'re using engraving for the first time, you can use the kraft card in the package to find the best focal length. Do you wish to load the calibration image? You can also load it later in "Advanced".',
             process_caption: 'Generating',
             laser_accepted_images: 'Supported formats: BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: 'Supported formats: SVG',
@@ -886,7 +895,7 @@ define(function() {
             cancel: 'Cancel',
             delete_mesh: 'Delete?',
             quality: 'QUALITY',
-            scan_again_confirm: 'Do you want to discard current scan result?',
+            scan_again_confirm: 'Do you wish to discard current scan result?',
             calibrate: 'Calibrate',
             calibration_done: {
                 caption: 'Calibration Done',
@@ -981,17 +990,20 @@ define(function() {
         beambox: {
             popup: {
                 select_favor_input_device: 'Better user experience has been optimized<br/>Please select your favorite input device.',
-                select_import_method: 'Select layering method:',
+                select_import_method: 'Select layering style:',
                 touchpad: 'TouchPad',
                 mouse: 'Mouse',
-                layer_by_layer: 'By Layer',
-                layer_by_color: 'By Color',
-                nolayer: 'No Layer',
-                should_update_firmware_to_continue: 'Please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
+                layer_by_layer: 'Layer',
+                layer_by_color: 'Color',
+                nolayer: 'Single Layer',
+                no_support_text: 'FLUX Studio does not support text tag currently. Please transfer text to path before importing.',
+                power_too_high_damage_laser_tube: 'Using lower laser power will extends laser tube\'s lifetime.' ,
+                should_update_firmware_to_continue: 'Your firmware does not support some improvements of FLUX Studio. For better performance and user experience, please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
             },
             left_panel: {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
+                advanced: 'Advanced',
                 suggest_calibrate_camera_first: 'Please calibrate the camera. (Menu > Machine > [Your Machine] > Calibrate Camera)\nRefocus platform properly everytime using it to perform better preview result.',
                 end_preview: 'End Preview Mode',
                 unpreviewable_area: 'The area is not allowed to preview',
@@ -1006,6 +1018,15 @@ define(function() {
                     line: 'Line',
                     image: 'Image',
                     text: 'Text'
+                },
+                advanced_panel: {
+                    engrave_parameters: 'Engrave Parameters',
+                    engrave_dpi: 'Engraving Resolution',
+                    low: 'Low',
+                    medium: 'Medium',
+                    high: 'High',
+                    cancel: 'Cancel',
+                    save: 'Save'
                 }
             },
             right_panel: {
@@ -1016,9 +1037,14 @@ define(function() {
                 laser_panel: {
                     strength: 'Power',
                     speed: 'Speed',
+                    repeat: 'Execute',
+                    times: 'times',
                     cut: 'Cut',
                     engrave: 'Engrave'
                 },
+            },
+            bottom_right_panel: {
+                convert_text_to_path_before_export: 'Convert Text to Path...'
             },
             object_panels: {
                 position: 'Position',
@@ -1028,7 +1054,16 @@ define(function() {
                 height: 'Height',
                 center: 'Center',
                 ellipse_radius: 'Size',
+                rounded_corner: 'Rounded Corner',
+                radius: 'Radius',
                 points: 'Points',
+                text: 'Text',
+                font_size: 'Size',
+                fill: 'Fill',
+                letter_spacing: 'Letter Spacing',
+                convert_to_path: 'Convert to Path',
+                convert_to_path_to_get_precise_result: 'Some fonts can\'t be parsed correctly. Please convert text to path before submitting to Beambox',
+                wait_for_parsing_font: 'Parsing font... Please wait a second',
                 laser_config: 'Laser Config',
                 shading: 'Shading',
                 threshold: 'Threshold',
@@ -1144,7 +1179,7 @@ define(function() {
             machine_radius: 'Delta Radius',
             disable: 'Disable',
             enable: 'Enable',
-            beambox_should_use_touch_panel_to_adjust: 'Beambox settings should be adjusted from Beambox touch panel.'            
+            beambox_should_use_touch_panel_to_adjust: 'Beambox settings should be adjusted from Beambox touch panel.'
         },
         monitor: {
             change_filament                     : 'CHANGE FILAMENT',
@@ -1198,7 +1233,7 @@ define(function() {
             second                              : 's',
             left                                : 'left',
             temperature                         : 'Temperature',
-            forceStop                           : 'Do you want to abort current task?',
+            forceStop                           : 'Do you wish to abort current task?',
             upload                              : 'Upload',
             download                            : 'Download',
             fileNotDownloadable                 : 'This file type is not supported for download',
@@ -1278,9 +1313,9 @@ define(function() {
             cant_establish_connection: 'Unable to connect FLUX Studio API. Please <a target="_blank" href="https://flux3dp.zendesk.com/hc/en-us/requests/new" target="_blank">contact FLUX support.</a>',
             application_occurs_error: 'The application has encountered an unhandled error.',
             error_log: 'Error Log',
-            fcodeForLaser: 'This is a fcode for engraving',
-            fcodeForPen: 'This is a fcode for drawing',
-            confirmFCodeImport: 'Importing fcode will remove all objects on the scene, are you sure?',
+            fcodeForLaser: 'This is a FCode for engraving',
+            fcodeForPen: 'This is a FCode for drawing',
+            confirmFCodeImport: 'Importing FCode will remove all objects on the scene, are you sure?',
             confirmSceneImport: 'Importing .fsc will remove all objects on the scene, are you sure?',
             brokenFcode: 'Unable to open %s',
             slicingFatalError: 'Error encountered during slicing. Kindly report STL file to customer support.',
@@ -1288,23 +1323,25 @@ define(function() {
             unknown_device: 'Cannot connect to the machine, please make sure USB is attached to the machine',
             important_update: {
                 caption: 'Important Update',
-                message: 'Important Machine firmware update is available. Do you want to update now?',
+                message: 'Important Machine firmware update is available. Do you wish to update now?',
             },
             unsupport_osx_version: 'Unsupported Mac OS X Version Detected',
             need_password: 'Need Password to Connect to the Machine',
-            new_app_downloading: 'FLUX Stduio is Downloading',
+            new_app_downloading: 'FLUX Studio is Downloading',
             new_app_download_canceled: 'FLUX Studio download has been canceled',
             new_app_downloaded: 'Newest FLUX Studio has been downloaded',
-            ask_for_upgrade: 'Do you wanna upgrade NOW?',
-            need_1_1_7_above: 'Please update Machine Firmware to v1.1.7+',
-            gcode_area_too_big: 'Imported gcode exceed the printable area.',
+            ask_for_upgrade: 'Do you wish to upgrade now?',
+            please_enter_dpi: 'Please enter the DPI of your file',
+            need_1_1_7_above: 'Please update firmware to v1.1.7+',
+            gcode_area_too_big: 'Imported GCode exceed the printable area.',
             empty_file: 'File is empty',
             usb_unplugged: 'USB connection is lost. Please check your USB connection',
             launghing_from_installer_warning: 'You are launching FLUX Studio from the installer, and this may cause problems. Please move the FLUX Studio to the Application folder.',
-            uploading_fcode: 'Uploading fcode',
-            cant_connect_to_device: 'Cannot connect to the machine, please check your connection',
+            uploading_fcode: 'Uploading FCode',
+            cant_connect_to_device: 'Unable to connect the machine, please check your connection',
             unable_to_find_machine: 'Unable to find machine ',
-            unable_to_start: 'Unable to start, please try again. If this continue to happen, please contact us with bug report:\n'
+            unable_to_start: 'Unable to start the task. Please try again. If this happens again, please contact us with bug report:\n',
+            camera_fail_to_transmit_image: 'Something went wrong with image transmission. Please try restarting your Beambox or contact us.'
         },
         machine_status: {
             '-10': 'Raw mode',
@@ -1379,18 +1416,19 @@ define(function() {
             attach_toolhead: 'Please connect the printing toolhead'
         },
         camera_calibration: {
-            camera_calibration: 'Camera Calibration',            
+            camera_calibration: 'Camera Calibration',
             next: 'NEXT',
             cancel: 'CANCEL',
             back: 'BACK',
             finish: 'DONE',
+            please_goto_beambox_first: 'Please switch to Engraving Mode ( Beambox ) in order to use this feature.',
             please_place_paper: 'Please place an A4 white paper at left-top corner of workarea',
             please_refocus: 'Please focus the platform properly',
             taking_picture: 'Taking Picture...',
             start_engrave: 'START ENGRAVE',
             analyze_result_fail: 'Fail to analyze captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             drawing_calibration_image: 'Drawing calibration image...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.<br/>3. If laser fail to emit, please go to Beambox touch panel "Motion", make sure strength and speed multiplier are 1, then calibrate again',
             calibrate_done: 'Calibration done. Better camera accurency is given when focus precisely.'
         },
         input_machine_password: {
@@ -1404,7 +1442,7 @@ define(function() {
         },
         tutorial: {
             set_first_default_caption: 'Welcome',
-            set_first_default: 'Do you want to set "%s" as your default device?',
+            set_first_default: 'Do you wish to set "%s" as your default device?',
             startWithFilament: 'Now we\'re going to load the filament',
             startWithModel: 'Next, let\'s import an example 3D model',
             startTour: 'Welcome!<br/>This is your first time printing,<br/>would you like to start printing tutorial?',
@@ -1452,7 +1490,8 @@ define(function() {
             USED                : 'Used',
             HARDWARE_VERSION    : 'Hardware Version',
             FOCAL_LENGTH        : 'Focal Length',
-            hours               : 'Hours'
+            hours               : 'Hours',
+            cannot_get_info     : 'Toolhead type is unreadable'
         }
     };
 });

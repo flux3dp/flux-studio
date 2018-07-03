@@ -1,8 +1,10 @@
+/* eslint-disable react/no-multi-comp */
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'helpers/i18n',
-    'helpers/api/config',
+    'app/actions/beambox/beambox-preference',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'helpers/device-master',
@@ -14,12 +16,13 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'helpers/api/camera-calibration',
     'helpers/sprintf',
-    'app/actions/beambox/constant',    
+    'app/actions/beambox/constant',
 ], function(
     $,
     React,
+    PropTypes,
     i18n,
-    ConfigHelper,
+    BeamboxPreference,
     Modal,
     Alert,
     DeviceMaster,
@@ -33,15 +36,9 @@ define([
     sprintf,
     Constant
 ) {
-    'use strict';
+    const LANG = i18n.lang.camera_calibration;
 
-    const lang = i18n.get();
-    const LANG = lang.camera_calibration;
-    const Config = ConfigHelper();
-
-    const cameraCalibrationWebSocket = CameraCalibration();    
-    
-    let imgBlobUrl = '';
+    const cameraCalibrationWebSocket = CameraCalibration();
 
     //View render the following steps
     const STEP_REFOCUS = Symbol();
@@ -52,95 +49,110 @@ define([
     class CameraCalibrationStateMachine extends React.Component {
         constructor(props) {
             super(props);
-            this.stepsMap = new Map([
-                [STEP_REFOCUS, StepRefocus],
-                [STEP_BEFORE_CUT, StepBeforeCut],
-                [STEP_BEFORE_ANALYZE_PICTURE, StepBeforeAnalyzePicture],
-                [STEP_FINISH, StepFinish]
-            ]);
-            
+
             this.state = {
-                currentStep: STEP_REFOCUS
+                currentStep: STEP_REFOCUS,
+                imgBlobUrl: ''
             };
 
-            this.changeCurrentStep = this.changeCurrentStep.bind(this);
+            this.updateCurrentStep = this.updateCurrentStep.bind(this);
             this.onClose = this.onClose.bind(this);
+            this.updateImgBlobUrl = this.updateImgBlobUrl.bind(this);
         }
 
-        changeCurrentStep(nextStep) {
-            this.setState({currentStep: nextStep});
+        updateCurrentStep(nextStep) {
+            this.setState({
+                currentStep: nextStep
+            });
         }
 
         onClose() {
             this.props.onClose();
         }
 
+        updateImgBlobUrl(val) {
+            URL.revokeObjectURL(this.state.imgBlobUrl);
+            this.setState({
+                imgBlobUrl: val
+            });
+        }
+
         render() {
+            const stepsMap = {
+                [STEP_REFOCUS]:
+                    <StepRefocus
+                        gotoNextStep={this.updateCurrentStep}
+                        onClose={this.onClose}
+                    />,
+                [STEP_BEFORE_CUT]:
+                    <StepBeforeCut
+                        gotoNextStep={this.updateCurrentStep}
+                        onClose={this.onClose}
+                        device={this.props.device}
+                        updateImgBlobUrl={this.updateImgBlobUrl}
+                    />,
+                [STEP_BEFORE_ANALYZE_PICTURE]:
+                    <StepBeforeAnalyzePicture
+                        gotoNextStep={this.updateCurrentStep}
+                        onClose={this.onClose}
+                        imgBlobUrl={this.state.imgBlobUrl}
+                    />,
+                [STEP_FINISH]:
+                    <StepFinish
+                        onClose={this.onClose}
+                    />
+            };
+
             const currentStep = this.state.currentStep;
-            const TheStep = this.stepsMap.get(currentStep);
-            const content = (<TheStep 
-                gotoNextStep={this.changeCurrentStep}
-                onClose={this.onClose}
-                device={this.props.device}
-            />);
+            const currentStepComponent = stepsMap[currentStep];
             return (
-                <div className="always-top" ref="modal">
-                    <Modal className={{"modal-camera-calibration": true}} content={content} disabledEscapeOnBackground={false}/>
+                <div className='always-top' ref='modal'>
+                    <Modal className={{'modal-camera-calibration': true}} content={currentStepComponent} disabledEscapeOnBackground={false}/>
                 </div>
             );
         }
     };
-    CameraCalibrationStateMachine.propTypes = {
-        device  : React.PropTypes.object,
-        onClose : React.PropTypes.func
-    };
 
-    class StepRefocus extends React.Component {
-        render() {
-            return (
-                <Alert
-                    caption={LANG.camera_calibration}
-                    message={LANG.please_refocus}
-                    buttons={
-                        [{
-                            label: LANG.next,
-                            className: 'btn-default btn-alone-right',
-                            onClick: () => this.props.gotoNextStep(STEP_BEFORE_CUT)
-                        },
-                        {
-                            label: LANG.cancel,
-                            className: 'btn-default btn-alone-left',
-                            onClick: this.props.onClose
-                        }]
-                    }
-                    />
-            );
-        }
-    }
-    
-    class StepBeforeCut extends React.Component {
-        async cutThenCapture() {
-            await this._doCuttingTask();
-            await this._doCaptureTask();
+    const StepRefocus = ({gotoNextStep, onClose}) => (
+        <Alert
+            caption={LANG.camera_calibration}
+            message={LANG.please_refocus}
+            buttons={
+                [{
+                    label: LANG.next,
+                    className: 'btn-default btn-alone-right',
+                    onClick: () => gotoNextStep(STEP_BEFORE_CUT)
+                },
+                {
+                    label: LANG.cancel,
+                    className: 'btn-default btn-alone-left',
+                    onClick: onClose
+                }]
+            }
+        />
+    );
+
+    const StepBeforeCut = ({device, updateImgBlobUrl, gotoNextStep, onClose}) => {
+        const cutThenCapture = async () => {
+            await _doCuttingTask();
+            await _doCaptureTask();
         };
-        async _doCuttingTask() {
-            const device = this.props.device;
+        const _doCuttingTask = async () => {
             await DeviceMaster.select(device);
             await CheckDeviceStatus(device);
             await DeviceMaster.runBeamboxCameraTest();
         };
-        async _doCaptureTask() {
-            const device = this.props.device;
-            await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode')});
-            ProgressActions.open(ProgressConstants.NONSTOP, LANG.taking_picture); 
+        const _doCaptureTask = async () => {
             try {
+                await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode');});
+
+                ProgressActions.open(ProgressConstants.NONSTOP, LANG.taking_picture);
+
                 const movementX = Constant.camera.calibrationPicture.centerX - Constant.camera.offsetX_ideal;
                 const movementY = Constant.camera.calibrationPicture.centerY - Constant.camera.offsetY_ideal;
                 const blobUrl = await PreviewModeController.takePictureAfterMoveTo(movementX, movementY);
-                if(imgBlobUrl) {
-                    URL.revokeObjectURL(imgBlobUrl);
-                }
-                imgBlobUrl = blobUrl;
+
+                updateImgBlobUrl(blobUrl);
             } catch (error) {
                 throw error;
             } finally {
@@ -149,9 +161,8 @@ define([
             }
         };
 
-        render() {
-            return (
-                <Alert
+        return (
+            <Alert
                 caption={LANG.camera_calibration}
                 message={LANG.please_place_paper}
                 buttons={
@@ -160,71 +171,82 @@ define([
                         className: 'btn-default btn-alone-right',
                         onClick: async ()=>{
                             try {
-                                await this.cutThenCapture();
-                                this.props.gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
+                                await cutThenCapture();
+                                gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
                             } catch (error) {
                                 console.log(error);
-                                AlertActions.showPopupError('menu-item', error.message);                                
+                                ProgressActions.close();
+                                AlertActions.showPopupError('menu-item', error.message || 'Fail to cut and capture');
                             }
                         }
                     },
                     {
                         label: LANG.cancel,
                         className: 'btn-default btn-alone-left',
-                        onClick: this.props.onClose
+                        onClick: onClose
                     }]
                 }
-                />
-            ); 
-        };
-    }
+            />
+        );
+    };
 
-    class StepBeforeAnalyzePicture extends React.Component {
-        async sendPictureThenSetConfig() {
-            const resp = await this._doSendPictureTask();
-            const result = this._doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
+    const StepBeforeAnalyzePicture = ({imgBlobUrl, gotoNextStep, onClose}) => {
+        const sendPictureThenSetConfig = async () => {
+            const resp = await _doSendPictureTask();
+            const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
             if(!result) {
                 throw new Error(LANG.analyze_result_fail);
             }
-            await this._doSetConfigTask(result.X, result.Y, result.R, result.S);
-        }
+            await _doSetConfigTask(result.X, result.Y, result.R, result.S);
+        };
 
-        async _doSendPictureTask() {
+        const _doSendPictureTask = async () => {
             const d = $.Deferred();
             fetch(imgBlobUrl)
-            .then(res => res.blob())
-            .then((blob) => {
-                var fileReader = new FileReader();
-                fileReader.onloadend = (e) => {
-                    cameraCalibrationWebSocket.upload(e.target.result)
-                    .done((resp)=>{
-                        d.resolve(resp);
-                    })
-                    .fail((resp)=>{
-                        d.reject(resp.toString());
-                    })
-                };
-                fileReader.readAsArrayBuffer(blob);
-            })
-            .catch((err) => {
-                d.reject(err);
-            });
+                .then(res => res.blob())
+                .then((blob) => {
+                    var fileReader = new FileReader();
+                    fileReader.onloadend = (e) => {
+                        cameraCalibrationWebSocket.upload(e.target.result)
+                            .done((resp)=>{
+                                d.resolve(resp);
+                            })
+                            .fail((resp)=>{
+                                d.reject(resp.toString());
+                            });
+                    };
+                    fileReader.readAsArrayBuffer(blob);
+                })
+                .catch((err) => {
+                    d.reject(err);
+                });
             return await d.promise();
-        }
+        };
 
-        _doAnalyzeResult(x, y, angle, size) {
+        const _doAnalyzeResult = async (x, y, angle, squareSize) => {
+            const blobImgSize = await new Promise(resolve => {
+                const img = new Image();
+                img.src = imgBlobUrl;
+                img.onload = () => {
+                    resolve({
+                        width:img.width,
+                        height: img.height
+                    });
+                };
+            });
+
             const offsetX_ideal = Constant.camera.offsetX_ideal; // mm
             const offsetY_ideal = Constant.camera.offsetY_ideal; // mm
             const scaleRatio_ideal = Constant.camera.scaleRatio_ideal;
             const square_size = Constant.camera.calibrationPicture.size; // mm
 
-            const scaleRatio = (square_size * Constant.dpmm) / size;
-            const deviationX = x - Constant.camera.imgWidth/2; // pixel
-            const deviationY = y - Constant.camera.imgHeight/2; // pixel
+            const scaleRatio = (square_size * Constant.dpmm) / squareSize;
+            const deviationX = x - blobImgSize.width/2; // pixel
+            const deviationY = y - blobImgSize.height/2; // pixel
 
             const offsetX = -deviationX * scaleRatio / Constant.dpmm + offsetX_ideal;
             const offsetY = -deviationY * scaleRatio / Constant.dpmm + offsetY_ideal;
-            
+
             if ((0.8 > scaleRatio/scaleRatio_ideal) || (scaleRatio/scaleRatio_ideal > 1.2)) {
                 return false;
             }
@@ -239,69 +261,63 @@ define([
                 Y: offsetY,
                 R: -angle,
                 S: scaleRatio
-            }
-        }
+            };
+        };
 
-        async _doSetConfigTask(X, Y, R, S) {
+        const _doSetConfigTask = async (X, Y, R, S) => {
             await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${S}`);
-        }
+        };
 
-        render() {
-            return (
-                <Alert
-                    caption={LANG.camera_calibration}
-                    message={sprintf(LANG.please_confirm_image, imgBlobUrl)}
-                    buttons={
-                        [{
-                            label: LANG.next,
-                            className: 'btn-default btn-alone-right-1',
-                            onClick: async () => {
-                                try {
-                                    await this.sendPictureThenSetConfig();
-                                    this.props.gotoNextStep(STEP_FINISH);
-                                } catch (error) {
-                                    console.log(error);
-                                    AlertActions.showPopupError('menu-item', error.message);                                        
-                                    this.props.gotoNextStep(STEP_REFOCUS);
-                                }
+        return (
+            <Alert
+                caption={LANG.camera_calibration}
+                message={sprintf(LANG.please_confirm_image, imgBlobUrl)}
+                buttons={
+                    [{
+                        label: LANG.next,
+                        className: 'btn-default btn-alone-right-1',
+                        onClick: async () => {
+                            try {
+                                await sendPictureThenSetConfig();
+                                gotoNextStep(STEP_FINISH);
+                            } catch (error) {
+                                console.log(error);
+                                AlertActions.showPopupError('menu-item', error.toString().replace('Error: ', ''));
+                                gotoNextStep(STEP_REFOCUS);
                             }
-                        },
-                        {
-                            label: LANG.back,
-                            className: 'btn-default btn-alone-right-2',
-                            onClick: () => this.props.gotoNextStep(STEP_BEFORE_CUT)
-                        },
-                        {
-                            label: LANG.cancel,
-                            className: 'btn-default btn-alone-left',
-                            onClick: this.props.onClose
-                        }]
-                    }
-                />
-            );
-        }
+                        }
+                    },
+                    {
+                        label: LANG.back,
+                        className: 'btn-default btn-alone-right-2',
+                        onClick: () => gotoNextStep(STEP_BEFORE_CUT)
+                    },
+                    {
+                        label: LANG.cancel,
+                        className: 'btn-default btn-alone-left',
+                        onClick: onClose
+                    }]
+                }
+            />
+        );
     };
 
-    class StepFinish extends React.Component {
-        render() {
-            return (
-                <Alert
-                    caption={LANG.camera_calibration}
-                    message={LANG.calibrate_done}
-                    buttons={
-                        [{
-                            label: LANG.finish,
-                            className: 'btn-default btn-alone-right',
-                            onClick: () => {
-                                Config.update('beambox-preference', 'should_remind_calibrate_camera', false);
-                                this.props.onClose();
-                            }
-                        }]
+    const StepFinish = ({onClose}) => (
+        <Alert
+            caption={LANG.camera_calibration}
+            message={LANG.calibrate_done}
+            buttons={
+                [{
+                    label: LANG.finish,
+                    className: 'btn-default btn-alone-right',
+                    onClick: () => {
+                        BeamboxPreference.write('should_remind_calibrate_camera', false);
+                        onClose();
                     }
-                />
-            );
-        }
-    };
+                }]
+            }
+        />
+    );
 
     return CameraCalibrationStateMachine;
 });

@@ -1,20 +1,19 @@
 define([
-    'jquery',
     'react',
+    'helpers/i18n',
     'helpers/api/cloud'
 ], function(
-    $,
     React,
+    i18n,
     CloudApi
 ) {
-    'use strict';
+    const LANG = i18n.lang.settings.flux_cloud;
 
     return React.createClass({
-
         getInitialState: function() {
             return {
                 email: ''
-            }
+            };
         },
 
         _handleEnterEmail: function(e) {
@@ -25,27 +24,23 @@ define([
             location.hash = '#studio/cloud/sign-in';
         },
 
-        _handleNext: function() {
-            let lang = this.props.lang.settings.flux_cloud;
-            CloudApi.resetPassword(this.state.email).then(response => {
-                if(response.ok) {
-                    location.hash = '#studio/cloud/email-sent';
-                }
-                else {
-                    alert(lang.contact_us);
-                }
-            })
+        _handleNext: async function() {
+            const response = await CloudApi.resetPassword(this.state.email);
+            if(response.ok) {
+                location.hash = '#studio/cloud/email-sent';
+            } else {
+                alert(LANG.contact_us);
+            }
 
         },
 
         render: function() {
-            let lang = this.props.lang.settings.flux_cloud;
             return(
                 <div className="cloud">
                     <div className="container forgot-password">
                         <div className="middle">
                             <div className="description">
-                                <h3>{lang.enter_email}</h3>
+                                <h3>{LANG.enter_email}</h3>
                             </div>
                             <div className="controls">
                                 <div className="control">
@@ -59,8 +54,8 @@ define([
                             <hr />
                         </div>
                         <div className="actions">
-                            <button className="btn btn-cancel" onClick={this._handleBack}>{lang.back}</button>
-                            <button className="btn btn-default" onClick={this._handleNext}>{lang.next}</button>
+                            <button className="btn btn-cancel" onClick={this._handleBack}>{LANG.back}</button>
+                            <button className="btn btn-default" onClick={this._handleNext}>{LANG.next}</button>
                         </div>
                     </div>
                 </div>

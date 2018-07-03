@@ -5,8 +5,6 @@ define([
     $,
     versionCompare
 ) {
-    'use strict';
-
     const infoMap = {
         delta: {
             firmware: {
@@ -59,33 +57,34 @@ define([
                 needUpdate: true
             });
             return deferred.promise();
-          }
+        }
 
         const series = checkMachineSeries(printer.model);
         const info = infoMap[series][type];
         const request_data = {
-          feature: 'check_update',
-          key: info['api_key']
+            feature: 'check_update',
+            key: info['api_key']
         };
 
         $.ajax({
             url: 'https://flux3dp.com/api_entry/',
             data: request_data
         })
-        .done(function(response) {
-            response.needUpdate =  versionCompare(printer.version, response.latest_version );
-            response.latestVersion = response.latest_version;
-            response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
-            response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');
-            response.downloadUrl = info['downloadUrl'].replace('[version]', response.latest_version);
+            .done(function(response) {
+                response.needUpdate =  versionCompare(printer.version, response.latest_version );
+                console.log('response.needUpdate: ', response.needUpdate);
+                response.latestVersion = response.latest_version;
+                response.changelog_en = response.changelog_en.replace(/[\r]/g, '<br/>');
+                response.changelog_zh = response.changelog_zh.replace(/[\r]/g, '<br/>');
+                response.downloadUrl = info['downloadUrl'].replace('[version]', response.latest_version);
 
-            deferred.resolve(response);
-        })
-        .fail(function() {
-            deferred.reject({
-                needUpdate: true
+                deferred.resolve(response);
+            })
+            .fail(function() {
+                deferred.reject({
+                    needUpdate: true
+                });
             });
-        });
 
         return deferred.promise();
     };

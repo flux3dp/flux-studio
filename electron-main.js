@@ -1,16 +1,20 @@
-'use strict';
-
 const {app, ipcMain, BrowserWindow} = require('electron');
-app.commandLine.appendSwitch("ignore-gpu-blacklist")
+app.commandLine.appendSwitch('ignore-gpu-blacklist');
 
 const BackendManager = require('./src/backend-manager.js');
 const MenuManager = require('./src/menu-manager.js');
 const UglyNotify = require('./src/ugly-notify.js');
 const events = require('./src/ipc-events');
 
+const TTC2TTF = require('./src/ttc2ttf.js');
+
+const FontManager = require('font-manager');
+const TextToSVG = require('text-to-svg');
+
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+const os = require('os');
 
 let mainWindow;
 let menuManager;
@@ -19,7 +23,7 @@ global.backend = {alive: false};
 global.devices = {};
 
 function createLogFile() {
-    var storageDir = app.getPath("userData");
+    var storageDir = app.getPath('userData');
 
     function chkDir(target) {
         if (fs.existsSync(target)) {
@@ -32,7 +36,7 @@ function createLogFile() {
     }
     chkDir(storageDir);
 
-    let filename = path.join(app.getPath("userData"), "backend.log");
+    let filename = path.join(app.getPath('userData'), 'backend.log');
     let f = fs.createWriteStream(filename, {flags: 'w'});
     global.backend.logfile = filename;
     console._stdout = f;
@@ -45,7 +49,7 @@ const logger = process.stderr.isTTY ? process.stderr : createLogFile();
 
 if(process.argv.indexOf('--debug') > 0) {
     DEBUG = true;
-    console.log("DEBUG Mode");
+    console.log('DEBUG Mode');
     // require('electron-reload')(__dirname);
 }
 
@@ -95,14 +99,14 @@ function onDeviceUpdated(deviceInfo) {
     } else {
         if(global.devices[deviceID]) {
             menuManager.removeDevice(deviceInfo.uuid, global.devices[deviceID]);
-            delete global.devices[deviceID]
+            delete global.devices[deviceID];
         }
     }
 
     global.devices[deviceID] = deviceInfo;
 }
 
-require("./src/bootstrap.js");
+require('./src/bootstrap.js');
 
 const backendManager = new BackendManager({
     location: process.env.BACKEND,
@@ -125,7 +129,7 @@ function createWindow () {
             preload: path.join(__dirname, 'src', 'main-window-entry.js')
         },
         vibrancy: 'light'});
-    
+
     mainWindow.maximize();
 
     mainWindow.loadURL(url.format({
@@ -138,7 +142,7 @@ function createWindow () {
         mainWindow = null;
 
         if (process.platform === 'darwin' && DEBUG) {
-            console.log("Main window closed.");
+            console.log('Main window closed.');
         } else {
             app.quit();
         }
@@ -148,7 +152,7 @@ function createWindow () {
         event.preventDefault();
     });
 
-    menuManager.on("DEBUG-RELOAD", () => {
+    menuManager.on('DEBUG-RELOAD', () => {
         mainWindow.loadURL(url.format({
             pathname: path.join(__dirname, 'public/index.html'),
             protocol: 'file:',
@@ -156,10 +160,10 @@ function createWindow () {
         }));
     });
 
-    menuManager.on("DEBUG-INSPECT", () => {
+    menuManager.on('DEBUG-INSPECT', () => {
         mainWindow.webContents.openDevTools();
     });
-    ipcMain.on("DEBUG-INSPECT", () => {
+    ipcMain.on('DEBUG-INSPECT', () => {
         mainWindow.webContents.openDevTools();
     });
     if(process.defaultApp || DEBUG) {
@@ -177,6 +181,93 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
         console.error('Recv async-status request but main window not exist');
     }
 });
+
+ipcMain.on(events.GET_AVAILABLE_FONTS , (event, arg) => {
+    const fonts = FontManager.getAvailableFontsSync();
+    event.returnValue = fonts;
+});
+
+ipcMain.on(events.FIND_FONTS , (event, arg) => {
+    // FontManager.findFontsSync({ family: 'Arial' });
+    const fonts = FontManager.findFontsSync(arg);
+    event.returnValue = fonts;
+});
+
+ipcMain.on(events.FIND_FONT , (event, arg) => {
+    // FontManager.findFontSync({ family: 'Arial', weight: 700 })
+    const font = FontManager.findFontSync(arg);
+    event.returnValue = font;
+});
+
+ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
+
+    const substitutedFamily = (function(){
+
+        //if only contain basic character (123abc!@#$...), don't substitute.
+        //because my Mac cannot substituteFont properly handing font like 'Windings'
+        //but we have to subsittue text if text contain both English and Chinese
+        const textOnlyContainBasicLatin = Array.from(text).every(char => {
+            return char.charCodeAt(0) <= 0x007F;
+        });
+        if (textOnlyContainBasicLatin) {
+            return fontFamily;
+        }
+
+        const originFont = FontManager.findFontSync({
+            family: fontFamily,
+            style: fontStyle
+        });
+
+        // array of used family which are in the text
+        const familyList = (function(){
+            const originPostscriptName = originFont.postscriptName;
+            const list = Array.from(text).map(char =>
+                FontManager.substituteFontSync(originPostscriptName, char).family
+            );
+            // make unique
+            return [...new Set(list)];
+        })();
+
+        if (familyList.length === 1) {
+            return familyList[0];
+        } else if (familyList.length === 2) {
+            // consider mixing Chinese with English. For example: '甲乙丙ABC' with font Arial.
+            // we choose to use Chinese font instead of English font, which make English characters differ form what it should be.
+            // This is not the best solution, just a quick fix.
+            return (familyList.filter(family => family !== fontFamily))[0];
+        } else {
+            console.log('Unexpected case in convert text to path: text contain more than 2 font-family!');
+            return familyList[0];
+        }
+    })();
+
+    const font = FontManager.findFontSync({
+        family: substitutedFamily,
+        style: fontStyle
+    });
+    let fontPath = font.path;
+
+    if(fontPath.toLowerCase().endsWith('.ttc') || fontPath.toLowerCase().endsWith('.ttcf')) {
+        fontPath = await TTC2TTF(fontPath, font.postscriptName);
+    }
+    const pathD = TextToSVG.loadSync(fontPath).getD(text, {
+        fontSize: Number(fontSize),
+        anchor: 'left baseline',
+        x: x,
+        y: y,
+        letterSpacing: letterSpacing
+    });
+
+    event.sender.send(events.RESOLVE_PATH_D_OF_TEXT + key, pathD);
+});
+
+console.log('Running FLUX Studio on ', os.arch());
+
+if  (os.arch() == 'ia32' || os.arch() == 'x32') {
+    app.commandLine.appendSwitch('js-flags', '--max-old-space-size=2048');
+} else {
+    app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
+}
 
 app.on('ready', () => {
     app.makeSingleInstance((commandLine, workingDirectory) => {
@@ -207,7 +298,7 @@ app.on('activate', function () {
     // On OS X it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
-      createWindow();
+        createWindow();
     }
 });
 

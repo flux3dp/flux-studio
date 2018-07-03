@@ -1,19 +1,20 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'app/actions/beambox/svgeditor-function-wrapper',
     'helpers/image-data',
     'helpers/i18n',
-], function($, React, FnWrapper, ImageData, i18n) {
+], function($, React, PropTypes, FnWrapper, ImageData, i18n) {
     'use strict';
 
     const LANG = i18n.lang.beambox.object_panels;
 
     return React.createClass({
         propTypes: {
-            shading: React.PropTypes.bool.isRequired,
-            threshold: React.PropTypes.number.isRequired,
-            $me: React.PropTypes.object.isRequired
+            shading: PropTypes.bool.isRequired,
+            threshold: PropTypes.number.isRequired,
+            $me: PropTypes.object.isRequired
         },
         
         getInitialState: function() {

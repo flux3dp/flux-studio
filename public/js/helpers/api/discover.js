@@ -9,8 +9,15 @@ define([
     'helpers/device-list',
     'helpers/logger',
     'helpers/smart-upnp',
-    'helpers/array-findindex'
-], function(Websocket, initializeMachine, config, DeviceList, Logger, SmartUpnp, ArrayFinxIndex) {
+    'helpers/api/cloud'
+], function(
+    Websocket, 
+    initializeMachine, 
+    Config, 
+    DeviceList, 
+    Logger, 
+    SmartUpnp,
+    CloudApi) {
     'use strict';
 
     var ws = ws || new Websocket({
@@ -68,11 +75,11 @@ define([
             ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));
         },
         BUFFER = 100,
-        pokeIPs = config().read('poke-ip-addr').split(';'),
+        pokeIPs = Config().read('poke-ip-addr').split(';'),
         timer;
 
     if ('' === pokeIPs[0]) {
-        config().write('poke-ip-addr', '192.168.1.1');
+        Config().write('poke-ip-addr', '192.168.1.1');
         pokeIPs = ['192.168.1.1'];
     }
 
@@ -130,6 +137,22 @@ define([
     for(var i in pokeIPs){
         SmartUpnp.startPoke(pokeIPs[i]);
     }
+
+    CloudApi.getDevices().then(resp => {
+        if (resp.ok) {
+            resp.json().then(content => {
+                if (content.devices) {
+                    content.devices.map(device => {
+                        console.log(device.alias, device.ip_addr);
+                        if (device.ip_addr) {
+                            // console.log("Start poking cloud device IP:", device.ip_addr);
+                            SmartUpnp.startPoke(device.ip_addr.trim().replace(/\u0000/g, ''));
+                        }
+                    });
+                }
+            });
+        }
+    });
 
     return self;
 });

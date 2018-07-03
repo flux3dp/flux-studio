@@ -190,8 +190,10 @@ define([
             $(svgEditor.init);
         }
 
-        _handleDisableHref() {
-            return false;
+        _handleDisableHref(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
         }
 
         render() {
@@ -1425,32 +1427,32 @@ define([
                         </li>
                         <li className="separator">
                             <a href="#group" onClick={this._handleDisableHref}>
-                                Group<span className="shortcut">G</span>
+                                Group
                             </a>
                         </li>
                         <li>
                             <a href="#ungroup" onClick={this._handleDisableHref}>
-                                Ungroup<span className="shortcut">G</span>
+                                Ungroup
                             </a>
                         </li>
                         <li className="separator">
                             <a href="#move_front" onClick={this._handleDisableHref}>
-                                Bring to Front<span className="shortcut">SHFT+CTRL+]</span>
+                                Bring to Front
                             </a>
                         </li>
                         <li>
                             <a href="#move_up" onClick={this._handleDisableHref}>
-                                Bring Forward<span className="shortcut">CTRL+]</span>
+                                Bring Forward
                             </a>
                         </li>
                         <li>
                             <a href="#move_down" onClick={this._handleDisableHref}>
-                                Send Backward<span className="shortcut">CTRL+[</span>
+                                Send Backward
                             </a>
                         </li>
                         <li>
                             <a href="#move_back" onClick={this._handleDisableHref}>
-                                Send to Back<span className="shortcut">SHFT+CTRL+[</span>
+                                Send to Back
                             </a>
                         </li>
                     </ul>

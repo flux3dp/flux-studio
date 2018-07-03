@@ -1,54 +1,45 @@
 define([
-    'jquery',
     'react',
+    'helpers/i18n',
     'helpers/device-master'
 ], function(
-    $,
     React,
+    i18n,
     DeviceMaster
 ) {
-    'use strict';
+    const LANG = i18n.lang.settings.flux_cloud;
 
-    return React.createClass({
+    return () => {
 
-        _handleDownloadError: function(e) {
+        const _handleDownloadError = async e => {
             e.preventDefault();
+            const info = await DeviceMaster.downloadErrorLog();
+            saveAs(info[1], 'error-log.txt');
+        };
 
-            DeviceMaster.downloadErrorLog().then(info => {
-                saveAs(info[1], 'error-log.txt');
-            });
-        },
+        const _handleCancel = () => location.hash = '#studio/print';
 
-        _handleCancel: function() {
-            location.hash = '#studio/print';
-        },
-
-        render: function() {
-            let lang = this.props.lang.settings.flux_cloud;
-            return(
-                <div className="cloud bind-success">
-                    <div className="container">
-                        <div className="title">
-                            <h3>{lang.binding_fail}</h3>
-                            <label>{lang.binding_error_description}</label>
-                        </div>
-                        <div className="icon">
-                            <img src="img/error-icon.svg" />
-                        </div>
+        return(
+            <div className="cloud bind-success">
+                <div className="container">
+                    <div className="title">
+                        <h3>{LANG.binding_fail}</h3>
+                        <label>{LANG.binding_error_description}</label>
                     </div>
-                    <div className="footer">
-                        <div className="divider">
-                            <hr />
-                        </div>
-                        <div className="actions">
-                            <button className="btn btn-cancel" onClick={this._handleCancel}>{lang.cancel}</button>
-                            <button className="btn btn-default" onClick={this._handleDownloadError}>{lang.retrieve_error_log}</button>
-                        </div>
+                    <div className="icon">
+                        <img src="img/error-icon.svg" />
                     </div>
                 </div>
-            );
-        }
-
-    });
-
+                <div className="footer">
+                    <div className="divider">
+                        <hr />
+                    </div>
+                    <div className="actions">
+                        <button className="btn btn-cancel" onClick={_handleCancel}>{LANG.cancel}</button>
+                        <button className="btn btn-default" onClick={_handleDownloadError}>{LANG.retrieve_error_log}</button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 });

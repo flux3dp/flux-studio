@@ -1,6 +1,7 @@
 define([
     'react',
-    'jsx!widgets/Select',
+    'reactDOM',
+    'reactPropTypes',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Text-Input',
     'jsx!widgets/Unit-Input',
@@ -14,7 +15,8 @@ define([
     'helpers/array-findindex',
 ], function(
     React,
-    SelectView,
+    ReactDOM,
+    PropTypes,
     ButtonGroup,
     TextInput,
     UnitInput,
@@ -32,15 +34,13 @@ define([
 
     return React.createClass({
 
-        getDefaultProps: function() {
-            return {
-                lang: React.PropTypes.object,
-                defaultMaterial: React.PropTypes.object,
-                onLoadPreset: React.PropTypes.func,
-                onClose: React.PropTypes.func,
-                onSave: React.PropTypes.func,
-                onDone : React.PropTypes.func
-            };
+        PropTypes: {
+            lang: PropTypes.object,
+            defaultMaterial: PropTypes.object,
+            onLoadPreset: PropTypes.func,
+            onClose: PropTypes.func,
+            onSave: PropTypes.func,
+            onDone : PropTypes.func
         },
 
         getInitialState: function() {
@@ -199,8 +199,8 @@ define([
 
         _changeRangeNumber: function() {
             var self = this,
-                speedRange = self.refs.speedRange.getDOMNode(),
-                powerRange = self.refs.powerRange.getDOMNode(),
+                speedRange = ReactDOM.findDOMNode(self.refs.speedRange),
+                powerRange = ReactDOM.findDOMNode(self.refs.powerRange),
                 defaultMaterial;
 
             defaultMaterial = {

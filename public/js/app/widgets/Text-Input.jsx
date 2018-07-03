@@ -1,12 +1,14 @@
 define([
-    'react'
-], function(React) {
+    'react',
+    'reactDOM',
+    'reactPropTypes'
+], function(React, ReactDOM, PropTypes) {
     'use strict';
 
     return React.createClass({
         // Public
         value: function() {
-            return this.refs.textInput.getDOMNode().value;
+            return ReactDOM.findDOMNode(this.refs.textInput).value;
         },
 
         // Lifecycle
@@ -21,10 +23,8 @@ define([
             );
         },
 
-        getDefaultProps: function() {
-            return {
-                defaultValue: React.PropTypes.string
-            };
+        propTypes: {
+            defaultValue: PropTypes.string
         }
     });
 });

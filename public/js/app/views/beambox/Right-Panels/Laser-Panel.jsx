@@ -1,25 +1,28 @@
 define([
     'jquery',
     'react',
+    'reactPropTypes',
     'jsx!widgets/Unit-Input-v2',
     'helpers/i18n',
-], function($, React, UnitInput, i18n) {
+], function($, React, PropTypes, UnitInput, i18n) {
     'use strict';
 
     const LANG = i18n.lang.beambox.right_panel.laser_panel;
 
     return React.createClass({
         propTypes: {
-            layerName:  React.PropTypes.string.isRequired,
-            speed:      React.PropTypes.number.isRequired,
-            strength:   React.PropTypes.number.isRequired,
-            funcs:      React.PropTypes.object.isRequired
+            layerName:  PropTypes.string.isRequired,
+            speed:      PropTypes.number.isRequired,
+            strength:   PropTypes.number.isRequired,
+            repeat:      PropTypes.number.isRequired,
+            funcs:      PropTypes.object.isRequired
         },
         
         getInitialState: function() {
             return {
                 speed:      this.props.speed,
                 strength:   this.props.strength,
+                repeat:      this.props.repeat
             };
         },
 
@@ -27,6 +30,7 @@ define([
             this.setState({
                 speed:      nextProps.speed,
                 strength:   nextProps.strength,
+                repeat:   nextProps.repeat
             });
         },
 
@@ -34,9 +38,15 @@ define([
             this.setState({speed: val});
             this.props.funcs.writeSpeed(this.props.layerName, val);
         },
+
         _handleStrengthChange: function(val) {
             this.setState({strength: val})
             this.props.funcs.writeStrength(this.props.layerName, val);
+        },
+
+        _handleRepeatChange: function(val) {
+            this.setState({repeat: val})
+            this.props.funcs.writeRepeat(this.props.layerName, val);
         },
 
         _renderStrength: function() {
@@ -69,10 +79,27 @@ define([
                 </div>
             );
         },
+
+        _renderRepeat: function() {
+            return (
+                <div className='panel'>
+                    <span className='title'>{LANG.repeat}</span>
+                    <UnitInput
+                        min={1}
+                        max={100}
+                        unit={LANG.times}
+                        defaultValue={this.state.repeat}
+                        getValue={this._handleRepeatChange}
+                        decimal={0}
+                    />
+                </div>
+            );
+        },
         
         render: function() {
             const speedPanel = this._renderSpeed();
             const strengthPanel = this._renderStrength();
+            const repeatPanel = this._renderRepeat();
             return (
                 <div>
                     <div className="layername">
@@ -81,6 +108,7 @@ define([
                     <div>
                         {strengthPanel}
                         {speedPanel}
+                        {repeatPanel}
                     </div>
                 </div>
             );
