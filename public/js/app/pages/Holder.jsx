@@ -300,6 +300,7 @@ define([
                             <PrinterSelector
                                 uniqleId="laser"
                                 className="laser-device-selection-popup"
+                                modelFilter={PrinterSelector.DELTA_FILTER}
                                 lang={lang}
                                 showExport={true}
                                 onClose={onClose}

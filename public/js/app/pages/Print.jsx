@@ -906,6 +906,7 @@ define([
                         <PrinterSelector
                             uniqleId='print'
                             lang={lang}
+                            modelFilter={PrinterSelector.DELTA_FILTER}
                             showExport={true}
                             onClose={this._handlePrinterSelectorWindowClose}
                             onUnmount={this._handlePrinterSelectorUnmount}

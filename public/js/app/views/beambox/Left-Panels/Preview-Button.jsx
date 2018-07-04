@@ -65,6 +65,7 @@ define([
                             <PrinterSelector
                                 uniqleId='laser'
                                 className='preview-printer-selector'
+                                modelFilter={PrinterSelector.BEAMBOX_FILTER}
                                 onClose={d.reject}
                                 onGettingPrinter={device => d.resolve(device)}
                                 WindowStyle={{
