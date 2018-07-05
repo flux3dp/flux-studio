@@ -22,6 +22,19 @@ define([
             });
             return decrypt.toString(CryptoJS.enc.Utf8);
         }
+        decryptUint8Array(uint8Arr) {
+            const parse = (u8arr) => {
+                // Shortcut
+                var len = u8arr.length;
+                // Convert
+                var words = [];
+                for (var i = 0; i < len; i++) {
+                    words[i >>> 2] |= (u8arr[i] & 0xff) << (24 - (i % 4) * 8);
+                }
+                return CryptoJS.lib.WordArray.create(words, len).toString(CryptoJS.enc.Base64);
+            };
+            return this.decrypt(parse(uint8Arr));
+        }
     };
 
     const instance = new AESCipher();

@@ -1395,6 +1395,10 @@ define([
         return SocketMaster.addTask('getHeadStatus');
     }
 
+    function pipeTask(fullCommand) {
+        return SocketMaster.addTask('pipe', fullCommand);
+    }
+
     function startMonitoringUsb() {
         let ws = {},
             requestingReport,
@@ -1635,6 +1639,7 @@ define([
             this.existDevice = existDevice;
             this.maintainMove = maintainMove;
             this.maintainCloseFan = maintainCloseFan;
+            this.pipeTask = pipeTask;
 
             Discover(
                 'device-master',

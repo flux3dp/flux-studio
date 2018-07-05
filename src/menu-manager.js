@@ -153,6 +153,8 @@ function buildDeviceMenu(callback, uuid, data) {
             { id: 'CALIBRATE_BEAMBOX_CAMERA', uuid, serial, source, label: r.calibrate_beambox_camera, click: callback },
             { type: 'separator' },
             { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, click: callback},
+            { id: 'SYNC_MACHINE_DATA', uuid, serial, source, label: '同步機器資訊', click: callback},
+            { id: 'SYNC_FILMS', uuid, serial, source, label: '同步手機膜檔案', click: callback},
             { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [
                 { id: 'LOG_NETWORK', label: r.log.network, uuid, serial, source, click: callback },
                 { id: 'LOG_HARDWARE', label: r.log.hardware, uuid, serial, source, click: callback },

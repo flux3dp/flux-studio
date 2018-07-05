@@ -20,13 +20,7 @@ define([
         };
         reader.readAsArrayBuffer(blob);
     });
-    const readBlobAsText = (blob) => new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = () => {
-            resolve(reader.result);
-        };
-        reader.readAsText(blob);
-    });
+
     const chunkArray = (array, chunkSize) => {
         return array.reduce((all,one,i) => {
             const ch = Math.floor(i/chunkSize);
@@ -46,7 +40,7 @@ define([
             const enc = ipc.sendSync(events.FILE_READ, {
                 filePath: `${type}/${brand}/${model}/${category}.enc`,
             });
-            const svg = AESCipher.decrypt(enc);
+            const svg = AESCipher.decryptUint8Array(new Uint8Array(enc.data));
             return svg;
         }
         ls(type, brand, model) {
@@ -72,14 +66,18 @@ define([
                     await Promise.all(
                         extractedFiles.map(async file => {
                             const name = decodeURIComponent(escape(file.name)).replace('film_files/', '');
-                            const content = await readBlobAsText(file.blob);
-                            this.set(name, content);
+                            const content = await readBlobAsArrayBuffer(file.blob);
+                            this.set(name, Buffer.from(content));
                         })
                     );
                 })
             );
 
             RecordManager.write('last_sync_film_data', synchronize_time);
+        }
+        validateUsageDownload() {
+            const expiry_time = RecordManager.read('usage_download');
+            return (Date.now() > expiry_time );
         }
     };
     if (!window.electron) {

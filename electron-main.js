@@ -281,7 +281,7 @@ ipcMain.on(events.FILE_WRITE , (event, {filePath, data}) => {
 });
 ipcMain.on(events.FILE_READ , (event, {filePath}) => {
     const fileAbsPath = path.join(app.getPath('userData'), 'film-database', filePath);
-    const val = fs.readFileSync(fileAbsPath, 'UTF-8');
+    const val = fs.readFileSync(fileAbsPath);
     event.returnValue = val;
 });
 ipcMain.on(events.FILE_LS , (event, {dirPath}) => {

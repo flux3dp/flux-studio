@@ -2,7 +2,6 @@ define([
     'react',
     'jsx!widgets/Modal',
     'app/actions/beambox/beambox-preference',
-    'app/actions/film-cutter/usage-download-manager',
     'app/actions/film-cutter/film-database',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
@@ -12,7 +11,6 @@ define([
     React,
     Modal,
     BeamboxPreference,
-    UsageDownloadManager,
     FilmDatabase,
     ProgressActions,
     ProgressConstants,
@@ -56,10 +54,15 @@ define([
         }
 
         async handleDownloadClick() {
-            if(!UsageDownloadManager.validate()) {
+            if(!FilmDatabase.validateUsageDownload()) {
                 AlertActions.showPopupError('film-cutter', '已超過數據下載期限');
                 return;
             }
+            if(!navigator.onLine) {
+                AlertActions.showPopupError('film-cutter', '請先連上網路');
+                return;
+            }
+
             try {
                 ProgressActions.open(ProgressConstants.WAITING, '下載數據中...');
                 await FilmDatabase.syncWithCloud();
@@ -87,6 +90,10 @@ define([
             let content;
             try {
                 content = FilmDatabase.get('svg', brand, model, category, 'enc');
+                if (content === '') {
+                    console.log('decoded file === \'\'');
+                    throw new Error();
+                }
             } catch (error) {
                 console.log('error: ', error);
                 AlertActions.showPopupError('film-cutter', '檔案解密失敗');

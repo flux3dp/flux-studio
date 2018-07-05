@@ -6,6 +6,7 @@ define([
     'helpers/device-list',
     'plugins/classnames/index',
     'app/actions/film-cutter/film-cutter-cloud',
+    'app/actions/film-cutter/film-cutter-manager',
     'app/actions/film-cutter/record-manager',
     'app/actions/alert-actions',
 ], function(
@@ -16,6 +17,7 @@ define([
     DeviceList,
     ClassNames,
     FilmCutterCloud,
+    FilmCutterManager,
     RecordManager,
     AlertActions
 ) {
@@ -52,11 +54,13 @@ define([
             location.hash = '#/studio/cloud/my-account';
         }
         async handleBindClick() {
-            const d = this.state.selectedDevice;
-            const uuid = d.source === 'h2h' ? d.h2h_uuid : d.uuid;
             try {
-                await FilmCutterCloud.bindMachine(uuid, uuid, d.model);
-                RecordManager.write('machine_pi_serial_number', uuid);
+                await DeviceMaster.select(this.state.selectedDevice);
+                const pi = await FilmCutterManager.getPiSerialNumber();
+                const stm32 = await FilmCutterManager.getSTM32SerialNumber();
+                await FilmCutterCloud.bindMachine(stm32, pi, this.state.selectedDevice.model);
+                RecordManager.write('machine_stm32_serial_number', stm32);
+                RecordManager.write('machine_pi_serial_number', pi);
                 location.hash = '#/studio/cloud/my-account';
             } catch (error) {
                 AlertActions.showPopupError('bind-machine', error.message || error.toString());

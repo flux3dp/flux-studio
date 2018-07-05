@@ -179,6 +179,15 @@ define([
         let ctrl = {
             connection: ws,
             mode: '',
+            pipe: (fullCommand) => {
+                const cmds = fullCommand.split(' ');
+                if(cmds[0] === 'get') {
+                    return useDefaultResponse(`pipe get ${cmds[1]}`);
+                }
+                if(cmds[0] === 'set') {
+                    return useDefaultResponse(`pipe set ${cmds[1]} ${cmds[2]}`);
+                }
+            },
             ls: (path) => {
                 let d = $.Deferred();
                 events.onMessage = (response) => {

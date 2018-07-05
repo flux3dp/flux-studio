@@ -38,7 +38,7 @@ define([
             usage_cut_overall:          RecordManager.read('usage_cut_overall_on_cloud'),
             usage_cut_used:             RecordManager.read('usage_cut_used_on_cloud') + RecordManager.read('usage_cut_recorded'),
             usage_download:             new Date(RecordManager.read('usage_download')).toDateString(),
-            machine_pi_serial_number:   RecordManager.read('machine_pi_serial_number'),
+            machine_serial_number:      `${RecordManager.read('machine_stm32_serial_number')} - ${RecordManager.read('machine_pi_serial_number')}`,
             last_connect_to_cloud:      new Date(RecordManager.read('last_connect_to_cloud')).toDateString(),
         };
         const handleChangePasswordClick = () => {
@@ -53,7 +53,7 @@ define([
                 AlertActions.showPopupError('my-account', '請先連網');
                 return;
             }
-            if (RecordManager.read('machine_pi_serial_number')) {
+            if (RecordManager.read('machine_stm32_serial_number')) {
                 AlertActions.showPopupError('my-account', '已綁定機器，如要更換機器，請聯繫客服');
                 return;
             }
@@ -81,10 +81,10 @@ define([
                         <Field title='數據下載期限' content={data.usage_download}/>
                     </Row>
                     <Row className='row'>
-                        <Field title='機器序號' content={data.machine_pi_serial_number}/>
+                        <Field title='機器序號' content={data.machine_serial_number}/>
                     </Row>
                     <Row className='row'>
-                        <Field title='最後同步時間' content={data.last_connect_to_cloud}/>
+                        <Field title='最後上線時間' content={data.last_connect_to_cloud}/>
                     </Row>
                     <button style={{width: '170px'}} className="btn btn-default" onClick={handleChangePasswordClick}>{'變更密碼'}</button>
                     <button style={{width: '170px'}} className="btn btn-default" onClick={handlebindMachineClick}>{'綁定機器'}</button>

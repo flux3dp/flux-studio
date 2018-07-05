@@ -25,6 +25,7 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/film-cutter/film-cutter-cloud',
+    'app/actions/film-cutter/film-cutter-manager',
     'app/constants/global-constants',
     'app/actions/initialize-machine'
 ], function(
@@ -54,6 +55,7 @@ define([
     ProgressActions,
     ProgressConstants,
     FilmCutterCloud,
+    FilmCutterManager,
     GlobalConstants,
     InitializeMachine
 ) {
@@ -386,6 +388,34 @@ define([
 
 
                     AlertActions.showPopupInfo('', displayInfo.join('\n'));
+                };
+
+                _action['SYNC_MACHINE_DATA'] = async (device) => {
+                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
+                    await DeviceMaster.select(device);
+
+                    if (!(await FilmCutterManager.validateMachineOwnership())) {
+                        AlertActions.showPopupInfo('menu', '尚未綁定這台機器，請先登入帳號並綁定這台機器');
+                        ProgressActions.close();
+                        return;
+                    }
+
+                    try {
+                        ProgressActions.open(ProgressConstants.NONSTOP, '同步機器紀錄');
+                        await FilmCutterManager.syncWithMachine();
+                        AlertActions.showPopupInfo('menu', '已成功更新機器資訊');
+                    } catch (error) {
+                        console.log(error);
+                        AlertActions.showPopupError('menu', '與機器同步資訊失敗');
+                    } finally {
+                        ProgressActions.close();
+                    }
+                };
+
+                _action['SYNC_FILMS'] = (device) => {
+                    console.log('Let\'s sync FILMS! with', device);
+                    // TODO: Check if machine is binded to me
+
                 };
 
                 _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
