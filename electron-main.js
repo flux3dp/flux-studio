@@ -309,6 +309,23 @@ ipcMain.on(events.FILE_RESET , (event) => {
     chkDir(path.join(app.getPath('userData'), 'film-database', 'fcode'));
     event.returnValue = '';
 });
+ipcMain.on(events.FILE_LS_FCODE_MTIME_GT, (event, {modified_after}) => {
+    // LiSt all FCODE which last Modified TIME is Greater Than modified_after
+    const root_path = dirAbsPath = path.join(app.getPath('userData'), 'film-database', 'fcode');
+    const ls = (...paths) => fs.readdirSync(path.join(root_path, ...paths));
+    const new_paths = [];
+    for (const brand of ls()){
+        for (const model of ls(brand)) {
+            for (const category of ls(brand, model)) {
+                const last_modified = fs.statSync(path.join(root_path, brand, model, category)).mtimeMs;
+                if (last_modified >= modified_after) {
+                    new_paths.push(path.join(brand, model, category));
+                }
+            }
+        }
+    }
+    event.returnValue = new_paths;
+});
 
 console.log('Running FLUX Studio on ', os.arch());
 
