@@ -45,6 +45,15 @@ define([
             } else {
                 handleOffline();
             }
+
+            const lastConnectToCloud = RecordManager.read('last_connect_to_cloud');
+            const maxOfflineDays = 3;
+            const hoursRemain = Math.floor(24 * maxOfflineDays - (Date.now() - lastConnectToCloud)/1000/60/60);
+            if (0 < hoursRemain && hoursRemain <= maxOfflineDays * 24 - 10) {
+                AlertActions.showPopupInfo('init', `機器離線${maxOfflineDays}天後，將無法使用。請於${hoursRemain}小時內連網。`);
+            } else if (hoursRemain <= 0) {
+                AlertActions.showPopupInfo('init', `機器已離線${maxOfflineDays}天，請連網並登入帳號後，方可使用。`);
+            }
         },
         displayGuides() {
             const guidesLines = (() => {
