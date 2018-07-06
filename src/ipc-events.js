@@ -25,5 +25,6 @@ module.exports = {
     FILE_LS                 : 'FILE_LS',
     FILE_RESET              : 'FILE_RESET',
     FILE_LS_FCODE_MTIME_GT  : 'FILE_LS_FCODE_MTIME_GT',
+    FILE_PACK_FCODE         : 'FILE_PACK_FCODE',
     SET_AS_DEFAULT          : 'SET_AS_DEFAULT'
 };

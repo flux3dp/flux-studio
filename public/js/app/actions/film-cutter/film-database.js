@@ -3,12 +3,20 @@ define([
     'app/actions/film-cutter/film-cutter-cloud',
     'app/actions/film-cutter/film-cutter-manager',
     'app/actions/film-cutter/aes-cipher',
+    'helpers/device-master',
+    'app/actions/alert-actions',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'lib/untar',
 ], function(
     RecordManager,
     FilmCutterCloud,
     FilmCutterManager,
     AESCipher,
+    DeviceMaster,
+    AlertActions,
+    ProgressActions,
+    ProgressConstants,
     Untar
 ) {
 
@@ -57,10 +65,10 @@ define([
             const last_sync_film_data = RecordManager.read('last_sync_film_data');
             const {info, synchronize_time} = await FilmCutterCloud.newFilmInfo(last_sync_film_data);
 
-            const flatIds = info.map(x => x.id);
+            const allIds = info.map(x => x.id);
             const chunkSize = 30;
             // split ids into chunk, will not receive all data once. need to request multiple times
-            const works = chunkArray(flatIds, chunkSize).map(ids =>
+            const works = chunkArray(allIds, chunkSize).map(ids =>
                 async () => {
                     const blob = await FilmCutterCloud.newFilm(ids, synchronize_time);
                     const arrayBuffer = await readBlobAsArrayBuffer(blob);
@@ -85,19 +93,31 @@ define([
         async syncWithMachine() {
 
             // get files to be uploaded
-            const last_sync = 0; // TODO: await FilmCutterManager.get('last_sync_film_fcodes');
-            const paths = ipc.sendSync(events.FILE_LS_FCODE_MTIME_GT, {
+            const last_sync = await FilmCutterManager.getLastSyncFilmFcodes();
+            const allPaths = ipc.sendSync(events.FILE_LS_FCODE_MTIME_GT, {
                 modified_after: last_sync
             });
+            if (allPaths.length === 0) {
+                AlertActions.showPopupInfo('film-database', '機器上的手機膜檔案已是最新版');
+                await FilmCutterManager.setLastSyncFilmFcodes(Date.now());
+                return;
+            }
 
-            const chunkSize = 30;
 
+            const chunkSize = 1;
+
+            ProgressActions.open(ProgressConstants.STEPPING);
             // seperate works
-            const works = chunkArray(paths, chunkSize).map(path =>
+            const pathsArray = chunkArray(allPaths, chunkSize);
+            const works = pathsArray.map((paths, index) =>
                 async () => {
-                    console.log(path);
-                    // TODO: pack a tar file
-                    // TODO: transmit
+                    const buffer = ipc.sendSync(events.FILE_PACK_FCODE, {paths});
+                    const blob = new Blob([new Uint8Array(buffer.data)]);
+                    await DeviceMaster.uploadFilmFcodeCollection(blob)
+                        .progress(data => {
+                            const percentage = (data.step / data.total + index) / pathsArray.length;
+                            ProgressActions.updating('傳送資料中', percentage * 100);
+                        });
                 }
             );
 
@@ -105,6 +125,9 @@ define([
             for (const work of works) {
                 await work();
             }
+            ProgressActions.updating('寫入機器資訊', 100);
+            await FilmCutterManager.setLastSyncFilmFcodes(Date.now());
+            ProgressActions.close();
         }
 
         validateUsageDownload() {

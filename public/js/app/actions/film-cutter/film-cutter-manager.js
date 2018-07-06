@@ -10,11 +10,12 @@ define([
             'film_secret_key',
             'usage_cut_recorded',
             'usage_cut_unrecorded',
-            'usage_cut_max_on_machine'
+            'usage_cut_max_on_machine',
+            'last_sync_film_fcodes',
         ],
         READ_ONLY_KEYS: [
             'stm32_serial_number',
-            'pi_serial_number'
+            'pi_serial_number',
         ],
         WRITE_ONLY_KEYS: [],
         async get(key) {
@@ -38,6 +39,13 @@ define([
 
         async getPiSerialNumber() {
             return await MachineCommunicator.get('pi_serial_number');
+        }
+
+        async getLastSyncFilmFcodes() {
+            return await MachineCommunicator.get('last_sync_film_fcodes');
+        }
+        async setLastSyncFilmFcodes(timestamp) {
+            return await MachineCommunicator.set('last_sync_film_fcodes', timestamp);
         }
 
         async validateMachineOwnership() {

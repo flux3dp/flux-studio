@@ -428,6 +428,20 @@ define([
         return d.promise();
     }
 
+    function uploadFilmFcodeCollection(blob) {
+        const d = $.Deferred();
+
+        SocketMaster.addTask('uploadFcodeCollection', blob).then(() => {
+            d.resolve();
+        }).progress((progress) => {
+            d.notify(progress);
+        }).fail((error) => {
+            d.reject(error);
+        });
+
+        return d.promise();
+    }
+
     function go(data) {
         let d = $.Deferred();
         if (!data || !(data instanceof Blob)) {
@@ -1637,6 +1651,7 @@ define([
             this.usbDefaultDeviceCheck = usbDefaultDeviceCheck;
             this.stopChangingFilament = stopChangingFilament;
             this.existDevice = existDevice;
+            this.uploadFilmFcodeCollection = uploadFilmFcodeCollection;
             this.maintainMove = maintainMove;
             this.maintainCloseFan = maintainCloseFan;
             this.pipeTask = pipeTask;

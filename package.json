@@ -11,13 +11,14 @@
   "main": "electron-main.js",
   "dependencies": {
     "bufferpack": "^0.0.6",
-    "font-manager": "^0.2.2",
+    "font-manager": "^0.3.0",
     "fontkit": "^1.7.7",
     "jquery": "^1.11.0",
     "jsdom-global": "^1.6.2",
-    "nan": "^2.4.0",
+    "nan": "^2.10.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
+    "tar-fs": "^1.16.3",
     "text-to-svg": "jeffontheground/text-to-svg#e4fb3dc1ac9c8e5a2440373e7e018f07653ad574",
     "websocket": "~1.0.24"
   },
@@ -34,8 +35,8 @@
     "chai": "3.5.0",
     "electron": "^1.6.17",
     "electron-builder": "19.52.1",
-    "electron-rebuild": "^1.7.3",
     "electron-publisher-s3": "19.53.1",
+    "electron-rebuild": "^1.7.3",
     "electron-reload": "~1.1.0",
     "eslint": "^4.9.0",
     "eslint-plugin-react": "^7.4.0",
@@ -103,7 +104,9 @@
       "artifactName": "FLUX Studio ${version}.${ext}"
     },
     "deb": {
-        "depends": ["libfontconfig1-dev"]
+      "depends": [
+        "libfontconfig1-dev"
+      ]
     },
     "nsis": {
       "include": "win-install.nsh",

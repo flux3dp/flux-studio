@@ -286,6 +286,13 @@ define([
                 return d.promise();
             },
 
+            uploadFcodeCollection: (blob) => {
+                const d = $.Deferred();
+                prepareUpload(d, blob);
+                ws.send(`upload application/fcode_collection ${blob.size}`);
+                return d.promise();
+            },
+
             abort: () => {
                 let d = $.Deferred(),
                     counter = 0;

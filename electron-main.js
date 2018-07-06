@@ -14,6 +14,7 @@ const TextToSVG = require('text-to-svg');
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
+const tar = require('tar-fs');
 const os = require('os');
 
 let mainWindow;
@@ -325,6 +326,19 @@ ipcMain.on(events.FILE_LS_FCODE_MTIME_GT, (event, {modified_after}) => {
         }
     }
     event.returnValue = new_paths;
+});
+ipcMain.on(events.FILE_PACK_FCODE, async (event, {paths}) => {
+    const root_path = dirAbsPath = path.join(app.getPath('userData'), 'film-database');
+    const pack = tar.pack(root_path, {
+        entries: paths.map(p => path.join('fcode', p))
+    });
+    // transform stream into buffer
+    const bufs = [];
+    pack.on('data', (d) => bufs.push(d));
+    const buf = await new Promise(resolve => {
+        pack.on('end', () => resolve(Buffer.concat(bufs)));
+    });
+    event.returnValue = buf;
 });
 
 console.log('Running FLUX Studio on ', os.arch());
