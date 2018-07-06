@@ -176,7 +176,8 @@ define([
             const {film_secret_key} = await get('api/data/film-secret-key').then(x => x.json());
             return film_secret_key;
         },
-        async newFilmInfo(last_sync_film_data) {
+        async newFilmInfo() {
+            const last_sync_film_data = RecordManager.read('last_sync_film_data');
             return {info, synchronize_time} = await get('api/data/new-film-info', {last_sync_film_data})
                 .then(res => res.json());
         },

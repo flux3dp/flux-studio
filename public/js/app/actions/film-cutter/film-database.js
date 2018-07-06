@@ -62,8 +62,7 @@ define([
             RecordManager.write('last_sync_film_data', 0);
         }
         async syncWithCloud() {
-            const last_sync_film_data = RecordManager.read('last_sync_film_data');
-            const {info, synchronize_time} = await FilmCutterCloud.newFilmInfo(last_sync_film_data);
+            const {info, synchronize_time} = await FilmCutterCloud.newFilmInfo();
 
             const allIds = info.map(x => x.id);
             const chunkSize = 30;
