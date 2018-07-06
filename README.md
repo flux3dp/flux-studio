@@ -20,6 +20,11 @@ FLUX Studio is the companion application for [FLUX Delta Series](http://flux3dp.
 
 1. Build resource `$> gulp jsx sass`
 
+## Rebuild module for electron `$> node_modules/.bin/electron-rebuild`
+* Rebuild C++ module to make it compatible with the node inside of electron.
+* Though the module was build when running yarn install (or npm install, npm rebuild), it was build for node in your command line environment, not for electron
+
+
 ## Run electron
 
 * Run default: `npm start`
