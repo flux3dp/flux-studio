@@ -3,10 +3,11 @@ define(function() {
 
     return {
         i18n : {
-            default_lang : 'zh-tw',
+            default_lang : 'zh-cn',
             supported_langs : {
                 'en' : 'English',
-                'zh-tw' : '繁體中文'
+                'zh-tw' : '繁體中文',
+                'zh-cn' : '简体中文'
             }
         },
 

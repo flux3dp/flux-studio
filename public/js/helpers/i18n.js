@@ -2,17 +2,18 @@ define([
     'helpers/local-storage',
     'app/app-settings',
     'app/lang/en',
-    'app/lang/zh-tw'
-], function(localStorage, AppSettings, LangEn, LangZHTW) {
-    'use strict';
+    'app/lang/zh-tw',
+    'app/lang/zh-cn',
+], function(localStorage, AppSettings, LangEn, LangZHTW, LangZHCN) {
 
-    var ACTIVE_LANG = 'active-lang',
-        langCache = {
-            'en': LangEn,
-            'zh-tw': LangZHTW
-        },
-        activeLang = localStorage.get(ACTIVE_LANG) || AppSettings.i18n.default_lang,
-        currentLang;
+    const ACTIVE_LANG = 'active-lang';
+    const langCache = {
+        'en': LangEn,
+        'zh-tw': LangZHTW,
+        'zh-cn': LangZHCN,
+    };
+    let activeLang = localStorage.get(ACTIVE_LANG) || AppSettings.i18n.default_lang;
+    let currentLang;
 
     return {
         /**

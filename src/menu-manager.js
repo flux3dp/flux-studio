@@ -3,7 +3,8 @@ const {app, Menu, MenuItem, shell, ipcMain} = require('electron');
 const resource = require('./menu-resource');
 const events = require('./ipc-events');
 
-let r = resource['en'];
+const defaultLanguage = 'zh-cn';
+let r = resource[defaultLanguage];
 
 function _buildOSXAppMenu(callback) {
     return {
@@ -225,7 +226,14 @@ class MenuManager extends EventEmitter {
         this.constructMenu();
 
         ipcMain.on(events.NOTIFY_LANGUAGE, (e, language) => {
-            language = language === 'zh-tw' ? 'zh-tw' : 'en';
+            switch (language) {
+                case 'zh-tw':
+                case 'en':
+                    break;
+                default:
+                    language = defaultLanguage;
+                    break;
+            }
             r = resource[language];
             this.constructMenu();
         });
