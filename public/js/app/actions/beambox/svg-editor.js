@@ -2073,11 +2073,6 @@ define([
                 });
             };
 
-            var zoomDone = function () {
-                updateWireFrame();
-                // updateCanvas(); // necessary?
-            };
-
             var zoomChanged = function (win, zoomData) {
                 const defaultZoomData = {
                     zoomLevel: undefined,
@@ -2103,8 +2098,9 @@ define([
                     });
                 }
 
-                zoomDone();
+                updateWireFrame();
             };
+            editor.zoomChanged = zoomChanged;
 
             $('#cur_context_panel').delegate('a', 'click', function () {
                 var link = $(this);
@@ -3627,9 +3623,7 @@ define([
             };
 
             var unzoom = function () {
-                svgCanvas.setZoom(1);
-                updateCanvas();
-                zoomDone();
+                editor.resetView();
             };
 
             var clickText = function () {
@@ -3772,21 +3766,23 @@ define([
                 updateContextPanel();
             };
 
-                // var clickClear = function() {
-                // 	var dims = curConfig.dimensions;
-                // 	$.confirm(uiStrings.notification.QwantToClear, function(ok) {
-                // 		if (!ok) {return;}
-                // 		setSelectMode();
-                // 		svgCanvas.clear();
-                // 		svgCanvas.setResolution(dims[0], dims[1]);
-                // 		updateCanvas(true);
-                // 		unzoom();
-                // 		populateLayers();
-                // 		updateContextPanel();
-                // 		prepPaints();
-                // 		svgCanvas.runExtensions('onNewDocument');
-                // 	});
-                // };
+            var clickClear = function() {
+                var dims = curConfig.dimensions;
+                $.confirm(uiStrings.notification.QwantToClear, function(ok) {
+                    if (!ok) {return;}
+                    setSelectMode();
+                    svgCanvas.clear();
+                    svgCanvas.setResolution(dims[0], dims[1]);
+                    updateCanvas(true);
+                    unzoom();
+                    populateLayers();
+                    updateContextPanel();
+                    prepPaints();
+                    svgCanvas.runExtensions('onNewDocument');
+                });
+            };
+
+            window.svgEditorClearScene = clickClear;
 
             var clickBold = function () {
                 svgCanvas.setBold(!svgCanvas.getBold());
@@ -5506,6 +5502,17 @@ define([
                     // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
                     $('#dialog_box').hide();
                 };
+
+                const importBvg = async (file) => {
+                    const parsedSvg = await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onloadend = (evt) => {
+                            editor.loadFromString(evt.target.result);
+                        };
+                        reader.readAsText(file);
+                    });
+                };
+
                 var importImage = function (e) {
                     $.process_cancel(uiStrings.notification.loadingImage);
                     e.stopPropagation();
@@ -5525,6 +5532,9 @@ define([
                                 return 'bitmap';
                             }
                         }
+                        if (file.name.toLowerCase().includes('.bvg')) {
+                            return 'bvg';
+                        }
                         if (file.name.toLowerCase().includes('.dxf')) {
                             return 'dxf';
                         }
@@ -5534,6 +5544,9 @@ define([
                         return 'unknown';
                     })();
                     switch (fileType) {
+                        case 'bvg':
+                            importBvg(file);
+                            break;
                         case 'svg':
                             importSvg(file);
                             break;
@@ -5582,7 +5595,7 @@ define([
                 $('#tool_open').show().prepend(open);
 
                 // enable beambox-global-interaction to click (data-file-input, trigger_file_input_click)
-                var imgImport = $('<input type="file" data-file-input="import_image">').change(importImage);
+                var imgImport = $('<input type="file" accept=".svg,.bvg,.jpg,.png,.dxf" data-file-input="import_image">').change(importImage);
                 $('#tool_import').show().prepend(imgImport);
 
                 //enable phone film chooser to insert image
@@ -5670,12 +5683,14 @@ define([
 
             //initialize the view
             // zoomImage(0.2);
-            // workarea[0].scrollLeft = 300;
-            // workarea[0].scrollTop = 750;
-            // $('#fit_to_canvas').mouseup();
+            //$('#fit_to_canvas').mouseup();
             zoomChanged(window, {
-                zoomLevel: 0.2
+                zoomLevel: 0.16
             });
+            svgCanvas.defaultScroll = {
+                x: workarea[0].scrollLeft,
+                y: workarea[0].scrollTop
+            };
 
             //greyscale all svgContent
             (function () {
@@ -5701,6 +5716,14 @@ define([
             })();
         };
 
+        editor.resetView = function() {
+            editor.zoomChanged(window, {
+                zoomLevel: 0.16
+            });
+            $('#workarea')[0].scrollLeft = svgCanvas.defaultScroll.x;
+            $('#workarea')[0].scrollTop = svgCanvas.defaultScroll.y;
+        }
+
         editor.ready = function (cb) {
             if (!isReady) {
                 callbacks.push(cb);
@@ -5718,7 +5741,9 @@ define([
 
         editor.loadFromString = function (str) {
             editor.ready(function () {
-                loadSvgString(str);
+                loadSvgString(str,function() {
+                    editor.resetView();
+                });
             });
         };
 

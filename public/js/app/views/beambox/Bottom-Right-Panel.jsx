@@ -80,7 +80,7 @@ define([
 
                 //check firmware
                 if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
-                    console.log('not valid version');
+                    console.error('Not a valid firmware version');
                     AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
                     this.setState({
                         isPrinterSelectorOpen: false
@@ -99,10 +99,12 @@ define([
                     isPrinterSelectorOpen: false
                 });
             };
+            
             const content = (
                 <PrinterSelector
                     uniqleId="laser"
                     className="laser-device-selection-popup"
+                    modelFilter={PrinterSelector.BEAMBOX_FILTER}
                     showExport={true}
                     onClose={onClose}
                     onGettingPrinter={onGettingPrinter}
