@@ -161,7 +161,7 @@ define([
                     location.hash = '#studio/' + (config().read('default-app')||'print');
                 }
                 else if (false === is_ready && false === hash.startsWith('#initialize')) {
-                    location.hash = '#';
+                    location.hash = '#initialize/wifi/connect-beambox';
                 }
 
                 callback();

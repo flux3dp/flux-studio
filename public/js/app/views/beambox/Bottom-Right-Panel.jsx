@@ -9,6 +9,7 @@ define([
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
+    'app/actions/film-cutter/record-manager',
     'app/actions/beambox/beambox-version-master'
 ], function (
     React,
@@ -21,6 +22,7 @@ define([
     Modal,
     PrinterSelector,
     AlertActions,
+    RecordManager,
     BeamboxVersionMaster
 ) {
     const lang = i18n.lang;
@@ -40,6 +42,12 @@ define([
             BottomRightFuncs.exportFcode();
         }
         async _handleStartClick() {
+            const maxOfflineDays = 3;
+            if (Date.now() - RecordManager.read('last_connect_to_cloud') > maxOfflineDays * 24 * 60 * 60) {
+                AlertActions.showPopupInfo('start', `您已 ${maxOfflineDays} 天未連網登入，請連網並登入帳號後，方可使用。`);
+                return;
+            }
+
             if (PreviewModeController.isPreviewMode()) {
                 await PreviewModeController.end();
             }

@@ -3,7 +3,7 @@ define(function() {
 
     return {
         i18n : {
-            default_lang : 'en',
+            default_lang : 'zh-tw',
             supported_langs : {
                 'en' : 'English',
                 'zh-tw' : '繁體中文'
