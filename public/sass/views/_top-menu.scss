@@ -23,9 +23,9 @@
         }
 
         .func-name {
-            color: $primaryColor;
+            color: #fff;
             font-size: 40px;
-            font-weight: lighter;
+            font-style: italic;
             line-height: 55px;
             padding: 0 0 0 21px;
         }
@@ -67,19 +67,19 @@
             }
         }
 
-        &:hover {
-            .menu {
-                display: block;
-            }
+        // &:hover {
+        //     .menu {
+        //         display: block;
+        //     }
 
-            .logo-icon {
-                transform: rotate(90deg);
-            }
+        //     .logo-icon {
+        //         transform: rotate(90deg);
+        //     }
 
-            .func-name {
-                display: none;
-            }
-        }
+        //     .func-name {
+        //         display: none;
+        //     }
+        // }
     }
 
     .item {
@@ -141,7 +141,7 @@
         }
 
         p {
-            color: #999;
+            color: white;
             font-size: 12px;
             font-weight: 500;
             line-height: 12px;

@@ -939,8 +939,8 @@ define([
                 return (
                     <div className={ClassNames(topClass)}>
                         <div className="brand-logo" onContextMenu={this._handleContextMenu}>
-                            <img className="logo-icon" src="img/menu/main_logo.svg" draggable="false"/>
-                            <span className="func-name">{currentWorkingFunction.displayName}</span>
+                            <img className="logo-icon" src="img/menu/mozu_logo.png" draggable="false"/>
+                            <span className="func-name">膜族科技</span>
                             <div className="menu">
                                 <div className="arrow arrow-left arrow-top-left-flat"/>
                                 <div className="product-group-title">

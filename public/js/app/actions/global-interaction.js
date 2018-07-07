@@ -15,7 +15,7 @@ define([
                 location.hash = '#studio/settings';
             },
             ADD_NEW_MACHINE: () => {
-                location.hash = '#initialize/wifi/select-machine-type';
+                location.hash = '#initialize/wifi/connect-beambox';
             },
             RELOAD_APP: () => {
                 location.reload();

@@ -57,7 +57,7 @@ define([
                 const innerContent = this._renderSelectMachineStep();
                 const content = (
                     <div className="connect-beambox text-center">
-                        <img className="brand-image" src="img/menu/main_logo.svg" />
+                        <img className="brand-image" src="img/menu/mozu_logo.png" />
                         {innerContent}
                     </div>
                 );

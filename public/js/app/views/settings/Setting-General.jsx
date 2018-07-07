@@ -112,7 +112,7 @@ define([
         _resetFS: function() {
             if(confirm(this.state.lang.settings.confirm_reset)) {
                 LocalStorage.clearAllExceptIP();
-                location.hash = '#';
+                location.hash = '#initialize/wifi/connect-beambox';
             }
         },
 
@@ -289,32 +289,6 @@ define([
 
             return (
                 <div className='form general'>
-
-                    <Controls label={lang.settings.language}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={options}
-                            onChange={this._changeActiveLang}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.notifications}>
-                        <SelectView
-                            className='font3'
-                            options={notificationOptions}
-                            onChange={this._updateOptions.bind(null, 'notification')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.default_app}>
-                        <SelectView
-                            className='font3'
-                            options={defaultAppOptions}
-                            onChange={this._updateOptions.bind(null, 'default-app')}
-                        />
-                    </Controls>
-
                     <Controls label={lang.settings.default_machine}>
                         <table style={tableStyle}>
                             <tr>
@@ -332,63 +306,6 @@ define([
                             autoComplete='false'
                             defaultValue={pokeIP}
                             onBlur={this._checkIPFormat}
-                        />
-                    </Controls>
-
-                    <div className='subtitle'>{lang.settings.delta_series}</div>
-
-                    <Controls label={lang.settings.projection}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={projectionOptions}
-                            onChange={this._updateOptions.bind(null, 'camera-projection')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.antialiasing}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={antialiasingOptions}
-                            onChange={this._updateOptions.bind(null, 'antialiasing')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.auto_slice}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={autoSlicingOptions}
-                            onChange={this._updateOptions.bind(null, 'auto-slicing')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.lock_selection}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={lockSelectionOptions}
-                            onChange={this._updateOptions.bind(null, 'lock-selected')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.default_model}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={defaultModelOptions}
-                            onChange={this._updateOptions.bind(null, 'default-model')}
-                        />
-                    </Controls>
-
-                    <div className='subtitle'>{lang.settings.beambox_series}</div>
-
-                    <Controls label={lang.settings.default_beambox_model}>
-                        <SelectView
-                            className='font3'
-                            options={defaultBeamboxModelOptions}
-                            onChange={e => this._updateBeamboxPreference('model', e.target.value)}
                         />
                     </Controls>
 
