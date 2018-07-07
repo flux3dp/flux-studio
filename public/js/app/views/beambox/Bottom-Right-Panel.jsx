@@ -6,10 +6,12 @@ define([
     'app/actions/beambox/beambox-preference',
     'jsx!widgets/Button-Group',
     'helpers/i18n',
+    'helpers/device-master',
     'jsx!widgets/Modal',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
     'app/actions/film-cutter/record-manager',
+    'app/actions/film-cutter/film-cutter-manager',
     'app/actions/beambox/beambox-version-master'
 ], function (
     React,
@@ -19,10 +21,12 @@ define([
     BeamboxPreference,
     ButtonGroup,
     i18n,
+    DeviceMaster,
     Modal,
     PrinterSelector,
     AlertActions,
     RecordManager,
+    FilmCutterManager,
     BeamboxVersionMaster
 ) {
     const lang = i18n.lang;
@@ -42,6 +46,7 @@ define([
             BottomRightFuncs.exportFcode();
         }
         async _handleStartClick() {
+            // validate last connect to cloud
             const maxOfflineDays = 3;
             if (Date.now() - RecordManager.read('last_connect_to_cloud') > maxOfflineDays * 24 * 60 * 60) {
                 AlertActions.showPopupInfo('start', `您已 ${maxOfflineDays} 天未連網登入，請連網並登入帳號後，方可使用。`);
@@ -69,12 +74,12 @@ define([
         }
         _renderPrinterSelectorWindow() {
             const onGettingPrinter = async (selected_item) => {
+                this.setState({
+                    isPrinterSelectorOpen: false,
+                });
                 //export fcode
                 if (selected_item === 'export_fcode') {
                     BottomRightFuncs.exportFcode();
-                    this.setState({
-                        isPrinterSelectorOpen: false
-                    });
                     return;
                 }
 
@@ -82,16 +87,26 @@ define([
                 if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
                     console.error('Not a valid firmware version');
                     AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
-                    this.setState({
-                        isPrinterSelectorOpen: false
-                    });
+                    return;
+                }
+
+                await DeviceMaster.select(selected_item);
+                await FilmCutterManager.syncWithMachine();
+
+                // validate machine ownership
+                if (!(await FilmCutterManager.validateMachineOwnership())) {
+                    AlertActions.showPopupInfo('start', '尚未綁定這台機器，請先登入帳號並綁定這台機器');
+                    return;
+                }
+
+                // validate usage cut
+                const usageCutRemain = RecordManager.read('usage_cut_overall_on_cloud') - RecordManager.read('usage_cut_recorded') - RecordManager.read('usage_cut_used_on_cloud');
+                if (usageCutRemain <= 0) {
+                    AlertActions.showPopupInfo('start', '您已沒有剩餘切割額度，請購買額度或聯絡客服人員');
                     return;
                 }
 
                 // start task
-                this.setState({
-                    isPrinterSelectorOpen: false,
-                });
                 BottomRightFuncs.uploadFcode(selected_item);
             };
             const onClose = () => {
@@ -99,7 +114,7 @@ define([
                     isPrinterSelectorOpen: false
                 });
             };
-            
+
             const content = (
                 <PrinterSelector
                     uniqleId="laser"
