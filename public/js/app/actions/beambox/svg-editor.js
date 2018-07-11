@@ -5364,12 +5364,21 @@ define([
                         reader.readAsArrayBuffer(file);
                     });
                 }
+                function getBasename(path) {
+                    const pathMatch = path.match(/(.+)\/.+/);
+                    if (pathMatch[1]) return pathMatch[1];
+                    return "";
+                }
                 function readSVG(blob, type) {
                     return new Promise((resolve, reject) => {
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
-                            console.log('Reading SVG');
-                            var newElement = svgCanvas.importSvgString(e.target.result, type);
+                            let svgString = e.target.result;
+                            if (blob.path) {
+                                svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(getBasename(blob.path)) + '/');
+                                svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
+                            }
+                            var newElement = svgCanvas.importSvgString(svgString, type);
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();

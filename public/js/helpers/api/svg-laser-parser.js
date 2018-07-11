@@ -374,28 +374,46 @@ define([
 
                 events.onMessage = function(data) {
                     switch (data.status) {
-                    case 'continue':
-                        console.log("uploading file", file);
-                        ws.send(file);
-                        break;
-                    case 'ok':
-                        $deferred.resolve();
-                        break;
-                    case 'warning':
-                        warningCollection.push(data.message);
-                        break;
+                        case 'continue':
+                            ws.send(file);
+                            break;
+                        case 'ok':
+                            $deferred.resolve();
+                            break;
+                        case 'warning':
+                            warningCollection.push(data.message);
+                            break;
                     }
                 };
 
                 events.onError = function(data) {
                     alert(data);
                 };
+                function getBasename(path) {
+                    const pathMatch = path.match(/(.+)\/.+/);
+                    if (pathMatch[1]) return pathMatch[1];
+                    return "";
+                }
+                var reader = new FileReader();
+                reader.onloadend = function (e) {
+                    let svgString = e.target.result;
+                    if (file.path) {
+                        svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(getBasename(file.path)) + '/');
+                        svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(file.path) + '/');
+                    }
+                    
+                    file = new Blob([svgString], {
+                        type: 'text/plain'
+                    });
+                    
+                    ws.send([
+                        'upload_plain_svg',
+                        encodeURIComponent(file.name),
+                        file.size
+                    ].join(' '));
+                };
+                reader.readAsText(file);
 
-                ws.send([
-                    'upload_plain_svg',
-                    encodeURIComponent(file.name),
-                    file.size
-                ].join(' '));
 
                 return $deferred.promise();
             },
