@@ -44,11 +44,12 @@ define(['react', 'reactPropTypes'], function(React, PropTypes){
 
                 // attribute schema matches <option> spec; http://www.w3.org/TR/REC-html40/interact/forms.html#h-17.6
                 // EXCEPT for 'key' attribute which is requested by ReactJS
-                return <option key={i} value={opt.value} label={opt.label} selected={defaultValue === opt.value} data-meta={metadata}>{opt.label}</option>;
+                return <option key={i} value={opt.value} label={opt.label} data-meta={metadata}>{opt.label}</option>;
             }, this);
 
             return  <select
                         defaultValue={defaultValue}
+                        value={defaultValue}
                         multiple={this.props.multiple}
                         name={this.props.name}
                         id={this.props.id}

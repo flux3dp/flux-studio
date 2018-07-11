@@ -21,7 +21,7 @@ define(['react'], function(React){
                 var metadata = JSON.stringify(opt.data),
                     labelItem = opt.label;
                 if (labelItem.item) labelItem = labelItem.item;
-                return <li data-meta={metadata} data-value={opt.value}>{labelItem}</li>;
+                return <li data-meta={metadata} data-value={opt.value} key={i}>{labelItem}</li>;
             }, this);
 
             return  (

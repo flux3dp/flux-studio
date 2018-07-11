@@ -50,12 +50,10 @@ define([
                 _options;
 
             _options = this.props.options.map(function(option) {
-                var isSelected = option === self.props.default ? 'selected' : '';
                 if (typeof option === 'object') {
-                    isSelected = option.value === self.props.default ? 'selected' : '';
-                    return (<option value={option.value} selected={isSelected}>{option.label}</option>);
+                    return (<option value={option.value}>{option.label}</option>);
                 } else {
-                    return (<option value={option} selected={isSelected}>{option}</option>);
+                    return (<option value={option}>{option}</option>);
                 }
             });
 
@@ -64,7 +62,7 @@ define([
                     <div className="label pull-left">{this.props.label}</div>
                     <div className="control">
                         <div className="dropdown-container">
-                            <select onChange={this._handleChange}>
+                            <select onChange={this._handleChange} defaultValue={self.props.default}>
                                 {_options}
                             </select>
                         </div>
