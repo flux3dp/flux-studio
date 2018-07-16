@@ -5303,8 +5303,13 @@ define([
             // and provide a file input to click. When that change event fires, it will
             // get the text contents of the file and send it to the canvas
             if (window.FileReader) {
-                function readImage(file, scale = 1) {
+                function readImage(file, scale = 1, offset = null) {
                     return new Promise((resolve, reject) => {
+                        var defaultX = 0, defaultY = 0;
+                        if (offset) {
+                            defaultX = offset[0];
+                            defaultY = offset[1];
+                        }
                         reader = new FileReader();
                         reader.onloadend = function (e) {
                             // let's insert the new image until we know its dimensions
@@ -5312,8 +5317,8 @@ define([
                                 var newImage = svgCanvas.addSvgElementFromJson({
                                     element: 'image',
                                     attr: {
-                                        x: 0,
-                                        y: 0,
+                                        x: defaultX * scale,
+                                        y: defaultY * scale,
                                         width: width * scale,
                                         height: height * scale,
                                         id: svgCanvas.getNextId(),
@@ -5342,8 +5347,10 @@ define([
                                 );
 
                                 svgCanvas.selectOnly([newImage]);
-                                svgCanvas.alignSelectedElements('l', 'page');
-                                svgCanvas.alignSelectedElements('t', 'page');
+                                if (!offset) {
+                                    svgCanvas.alignSelectedElements('l', 'page');
+                                    svgCanvas.alignSelectedElements('t', 'page');
+                                }
                                 resolve();
                                 updateContextPanel();
                                 $('#dialog_box').hide();
@@ -5375,7 +5382,7 @@ define([
                         reader.onloadend = function (e) {
                             let svgString = e.target.result;
                             if (blob.path) {
-                                svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(getBasename(blob.path)) + '/');
+                                svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(blob.path) + '/../');
                                 svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
                             }
                             var newElement = svgCanvas.importSvgString(svgString, type);
@@ -5412,7 +5419,7 @@ define([
 
                             if (outputs['bitmap'].size > 0) {
                                 svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+                                await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
                             }
                             console.log('Load complete');
                         } else {
@@ -5447,13 +5454,15 @@ define([
                     readImage(file);
                 };
                 const importDxf = async file => {
+                    let defaultDpiValue = 25.4;
                     const parsedSvg = await new Promise(resolve => {
                         const reader = new FileReader();
                         reader.onloadend = evt => {
                             const parsed = Dxf2Svg.parseString(evt.target.result);
-                            console.log('Parsed DXF', parsed);
+                            if (parsed.header.insunits == '1') {
+                                defaultDpiValue = 72;
+                            }
                             const svg = Dxf2Svg.toSVG(parsed);
-                            console.log('svg: ', svg);
                             resolve(svg);
                         };
                         reader.readAsText(file);
@@ -5464,6 +5473,7 @@ define([
                             React.createElement(
                                 DxfDpiSelector,
                                 {
+                                    defaultDpiValue: defaultDpiValue,
                                     onSubmit: val => {
                                         Announcement.unpost('DXF_DPI_SELECTOR');
                                         resolve(val);

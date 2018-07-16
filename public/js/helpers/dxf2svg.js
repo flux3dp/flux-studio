@@ -1299,6 +1299,12 @@
             header.extMax = {};
             state = 'extMax';
             return;
+          case '$INSUNITS':
+            state = 'insUnits';
+            return;
+          case '$LUNITS':
+            state = 'LUnits';
+            return;
           default:
             if (state === 'extMin') {
               switch (type) {
@@ -1324,6 +1330,22 @@
                   break;
                 case 30:
                   header.extMax.z = value;
+                  state = undefined;
+                  break;
+              }
+            }
+            if (state === 'insUnits') {
+              switch (type) {
+                case 70:
+                  header.insunits = value;
+                  state = undefined;
+                  break;
+              }
+            }
+            if (state === 'LUnits') {
+              switch (type) {
+                case 70:
+                  header.lunits = value;
                   state = undefined;
                   break;
               }

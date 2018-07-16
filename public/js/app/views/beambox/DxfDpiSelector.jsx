@@ -12,7 +12,7 @@ function(
 ) {
     const lang = i18n.lang;
 
-    const DxfDpiSelector = ({onSubmit, onCancel}) => {
+    const DxfDpiSelector = ({defaultDpiValue, onSubmit, onCancel}) => {
         const submitValue = () => {
             const dpi = Number($('#dpi-input').val());
             onSubmit(dpi);
@@ -53,6 +53,7 @@ function(
                 <div className="message" style={{textAlign: 'center'}}>
                     <input
                         id='dpi-input'
+                        defaultValue={defaultDpiValue}
                         onClick={clearInputValue}
                         onKeyDown={_handleKeyDown}
                         style={style}
