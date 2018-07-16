@@ -352,6 +352,9 @@ define([
                     if (data.name) {
                         currentName = data.name;
                         currentLength = data.length;
+                        if (currentName == 'bitmap') {
+                            finalBlobs["bitmap_offset"] = data.offset;
+                        }
                     } else if (data instanceof Blob) {
                         blobs.push(data);
                         var blob = new Blob(blobs);
@@ -398,7 +401,7 @@ define([
                 reader.onloadend = function (e) {
                     let svgString = e.target.result;
                     if (file.path) {
-                        svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(getBasename(file.path)) + '/');
+                        svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(file.path) + '/../');
                         svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(file.path) + '/');
                     }
                     
