@@ -43,13 +43,13 @@ define(['react','reactCreateReactClass'], function(React){
 
                     if ('link' === opt.type) {
                         content = (
-                            <a className={className} key={opt.href} href={opt.href} {...attrs} onClick={opt.onClick} >{opt.label}</a>
+                            <a className={className} key={i} href={opt.href} {...attrs} onClick={opt.onClick} >{opt.label}</a>
                         );
                     }
                     else if ('icon' === opt.type) {
                         content = (
                             <button
-                                key={opt.label}
+                                key={i}
                                 title={opt.title}
                                 className={className}
                                 type="button"
@@ -62,7 +62,7 @@ define(['react','reactCreateReactClass'], function(React){
                     else {
                         content = (
                             <button
-                                key={opt.label}
+                                key={i}
                                 title={opt.title}
                                 className={className}
                                 type={opt.type || 'button'}
@@ -86,8 +86,8 @@ define(['react','reactCreateReactClass'], function(React){
 
             return (
                 0 < this.props.buttons.length ?
-                <div className={className}>{buttons}</div> :
-                <span/>
+                    <div className={className}>{buttons}</div> :
+                    <span/>
             );
         }
     });

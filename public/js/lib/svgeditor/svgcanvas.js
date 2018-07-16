@@ -2610,10 +2610,12 @@ define([
                     }
 
                     function _panAsIllustrator() {
-                        const scrollLeft = $('#workarea').scrollLeft() + evt.deltaX / 2.0;
-                        const scrollTop = $('#workarea').scrollTop() + evt.deltaY / 2.0;
-                        $('#workarea').scrollLeft(scrollLeft);
-                        $('#workarea').scrollTop(scrollTop);
+                        requestAnimationFrame(() => {
+                            const scrollLeft = $('#workarea').scrollLeft() + evt.deltaX / 2.0;
+                            const scrollTop = $('#workarea').scrollTop() + evt.deltaY / 2.0;
+                            $('#workarea').scrollLeft(scrollLeft);
+                            $('#workarea').scrollTop(scrollTop);
+                        });
                     }
                 };
             })());

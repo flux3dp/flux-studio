@@ -1902,34 +1902,36 @@ TODOS
 			};
 
 			var zoomChanged = svgCanvas.zoomChanged = function(win, bbox, autoCenter) {
-				var scrbar = 15,
-					// res = svgCanvas.getResolution(), // Currently unused
-					w_area = workarea;
-				// var canvas_pos = $('#svgcanvas').position(); // Currently unused
-				var z_info = svgCanvas.setBBoxZoom(bbox, w_area.width()-scrbar, w_area.height()-scrbar);
-				if (!z_info) {return;}
-				var zoomlevel = z_info.zoom,
-					bb = z_info.bbox;
+				requestAnimationFrame(() => {
+					var scrbar = 15,
+						// res = svgCanvas.getResolution(), // Currently unused
+						w_area = workarea;
+					// var canvas_pos = $('#svgcanvas').position(); // Currently unused
+					var z_info = svgCanvas.setBBoxZoom(bbox, w_area.width()-scrbar, w_area.height()-scrbar);
+					if (!z_info) {return;}
+					var zoomlevel = z_info.zoom,
+						bb = z_info.bbox;
 
-				if (zoomlevel < 0.001) {
-					changeZoom({value: 0.1});
-					return;
-				}
+					if (zoomlevel < 0.001) {
+						changeZoom({value: 0.1});
+						return;
+					}
 
-				$('#zoom').val((zoomlevel*100).toFixed(1));
+					$('#zoom').val((zoomlevel*100).toFixed(1));
 
-				if (autoCenter) {
-					updateCanvas();
-				} else {
-					updateCanvas(false, {x: bb.x * zoomlevel + (bb.width * zoomlevel)/2, y: bb.y * zoomlevel + (bb.height * zoomlevel)/2});
-				}
+					if (autoCenter) {
+						updateCanvas();
+					} else {
+						updateCanvas(false, {x: bb.x * zoomlevel + (bb.width * zoomlevel)/2, y: bb.y * zoomlevel + (bb.height * zoomlevel)/2});
+					}
 
-				if (svgCanvas.getMode() == 'zoom' && bb.width) {
-					// Go to select if a zoom box was drawn
-					setSelectMode();
-				}
+					if (svgCanvas.getMode() == 'zoom' && bb.width) {
+						// Go to select if a zoom box was drawn
+						setSelectMode();
+					}
 
-				zoomDone();
+					zoomDone();
+				});
 			};
 
 			changeZoom = function(ctl) {
