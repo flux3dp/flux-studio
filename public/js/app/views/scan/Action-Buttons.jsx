@@ -133,7 +133,7 @@ define([
         render : function() {
             var lang = this.props.lang,
                 buttons = this._getActionButtons(lang),
-                defaultClassName = cx(this.props.className);
+                defaultClassName = ReactCx.cx(this.props.className);
 
             return (
                 <ButtonGroup className={defaultClassName} buttons={buttons}/>

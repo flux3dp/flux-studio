@@ -1553,6 +1553,7 @@ define([
                         content = (
                             <PrinterSelector
                                 uniqleId="scan"
+                                modelFilter={PrinterSelector.DELTA_FILTER}
                                 className="scan-printer-selection"
                                 lang={lang}
                                 onClose={noDeviceAvailable}
