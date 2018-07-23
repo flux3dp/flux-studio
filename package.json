@@ -33,7 +33,7 @@
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
     "electron": "^1.6.17",
-    "electron-builder": "19.52.1",
+    "electron-builder": "simonxeko/electron-builder",
     "electron-rebuild": "^1.7.3",
     "electron-publisher-s3": "19.53.1",
     "electron-reload": "~1.1.0",
