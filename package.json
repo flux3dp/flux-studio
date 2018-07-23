@@ -18,7 +18,7 @@
     "nan": "^2.4.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
-    "electron-builder": "git://github.com/simonxeko/electron-builder.git#5f9be64561bd8ad1ece9299aecdb58f737f62280",
+    "electron-builder": "simonxeko/electron-builder.git#master",
     "text-to-svg": "jeffontheground/text-to-svg#e4fb3dc1ac9c8e5a2440373e7e018f07653ad574",
     "websocket": "~1.0.24"
   },
@@ -34,7 +34,7 @@
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
     "electron": "^1.6.17",
-    "electron-builder": "git://github.com/simonxeko/electron-builder.git#5f9be64561bd8ad1ece9299aecdb58f737f62280",
+    "electron-builder": "simonxeko/electron-builder.git#master",
     "electron-publisher-s3": "19.53.1",
     "electron-rebuild": "^1.8.1",
     "electron-reload": "~1.1.0",
