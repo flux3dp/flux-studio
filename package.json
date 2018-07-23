@@ -33,9 +33,9 @@
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
     "electron": "^1.6.17",
-    "electron-builder": "simonxeko/electron-builder#master",
-    "electron-rebuild": "^1.7.3",
+    "electron-builder": "simonxeko/electron-builder#5f9be64561bd8ad1ece9299aecdb58f737f62280",
     "electron-publisher-s3": "19.53.1",
+    "electron-rebuild": "^1.8.1",
     "electron-reload": "~1.1.0",
     "eslint": "^4.9.0",
     "eslint-plugin-react": "^7.4.0",
@@ -64,6 +64,7 @@
   "scripts": {
     "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register",
     "start": "electron .",
+    "postinstall": "electron-rebuild",
     "pack": "build --dir",
     "dist": "build"
   },
@@ -103,7 +104,9 @@
       "artifactName": "FLUX Studio ${version}.${ext}"
     },
     "deb": {
-        "depends": ["libfontconfig1-dev"]
+      "depends": [
+        "libfontconfig1-dev"
+      ]
     },
     "nsis": {
       "include": "win-install.nsh",
