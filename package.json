@@ -18,7 +18,6 @@
     "nan": "^2.4.0",
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
-    "electron-builder": "simonxeko/electron-builder.git#master",
     "text-to-svg": "jeffontheground/text-to-svg#e4fb3dc1ac9c8e5a2440373e7e018f07653ad574",
     "websocket": "~1.0.24"
   },
