@@ -164,6 +164,9 @@ define([
             return this.isPreviewModeOn;
         }
 
+        getCameraOffset() {
+            return this.cameraOffset;
+        }
 
         //helper functions
 
