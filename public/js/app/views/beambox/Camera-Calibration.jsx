@@ -264,7 +264,7 @@ define([
             };
         };
 
-        const _doSetConfigTask = async (X, Y, R, S) => {
+        const _doSetConfigTask = async (X, Y, R, S, F) => {
             await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${S}`);
         };
 
