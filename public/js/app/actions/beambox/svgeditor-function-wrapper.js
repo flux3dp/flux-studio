@@ -18,6 +18,14 @@ define([
     };
 
     const funcs =  {
+        isAnyElementSelected: function() {
+            if (!window.svgCanvas) {
+                return false;
+            }
+            const selectedElements = window.svgCanvas.getSelectedElems();
+
+            return ((selectedElements.length > 0) && (selectedElements[0] !== null));
+        },
         cloneSelectedElement: function() {
             window.svgCanvas.cloneSelectedElements(20, 20);
         },
@@ -28,6 +36,36 @@ define([
         //main panel
         importImage: function() {
             $('#tool_import input').click();
+        },
+
+        //align toolbox
+        alignLeft: function() {
+            svgCanvas.alignSelectedElements('l', 'page');
+        },
+        alignCenter: function(){
+            svgCanvas.alignSelectedElements('c', 'page');
+        },
+        alignRight: function() {
+            svgCanvas.alignSelectedElements('r', 'page');
+        },
+        alignTop: function() {
+            svgCanvas.alignSelectedElements('t', 'page');
+        },
+        alignMiddle: function() {
+            svgCanvas.alignSelectedElements('m', 'page');
+        },
+        alignBottom: function() {
+            svgCanvas.alignSelectedElements('b', 'page');
+        },
+        // distribute toolbox
+        distHori: function() {
+            svgCanvas.distHori();
+        },
+        distVert: function() {
+            svgCanvas.distHori();
+        },
+        distEven: function() {
+            svgCanvas.distEven();
         },
 
         //left panel
@@ -53,7 +91,7 @@ define([
         saveFile: function() {
             const output = svgCanvas.getSvgString();
             const defaultFileName = svgCanvas.getLatestImportFileName() || 'untitled';
-            saveAs(new Blob([output], {type: 'text/plain'}), defaultFileName + ".bvg");
+            saveAs(new Blob([output], {type: 'text/plain'}), defaultFileName + '.bvg');
         },
 
         //top panel

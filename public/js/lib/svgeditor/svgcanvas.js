@@ -5521,7 +5521,7 @@ define([
                     fill-opacity: 1 !important;
                     stroke-width: 0 !important;
                 }
-                
+
                 *[data-wireframe] {
                     fill-opacity: 0 !important;
                     stroke: #000 !important;
@@ -5532,7 +5532,7 @@ define([
                     vector-effect: non-scaling-stroke !important;
                     filter: none !important;
                 }
-                
+
                 #svg_editor:not(.color) #${symbol.id} * {
                     fill-opacity: 0;
                     stroke: #000 !important;
@@ -7330,7 +7330,7 @@ define([
             for (i = 0; i < len && selectedElements[i]; ++i) {
                 var selected = selectedElements[i],
                     selectedRef = selectedElements[i];
-                
+
                 var layerName = $(selected.parentNode).find('title').text();
                 selected.setAttribute("data-origin-layer", layerName);
                 if (!layerDict[layerName]) {
@@ -7978,6 +7978,216 @@ define([
             }
         };
 
+        this.getCenter = function(elem) {
+            let centerX,centerY ;
+            switch(elem.tagName) {
+                case 'image':
+                case 'rect':
+                    centerX = elem.x.baseVal.value + elem.width.baseVal.value /2 ;
+                    centerY = elem.y.baseVal.value + elem.height.baseVal.value /2 ;
+                    break;
+                case 'line':
+                    centerX = (elem.x1.baseVal.value + elem.x2.baseVal.value) /2 ;
+                    centerY = (elem.y1.baseVal.value + elem.y2.baseVal.value) /2 ;
+                    break;
+                case 'ellipse':
+                    centerX = elem.cx.baseVal.value;
+                    centerY = elem.cy.baseVal.value;
+                    break;
+                case 'use':
+                    let realLocation = this.getSvgRealLocation(elem);
+                    centerX = realLocation.x + realLocation.width/2 ;
+                    centerY = realLocation.y + realLocation.height/2 ;
+                    break;
+            }
+            return {
+                x: centerX,
+                y: centerY
+            };
+        };
+
+        this.distHori = function () {
+            const centerXs = [];
+            let minX = Number.MAX_VALUE,
+                maxX = Number.MIN_VALUE;
+            let indexMax = -1,
+                indexMin = -1;
+
+            const len = selectedElements.length;
+            if (len < 3) {
+                return;
+            }
+            for (let i = 0; i < len; i=i+1) {
+                if (selectedElements[i] == null) {
+                    break;
+                }
+                const elem = selectedElements[i];
+
+                let centerX = this.getCenter(elem).x;
+                centerXs[i] = centerX;
+                if (centerX < minX) {
+                    minX = centerX;
+                    indexMin = i;
+                }
+                if (centerX > maxX) {
+                    maxX = centerX;
+                    indexMax = i;
+                }
+            }
+
+            if (indexMin === indexMax || maxX === minX) {
+                return;
+            }
+
+            const dx = (maxX - minX) /(len-1);
+
+            let j = 1;
+
+            for (let i = indexMin + 1; i< len + indexMin ; i=i+1) {
+                if ( (i === indexMax) || (i-len) === indexMax ) {
+                    continue;
+                }
+                if (i < len) {
+                    this.moveElemPosition((minX + dx*j) - centerXs[i], 0, selectedElements[i]);
+                } else {
+                    this.moveElemPosition((minX + dx*j) - centerXs[i-len], 0, selectedElements[i-len]);
+                }
+                j = j+1;
+            }
+
+        };
+
+        this.distVert = function () {
+            const centerYs = [];
+            let minY = Number.MAX_VALUE,
+                maxY = Number.MIN_VALUE;
+            let indexMax = -1,
+                indexMin = -1;
+
+            const len = selectedElements.length;
+            if (len < 3) {
+                return;
+            }
+            for (let i = 0; i < len; i=i+1) {
+                if (selectedElements[i] == null) {
+                    break;
+                }
+                const elem = selectedElements[i];
+
+                let centerY = this.getCenter(elem).y;
+                centerYs[i] = centerY;
+                if (centerY < minY) {
+                    minY = centerY;
+                    indexMin = i;
+                }
+                if (centerY > maxY) {
+                    maxY = centerY;
+                    indexMax = i;
+                }
+            }
+
+            if (indexMin === indexMax || maxY === minY) {
+                return;
+            }
+
+            const dy = (maxY - minY) /(len-1);
+
+            let j = 1;
+
+            for (let i = indexMin + 1; i< len + indexMin ; i=i+1) {
+                if ( (i === indexMax) || (i-len) === indexMax ) {
+                    continue;
+                }
+                if (i < len) {
+                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i], selectedElements[i]);
+                } else {
+                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i-len], selectedElements[i-len]);
+                }
+                j = j+1;
+            }
+
+        };
+
+        this.distEven = function () {
+            const centerXs = [];
+            const centerYs = [];
+            let minX = Number.MAX_VALUE,
+                minY = Number.MAX_VALUE,
+                maxX = Number.MIN_VALUE,
+                maxY = Number.MIN_VALUE;
+            let indexMinX = -1,
+                indexMinY = -1,
+                indexMaxX = -1,
+                indexMaxY = -1;
+
+            const len = selectedElements.length;
+            if (len < 3) {
+                return;
+            }
+
+            for (let i = 0; i < len; i=i+1) {
+                if (selectedElements[i] == null) {
+                    console.error('distributing null');
+                    break;
+                }
+                const elem = selectedElements[i];
+
+                let center = this.getCenter(elem);
+                centerXs[i] = center.x;
+                centerYs[i] = center.y;
+                if ( center.x < minX) {
+                    minX = center.x;
+                    indexMinX = i;
+                }
+                if ( center.x > maxX) {
+                    maxX = center.x;
+                    indexMaxX = i;
+                }
+                if ( center.y < minY) {
+                    minY = center.y;
+                    indexMinY = i;
+                }
+                if ( center.y > maxY) {
+                    maxY = center.y;
+                    indexMaxY = i;
+                }
+            }
+
+            if ((indexMinX === indexMaxX) && (indexMinY === indexMaxY)) {
+                return;
+            }
+            const diffX = maxX-minX;
+            const diffY = maxY-minY;
+
+            let start=-1,
+                end=-1;
+
+            if(diffX >= diffY) {
+                start = indexMinX;
+                end = indexMaxX;
+            } else {
+                start = indexMinY;
+                end = indexMaxY;
+            }
+            const startX = centerXs[start];
+            const startY = centerYs[start];
+            const dx = (centerXs[end] - startX) /(len-1);
+            const dy = (centerYs[end] - startY) /(len-1);
+            let j = 1;
+
+            for (let i = start + 1; i< len + start ; i=i+1) {
+                if ( (i === end) || (i-len) === end ) {
+                    continue;
+                }
+                if (i < len) {
+                    this.moveElemPosition((startX + dx*j) - centerXs[i], (startY + dy*j) - centerYs[i], selectedElements[i]);
+                } else {
+                    this.moveElemPosition((startX + dx*j) - centerXs[i-len], (startY + dy*j) - centerYs[i-len], selectedElements[i-len]);
+                }
+                j = j+1;
+            }
+        };
+
         // Function: cloneSelectedElements
         // Create deep DOM copies (clones) of all selected elements and move them slightly
         // from their originals
@@ -8354,12 +8564,98 @@ define([
             };
         };
 
+        this.getSvgRealLocation = function (elem) {
+            const ts = $(elem).attr('transform') || '';
+            const xform = $(elem).attr('data-xform');
+            const elemX = parseFloat($(elem).attr('x') || '0');
+            const elemY = parseFloat($(elem).attr('y') || '0');
+
+            const obj = {};
+            console.log('getSvgRalll');
+            xform.split(' ').forEach((pair) => {
+                [key, value] = pair.split('=');
+                if (value === undefined) {
+                    return;
+                };
+                obj[key] = parseFloat(value);
+            });
+            console.log('just');
+            const matrix = ts.match(/matrix\(.*?\)/g);
+
+            const matr = matrix ? matrix[0].substring(7, matrix[0].length - 1) : '1,0,0,1,0,0';
+            [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+
+            const x = a * obj.x + c * obj.y + e + a * elemX;
+            const y = b * obj.x + d * obj.y + f + d * elemY;
+
+            const width = obj.width * a;
+            const height = obj.height * d;
+
+            return {
+                x: x,
+                y: y,
+                width: width,
+                height: height
+            };
+        };
+
         String.prototype.format = function () {
             a = this;
             for (k in arguments) {
                 a = a.replace('{' + k + '}', arguments[k]);
             }
             return a;
+        };
+
+        this.moveElemPosition = function (dx, dy, elem) {
+            if (elem === null) {
+                return;
+            }
+
+            switch(elem.tagName) {
+                case 'image':
+                case 'rect':
+                    if(dx !== 0) {
+                        elem.setAttribute('x', elem.x.baseVal.value + dx);
+                    }
+                    if(dy !== 0) {
+                        elem.setAttribute('y', elem.y.baseVal.value + dy);
+                    }
+                    break;
+                case 'line':
+                    if(dx !== 0) {
+                        elem.setAttribute('x1', elem.x1.baseVal.value + dx);
+                        elem.setAttribute('x2', elem.x2.baseVal.value + dx);
+                    }
+                    if(dy !== 0) {
+                        elem.setAttribute('y1', elem.y1.baseVal.value + dy);
+                        elem.setAttribute('y2', elem.y2.baseVal.value + dy);
+                    }
+                    break;
+                case 'ellipse':
+                    if(dx !== 0) {
+                        elem.setAttribute('cx', elem.cx.baseVal.value + dx);
+                    }
+                    if(dy !== 0) {
+                        elem.setAttribute('cy', elem.cy.baseVal.value + dy);
+                    }
+                    break;
+                case 'use':
+                    let xform = svgroot.createSVGTransform();
+                    let tlist = svgedit.transformlist.getTransformList(elem);
+
+                    xform.setTranslate(dx, dy);
+                    if (tlist.numberOfItems) {
+                        tlist.insertItemBefore(xform, 0);
+                    } else {
+                        tlist.appendItem(xform);
+                    }
+                    break;
+            }
+
+            selectorManager.requestSelector(elem).resize();
+            recalculateAllSelectedDimensions();
+
         };
 
         //   this.calcLocation = function(elem, para, val) {
@@ -8419,6 +8715,7 @@ define([
         //   };
         this.setSvgElemPosition = function (para, val) {
             const selected = selectedElements[0];
+            console.log('setSvgElemPosition');
             const realLocation = this.getSvgRealLocation(selected);
             let dx = 0;
             let dy = 0;

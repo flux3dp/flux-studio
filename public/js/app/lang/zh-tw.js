@@ -1492,6 +1492,16 @@ define(function() {
             FOCAL_LENGTH        : '焦距調整',
             hours               : '小時',
             cannot_get_info     : '無法讀取工具頭資訊'
+        },
+        topbar: {
+            align_toolbox: {
+                ALIGN_LEFT: '向左靠齊',
+                ALIGN_RIGHT: '向右靠齊',
+                ALIGN_CENTER : '水平置中',
+                ALIGN_TOP : '向上靠齊',
+                ALIGN_MIDDLE : '垂直置中',
+                ALIGN_BOTTOM : '向下靠齊'
+            }
         }
     };
 });

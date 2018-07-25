@@ -15,6 +15,7 @@ define([
     'helpers/output-error',
     'plugins/classnames/index',
     'app/constants/device-constants',
+    'jsx!views/toolbox/Toolbox',
     'jsx!views/print/Monitor',
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
@@ -43,6 +44,7 @@ define([
     OutputError,
     ClassNames,
     DeviceConstants,
+    Toolbox,
     Monitor,
     Modal,
     AlertActions,
@@ -925,6 +927,7 @@ define([
                                 </div>
                             </div>
                         </div>
+                        <Toolbox />
                     </div>
                 );
             }

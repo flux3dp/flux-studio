@@ -30,6 +30,7 @@ define([
     'jsx!app/actions/announcement',
     'jsx!app/views/beambox/DxfDpiSelector',
     'app/actions/alert-actions',
+    'app/actions/topbar',
     'helpers/image-data',
     'helpers/shortcuts',
     'helpers/i18n',
@@ -45,6 +46,7 @@ define([
     Announcement,
     DxfDpiSelector,
     AlertActions,
+    TopbarActions,
     ImageData,
     Shortcuts,
     i18n,
@@ -1964,6 +1966,8 @@ define([
                 // if elems[1] is present, then we have more than one element
                 selectedElement = (elems.length === 1 || elems[1] == null ? elems[0] : null);
                 multiselected = (elems.length >= 2 && elems[1] != null);
+                const isAlignToolboxShowed = (elems.length >= 1) && (elems[0] !== null );
+                const isDistributeToolboxShowed = multiselected && elems.length >=3 ;
                 if (selectedElement != null) {
                     // unless we're already in always set the mode of the editor to select because
                     // upon creation of a text element the editor is switched into
@@ -1972,8 +1976,17 @@ define([
                     if (!is_node) {
                         updateToolbar();
                     }
-                } // if (elem != null)
-
+                }
+                if (isAlignToolboxShowed) {
+                    TopbarActions.showAlignToolbox();
+                } else {
+                    TopbarActions.closeAlignToolbox();
+                }
+                if (isDistributeToolboxShowed) {
+                    TopbarActions.showDistributeToolbox();
+                } else {
+                    TopbarActions.closeDistributeToolbox();
+                }
                 // Deal with pathedit mode
                 togglePathEditMode(is_node, elems);
                 updateContextPanel();
