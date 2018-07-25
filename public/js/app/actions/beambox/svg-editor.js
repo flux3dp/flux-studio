@@ -5528,6 +5528,9 @@ define([
                     } catch (e) {
                         console.log(e);
                     }
+
+                    svgCanvas.setSvgElemPosition('x', 0);
+                    svgCanvas.setSvgElemPosition('y', 0);
                     // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
                     $('#dialog_box').hide();
                 };

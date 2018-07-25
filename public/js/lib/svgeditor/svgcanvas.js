@@ -8571,7 +8571,6 @@ define([
             const elemY = parseFloat($(elem).attr('y') || '0');
 
             const obj = {};
-            console.log('getSvgRalll');
             xform.split(' ').forEach((pair) => {
                 [key, value] = pair.split('=');
                 if (value === undefined) {
@@ -8579,7 +8578,6 @@ define([
                 };
                 obj[key] = parseFloat(value);
             });
-            console.log('just');
             const matrix = ts.match(/matrix\(.*?\)/g);
 
             const matr = matrix ? matrix[0].substring(7, matrix[0].length - 1) : '1,0,0,1,0,0';
@@ -8715,7 +8713,6 @@ define([
         //   };
         this.setSvgElemPosition = function (para, val) {
             const selected = selectedElements[0];
-            console.log('setSvgElemPosition');
             const realLocation = this.getSvgRealLocation(selected);
             let dx = 0;
             let dy = 0;
