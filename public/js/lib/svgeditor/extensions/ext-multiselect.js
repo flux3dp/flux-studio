@@ -14,7 +14,6 @@
 */
 
 svgEditor.addExtension('ext-multiselect', function() {'use strict';
-    console.log("Extension load", svgCanvas);
 	return {
 		name: 'Extension Multiselect',
         svgicons: svgEditor.curConfig.extPath + 'ext-multiselect.xml',

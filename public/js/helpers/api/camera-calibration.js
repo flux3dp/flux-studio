@@ -32,7 +32,8 @@ define([
             /**
              * @param {ArrayBuffer} data    - binary data with array buffer type
              */
-            upload: (data) => {
+            upload: (data, opts) => {
+                opts = opts || {};
                 let d = $.Deferred();
                 events.onMessage = (response) => {
                     switch (response.status) {
@@ -51,7 +52,7 @@ define([
                 events.onError = (response) => { d.reject(response); console.log('on error', response); };
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
-                ws.send(`upload ${data.size || data.byteLength}`);
+                ws.send(`upload ${data.size || data.byteLength}${opts.flip ? ' flip' : ''}`);
                 return d.promise();
             },
         };

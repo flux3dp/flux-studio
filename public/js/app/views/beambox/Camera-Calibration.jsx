@@ -46,6 +46,8 @@ define([
     const STEP_BEFORE_ANALYZE_PICTURE = Symbol();
     const STEP_FINISH = Symbol();
 
+    let cameraOffset = {};
+
     class CameraCalibrationStateMachine extends React.Component {
         constructor(props) {
             super(props);
@@ -151,7 +153,7 @@ define([
                 const movementX = Constant.camera.calibrationPicture.centerX - Constant.camera.offsetX_ideal;
                 const movementY = Constant.camera.calibrationPicture.centerY - Constant.camera.offsetY_ideal;
                 const blobUrl = await PreviewModeController.takePictureAfterMoveTo(movementX, movementY);
-
+                cameraOffset = PreviewModeController.getCameraOffset();
                 updateImgBlobUrl(blobUrl);
             } catch (error) {
                 throw error;
@@ -207,7 +209,7 @@ define([
                 .then((blob) => {
                     var fileReader = new FileReader();
                     fileReader.onloadend = (e) => {
-                        cameraCalibrationWebSocket.upload(e.target.result)
+                        cameraCalibrationWebSocket.upload(e.target.result, { flip: cameraOffset.flip })
                             .done((resp)=>{
                                 d.resolve(resp);
                             })

@@ -1,7 +1,7 @@
 {
   "name": "flux-studio",
   "productName": "FLUX Studio",
-  "version": "0.9.16",
+  "version": "0.9.18",
   "author": {
     "name": "FLUX Inc.",
     "email": "dev@flux3dp.com"
@@ -36,7 +36,11 @@
     "electron": "^1.6.17",
     "electron-builder": "19.52.1",
     "electron-publisher-s3": "19.53.1",
+<<<<<<< HEAD
     "electron-rebuild": "^1.7.3",
+=======
+    "electron-rebuild": "^1.8.1",
+>>>>>>> 525274646bfc76420da267ba663a80be08023f6c
     "electron-reload": "~1.1.0",
     "eslint": "^4.9.0",
     "eslint-plugin-react": "^7.4.0",
@@ -65,6 +69,7 @@
   "scripts": {
     "test": "mocha '_test/unit/slicer.js' --compilers js:babel-core/register",
     "start": "electron .",
+    "postinstall": "electron-rebuild",
     "pack": "build --dir",
     "dist": "build"
   },

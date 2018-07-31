@@ -1,0 +1,31 @@
+.toolbox {
+    position: relative;
+    top: 32px;
+    left: 290px;
+    width: 270px;
+    height: 30px;
+    z-index: 0;
+
+    div {
+        display: inline-block;
+    }
+}
+
+.toolbox-item {
+    display: inline-block;
+    width: 27px;
+    height: 27px;
+    margin: 6px 0 0 2px;
+    padding: 0;
+    background-color: #e8e8e8;
+
+    :hover {
+        cursor: pointer;
+        background-color:#d0d0d0 ;
+    }
+
+    img {
+        width: 24px;
+        height: 24px;
+    }
+}

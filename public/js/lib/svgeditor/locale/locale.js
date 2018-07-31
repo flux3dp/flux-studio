@@ -17,11 +17,11 @@
 
 var svgEditor = (function($, editor) {'use strict';
 
-	var lang_param;
+	var lang_param, missingElements = [];
 	
 	function setStrings(type, obj, ids) {
 		// Root element to look for element from
-		var i, sel, val, $elem, elem, node, parent = $('#svg_editor').parent();
+		let i, sel, val, $elem, elem, node, parent = $('#svg_editor').parent();
 		for (sel in obj) {
 			val = obj[sel];
 			if (!val) {console.log(sel);}
@@ -49,7 +49,7 @@ var svgEditor = (function($, editor) {'use strict';
 				
 				
 			} else {
-				console.log('Missing Element: ' + sel);
+				missingElements.push(sel);
 			}
 		}
 	}
@@ -272,6 +272,10 @@ var svgEditor = (function($, editor) {'use strict';
 
 		}, true);
 		
+		if (missingElements.length) {
+			console.log('SVGEditor Locale Missing Elements', missingElements);
+		}
+
 		editor.setLang(lang_param, langData);
 	};
 
@@ -293,8 +297,6 @@ var svgEditor = (function($, editor) {'use strict';
 					return;
 				}
 			}
-			
-			console.log('Lang: ' + lang_param);
 			
 			// Set to English if language is not in list of good langs
 			if ($.inArray(lang_param, good_langs) === -1 && lang_param !== 'test') {
@@ -321,8 +323,8 @@ var svgEditor = (function($, editor) {'use strict';
 				document.querySelector('head').appendChild(s);
 			}
 		});
-		
+
 	};
-	
+
 	return editor;
 }(jQuery, svgEditor));

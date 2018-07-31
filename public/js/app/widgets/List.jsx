@@ -18,9 +18,10 @@ define(['react'], function(React){
         render: function() {
 
             var list_items = this.props.items.map(function(opt, i){
-                var metadata = JSON.stringify(opt.data);
-
-                return <li data-meta={metadata} data-value={opt.value}>{opt.label}</li>;
+                var metadata = JSON.stringify(opt.data),
+                    labelItem = opt.label;
+                if (labelItem.item) labelItem = labelItem.item;
+                return <li data-meta={metadata} data-value={opt.value} key={i}>{labelItem}</li>;
             }, this);
 
             return  (

@@ -15,6 +15,7 @@ define([
     'helpers/output-error',
     'plugins/classnames/index',
     'app/constants/device-constants',
+    'jsx!views/toolbox/Toolbox',
     'jsx!views/print/Monitor',
     'jsx!widgets/Modal',
     'app/actions/alert-actions',
@@ -46,6 +47,7 @@ define([
     OutputError,
     ClassNames,
     DeviceConstants,
+    Toolbox,
     Monitor,
     Modal,
     AlertActions,
@@ -957,6 +959,23 @@ define([
                                 </ul>
                             </div>
                         </div>
+<<<<<<< HEAD
+=======
+
+                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
+                            <p className="device-icon">
+                                <img src="img/btn-device.svg" draggable="false"/>
+                                <span>{lang.menu.device}</span>
+                            </p>
+                            <div className={menuClass}>
+                                <div className="arrow arrow-right"/>
+                                <div className="device-list">
+                                    {deviceList}
+                                </div>
+                            </div>
+                        </div>
+                        <Toolbox />
+>>>>>>> 525274646bfc76420da267ba663a80be08023f6c
                     </div>
                 );
             }

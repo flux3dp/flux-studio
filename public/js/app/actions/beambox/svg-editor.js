@@ -30,6 +30,7 @@ define([
     'jsx!app/actions/announcement',
     'jsx!app/views/beambox/DxfDpiSelector',
     'app/actions/alert-actions',
+    'app/actions/topbar',
     'helpers/image-data',
     'helpers/shortcuts',
     'helpers/i18n',
@@ -45,6 +46,7 @@ define([
     Announcement,
     DxfDpiSelector,
     AlertActions,
+    TopbarActions,
     ImageData,
     Shortcuts,
     i18n,
@@ -1964,6 +1966,8 @@ define([
                 // if elems[1] is present, then we have more than one element
                 selectedElement = (elems.length === 1 || elems[1] == null ? elems[0] : null);
                 multiselected = (elems.length >= 2 && elems[1] != null);
+                const isAlignToolboxShowed = (elems.length >= 1) && (elems[0] !== null );
+                const isDistributeToolboxShowed = multiselected && elems.length >=3 ;
                 if (selectedElement != null) {
                     // unless we're already in always set the mode of the editor to select because
                     // upon creation of a text element the editor is switched into
@@ -1972,8 +1976,17 @@ define([
                     if (!is_node) {
                         updateToolbar();
                     }
-                } // if (elem != null)
-
+                }
+                if (isAlignToolboxShowed) {
+                    TopbarActions.showAlignToolbox();
+                } else {
+                    TopbarActions.closeAlignToolbox();
+                }
+                if (isDistributeToolboxShowed) {
+                    TopbarActions.showDistributeToolbox();
+                } else {
+                    TopbarActions.closeDistributeToolbox();
+                }
                 // Deal with pathedit mode
                 togglePathEditMode(is_node, elems);
                 updateContextPanel();
@@ -5303,8 +5316,13 @@ define([
             // and provide a file input to click. When that change event fires, it will
             // get the text contents of the file and send it to the canvas
             if (window.FileReader) {
-                function readImage(file, scale = 1) {
+                function readImage(file, scale = 1, offset = null) {
                     return new Promise((resolve, reject) => {
+                        var defaultX = 0, defaultY = 0;
+                        if (offset) {
+                            defaultX = offset[0];
+                            defaultY = offset[1];
+                        }
                         reader = new FileReader();
                         reader.onloadend = function (e) {
                             // let's insert the new image until we know its dimensions
@@ -5312,8 +5330,8 @@ define([
                                 var newImage = svgCanvas.addSvgElementFromJson({
                                     element: 'image',
                                     attr: {
-                                        x: 0,
-                                        y: 0,
+                                        x: defaultX * scale,
+                                        y: defaultY * scale,
                                         width: width * scale,
                                         height: height * scale,
                                         id: svgCanvas.getNextId(),
@@ -5342,8 +5360,10 @@ define([
                                 );
 
                                 svgCanvas.selectOnly([newImage]);
-                                svgCanvas.alignSelectedElements('l', 'page');
-                                svgCanvas.alignSelectedElements('t', 'page');
+                                if (!offset) {
+                                    svgCanvas.alignSelectedElements('l', 'page');
+                                    svgCanvas.alignSelectedElements('t', 'page');
+                                }
                                 resolve();
                                 updateContextPanel();
                                 $('#dialog_box').hide();
@@ -5364,12 +5384,21 @@ define([
                         reader.readAsArrayBuffer(file);
                     });
                 }
+                function getBasename(path) {
+                    const pathMatch = path.match(/(.+)[\/\\].+/);
+                    if (pathMatch[1]) return pathMatch[1];
+                    return "";
+                }
                 function readSVG(blob, type) {
                     return new Promise((resolve, reject) => {
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
-                            console.log('Reading SVG');
-                            var newElement = svgCanvas.importSvgString(e.target.result, type);
+                            let svgString = e.target.result;
+                            if (blob.path) {
+                                svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(blob.path) + '/../');
+                                svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
+                            }
+                            var newElement = svgCanvas.importSvgString(svgString, type);
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
@@ -5403,7 +5432,7 @@ define([
 
                             if (outputs['bitmap'].size > 0) {
                                 svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                await readImage(outputs['bitmap'], 3.5277777); // Magic number 72dpi / 25.4 inch per mm
+                                await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
                             }
                             console.log('Load complete');
                         } else {
@@ -5441,13 +5470,15 @@ define([
                     readImage(file);
                 };
                 const importDxf = async file => {
+                    let defaultDpiValue = 25.4;
                     const parsedSvg = await new Promise(resolve => {
                         const reader = new FileReader();
                         reader.onloadend = evt => {
                             const parsed = Dxf2Svg.parseString(evt.target.result);
-                            console.log('Parsed DXF', parsed);
+                            if (parsed.header.insunits == '1') {
+                                defaultDpiValue = 72;
+                            }
                             const svg = Dxf2Svg.toSVG(parsed);
-                            console.log('svg: ', svg);
                             resolve(svg);
                         };
                         reader.readAsText(file);
@@ -5458,6 +5489,7 @@ define([
                             React.createElement(
                                 DxfDpiSelector,
                                 {
+                                    defaultDpiValue: defaultDpiValue,
                                     onSubmit: val => {
                                         Announcement.unpost('DXF_DPI_SELECTOR');
                                         resolve(val);
@@ -5499,6 +5531,9 @@ define([
                     } catch (e) {
                         console.log(e);
                     }
+
+                    svgCanvas.setSvgElemPosition('x', 0);
+                    svgCanvas.setSvgElemPosition('y', 0);
                     // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
                     $('#dialog_box').hide();
                 };

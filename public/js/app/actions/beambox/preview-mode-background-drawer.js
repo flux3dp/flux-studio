@@ -94,16 +94,17 @@ define([
         }
 
         _cropAndRotateImg(imageObj) {
-            const {angle, scaleRatio} = this.cameraOffset;
+            const {angle, scaleRatio, flip} = this.cameraOffset;
 
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');
-
-            const a = angle;
+            
+            const a = angle + (flip ? Math.PI : 0);
             const s = scaleRatio;
             const w = imageObj.width;
             const h = imageObj.height;
 
+            /* Old Formula
             const c = h / (Math.cos(a) + Math.sin(a));
             const dstx = (h - w) / 2 * s;
             const dsty = - h * Math.sin(a) / (Math.cos(a) + Math.sin(a)) * s;
@@ -112,6 +113,14 @@ define([
 
             ctx.rotate(a);
             ctx.drawImage(imageObj, 0, 0, w, h, dstx, dsty, w * s, h * s);
+            */
+            // New Formula ( Support rotation for over 180 )
+            cvs.width = cvs.height = h * s;
+            ctx.save();
+            ctx.translate(h * s / 2, h * s / 2);
+            ctx.rotate(a);
+            ctx.drawImage(imageObj, - w * s / 2, - h * s / 2, w * s, h * s);
+            ctx.restore();
 
             return cvs;
         }

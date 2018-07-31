@@ -293,11 +293,12 @@ define([
                             <div className='selLayerBlock'>
                                 <span id="selLayerLabel">Move elements to:</span>
                                 <select
+                                    value={LANG.right_panel.layer_panel.layer1}
                                     id="selLayerNames"
                                     title="Move selected elements to a different layer"
                                     disabled="disabled"
                                 >
-                                    <option selected="selected" value={LANG.right_panel.layer_panel.layer1}>
+                                    <option value={LANG.right_panel.layer_panel.layer1}>
                                         {LANG.right_panel.layer_panel.layer1}
                                     </option>
                                 </select>
@@ -935,8 +936,8 @@ define([
                                         data-attr="y"
                                     />
                                 </label>
-                                <select id="seg_type" title="Change Segment type">
-                                    <option id="straight_segments" selected="selected" value={4}>
+                                <select id="seg_type" title="Change Segment type" defaultValue={4}>
+                                    <option id="straight_segments" value={4}>
                                         Straight
                                     </option>
                                     <option id="curve_segments" value={6}>
@@ -1078,10 +1079,8 @@ define([
                                             title="Show/hide more stroke tools"
                                         />
                                         <label className="stroke_tool">
-                                            <select id="stroke_style" title="Change stroke dash style">
-                                                <option selected="selected" value="none">
-                                                    —
-                                                </option>
+                                            <select id="stroke_style" defaultValue="none" title="Change stroke dash style">
+                                                <option value="none">—</option>
                                                 <option value="2,2">...</option>
                                                 <option value="5,5">- -</option>
                                                 <option value="5,2,2,2">- .</option>
@@ -1252,8 +1251,8 @@ define([
                                         <input type="text" id="canvas_height" size={6} />
                                     </label>
                                     <label>
-                                        <select id="resolution">
-                                            <option id="selectedPredefined" selected="selected">
+                                        <select id="resolution" defaultValue="predefined">
+                                            <option id="selectedPredefined" value="predefined">
                                                 Select predefined:
                                             </option>
                                             <option>640x480</option>
@@ -1304,8 +1303,8 @@ define([
                                 <label>
                                     <span id="svginfo_lang">Language:</span>
                                     {}
-                                    <select id="lang_select">
-                                        <option id="lang_en" value="en" selected="selected">
+                                    <select id="lang_select" defaultValue="en">
+                                        <option id="lang_en" value="en">
                                             English
                                         </option>
                                         <option id="lang_zh-TW" value="zh-TW">
@@ -1315,11 +1314,11 @@ define([
                                 </label>
                                 <label>
                                     <span id="svginfo_icons">Icon size:</span>
-                                    <select id="iconsize">
+                                    <select id="iconsize" defaultValue="m">
                                         <option id="icon_small" value="s">
                                             Small
                                         </option>
-                                        <option id="icon_medium" value="m" selected="selected">
+                                        <option id="icon_medium" value="m">
                                             Medium
                                         </option>
                                         <option id="icon_large" value="l">

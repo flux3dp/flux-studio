@@ -29,8 +29,8 @@ define([
 
     return function(args) {
         var upnpMethods,
-
-        args = args || {};
+            usbConnectionTestingTimer,
+            args = args || {};
 
         return React.createClass({
             // Lifecycle
@@ -40,7 +40,7 @@ define([
 
             getInitialState: function() {
                 var self = this;
-                setInterval(function() {
+                usbConnectionTestingTimer = setInterval(function() {
                     self.setState({usbConnected: (DeviceMaster.getAvailableUsbChannel() >= 0)});
                 }, 1000);
                 return {
@@ -54,6 +54,7 @@ define([
                 if ('undefined' !== typeof upnpMethods) {
                     upnpMethods.connection.close();
                 }
+                clearInterval(usbConnectionTestingTimer);
             },
 
             // UI events
