@@ -87,8 +87,8 @@ define([
         render() {
             return (
                 <div className="left-panel">
-                    {this._renderInsertObject()}
                     {this._renderDownloadFilms()}
+                    {this._renderInsertObject()}
                     {this._renderAdvanced()}
                 </div>
             );

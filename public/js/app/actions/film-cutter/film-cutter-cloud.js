@@ -55,7 +55,7 @@ define([
         if (!res.ok) {
             const err = await res.json();
             console.error(err);
-            throw new Error(err.message.toString() || JSON.stringify(err));
+            throw new Error((err.message && err.message.toString()) || JSON.stringify(err));
         }
         return res;
     };

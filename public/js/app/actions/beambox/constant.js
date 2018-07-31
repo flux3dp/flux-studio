@@ -6,6 +6,8 @@ define([
     BeamboxPreference
 ){
     const workareaMap = new Map();
+
+    workareaMap.set('mozu1', [2650, 1800]);
     workareaMap.set('fbb1b', [4000, 3750]);
     workareaMap.set('fbb1p', [6000, 3750]);
 

@@ -46,6 +46,12 @@ define([
             BottomRightFuncs.exportFcode();
         }
         async _handleStartClick() {
+            // validate user has login before
+            if (RecordManager.read('last_connect_to_cloud') === 0) {
+                AlertActions.showPopupInfo('start', '請先連網並登入，卻認綁定機器後，方可使用。');
+                return;
+            }
+
             // validate last connect to cloud
             const maxOfflineDays = 3;
             if (Date.now() - RecordManager.read('last_connect_to_cloud') > maxOfflineDays * 24 * 60 * 60) {
@@ -136,7 +142,7 @@ define([
                     className: ReactCx.cx({
                         'btn-disabled': false,
                         'btn-default': true,
-                        'btn-hexagon': true,
+                        'btn-start': true,
                         'btn-go': true
                     }),
                     dataAttrs: {
@@ -147,7 +153,7 @@ define([
             ];
 
             return (
-                <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons" />
+                <ButtonGroup buttons={buttons} className="action-buttons" />
             );
         }
         render() {
@@ -155,7 +161,7 @@ define([
             const printerSelector = this._renderPrinterSelectorWindow();
 
             return (
-                <div>
+                <div className='bottom-right-panel'>
                     {actionButtons}
                     {this.state.isPrinterSelectorOpen?printerSelector:''}
                 </div>

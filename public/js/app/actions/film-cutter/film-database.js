@@ -131,7 +131,7 @@ define([
 
         validateUsageDownload() {
             const expiry_time = RecordManager.read('usage_download');
-            return (Date.now() > expiry_time );
+            return (expiry_time > Date.now());
         }
     };
     if (!window.electron) {
