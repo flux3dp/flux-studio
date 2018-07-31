@@ -1012,6 +1012,7 @@ define(function() {
             left_panel: {
                 insert_object: '插入物件',
                 preview: '相機預覽',
+                image_trace:'影像描圖' ,
                 advanced: '進階選項',
                 suggest_calibrate_camera_first: '提醒您：\n第一次使用相機，請先進行相機校正。並在每次使用時將平台對焦，以取得最好的效果。',
                 end_preview: '結束預覽模式',

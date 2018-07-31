@@ -1,6 +1,6 @@
 /**
- * API camera calibration
- * Ref: none
+ * API fcode reader
+ * Ref: https://github.com/flux3dp/fluxghost/wiki/fcode-reader
  */
 define([
     'helpers/websocket',
@@ -9,7 +9,7 @@ define([
 
     return function() {
         var ws = new Websocket({
-                method: 'camera-calibration',
+                method: 'image-tracer',
                 onMessage: (data) => {
                     events.onMessage(data);
                 },
@@ -52,7 +52,7 @@ define([
                 events.onError = (response) => { d.reject(response); console.log('on error', response); };
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
-                ws.send(`upload ${data.size || data.byteLength}${opts.flip ? ' flip' : ''}`);
+                ws.send(`image_trace ${data.size || data.byteLength}`);
                 return d.promise();
             },
         };

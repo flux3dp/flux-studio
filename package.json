@@ -11,6 +11,7 @@
   "main": "electron-main.js",
   "dependencies": {
     "bufferpack": "^0.0.6",
+    "cropperjs": "^1.4.1",
     "font-manager": "^0.2.2",
     "fontkit": "^1.7.7",
     "jquery": "^1.11.0",

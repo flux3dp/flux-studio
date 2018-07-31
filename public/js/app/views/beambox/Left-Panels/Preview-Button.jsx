@@ -2,6 +2,7 @@ define([
     'react',
     'reactDOM',
     'jsx!widgets/Modal',
+    'jsx!views/beambox/Left-Panels/Image-Tracer',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
     'app/actions/beambox/svgeditor-function-wrapper',
@@ -15,6 +16,7 @@ define([
     React,
     ReactDOM,
     Modal,
+    ImageTracer,
     PrinterSelector,
     AlertActions,
     FnWrapper,
@@ -32,8 +34,31 @@ define([
         constructor() {
             super();
             this.state = {
-                isPreviewMode: false
+                isPreviewMode: false,
+                isImageTraceMode: false
             };
+        }
+
+        handleImageTraceClick() {
+            try {
+                PreviewModeController.end();
+            } catch (error) {
+                console.log(error);
+            } finally {
+                FnWrapper.useSelectTool();
+                this.setState({
+                    isPreviewMode: false,
+                    isImageTraceMode: true
+                });
+            }
+            console.log('handle!!!! ImageTraceClick');
+        }
+
+        backToPreviewMode() {
+            this.setState({
+                isPreviewMode: true,
+                isImageTraceMode: false
+            });
         }
 
         _handlePreviewClick() {
@@ -141,6 +166,7 @@ define([
                 }
             };
 
+
             if(!this.state.isPreviewMode) {
                 tryToStartPreviewMode();
             } else {
@@ -148,17 +174,33 @@ define([
             }
         }
 
+        _renderImageTraceButton() {
+            if(this.state.isImageTraceMode) {
+                return ;
+            } else {
+                return null;
+            }
+        }
+
         render() {
+            const ImageTrace = (
+                this.state.isPreviewMode || this.state.isImageTraceMode ?
+                <ImageTracer
+                    onClick={() => this.handleImageTraceClick()}
+                /> :
+                null
+            );
             return (
                 <div>
                     <div
                         className={classNames('option', 'preview-btn', {'preview-mode-on': this.state.isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        {this.state.isPreviewMode ? LANG.end_preview : LANG.preview}
+                        {this.state.isPreviewMode || this.state.isImageTraceMode ? LANG.end_preview : LANG.preview}
                     </div>
                     <span id='clear-preview-graffiti-button-placeholder' />
                     <span id='printer-selector-placeholder' />
+                    {ImageTrace}
                 </div>
             );
         }

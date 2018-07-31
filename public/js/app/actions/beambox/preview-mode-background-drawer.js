@@ -1,11 +1,13 @@
 define([
     'Rx',
     'helpers/i18n',
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
+    'app/actions/beambox'
 ], function (
     Rx,
     i18n,
-    Constant
+    Constant,
+    BeamboxActions
 ) {
     const LANG = i18n.lang.beambox.left_panel;
 
@@ -72,6 +74,8 @@ define([
             }
             this.cameraCanvasUrl = URL.createObjectURL(blob);
             window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
+            BeamboxActions.drawPreviewBlob(this.cameraCanvasUrl);
+            console.log('cameraC', this.cameraCanvasUrl)
         }
 
         _prepareCroppedAndRotatedImgBlob(imgUrl, x, y) {
@@ -98,7 +102,7 @@ define([
 
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');
-            
+
             const a = angle + (flip ? Math.PI : 0);
             const s = scaleRatio;
             const w = imageObj.width;

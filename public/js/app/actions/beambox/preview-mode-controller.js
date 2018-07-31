@@ -70,6 +70,7 @@ define([
         }
 
         async end() {
+            console.log('end of pmc');
             PreviewModeBackgroundDrawer.clearBoundary();
             PreviewModeBackgroundDrawer.end();
             const storedPrinter = this.storedPrinter;

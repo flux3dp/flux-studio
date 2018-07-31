@@ -7,6 +7,7 @@ define([
     'app/actions/beambox/font-funcs',
     'helpers/api/svg-laser-parser',
     'app/actions/alert-actions',
+    'app/actions/beambox',
     'app/actions/global-actions',
 ], function (
     DeviceMaster,
@@ -17,11 +18,13 @@ define([
     FontFuncs,
     svgLaserParser,
     AlertActions,
+    BeamboxActions,
     GlobalActions
 ) {
     const lang = i18n.lang;
     const svgeditorParser = svgLaserParser({ type: 'svgeditor' });
 
+    // capture the scene of the svgCanvas to bitmap
     const fetchThumbnail = async () => {
         function cloneAndModifySvg($svg) {
             const $clonedSvg = $svg.clone(false);
@@ -36,12 +39,13 @@ define([
         }
 
         async function DOM2Image($svg){
+            const $modifiedSvg = cloneAndModifySvg($svg);
+            const svgString = new XMLSerializer().serializeToString($modifiedSvg.get(0));
+
             return await new Promise((resolve)=>{
                 const img  = new Image();
                 img.onload = () => resolve(img);
 
-                const $modifiedSvg = cloneAndModifySvg($svg);
-                const svgString = new XMLSerializer().serializeToString($modifiedSvg.get(0));
                 img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(svgString);
             });
         }
@@ -81,7 +85,6 @@ define([
     const prepareFileWrappedFromSvgStringAndThumbnail = async () => {
         const [thumbnail, thumbnailBlobURL] = await fetchThumbnail();
         const svgString = svgCanvas.getSvgString();
-
         const blob = new Blob([thumbnail, svgString], { type: 'application/octet-stream' });
         const reader = new FileReader();
         const uploadFile = await new Promise((resolve) => {
@@ -145,6 +148,12 @@ define([
 
 
     return {
+        uploadForTrace: async function () {
+            const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
+
+            BeamboxActions.showCropper(fcodeBlob, thumbnailBlobURL);
+            ProgressActions.close();
+        },
         uploadFcode: async function (device) {
             const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
             await DeviceMaster.select(device)
