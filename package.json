@@ -36,11 +36,7 @@
     "electron": "^1.6.17",
     "electron-builder": "19.52.1",
     "electron-publisher-s3": "19.53.1",
-<<<<<<< HEAD
-    "electron-rebuild": "^1.7.3",
-=======
     "electron-rebuild": "^1.8.1",
->>>>>>> 525274646bfc76420da267ba663a80be08023f6c
     "electron-reload": "~1.1.0",
     "eslint": "^4.9.0",
     "eslint-plugin-react": "^7.4.0",
