@@ -393,7 +393,7 @@ define([
                     alert(data);
                 };
                 function getBasename(path) {
-                    const pathMatch = path.match(/(.+)\/.+/);
+                    const pathMatch = path.match(/(.+)[\/\\].+/);
                     if (pathMatch[1]) return pathMatch[1];
                     return "";
                 }
