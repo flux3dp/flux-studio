@@ -185,13 +185,13 @@ define([
                                     placeholder={LANG.password}
                                 />
                             </Control>
-                            <Control label={LANG.rePassword} errorMessage={this.state.showRePasswordUnmatchError ? '密碼不符合' : ' '}>
+                            <Control label={'密碼確認'} errorMessage={this.state.showRePasswordUnmatchError ? '密碼不符合' : ' '}>
                                 <input
                                     type='password'
                                     value={this.state.rePassword}
                                     onChange={e => this.handleInputChange('rePassword', e.target.value)}
                                     onBlur={e => this.handleInputChange('rePassword', e.target.value)}
-                                    placeholder={LANG.rePassword}
+                                    placeholder={'密碼確認'}
                                 />
                             </Control>
                         </div>

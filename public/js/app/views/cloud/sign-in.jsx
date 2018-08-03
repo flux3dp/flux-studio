@@ -72,7 +72,7 @@ define([
                 RecordManager.write('password', password);
 
                 await FilmCutterCloud.sync()
-                    .catch(error => {throw new Error(error.message || '同步資料失敗');});
+                    .catch(error => {throw new Error('同步資料失敗 ' + (error.message || ''));});
 
                 location.hash = '#/studio/cloud/my-account';
             } catch (error) {
