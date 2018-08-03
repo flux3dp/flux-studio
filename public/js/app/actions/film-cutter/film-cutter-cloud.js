@@ -85,7 +85,7 @@ define([
         return await errorHandlerWrapper(fetch(
             `${ip}/${apiUrl}`,
             {
-                method: 'patch',
+                method: 'PATCH',
                 headers: auth ? getAuthHeaders() : getBaseHeaders(),
                 body: JSON.stringify(json)
             }

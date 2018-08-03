@@ -22,7 +22,16 @@ define([
             if (!this.READ_WRTIE_KEYS.concat(this.READ_ONLY_KEYS).includes(key)) {
                 throw new Error('invalid key to get');
             }
-            return (await DeviceMaster.pipeTask(`get ${key}`)).value;
+            const res = (await DeviceMaster.pipeTask(`get ${key}`)).value;
+            switch(key) {
+                case 'usage_cut_recorded':
+                case 'usage_cut_unrecorded':
+                case 'usage_cut_max_on_machine':
+                case 'last_sync_film_fcodes':
+                    return Number(res);
+                default:
+                    return res;
+            }
         },
         async set(key, val) {
             if (!this.READ_WRTIE_KEYS.concat(this.WRITE_ONLY_KEYS).includes(key)) {

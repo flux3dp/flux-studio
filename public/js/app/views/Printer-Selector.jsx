@@ -73,7 +73,7 @@ define([
 
 
             const defaultPrinter = InitializeMachine.defaultPrinter.get();
-            
+
             if (modelFilter.length > 0 && defaultPrinter.model) {
                 // If the model of defaultPrinter is not in the whitelist
                 if (modelFilter.indexOf(defaultPrinter.model) <= 0) {
@@ -207,8 +207,8 @@ define([
                 }, next);
             };
 
-            if (defaultDeviceExists && 
-                (this.state.modelFilter.length === 0 || 
+            if (defaultDeviceExists &&
+                (this.state.modelFilter.length === 0 ||
                  this.state.modelFilter.indexOf(selectedPrinter.model) >= 0)) {
                 let existBothConnection = existWifiAndUsbConnection(selectedPrinter.serial);
                 if (existBothConnection) {
@@ -485,6 +485,7 @@ define([
     });
 
     View.BEAMBOX_FILTER = "laser-b1,laser-b2,fbb1b,fbb1p";
+    View.MOZU_FILTER = "mozu1";
     View.DELTA_FILTER = "delta-1,delta-1p";
     return View;
 });

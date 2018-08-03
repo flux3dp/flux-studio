@@ -127,6 +127,7 @@ define([
             ProgressActions.updating('寫入機器資訊', 100);
             await FilmCutterManager.setLastSyncFilmFcodes(Date.now());
             ProgressActions.close();
+            AlertActions.showPopupError('menu', '已更新機器上的手機膜檔案');
         }
 
         validateUsageDownload() {

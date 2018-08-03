@@ -431,6 +431,8 @@ define([
                     } catch (error) {
                         console.log(error);
                         AlertActions.showPopupError('menu', '與機器同步手機膜檔案失敗');
+                    } finally {
+                        ProgressActions.close();
                     }
                 };
 

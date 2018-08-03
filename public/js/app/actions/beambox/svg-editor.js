@@ -5720,7 +5720,7 @@ define([
             // zoomImage(0.2);
             //$('#fit_to_canvas').mouseup();
             zoomChanged(window, {
-                zoomLevel: 0.16
+                zoomLevel: 0.25
             });
             svgCanvas.defaultScroll = {
                 x: workarea[0].scrollLeft,

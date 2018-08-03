@@ -54,8 +54,8 @@ define([
 
             // validate last connect to cloud
             const maxOfflineDays = 3;
-            if (Date.now() - RecordManager.read('last_connect_to_cloud') > maxOfflineDays * 24 * 60 * 60) {
-                AlertActions.showPopupInfo('start', `您已 ${maxOfflineDays} 天未連網登入，請連網並登入帳號後，方可使用。`);
+            if (Date.now() - RecordManager.read('last_connect_to_cloud') > maxOfflineDays * 24 * 60 * 60 * 1000) {
+                AlertActions.showPopupInfo('start', `您已超過 ${maxOfflineDays} 天未連網登入，請連網並登入帳號後，方可使用。`);
                 return;
             }
 
@@ -125,7 +125,7 @@ define([
                 <PrinterSelector
                     uniqleId="laser"
                     className="laser-device-selection-popup"
-                    modelFilter={PrinterSelector.BEAMBOX_FILTER}
+                    modelFilter={PrinterSelector.MOZU_FILTER}
                     showExport={true}
                     onClose={onClose}
                     onGettingPrinter={onGettingPrinter}
