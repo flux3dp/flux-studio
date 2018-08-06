@@ -5329,6 +5329,9 @@ define([
                 if(type !== 'color') {
                     use_el.setAttribute('data-wireframe', true);
                 }
+                if(_type === 'film') {
+                    use_el.setAttribute('data-phone-film', true);
+                }
 
                 $(use_el).data('symbol', symbol).data('ref', symbol);
 

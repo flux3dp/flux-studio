@@ -27,12 +27,12 @@ define([
             },
             _renderSelectMachineStep: function () {
                 var buttons = [
-                    {
-                        label: LANG.please_see_tutorial_video,
-                        className: 'btn btn-link btn-large',
-                        type: 'link',
-                        onClick: this.onOpenTutorialLink
-                    },
+                    // {
+                    //     label: LANG.please_see_tutorial_video,
+                    //     className: 'btn btn-link btn-large',
+                    //     type: 'link',
+                    //     onClick: this.onOpenTutorialLink
+                    // },
                     {
                         label: i18n.lang.initialize.setting_completed.start,
                         className: 'btn btn-action btn-large start',

@@ -106,9 +106,9 @@ define([
                                     onChange={this._handlePhonePrefixChange}
                                 >
                                     <option value='+86'>+86 中國</option>
-                                    <option value='+852'>+852 香港</option>
+                                    {/* <option value='+852'>+852 香港</option>
                                     <option value='+853'>+853 澳門</option>
-                                    <option value='+886'>+886 台灣</option>
+                                    <option value='+886'>+886 台灣</option> */}
                                 </select>
                                 <input
                                     value={this.state.phoneNumber}

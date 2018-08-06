@@ -187,9 +187,9 @@ define(function() {
 
             // page specific
             connect_beambox: {
-                set_beambox_connection: '设定 Beambox 连线',
-                please_goto_touchpad: '请使用 Beambox 触控面板进行 WiFi 连线绑定',
-                tutorial: '1. 点选触控面板 "设定" > "网际网路" > "设定"\n2. 选取欲绑定的 WiFi 名称并输入密码\n3. 稍待10秒，若于 "设定" > "网际网路" 成功显示无线网路 IP，即代表绑定成功',
+                set_beambox_connection: '设定手机切膜机连线',
+                please_goto_touchpad: '请使用手机切膜机触控面板进行 WiFi 连线绑定',
+                tutorial: '1. 点选触控面板 "设定" > "网际网路" > "设定"\n2. 选取欲绑定的 WiFi 名称并输入密码\n3. 稍待10秒，若于 "设定" > "网际网路" 成功显示无线网路 IP，即代表绑定成功\n4. 请将此无线网路 IP 输入至 "主选单" > "偏好设定" > "机器 IP 位址"，以确保不论您使用哪一种路由器，都能顺利连线',
                 please_see_tutorial_video: '观看教学影片',
                 tutorial_url: 'https://tw.flux3dp.com/beambox-tutorial/'
             },
@@ -997,7 +997,7 @@ define(function() {
                 nolayer: '不分层',
                 no_support_text: 'FLUX Studio 目前不支援由外部汇入文字标签，请由向量绘图软体将文字转成路径后再汇入。',
                 power_too_high_damage_laser_tube: '雷射管在高功率下耗损较快，使用低功率可以延长雷试管使用寿命',
-                should_update_firmware_to_continue: '您的韧体版本不支援最新的软体改善。为了更良好的使用经验与雕刻品质，请先更新 Beambox 的韧体以继续。 (主选单 > 机器 > [ Your Beambox ] > 韧体更新)'
+                should_update_firmware_to_continue: '您的韧体版本不支援最新的软体改善。为了更良好的使用经验与雕刻品质，请先更新手机切膜机的韧体以继续。 (主选单 > 机器 > [ Your手机切膜机] > 韧体更新)'
             },
             left_panel: {
                 insert_object: '插入物件',
@@ -1178,7 +1178,7 @@ define(function() {
             postback_url: '状态回传URL',
             disable: '关闭',
             enable: '开启',
-            beambox_should_use_touch_panel_to_adjust: '请至 Beambox 触控面板调整设定。'
+            beambox_should_use_touch_panel_to_adjust: '请至手机切膜机触控面板调整设定。'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',

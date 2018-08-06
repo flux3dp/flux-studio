@@ -8,8 +8,8 @@ define([
     AlertActions
 ) {
     const _ip = {
-        dev: 'http://0.0.0.0:3000',
-        prod: 'http://0.0.0.0:3000'
+        dev: 'http://0.0.0.0:8080',
+        prod: 'http://back.52mozu.com'
     };
     const ip = window.FLUX.dev ? _ip.dev : _ip.prod;
 
@@ -50,7 +50,7 @@ define([
     const errorHandlerWrapper = async (fetchPromise) => {
         const res = await fetchPromise.catch(error => {
             console.log(error);
-            throw new Error('伺服器錯誤，請聯絡客服人員');
+            throw new Error('伺服器错误，请联络客服人员');
         });
         if (!res.ok) {
             const err = await res.json();
@@ -214,7 +214,7 @@ define([
             const keyOnCloud = await this.filmSecretKey();
             const keyAtLocal = RecordManager.read('film_secret_key');
             if (keyAtLocal !== '' && keyAtLocal !== keyOnCloud) {
-                AlertActions.showPopupError('sync', '您已切換不同的帳號，所有已下載的手機膜數據將無法使用新的密鑰解密。請清除數據後重新下載');
+                AlertActions.showPopupError('sync', '您已切换不同的帐号，所有已下载的手机膜数据将无法使用新的密钥解密。请清除数据后重新下载');
             }
             RecordManager.write('film_secret_key', keyOnCloud);
 
@@ -238,7 +238,7 @@ define([
             RecordManager.write('last_connect_to_cloud', 0);
             RecordManager.write('last_sync_film_data', 0);
             HelperFunctions.toggleLoginMenu({myAccount: false, signIn: true, signOut: false});
-            AlertActions.showPopupError('sync', '您已登出，請重新登入原帳號來使用已下載的手機膜數據');
+            AlertActions.showPopupError('sync', '您已登出，请重新登入原帐号来使用已下载的手机膜数据');
         }
     };
 });

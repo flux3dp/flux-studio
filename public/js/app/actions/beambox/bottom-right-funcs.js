@@ -116,7 +116,8 @@ define([
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
         await svgeditorParser.uploadToSvgeditorAPI([uploadFile], {
             model: BeamboxPreference.read('model'),
-            engraveDpi: BeamboxPreference.read('engrave_dpi')
+            engraveDpi: BeamboxPreference.read('engrave_dpi'),
+            containPhoneFilm: document.querySelector('[data-phone-film=true]') ? true : false
         });
         const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for

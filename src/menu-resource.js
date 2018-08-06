@@ -146,8 +146,8 @@ module.exports = {
     },
     'zh-cn': {
         preferences: '偏好设定',
-        about: '关于 FLUX Studio',
-        hide: '隐藏 FLUX Studio',
+        about: '关于',
+        hide: '隐藏',
         hideothers: '隐藏其他',
         service: '服务',
         reload_app: '重新整理',
@@ -175,7 +175,7 @@ module.exports = {
         tutorial: 'Delta Family 列印教学',
         forum: '社群论坛',
         software_update: '软体更新',
-        bug_report: '错误回报',
+        bug_report: '下载错误报告',
         dashboard: '仪表版',
         machine_info: '机器资讯',
         toolhead_info: '工具头资讯',
@@ -213,7 +213,7 @@ module.exports = {
             help_center: 'https://helpcenter.flux3dp.com/',
             contact_us: 'https://flux3dp.zendesk.com/hc/zh-tw/requests/new',
             forum: 'https://forum.flux3dp.com/',
-            downloads: 'https://tw.flux3dp.com/downloads/'
+            downloads: 'http://52mozu.com'
         }
     },
 };

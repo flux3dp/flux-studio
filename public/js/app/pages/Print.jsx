@@ -189,6 +189,7 @@ define([
                 },
 
                 componentDidMount: function() {
+                    location.hash = '#studio/beambox';
                     director.init(this);
 
                     // prevent user to operate before settings are set

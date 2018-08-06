@@ -70,9 +70,9 @@ define([
                                         style={{display: 'inline-block', width: '100px', height: '41px', marginLeft: '10px', backgroundPosition: 'calc(100% - 6px) center'}}
                                     >
                                         <option value='+86'>+86 中國</option>
-                                        <option value='+852'>+852 香港</option>
+                                        {/* <option value='+852'>+852 香港</option>
                                         <option value='+853'>+853 澳門</option>
-                                        <option value='+886'>+886 台灣</option>
+                                        <option value='+886'>+886 台灣</option> */}
                                     </select>
                                     <input
                                         type='text'

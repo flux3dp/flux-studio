@@ -55,19 +55,19 @@ define([
 
         async handleDownloadClick() {
             if(!FilmDatabase.validateUsageDownload()) {
-                AlertActions.showPopupError('film-cutter', '已超過數據下載期限');
+                AlertActions.showPopupError('film-cutter', '已超过数据下载期限');
                 return;
             }
             if(!navigator.onLine) {
-                AlertActions.showPopupError('film-cutter', '請先連上網路');
+                AlertActions.showPopupError('film-cutter', '请先连上网路');
                 return;
             }
 
             try {
-                ProgressActions.open(ProgressConstants.WAITING, '下載數據中...');
+                ProgressActions.open(ProgressConstants.WAITING, '下载数据中...');
                 await FilmDatabase.syncWithCloud();
                 ProgressActions.close();
-                AlertActions.showPopupInfo('film-cutter', '已成功更新數據');
+                AlertActions.showPopupInfo('film-cutter', '已成功更新数据');
                 this.forceUpdate();
             } catch (error) {
                 AlertActions.showPopupError('film-cutter', error.toString());
@@ -77,7 +77,7 @@ define([
         }
 
         handlResetClick() {
-            AlertActions.showPopupYesNo('film-cutter', '您確定要重設手機膜嗎？這將清空所有已下載的手機模數據。', '重設手機膜', null, {
+            AlertActions.showPopupYesNo('film-cutter', '您确定要重设手机膜吗？这将清空所有已下载的手机模数据。', '重设手机膜', null, {
                 yes: () => {
                     FilmDatabase.reset();
                     this.forceUpdate();
@@ -96,13 +96,13 @@ define([
                 }
             } catch (error) {
                 console.log('error: ', error);
-                AlertActions.showPopupError('film-cutter', '檔案解密失敗');
+                AlertActions.showPopupError('film-cutter', '档案解密失败');
             }
             try {
                 window.importFilmSvg(content, `${brand}-${model}-${category}`);
             } catch (error) {
                 console.log('error: ', error);
-                AlertActions.showPopupError('film-cutter', 'SVG 插入發生異常');
+                AlertActions.showPopupError('film-cutter', 'SVG 汇入发生异常');
             }
             this.props.onClose();
         }
@@ -158,7 +158,7 @@ define([
                 <Modal onClose={() => this.props.onClose()}>
                     <div className='advanced-panel'>
                         <section className='main-content'>
-                            <div className='title'>{'選擇手機膜'} {this._renderBanner()}</div>
+                            <div className='title'>{'选择手机膜'} {this._renderBanner()}</div>
                             {this._renderMainContent()}
                         </section>
                         <section className='footer'>
@@ -170,19 +170,19 @@ define([
                             <button
                                 className='btn btn-default pull-right'
                                 onClick={() => this.handleDownloadClick()}
-                            >{'下載最新手機膜'}
+                            >{'下载最新手机膜'}
                             </button>
                             <button
                                 className='btn btn-default pull-right'
                                 onClick={() => this.handlResetClick()}
-                            >{'清空所有檔案'}
+                            >{'清空所有档案'}
                             </button>
                             <button
                                 className='btn btn-default pull-left'
                                 onClick={() => {
                                     this._handleBackClick();
                                 }}
-                            >{'上一頁'}
+                            >{'上一页'}
                             </button>
                         </section>
                     </div>

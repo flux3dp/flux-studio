@@ -32,17 +32,23 @@ define([
         }
         _toggleAdvanced(isOpen) {
             this.setState({
-                isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
+                isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen,
+                isInsertObjectMenuOpen: false,
+                isDownloadFilmsOpen: false,
             });
         }
         _toggleInsert(isOpen) {
             this.setState({
-                isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
+                isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen,
+                isAdvancedPanelOpen: false,
+                isDownloadFilmsOpen: false,
             });
         }
         _toggleDownloadFilms(isOpen) {
             this.setState({
-                isDownloadFilmsOpen: isOpen === undefined ? !this.state.isDownloadFilmsOpen : isOpen
+                isDownloadFilmsOpen: isOpen === undefined ? !this.state.isDownloadFilmsOpen : isOpen,
+                isAdvancedPanelOpen: false,
+                isInsertObjectMenuOpen: false,
             });
         }
 
@@ -51,7 +57,7 @@ define([
             return (
                 <div>
                     <div className='option' onClick={() => this._toggleDownloadFilms()}>
-                        {'選擇手機膜'}
+                        {'选择手机膜'}
                     </div>
                     {this.state.isDownloadFilmsOpen ? downloadFilmsPanel : ''}
                 </div>

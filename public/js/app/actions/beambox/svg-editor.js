@@ -85,7 +85,18 @@ define([
             // The iteration algorithm for defaultPrefs does not currently support array/objects
             defaultPrefs = {
                 // EDITOR OPTIONS (DIALOG)
-                lang: (i18n.getActiveLang() === 'en') ? 'en' : 'zh-TW', // Default to "en" if locale.js detection does not detect another language
+                lang: (function() {
+                    switch(i18n.getActiveLang()){
+                        case 'en':
+                            return 'en';
+                        case 'zh-tw':
+                            return 'zh-TW';
+                        case 'zh-cn':
+                            return 'zh-CN';
+                        default:
+                            return 'zh-CN';
+                    }
+                })(),
                 iconsize: '', // Will default to 's' if the window height is smaller than the minimum height and 'm' otherwise
                 bkgd_color: '#FFF',
                 bkgd_url: '',
@@ -5417,7 +5428,7 @@ define([
                         reader.readAsText(blob);
                     });
                 }
-                const importSvg = (file, importType, name) => {
+                const importSvg = async (file, importType, name) => {
                     svgCanvas.setLatestImportFileName(name || file.name.split('.')[0]);
                     async function importAs(type) {
                         if (type === 'color') {
@@ -5436,34 +5447,32 @@ define([
                             }
                             console.log('Load complete');
                         } else {
-                            readSVG(file, type);
+                            await readSVG(file, type);
                         }
                     }
-                    if (importType) {
-                        importAs(importType);
-                    } else {
-                        AlertActions.showPopupCustomGroup(
+                    if(!importType) {
+                        importType = await new Promise(resolve => AlertActions.showPopupCustomGroup(
                             'confirm_mouse_input_device',
                             LANG.popup.select_import_method,
-                            [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer],
-                            '',
-                            '',
+                            [LANG.popup.layer_by_layer, LANG.popup.layer_by_color, LANG.popup.nolayer], '', '',
                             [
-                                () => {
-                                    $('#svg_editor').removeClass('color');
-                                    importAs('layer');
-                                },
-                                () => {
-                                    $('#svg_editor').addClass('color');
-                                    importAs('color');
-                                },
-                                () => {
-                                    $('#svg_editor').removeClass('color');
-                                    importAs('nolayer');
-                                }
+                                () => resolve('layer'),
+                                () => resolve('color'),
+                                () => resolve('nolayer'),
                             ]
-                        );
+                        ));
                     }
+                    switch (importType) {
+                        case 'color':
+                            $('#svg_editor').addClass('color');
+                            break;
+                        case 'layer':
+                        case 'nolayer':
+                        case 'film':
+                            $('#svg_editor').removeClass('color');
+                            break;
+                    }
+                    await importAs(importType);
                 };
                 const importBitmap = file => {
                     svgCanvas.setLatestImportFileName(file.name.split('.')[0]);

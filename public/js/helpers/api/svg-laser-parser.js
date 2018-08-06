@@ -404,11 +404,11 @@ define([
                         svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(file.path) + '/../');
                         svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(file.path) + '/');
                     }
-                    
+
                     file = new Blob([svgString], {
                         type: 'text/plain'
                     });
-                    
+
                     ws.send([
                         'upload_plain_svg',
                         encodeURIComponent(file.name),
@@ -459,10 +459,10 @@ define([
                             file.size,
                             file.thumbnailSize
                         ];
-                        if (opts && opts.model === 'fbb1p') {
-                            args.push('-pro');
-                        }
                         if (opts) {
+                            if (opts.model === 'fbb1p') {
+                                args.push('-pro');
+                            }
                             switch (opts.engraveDpi) {
                                 case 'low':
                                     args.push('-ldpi');
@@ -474,7 +474,11 @@ define([
                                     args.push('-hdpi');
                                     break;
                             }
+                            if (opts.containPhoneFilm) {
+                                args.push('-film');
+                            }
                         }
+
                         ws.send(args.join(' '));
                     };
 

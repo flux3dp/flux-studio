@@ -26,11 +26,10 @@ function _buildOSXAppMenu(callback) {
 
 
 function _buildFileMenu(fnKey, callback) {
-    let menuItems = [
+    const menuItems = [
         { 'id': 'IMPORT', label: r.import || 'Import', click: callback, 'accelerator': `${fnKey}+I` },
         { type: 'separator' },
         { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': `${fnKey}+E` },
-        { 'id': 'SAVE_SCENE', label: r.save_scene || 'Save Scene', click: callback, 'accelerator': `${fnKey}+S` }
     ];
 
     if(process.platform !== 'darwin') {
@@ -62,12 +61,6 @@ function buildMenu(callback) {
         submenu: [
             { 'id': 'UNDO', label: r.undo || 'Undo', click: callback, 'accelerator': `${fnKey}+Z`},
             { type:'separator'},
-            { 'id': 'DUPLICATE', label: r.duplicate || 'Duplicate', enabled: false , click: callback, 'accelerator': `${fnKey}+D` },
-            { 'id': 'SCALE', label: r.scale || 'Scale', enabled: false, click: callback },
-            { 'id': 'ROTATE', label: r.rotate || 'Rotate', enabled: false, click: callback },
-            { 'id': 'RESET', label: r.reset || 'Reset', enabled: false, click: callback },
-            { 'id': 'ALIGN_CENTER', label: r.align_center || 'Align Center', enabled: false, click: callback },
-            { type: 'separator' },
             { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Shift+X` },
         ]
     });
@@ -156,7 +149,6 @@ function buildDeviceMenu(callback, uuid, data) {
                 return 'delta-series';
         }
     })();
-    console.log('modelType: ', modelType);
     let submenu = [];
     if(modelType === 'beambox-series') {
         submenu = [
