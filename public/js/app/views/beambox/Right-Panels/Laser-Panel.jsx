@@ -85,7 +85,7 @@ define([
                 <div className='panel'>
                     <span className='title'>{LANG.repeat}</span>
                     <UnitInput
-                        min={1}
+                        min={0}
                         max={100}
                         unit={LANG.times}
                         defaultValue={this.state.repeat}
