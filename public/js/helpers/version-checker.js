@@ -31,10 +31,10 @@ define(function() {
             if (targetVersion[1].indexOf('b') > -1) targetMinorScore -= 40000; // Beta Version => Score -40000
             if (currentVersion[1].indexOf('a') > -1) currentMinorScore -= 80000;
             if (currentVersion[1].indexOf('b') > -1) currentMinorScore -= 40000;
-            if (targetMinorScore > currentMinorScore) return false;
-            // Compare third version number
-            if (parseInt(targetVersion[2] || 0) > parseInt(currentVersion[2] || 0)) return false;
-            return true;
+            if (targetMinorScore == currentMinorScore) {
+                return parseInt(targetVersion[2] || 0) <= parseInt(currentVersion[2] || 0);
+            }
+            return targetMinorScore < currentMinorScore;
         };
 
         const meetRequirement = key => meetVersion(requirement[key]);
