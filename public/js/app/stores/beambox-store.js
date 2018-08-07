@@ -19,7 +19,7 @@ define([
             return beamboxStore;
         },
 
-        onCropperShowed: function(callback) {
+        onCropperShown: function(callback) {
             this.on(Constants.SHOW_CROPPER, callback);
             return beamboxStore;
         },
@@ -28,7 +28,7 @@ define([
             return beamboxStore;
         },
 
-        removeCropperShowedListener: function(callback) {
+        removeCropperShownListener: function(callback) {
             this.removeListener(Constants.SHOW_CROPPER, callback);
             return beamboxStore;
         },

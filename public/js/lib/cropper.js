@@ -67,7 +67,7 @@
   // RegExps
   var REGEXP_ACTIONS = /^(?:e|w|s|n|se|sw|ne|nw|all|crop|move|zoom)$/;
   var REGEXP_DATA_URL = /^data:/;
-  var REGEXP_DATA_URL_JPEG = /^data:image\/jpeg;base64,/;
+  var REGEXP_DATA_URL_JPEG = /^(data:image|data:img)\/jpeg;base64,/;
   var REGEXP_TAG_NAME = /^(?:img|canvas)$/i;
 
   var DEFAULTS = {
@@ -1207,8 +1207,8 @@
       removeClass(element, CLASS_HIDDEN);
 
       var containerData = {
-        width: Math.max(container.offsetWidth, Number(options.minContainerWidth) || 200),
-        height: Math.max(container.offsetHeight, Number(options.minContainerHeight) || 100)
+        width: Math.max(640, Number(options.minContainerWidth) || 200),
+        height: Math.max(600, Number(options.minContainerHeight) || 100)
       };
 
       this.containerData = containerData;

@@ -2,13 +2,14 @@ define([
     'react',
     'reactDOM',
     'jsx!widgets/Modal',
-    'jsx!views/beambox/Left-Panels/Image-Tracer',
+    'jsx!views/beambox/Left-Panels/Image-Trace-Button',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-preference',
+    'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
     'helpers/api/config',
     'helpers/i18n',
@@ -16,13 +17,14 @@ define([
     React,
     ReactDOM,
     Modal,
-    ImageTracer,
+    ImageTraceButton,
     PrinterSelector,
     AlertActions,
     FnWrapper,
     PreviewModeController,
     BeamboxVersionMaster,
     BeamboxPreference,
+    ImageTracePanelController,
     classNames,
     ConfigHelper,
     i18n
@@ -62,6 +64,8 @@ define([
         }
 
         _handlePreviewClick() {
+            ImageTracePanelController.render();
+
             const tryToStartPreviewMode = async () => {
 
                 const isAlreadyRemindUserToCalibrateCamera = () => {
@@ -185,7 +189,7 @@ define([
         render() {
             const ImageTrace = (
                 this.state.isPreviewMode || this.state.isImageTraceMode ?
-                <ImageTracer
+                <ImageTraceButton
                     onClick={() => this.handleImageTraceClick()}
                 /> :
                 null

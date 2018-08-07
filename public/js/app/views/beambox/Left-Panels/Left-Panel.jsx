@@ -4,7 +4,6 @@ define([
     'jsx!views/beambox/Left-Panels/Insert-Object-Submenu',
     'jsx!views/beambox/Left-Panels/Preview-Button',
     'jsx!views/beambox/Left-Panels/Advanced-Panel',
-    'jsx!views/beambox/Left-Panels/Image-Tracer',
     'helpers/i18n',
 ], function(
     React,
@@ -12,7 +11,6 @@ define([
     InsertObjectSubmenu,
     PreviewButton,
     AdvancedPanel,
-    ImageTracer,
     i18n
 ) {
     const LANG = i18n.lang.beambox.left_panel;
