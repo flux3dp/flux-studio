@@ -19,13 +19,14 @@
 
         .logo-icon {
             transition: all .25s;
-            width: 49px;
+            width: 100px;
+            height: 49px;
+            object-fit: cover;
         }
 
         .func-name {
             color: #fff;
             font-size: 40px;
-            font-style: italic;
             line-height: 55px;
             padding: 0 0 0 21px;
         }

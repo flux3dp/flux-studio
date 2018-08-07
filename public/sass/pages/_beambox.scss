@@ -1,4 +1,6 @@
 .beambox-studio {
+    font-family: 'Times New Roman', Times, serif;
+
     svg:not(:root) {
         overflow: visible;
     }
@@ -118,6 +120,23 @@
             transition: opacity 0.3s;
             &:hover {
                 opacity: 1;
+            }
+        }
+    }
+    .bottom-right-panel {
+        button.btn-start {
+            position: fixed;
+            width: 133px;
+            height: 50px;
+            right: 13px;
+            bottom: 30px;
+            background-color: lightslategray;
+            color: white;
+            font-size: 24px;
+            &:hover {
+                background-color: darken($color: lightslategray, $amount: 0.3);
+                border: none;
+                border-radius: 2px;
             }
         }
     }
@@ -261,7 +280,7 @@
             right: 0px;
             bottom: 0px;
             #svgcanvas {
-                background: oldlace;
+                background: #f8f8f8;
             }
         }
         #sidepanels {
@@ -272,7 +291,9 @@
             padding-right: 10px;
             opacity: 0.8;
             z-index: 2;
-            top: 110px;
+            top: 50%;
+            transform: translateY(-50%);
+            bottom: initial;
             right: 9px;
             transition: opacity 0.3s;
             &:hover {
@@ -280,12 +301,11 @@
                 z-index: 4;
             }
             #layerpanel {
-                background-color: $backgroundColor;
+                background-color: #ddd;
                 display: block;
                 overflow: initial;
-                border: 1px #444 solid;
                 border-radius: 2px;
-                // box-shadow: 4px 5px 14px #444;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 
                 #layerbuttons {
                     padding: 0;
@@ -363,16 +383,16 @@
             }
         }
         #layer-laser-panel-placeholder {
-            background-color: $backgroundColor;
+            background-color: #ddd;
             min-height: 200px;
             margin-top: 20px;
-            border: 1px #444 solid;
             border-radius: 2px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             .layername {
                 margin-bottom: 10px;
-                border-bottom: 1px #444 solid;
                 padding: 2px;
                 text-align: center;
+                background-color: #ccc;
             }
             .panel {
                 padding-left: 10px;
@@ -385,7 +405,6 @@
                 }
                 input {
                     outline: none;
-                    border: 1px #333 solid;
                     width: 90%;
                     padding: 3px 0px 3px 12px;
                 }
