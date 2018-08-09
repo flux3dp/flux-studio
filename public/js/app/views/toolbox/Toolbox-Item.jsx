@@ -11,7 +11,7 @@ define([
 
         render() {
             return (
-                <div onClick={this.props.onClick} className="toolbox-item">
+                <div onClick={this.props.onClick} className="toolbox-item" title={this.props.title}>
                     <img src={this.props.src} />
                 </div>
             );

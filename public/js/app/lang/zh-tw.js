@@ -986,6 +986,17 @@ define(function() {
             }
         },
         beambox: {
+            toolbox: {
+                ALIGN_LEFT: '向左靠齊',
+                ALIGN_RIGHT: '向右靠齊',
+                ALIGN_CENTER : '水平置中',
+                ALIGN_TOP : '向上靠齊',
+                ALIGN_MIDDLE : '垂直置中',
+                ALIGN_BOTTOM : '向下靠齊',
+                ARRANGE_HORIZON: '水平平均分配',
+                ARRANGE_VERTICAL: '垂直平均分配',
+                ARRANGE_DIAGONAL: '對角平均分配'
+            },
             popup: {
                 select_favor_input_device: '為了提供更好的使用者體驗<br/>請選擇你喜愛的輸入裝置',
                 select_import_method: '選擇分層方式:',
@@ -1500,7 +1511,9 @@ define(function() {
                 ALIGN_CENTER : '水平置中',
                 ALIGN_TOP : '向上靠齊',
                 ALIGN_MIDDLE : '垂直置中',
-                ALIGN_BOTTOM : '向下靠齊'
+                ALIGN_BOTTOM : '向下靠齊',
+                ARRANGE_HORIZON: '水平平均分配',
+                ARRANGE_VERTICAL: '垂直平均分配'
             }
         }
     };

@@ -988,6 +988,17 @@ define(function() {
             }
         },
         beambox: {
+            toolbox: {
+                ALIGN_LEFT: 'Align Left',
+                ALIGN_RIGHT: 'Align Right',
+                ALIGN_TOP: 'Align Top',
+                ALIGN_BOTTOM: 'Align Bottom',
+                ALIGN_CENTER: 'Align Center',
+                ALIGN_MIDDLE: 'Align Middle',
+                ARRANGE_HORIZON: 'Arrange Horizontally',
+                ARRANGE_VERTICAL: 'Arrange Vertically',
+                ARRANGE_DIAGONAL: 'Arrange Diagonally'
+            },
             popup: {
                 select_favor_input_device: 'Better user experience has been optimized<br/>Please select your favorite input device.',
                 select_import_method: 'Select layering style:',

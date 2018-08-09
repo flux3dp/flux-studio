@@ -11,7 +11,7 @@ define([
     ToolboxItem,
     i18n
 ) {
-    const LANG = i18n.lang.Toolbox;
+    const LANG = i18n.lang.beambox.toolbox;
 
     class Toolbox extends React.Component {
         constructor() {
@@ -66,21 +66,22 @@ define([
             if (this.state.showAlign) {
                 alignToolbox = (
                     <div className="Toolbox-content">
-                        <ToolboxItem onClick={FnWrapper.alignLeft} src="img/icon_alignment-left.png" />
-                        <ToolboxItem onClick={FnWrapper.alignRight} src="img/icon_alignment-right.png" />
-                        <ToolboxItem onClick={FnWrapper.alignCenter} src="img/icon_alignment-centered-horizontally.png" />
-                        <ToolboxItem onClick={FnWrapper.alignTop} src="img/icon_alignment-top.png" />
-                        <ToolboxItem onClick={FnWrapper.alignMiddle} src="img/icon_alignment-centered-vertically.png" />
-                        <ToolboxItem onClick={FnWrapper.alignBottom} src="img/icon_alignment-bottom.png" />
+                        <ToolboxItem onClick={FnWrapper.alignLeft} src="img/beambox/align-left.png" title={LANG.ALIGN_LEFT} />
+                        <ToolboxItem onClick={FnWrapper.alignCenter} src="img/beambox/align-center-horizontal.png" title={LANG.ALIGN_CENTER} />
+                        <ToolboxItem onClick={FnWrapper.alignRight} src="img/beambox/align-right.png" title={LANG.ALIGN_RIGHT} />
+                        <ToolboxItem onClick={FnWrapper.alignTop} src="img/beambox/align-top.png" title={LANG.ALIGN_TOP} />
+                        <ToolboxItem onClick={FnWrapper.alignMiddle} src="img/beambox/align-center-vertical.png" title={LANG.ALIGN_MIDDLE} />
+                        <ToolboxItem onClick={FnWrapper.alignBottom} src="img/beambox/align-bottom.png" title={LANG.ALIGN_BOTTOM} />
+                        
                     </div>
                 );
             }
             if (this.state.showDistribute) {
                 distributeToolbox = (
                     <div className="Toolbox-content">
-                        <ToolboxItem onClick={FnWrapper.distHori} src="img/distribute_horizontal_center.png" />
-                        <ToolboxItem onClick={FnWrapper.distVert} src="img/distribute_vertical_center.png" />
-                        <ToolboxItem onClick={FnWrapper.distEven} src="img/diffusion2.png" />
+                        <ToolboxItem onClick={FnWrapper.distHori} src="img/beambox/arrange-horizontal.png" title={LANG.ARRANGE_HORIZONTAL} />
+                        <ToolboxItem onClick={FnWrapper.distVert} src="img/beambox/arrange-vertical.png" title={LANG.ARRANGE_VERTICAL} />
+                        <ToolboxItem onClick={FnWrapper.distEven} src="img/beambox/diffusion2.png" title={LANG.ARRANGE_DIAGONAL} />
                     </div>
                 );
             }
