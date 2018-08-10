@@ -18,7 +18,8 @@ define([
             super();
             this.state = {
                 showAlign: false,
-                showDistribute: false
+                showDistribute: false,
+                showImage: false
             };
         }
 
@@ -27,6 +28,8 @@ define([
             TopbarStore.onAlignToolboxClosed(() => this.closeAlign());
             TopbarStore.onDistributeToolboxShowed(() => this.showDistribute());
             TopbarStore.onDistributeToolboxClosed(() => this.closeDistribute());
+            TopbarStore.onImageToolboxShowed(() => this.showImage());
+            TopbarStore.onImageToolboxClosed(() => this.closeImage());
         }
 
         componentDidUnMount() {
@@ -34,6 +37,8 @@ define([
             TopbarStore.removeAlignToolboxClosedListener(() => this.closeAlign());
             TopbarStore.removeDistributeToolboxShowed(() => this.showDistribute());
             TopbarStore.removeDistributeToolboxClosed(() => this.closeDistribute());
+            TopbarStore.removeImageToolboxShowedListener(() => this.showImage());
+            TopbarStore.removeImageToolboxClosedListener(() => this.closeImage());
         }
 
         showDistribute() {
@@ -60,9 +65,22 @@ define([
             }
         }
 
+        showImage() {
+            if (!this.state.showImage) {
+                this.setState({ showImage: true });
+            }
+        }
+
+        closeImage() {
+            if (this.state.showImage) {
+                this.setState({ showImage: false });
+            }
+        }
+
         renderElement() {
             let alignToolbox = null,
-                distributeToolbox = null;
+                distributeToolbox = null,
+                imageToolbox = null;
             if (this.state.showAlign) {
                 alignToolbox = (
                     <div className="Toolbox-content">
@@ -83,6 +101,14 @@ define([
                         <ToolboxItem onClick={FnWrapper.distVert} src="img/beambox/arrange-vertical.png" title={LANG.ARRANGE_VERTICAL} />
                         <ToolboxItem onClick={FnWrapper.distEven} src="img/beambox/diffusion2.png" title={LANG.ARRANGE_DIAGONAL} />
                     </div>
+                ); 
+            }
+            if (this.state.showImage) {
+                imageToolbox = (
+                    <div className="Toolbox-content">
+                        <ToolboxItem onClick={FnWrapper.flipHorizontal} src="img/beambox/flip-horizontal.png" title={LANG.FLIP} />
+                        <ToolboxItem onClick={FnWrapper.flipVertical} src="img/beambox/flip-vertical.png" title={LANG.FLIP} />
+                    </div>
                 );
             }
             if (this.state.showAlign) {
@@ -90,6 +116,7 @@ define([
                     <div className="toolbox">
                         {alignToolbox}
                         {distributeToolbox}
+                        {imageToolbox}
                     </div>
                 );
             } else {

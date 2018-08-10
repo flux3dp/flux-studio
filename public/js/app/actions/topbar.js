@@ -26,5 +26,15 @@ define([
                 actionType: TopbarConstants.CLOSE_DISTRIBUTE_TOOLBOX
             });
         },
+        showImageToolbox: function() {
+            Dispatcher.dispatch({
+                actionType: TopbarConstants.SHOW_IMAGE_TOOLBOX
+            });
+        },
+        closeImageToolbox: function() {
+            Dispatcher.dispatch({
+                actionType: TopbarConstants.CLOSE_IMAGE_TOOLBOX
+            });
+        }
     };
 });

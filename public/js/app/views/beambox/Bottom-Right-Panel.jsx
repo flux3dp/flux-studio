@@ -32,12 +32,8 @@ define([
                 isPrinterSelectorOpen: false
             };
 
-            this._handleExportClick = this._handleExportClick.bind(this);
             this._handleStartClick = this._handleStartClick.bind(this);
             this._renderPrinterSelectorWindow = this._renderPrinterSelectorWindow.bind(this);
-        }
-        _handleExportClick() {
-            BottomRightFuncs.exportFcode();
         }
         async _handleStartClick() {
             if (PreviewModeController.isPreviewMode()) {

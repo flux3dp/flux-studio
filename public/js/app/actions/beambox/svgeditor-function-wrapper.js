@@ -17,6 +17,18 @@ define([
         $('#workarea').css('cursor', 'crosshair');
     };
 
+    let _flipImage = function(horizon=1, vertical=1) {
+        const image = window.svgCanvas.getSelectedElems()[0];
+        const flipCanvas = document.createElement('canvas');
+        const flipContext = flipCanvas.getContext('2d');
+        flipCanvas.width = $(image).width();
+        flipCanvas.height = $(image).height();
+        flipContext.translate(horizon < 0 ? $(image).width() : 0, vertical < 0 ? $(image).height() : 0);
+        flipContext.scale(horizon, vertical);
+        flipContext.drawImage(image, 0, 0, flipCanvas.width, flipCanvas.height);
+        $(image).attr('xlink:href', flipCanvas.toDataURL());
+    };
+
     const funcs =  {
         isAnyElementSelected: function() {
             if (!window.svgCanvas) {
@@ -67,7 +79,12 @@ define([
         distEven: function() {
             svgCanvas.distEven();
         },
-
+        flipHorizontal: function() {
+            _flipImage(-1, 1);
+        },
+        flipVertical: function() {
+            _flipImage(1, -1);
+        },
         //left panel
         useSelectTool: function() {
             $('#tool_select').click();

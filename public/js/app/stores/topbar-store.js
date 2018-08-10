@@ -34,6 +34,16 @@ define([
             return topbarStore;
         },
 
+        onImageToolboxShowed: function(callback) {
+            this.on(Constants.SHOW_IMAGE_TOOLBOX, callback);
+            return topbarStore;
+        },
+
+        onImageToolboxClosed: function(callback) {
+            this.on(Constants.CLOSE_IMAGE_TOOLBOX, callback);
+            return topbarStore;
+        },
+
         removeAlignToolboxShowedListener: function(callback) {
             this.removeListener(Constants.SHOW_ALIGN_TOOLBOX, callback);
             return topbarStore;
@@ -51,6 +61,16 @@ define([
 
         removeDistributeToolboxClosedListener: function(callback) {
             this.removeListener(Constants.CLOSE_DISTRIBUTE_TOOLBOX, callback);
+            return topbarStore;
+        },
+
+        removeImageToolboxShowedListener: function(callback) {
+            this.removeListener(Constants.SHOW_IMAGE_TOOLBOX, callback);
+            return topbarStore;
+        },
+
+        removeImageToolboxClosedListener: function(callback) {
+            this.removeListener(Constants.CLOSE_IMAGE_TOOLBOX, callback);
             return topbarStore;
         },
 
