@@ -369,7 +369,10 @@ define([
         _renderPrinterSelection: function() {
             let devices = this.state.devices;
             if (this.state.modelFilter.length > 0) {
-                devices = devices.filter((v) => this.state.modelFilter.indexOf(v.label.props['data-model'])>=0);
+                
+                devices = devices.filter((v) => {
+                    return this.state.modelFilter.indexOf(v.label.props['data-model'])>=0 || v.label.props.id === "export-item";
+                });
             }
             let options = (0 < devices.length ? devices : [{
                     label: (
