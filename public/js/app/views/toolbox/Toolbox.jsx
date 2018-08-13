@@ -35,8 +35,8 @@ define([
         componentDidUnMount() {
             TopbarStore.removeAlignToolboxShowedListener(() => this.showAlign());
             TopbarStore.removeAlignToolboxClosedListener(() => this.closeAlign());
-            TopbarStore.removeDistributeToolboxShowed(() => this.showDistribute());
-            TopbarStore.removeDistributeToolboxClosed(() => this.closeDistribute());
+            TopbarStore.removeDistributeToolboxShowedListener(() => this.showDistribute());
+            TopbarStore.removeDistributeToolboxClosedListener(() => this.closeDistribute());
             TopbarStore.removeImageToolboxShowedListener(() => this.showImage());
             TopbarStore.removeImageToolboxClosedListener(() => this.closeImage());
         }
@@ -90,7 +90,7 @@ define([
                         <ToolboxItem onClick={FnWrapper.alignTop} src="img/beambox/align-top.png" title={LANG.ALIGN_TOP} />
                         <ToolboxItem onClick={FnWrapper.alignMiddle} src="img/beambox/align-center-vertical.png" title={LANG.ALIGN_MIDDLE} />
                         <ToolboxItem onClick={FnWrapper.alignBottom} src="img/beambox/align-bottom.png" title={LANG.ALIGN_BOTTOM} />
-                        
+
                     </div>
                 );
             }
@@ -101,7 +101,7 @@ define([
                         <ToolboxItem onClick={FnWrapper.distVert} src="img/beambox/arrange-vertical.png" title={LANG.ARRANGE_VERTICAL} />
                         <ToolboxItem onClick={FnWrapper.distEven} src="img/beambox/diffusion2.png" title={LANG.ARRANGE_DIAGONAL} />
                     </div>
-                ); 
+                );
             }
             if (this.state.showImage) {
                 imageToolbox = (
