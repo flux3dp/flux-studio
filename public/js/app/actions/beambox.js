@@ -8,6 +8,11 @@ define([
     Dispatcher
 ) {
     return {
+        backToPreviewMode: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.BACK_TO_PREVIEW,
+            });
+        },
         drawPreviewBlob: function(previewBlobUrl) {
             Dispatcher.dispatch({
                 actionType: BeamboxConstants.DRAW_PREVIEW_BLOB,
@@ -17,6 +22,12 @@ define([
         showCropper: function() {
             Dispatcher.dispatch({
                 actionType: BeamboxConstants.SHOW_CROPPER,
+            });
+        },
+        getImageTrace: function(imageTrace) {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.GET_IMAGE_TRACE,
+                imageTrace
             });
         },
         tuneParams: function() {

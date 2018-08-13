@@ -1058,6 +1058,16 @@ define(function() {
             bottom_right_panel: {
                 convert_text_to_path_before_export: 'Convert Text to Path...'
             },
+            image_trace_panel: {
+                apply: 'Apply',
+                back: 'Back',
+                cancel: 'Cancel',
+                next: 'Next',
+                brightness: 'Brightness',
+                contrast: 'Contrast',
+                threshold: 'Threshold',
+                okay: 'Okay'
+            },
             object_panels: {
                 position: 'Position',
                 rotation: 'Rotation',

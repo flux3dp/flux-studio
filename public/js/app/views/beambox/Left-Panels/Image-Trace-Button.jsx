@@ -31,9 +31,7 @@ define([
         }
 
         _handleClick() {
-            if (this.state.isWorking) {
-                console.log('Image Trace is Working~');
-            } else {
+            if (!this.state.isWorking) {
                 this.props.onClick();
                 this.setState({ isWorking: true });
                 BeamboxActions.showCropper();

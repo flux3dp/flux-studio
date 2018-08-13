@@ -75,7 +75,6 @@ define([
             this.cameraCanvasUrl = URL.createObjectURL(blob);
             window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
             BeamboxActions.drawPreviewBlob(this.cameraCanvasUrl);
-            console.log('cameraC', this.cameraCanvasUrl)
         }
 
         _prepareCroppedAndRotatedImgBlob(imgUrl, x, y) {

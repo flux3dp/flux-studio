@@ -1,10 +1,14 @@
 /**
- * API fcode reader
- * Ref: https://github.com/flux3dp/fluxghost/wiki/fcode-reader
+ * API image tracer
+ * Ref: none
  */
 define([
     'helpers/websocket',
-], function(Websocket) {
+    'app/actions/beambox'
+], function(
+    Websocket,
+    BeamboxActions
+) {
     'use strict';
 
     return function() {
@@ -39,6 +43,7 @@ define([
                     switch (response.status) {
                         case 'ok':
                             d.resolve(response);
+                            BeamboxActions.getImageTrace(response.svg);
                             break;
                         case 'continue':
                             ws.send(data);
@@ -52,7 +57,7 @@ define([
                 events.onError = (response) => { d.reject(response); console.log('on error', response); };
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
-                ws.send(`image_trace ${data.size || data.byteLength}`);
+                ws.send(`image_trace ${data.size || data.byteLength} ${opts.brightness} ${opts.contrast} ${opts.threshold}`);
                 return d.promise();
             },
         };

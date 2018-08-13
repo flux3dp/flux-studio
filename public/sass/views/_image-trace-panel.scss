@@ -2,23 +2,16 @@
     position: absolute;
 }
 
+#tunedImage {
+    z-index: 1;
+}
+
+#imageTrace {
+    z-index: 2;
+    position: absolute;
+}
+
 .cropper {
-
-    &-check-box {
-        position: relative;
-        width: 32px;
-        height: 32px;
-        margin: 6px 0 0 2px;
-        padding: 0;
-        z-index: 1;
-        background-color: #e8e8e8;
-
-        :hover {
-            cursor: pointer;
-            background-color:#d0d0d0 ;
-        }
-    }
-
     &-container {
         direction: ltr;
         font-size: 0;
@@ -313,7 +306,7 @@
     height: 600px;
     position: relative;
     opacity: 0.8;
-    top: 500px;
+    top: 800px;
 }
 
 .image-trace-panel {
@@ -321,13 +314,19 @@
     box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
     padding: 0px;
     max-width: 600px;
+    background-color: #e2e1e0;
 
     .main-content {
         padding: 20px;
-        background-color: #e2e1e0;
+
         .cropped-container {
             max-width: 32%;
             margin: 0 auto;
+        }
+
+        .scroll-bar-container {
+            margin: 0 auto;
+            width: 200px;
         }
     }
 
@@ -336,7 +335,6 @@
         padding-top: 12px;
         padding-bottom: 12px;
         margin-bottom: 0px;
-        background-color: #e2e1e0;
         border-top: 1px solid #DDD;
         .btn {
             margin-left: 12px;
@@ -346,10 +344,6 @@
                 margin-right: 12px;
             }
         }
-        .scroll-bar-container {
-            margin: 0 auto;
-            width: 200px;
-        }
     }
 }
 
@@ -358,6 +352,9 @@
     box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
     padding: 0px;
     .main-content {
+        img {
+            position: absolute;
+        }
         .control {
             display: flex;
             align-items: center;
@@ -374,11 +371,13 @@
     }
 
     .footer {
+        background-color: #e2e1e0;
         height: 59px;
         padding-top: 12px;
         padding-bottom: 12px;
         margin-bottom: 0px;
         border-top: 1px solid #DDD;
+
         .btn {
             margin-left: 12px;
             margin-right: 0px;

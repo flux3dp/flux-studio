@@ -148,12 +148,6 @@ define([
 
 
     return {
-        uploadForTrace: async function () {
-            const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
-
-            BeamboxActions.showCropper(fcodeBlob, thumbnailBlobURL);
-            ProgressActions.close();
-        },
         uploadFcode: async function (device) {
             const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
             await DeviceMaster.select(device)

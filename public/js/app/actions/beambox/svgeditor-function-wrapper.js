@@ -49,6 +49,33 @@ define([
         importImage: function() {
             $('#tool_import input').click();
         },
+        insertSvg: function(svgString, cropData) {
+            const newElement = svgCanvas.importSvgString(svgString, 'nolayer');
+            const {
+                x,
+                y,
+                width,
+                height
+            } = cropData;
+
+            svgCanvas.ungroupSelectedElement();
+            svgCanvas.ungroupSelectedElement();
+            svgCanvas.groupSelectedElements();
+            svgCanvas.alignSelectedElements('m', 'page');
+            svgCanvas.alignSelectedElements('c', 'page');
+            // highlight imported element, otherwise we get strange empty selectbox
+            try {
+                svgCanvas.selectOnly([newElement]);
+                svgCanvas.setSvgElemPosition('x', x);
+                svgCanvas.setSvgElemPosition('y', y);
+                svgCanvas.setSvgElemSize('width', width);
+                svgCanvas.setSvgElemSize('height', height);
+            } catch(e) {
+                console.warn('Reading empty SVG');
+            }
+            // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+            $('#dialog_box').hide();
+        },
 
         //align toolbox
         alignLeft: function() {

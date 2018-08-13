@@ -9,6 +9,7 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-preference',
+    'app/stores/beambox-store',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
     'helpers/api/config',
@@ -24,6 +25,7 @@ define([
     PreviewModeController,
     BeamboxVersionMaster,
     BeamboxPreference,
+    BeamboxStore,
     ImageTracePanelController,
     classNames,
     ConfigHelper,
@@ -32,13 +34,30 @@ define([
 
     const LANG = i18n.lang.beambox.left_panel;
 
-    return class LeftPanel extends React.Component {
+    return class PreviewButton extends React.Component {
         constructor() {
             super();
             this.state = {
                 isPreviewMode: false,
                 isImageTraceMode: false
             };
+        }
+
+        componentDidMount() {
+            BeamboxStore.onBackToPreviewMode(() => this.backToPreviewMode());
+            BeamboxStore.onEndImageTrace(() => this.endImageTrace());
+        }
+
+        componentWillUnmount() {
+            BeamboxStore.removeBackToPreviewModeListener(() => this.backToPreviewMode());
+            BeamboxStore.removeEndImageTraceListener(() => this.endImageTrace());
+        }
+
+        endImageTrace() {
+            this.setState({
+                isPreviewMode: false,
+                isImageTraceMode: false
+            });
         }
 
         handleImageTraceClick() {
@@ -53,18 +72,20 @@ define([
                     isImageTraceMode: true
                 });
             }
-            console.log('handle!!!! ImageTraceClick');
         }
 
         backToPreviewMode() {
             this.setState({
-                isPreviewMode: true,
                 isImageTraceMode: false
             });
+
+            this._handlePreviewClick();
         }
 
         _handlePreviewClick() {
-            ImageTracePanelController.render();
+            if (!document.getElementById('image-trace-panel-outer')) {
+                ImageTracePanelController.render();
+            }
 
             const tryToStartPreviewMode = async () => {
 
