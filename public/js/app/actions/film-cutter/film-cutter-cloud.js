@@ -185,6 +185,10 @@ define([
             return blob = await get('api/data/new-film', {id: ids, modified_before})
                 .then(res => res.blob());
         },
+        async latestFirmware(model) {
+            return {version, download_link, changelog} = await get('api/service/latest-firmware', {model})
+                .then(res => res.json());
+        },
 
         async sync() {
             // user profile

@@ -4,9 +4,9 @@ define([
 
     const DEFAULT_RECORD = {
         // string
-        'account': '+886952611152',
-        'password': '123',
-        'film_secret_key': 'd19d47bb5033126e3961084ccb6ed6d6',
+        'account': '',
+        'password': '',
+        'film_secret_key': '',
         'machine_stm32_serial_number': '',
         'machine_pi_serial_number': '',
         'last_name': '',
@@ -21,7 +21,7 @@ define([
         'usage_cut_used_on_cloud': 0,
 
         // time in millisecond
-        'usage_download': 1539129600000,
+        'usage_download': 0,
         'last_connect_to_cloud': 0,
         'last_sync_film_data': 0,
     };

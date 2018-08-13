@@ -1,9 +1,9 @@
 define([
-    'jquery',
-    'helpers/version-compare'
+    'helpers/version-compare',
+    'app/actions/film-cutter/film-cutter-cloud'
 ], function(
-    $,
-    versionCompare
+    versionCompare,
+    FilmCutterCloud
 ) {
     const infoMap = {
         delta: {
@@ -31,7 +31,6 @@ define([
             case 'fbb1p':
             case 'laser-b1':
                 return 'beambox';
-                break;
             case 'delta-1':
             case 'delta-1p':
                 return 'delta';
@@ -40,14 +39,23 @@ define([
         }
     }
 
-    /**
-     * check firmware update that has to be pass the printer information here
-     *
-     * @param {JSON}   printer - printer info
-     * @param {STRING} type    - checking type with device(pi)/toolhead(toolhead)
-     *
-     * @return Promise
-     */
+    function checkMozu1Firmware(printerVersion) {
+        const deferred = $.Deferred();
+        FilmCutterCloud.latestFirmware('mozu1').then(
+            ({version, download_link, changelog}) => {
+                const response = {
+                    needUpdate: versionCompare(printerVersion, version),
+                    latestVersion: version,
+                    changelog_en: changelog.replace(/[\r]/g, '<br/>'),
+                    changelog_zh: changelog.replace(/[\r]/g, '<br/>'),
+                    downloadUrl: download_link
+                };
+                deferred.resolve(response);
+            },
+            () => deferred.reject({needUpdate: true})
+        );
+        return deferred.promise();
+    }
 
     return function(printer, type) {
         const deferred = $.Deferred();
@@ -57,6 +65,10 @@ define([
                 needUpdate: true
             });
             return deferred.promise();
+        }
+
+        if (printer.model === 'mozu1') {
+            return checkMozu1Firmware(printer.version);
         }
 
         const series = checkMachineSeries(printer.model);
