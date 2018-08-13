@@ -313,20 +313,69 @@
     border-radius: 2px;
     box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
     padding: 0px;
-    max-width: 600px;
-    background-color: #e2e1e0;
+    max-height: 640px;
+    background-color: #fff;
 
     .main-content {
+        display: flex;
         padding: 20px;
 
+        .left-part {
+            display: inline;
+
+            .cropped-container {
+                // margin: 0 auto;
+                width: 400px;
+            }
+        }
+
+
         .cropped-container {
-            max-width: 32%;
-            margin: 0 auto;
+            width: 400px;
+            display: inline-block;
+        }
+
+        .right-part {
+            max-height: 100%;
+            display: inline-block;
         }
 
         .scroll-bar-container {
-            margin: 0 auto;
-            width: 200px;
+            width: 290px;
+            display: inline-block;
+            padding-left: 20px;
+
+            .controls {
+                padding-top: 20px;
+
+                .label {
+                    color: #888;
+                    font-size: 14px;
+                    line-height: 40px;
+                    width: 80px;
+                }
+
+                .control {
+                    input {
+                        width: 70px;
+                    }
+                }
+
+                .slider-container {
+                    margin-right: 25px;
+
+                    input {
+                        width: 120px;
+                    }
+                }
+            }
+        }
+
+        .title {
+            color: #626262;
+            font-size: 18px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
     }
 

@@ -1066,7 +1066,8 @@ define(function() {
                 brightness: 'Brightness',
                 contrast: 'Contrast',
                 threshold: 'Threshold',
-                okay: 'Okay'
+                okay: 'Okay',
+                tuning: 'Parameters'
             },
             object_panels: {
                 position: 'Position',

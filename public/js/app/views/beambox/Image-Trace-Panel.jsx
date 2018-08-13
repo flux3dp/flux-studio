@@ -11,6 +11,7 @@ define([
     'helpers/image-data',
     'helpers/api/image-tracer',
     'jsx!widgets/Modal',
+    'jsx!widgets/Slider-Control',
     'lib/cropper'
 ], function(
     $,
@@ -23,6 +24,7 @@ define([
     ImageData,
     ImageTracerApi,
     Modal,
+    SliderControl,
     Cropper
 ) {
     const LANG = i18n.lang.beambox.image_trace_panel;
@@ -64,6 +66,7 @@ define([
             BeamboxStore.onGetImageTrace((payload) => this.getImageTrace(payload));
 
             if (TESTING_IT) {
+                console.log('dev ! testing it-panel');
                 const canvas = document.createElement('canvas')
                 const context = canvas.getContext('2d');
 
@@ -75,10 +78,25 @@ define([
                     context.drawImage(img,0,0);
                     canvas.toBlob((blob) => {
                         const croppedBlobUrl = URL.createObjectURL(blob);
-                        this.setState({
-                            roppedBlobUrl,
-                            currentStep : STEP_TUNE
-                        });
+
+                        this.setState({ croppedBlobUrl });
+                        ImageData(
+                            croppedBlobUrl,
+                            {
+                                height: 0,
+                                width: 0,
+                                grayscale: {
+                                    is_rgba: true,
+                                    is_shading: true,
+                                    threshold: 255,
+                                    is_svg: false
+                                },
+                                onComplete: (result) => {
+                                    grayscaleCroppedImg = result.canvas.toDataURL('image/png');
+                                    this.setState({ currentStep : STEP_TUNE })
+                                }
+                            }
+                        );
                     });
                 };
             }
@@ -223,38 +241,38 @@ define([
             BeamboxActions.backToPreviewMode();
         }
 
-        _handleBrightnessChange(e) {
-            this.setState({ brightness: e.target.value });
-            this._applyFilterEffect();
-        }
+        _handleParameterChange(id, value) {
+            switch(id) {
+                case 'brightness':
+                    this.setState({ brightness: value });
+                    this._applyFilterEffect();
+                    break;
+                case 'contrast':
+                    this.setState({ contrast: value });
+                    this._applyFilterEffect();
+                    break;
+                case 'threshold':
+                    ImageData(
+                        this.state.croppedBlobUrl,
+                        {
+                            height: 0,
+                            width: 0,
+                            grayscale: {
+                                is_rgba: true,
+                                is_shading: true,
+                                threshold: parseInt(value),
+                                is_svg: false
+                            },
+                            onComplete: (result) => {
+                                const img = document.getElementById('tunedImage');
 
-        _handleContrastChange(e) {
-            this.setState({ contrast: e.target.value });
-            this._applyFilterEffect();
-        }
-
-        _handleThresholdChange(e) {
-            const img = document.getElementById('tunedImage');
-
-            this.setState({ threshold: e.target.value });
-
-            ImageData(
-                this.state.croppedBlobUrl,
-                {
-                    height: 0,
-                    width: 0,
-                    grayscale: {
-                        is_rgba: true,
-                        is_shading: true,
-                        threshold: parseInt(this.state.threshold),
-                        is_svg: false
-                    },
-                    onComplete: function(result) {
-                        img.src = result.canvas.toDataURL('image/png')
-                    }
-                }
-            );
-
+                                img.src = result.canvas.toDataURL('image/png');
+                                this.setState({ threshold: value });
+                            }
+                        }
+                    );
+                    break;
+            }
         }
 
         _applyFilterEffect() {
@@ -263,7 +281,7 @@ define([
             const filterValue = `brightness(${brightness}%) contrast(${contrast}%)`;
 
             $(img).css({
-                "-webkit-filter": filterValue,
+                '-webkit-filter': filterValue,
             });
         }
 
@@ -364,6 +382,9 @@ define([
 
         _renderImageTraceModal() {
             const {
+                brightness,
+                contrast,
+                threshold,
                 currentStep,
                 imageTrace
             } = this.state;
@@ -374,46 +395,47 @@ define([
                 <Modal>
                     <div className='image-trace-panel'>
                         <div className='main-content'>
-                            <div className='cropped-container'>
-                                <img id="tunedImage" src={grayscaleCroppedImg} />
-                                {it}
-                            </div>
-                            <div className='scroll-bar-container'>
-                                <span className="text-center header">
-                                    {LANG.brightness}
-                                </span>
-                                <input
-                                    type='range'
-                                    min={50}
-                                    max={150}
-                                    value={this.state.brightness}
-                                    onChange={(e) => this._handleBrightnessChange(e)}
-                                />
-                            </div>
-                            <div className='scroll-bar-container'>
-                                <span className="text-center header">
-                                    {LANG.contrast}
-                                </span>
-                                <input
-                                    type='range'
-                                    min={50}
-                                    max={150}
-                                    value={this.state.contrast}
-                                    onChange={(e) => this._handleContrastChange(e)}
-                                />
-                            </div>
-                            <div className='scroll-bar-container'>
-                                <span className="text-center header">
-                                    {LANG.threshold}
-                                </span>
-                                <input
-                                    type='range'
-                                    min={0}
-                                    max={255}
-                                    value={this.state.threshold}
-                                    onChange={(e) => this._handleThresholdChange(e)}
-                                />
-                            </div>
+                                <div className='cropped-container'>
+                                    <img id='tunedImage' src={grayscaleCroppedImg} />
+                                    {it}
+                                </div>
+                                <div className='right-part'>
+                                <div className='scroll-bar-container'>
+                                    <div className='title'>{LANG.tuning}</div>
+                                    <SliderControl
+                                        id='brightness'
+                                        key='brightness'
+                                        label={LANG.brightness}
+                                        min={50}
+                                        max={150}
+                                        step={1}
+                                        unit='percent'
+                                        default={parseInt(brightness)}
+                                        onChange={(id, val) => this._handleParameterChange(id, val)}
+                                    />
+                                    <SliderControl
+                                        id='contrast'
+                                        key='contrast'
+                                        label={LANG.contrast}
+                                        min={50}
+                                        max={150}
+                                        step={1}
+                                        unit='percent'
+                                        default={parseInt(contrast)}
+                                        onChange={(id, val) => this._handleParameterChange(id, val)}
+                                    />
+                                    <SliderControl
+                                        id='threshold'
+                                        key='threshold'
+                                        label={LANG.threshold}
+                                        min={0}
+                                        max={255}
+                                        step={1}
+                                        default={parseInt(threshold)}
+                                        onChange={(id, val) => this._handleParameterChange(id, val)}
+                                    />
+                                </div>
+                                </div>
                         </div>
                         {footer}
                     </div>

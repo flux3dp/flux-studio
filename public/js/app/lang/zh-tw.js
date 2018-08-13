@@ -1064,7 +1064,8 @@ define(function() {
                 brightness: '曝光',
                 contrast: '對比',
                 threshold: '閾值',
-                okay: '完成'
+                okay: '完成',
+                tuning: '描圖參數'
             },
             object_panels: {
                 position: '位置',
