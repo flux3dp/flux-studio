@@ -21,9 +21,9 @@ define([
         const image = window.svgCanvas.getSelectedElems()[0];
         const flipCanvas = document.createElement('canvas');
         const flipContext = flipCanvas.getContext('2d');
-        flipCanvas.width = $(image).width();
-        flipCanvas.height = $(image).height();
-        flipContext.translate(horizon < 0 ? $(image).width() : 0, vertical < 0 ? $(image).height() : 0);
+        flipCanvas.width = $(image).attr('width');
+        flipCanvas.height = $(image).attr('height');
+        flipContext.translate(horizon < 0 ? flipCanvas.width : 0, vertical < 0 ? flipCanvas.height : 0);
         flipContext.scale(horizon, vertical);
         flipContext.drawImage(image, 0, 0, flipCanvas.width, flipCanvas.height);
         $(image).attr('xlink:href', flipCanvas.toDataURL());

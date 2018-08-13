@@ -1990,10 +1990,8 @@ define([
                 }
                 if (isImageToolboxShowed) {
                     TopbarActions.showImageToolbox();
-                    console.log("Show image toolbox");
                 } else {
                     TopbarActions.closeImageToolbox();
-                    console.log("Close image toolbox");
                 }
                 // Deal with pathedit mode
                 togglePathEditMode(is_node, elems);
