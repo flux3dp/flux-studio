@@ -14,8 +14,13 @@ define([
 
     beamboxStore = Object.assign(EventEmitter.prototype, {
 
-        onDrawPreviewBlob: function(callback) {
-            this.on(Constants.DRAW_PREVIEW_BLOB, callback);
+        onEndDrawingPreviewBlob: function(callback) {
+            this.on(Constants.END_DRAWING_PREVIEW_BLOB, callback);
+            return beamboxStore;
+        },
+
+        onStartDrawingPreviewBlob: function(callback) {
+            this.on(Constants.START_DRAWING_PREVIEW_BLOB, callback);
             return beamboxStore;
         },
 
@@ -39,8 +44,13 @@ define([
             return beamboxStore;
         },
 
-        removeDrawPreviewBlobListener: function(callback) {
-            this.removeListener(Constants.DRAW_PREVIEW_BLOB, callback);
+        removeEndDrawingPreviewBlobListener: function(callback) {
+            this.removeListener(Constants.END_DRAWINGk_PREVIEW_BLOB, callback);
+            return beamboxStore;
+        },
+
+        removeStartDrawingPreviewBlobListener: function(callback) {
+            this.removeListener(Constants.START_DRAWING_PREVIEW_BLOB, callback);
             return beamboxStore;
         },
 

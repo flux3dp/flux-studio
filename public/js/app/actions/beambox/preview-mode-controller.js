@@ -11,7 +11,8 @@ define([
     'helpers/check-device-status',
     'helpers/firmware-version-checker',
     'helpers/i18n',
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
+    'app/actions/beambox'
 ], function (
     Rx,
     PreviewModeBackgroundDrawer,
@@ -25,7 +26,8 @@ define([
     checkDeviceStatus,
     FirmwareVersionChecker,
     i18n,
-    Constant
+    Constant,
+    BeamboxActions
 ) {
 
     class PreviewModeController {
@@ -79,7 +81,7 @@ define([
             await DeviceMaster.endMaintainMode();
         }
 
-        async preview(x, y) {
+        async preview(x, y, last = false) {
             if (this.isPreviewBlocked) {
                 return;
             }
@@ -92,10 +94,10 @@ define([
 
             try {
                 const imgUrl = await this._getPhotoAfterMove(x, y);
+                const p = PreviewModeBackgroundDrawer.draw(imgUrl, x, y, last);
+
                 $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
-                PreviewModeBackgroundDrawer.draw(imgUrl, x, y);
-                this.isPreviewBlocked = false;
-                ClearPreviewGraffitiButton.show();
+                                this.isPreviewBlocked = false;
                 return true;
             } catch (error) {
                 console.log(error);
@@ -150,8 +152,11 @@ define([
             })();
 
             for(let i=0; i<points.length; i++) {
-                if (!(await this.preview(points[i][0], points[i][1]))) {
-                    return;
+                const result = await this.preview(points[i][0], points[i][1], (i === points.length - 1));
+
+                if (!result) {
+                    BeamboxActions.endDrawingPreviewBlob();
+                    return
                 }
             }
         }

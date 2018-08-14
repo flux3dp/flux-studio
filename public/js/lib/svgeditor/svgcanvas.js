@@ -33,13 +33,14 @@ define([
     'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
-
+    'app/actions/beambox'
 ], function (
     i18n,
     BeamboxPreference,
     AlertActions,
     ObjectPanelsController,
-    PreviewModeController
+    PreviewModeController,
+    BeamboxActions
 ) {
     const LANG = i18n.lang.beambox;
     // Class: SvgCanvas
@@ -2153,8 +2154,10 @@ define([
                         if (justClearSelection) {
                             justClearSelection = false;
                         } else {
+                            BeamboxActions.startDrawingPreviewBlob();
+
                             if (start_x === real_x && start_y === real_y) {
-                                PreviewModeController.preview(real_x, real_y);
+                                PreviewModeController.preview(real_x, real_y, true);
                             } else {
                                 PreviewModeController.previewRegion(start_x, start_y, real_x, real_y);
                             }

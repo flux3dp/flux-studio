@@ -1,9 +1,11 @@
 define([
     'react',
-    'reactDOM'
+    'reactDOM',
+    'app/actions/beambox/preview-mode-background-drawer'
 ], function (
     React,
-    ReactDOM
+    ReactDOM,
+    PreviewModeBackgroundDrawer
 ) {
     const rootId = 'clear-preview-graffiti-button-placeholder';
 
@@ -24,8 +26,10 @@ define([
                 className='fa fa-times clear-preview'
                 title="Clear all"
                 onClick={() => {
-                    this.onClick();
-                    this.hide();
+                    if(!PreviewModeBackgroundDrawer.isClean()) {
+                        this.onClick();
+                        this.hide();
+                    }
                 }}
             />);
             ReactDOM.render(button, root);

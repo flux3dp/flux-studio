@@ -7,6 +7,7 @@ define([
     'helpers/i18n',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'app/actions/beambox',
+    'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
     'helpers/api/image-tracer',
 ], function(
@@ -16,6 +17,7 @@ define([
     i18n,
     ImageTracePanelController,
     BeamboxActions,
+    PreviewModeBackgroundDrawer,
     PreviewModeController,
     ImageTracerApi
 ) {
@@ -31,7 +33,7 @@ define([
         }
 
         _handleClick() {
-            if (!this.state.isWorking) {
+            if (!PreviewModeBackgroundDrawer.isClean()) {
                 this.props.onClick();
                 this.setState({ isWorking: true });
                 BeamboxActions.showCropper();

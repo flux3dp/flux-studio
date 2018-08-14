@@ -13,10 +13,14 @@ define([
                 actionType: BeamboxConstants.BACK_TO_PREVIEW,
             });
         },
-        drawPreviewBlob: function(previewBlobUrl) {
+        startDrawingPreviewBlob: function() {
             Dispatcher.dispatch({
-                actionType: BeamboxConstants.DRAW_PREVIEW_BLOB,
-                previewBlobUrl
+                actionType: BeamboxConstants.START_DRAWING_PREVIEW_BLOB,
+            });
+        },
+        endDrawingPreviewBlob: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.END_DRAWING_PREVIEW_BLOB,
             });
         },
         showCropper: function() {

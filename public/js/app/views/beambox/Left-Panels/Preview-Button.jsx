@@ -2,10 +2,12 @@ define([
     'react',
     'reactDOM',
     'jsx!widgets/Modal',
+    'jsx!views/beambox/Left-Panels/Clear-Preview-Graffiti-Button',
     'jsx!views/beambox/Left-Panels/Image-Trace-Button',
     'jsx!views/Printer-Selector',
     'app/actions/alert-actions',
     'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-preference',
@@ -18,10 +20,12 @@ define([
     React,
     ReactDOM,
     Modal,
+    ClearPreviewGraffitiButton,
     ImageTraceButton,
     PrinterSelector,
     AlertActions,
     FnWrapper,
+    PreviewModeBackgroundDrawer,
     PreviewModeController,
     BeamboxVersionMaster,
     BeamboxPreference,
@@ -39,16 +43,21 @@ define([
             super();
             this.state = {
                 isPreviewMode: false,
-                isImageTraceMode: false
+                isImageTraceMode: false,
+                isDrawing: false
             };
         }
 
         componentDidMount() {
+            BeamboxStore.onStartDrawingPreviewBlob(() => this.startDrawing());
+            BeamboxStore.onEndDrawingPreviewBlob(() => this.endDrawing());
             BeamboxStore.onBackToPreviewMode(() => this.backToPreviewMode());
             BeamboxStore.onEndImageTrace(() => this.endImageTrace());
         }
 
         componentWillUnmount() {
+            BeamboxStore.removeStartDrawingPreviewBlobListener(() => this.startDrawing());
+            BeamboxStore.removeEndDrawingPreviewBlobListener(() => this.endDrawing());
             BeamboxStore.removeBackToPreviewModeListener(() => this.backToPreviewMode());
             BeamboxStore.removeEndImageTraceListener(() => this.endImageTrace());
         }
@@ -75,11 +84,18 @@ define([
         }
 
         backToPreviewMode() {
-            this.setState({
-                isImageTraceMode: false
-            });
-
+            this.setState({ isImageTraceMode: false });
             this._handlePreviewClick();
+        }
+
+        endDrawing() {
+            ClearPreviewGraffitiButton.show();
+            this.setState({ isDrawing: false });
+        }
+
+        startDrawing() {
+            ClearPreviewGraffitiButton.hide();
+            this.setState({ isDrawing: true });
         }
 
         _handlePreviewClick() {
@@ -187,7 +203,10 @@ define([
                     console.log(error);
                 } finally {
                     FnWrapper.useSelectTool();
-                    this.setState({isPreviewMode: false});
+                    this.setState({
+                        isPreviewMode: false,
+                        isImageTraceMode: false
+                    });
                 }
             };
 
@@ -208,20 +227,25 @@ define([
         }
 
         render() {
+            const {
+                isPreviewMode,
+                isImageTraceMode,
+                isDrawing
+            } = this.state;
             const ImageTrace = (
-                this.state.isPreviewMode || this.state.isImageTraceMode ?
+                PreviewModeBackgroundDrawer.isClean() || isDrawing ?
+                null :
                 <ImageTraceButton
                     onClick={() => this.handleImageTraceClick()}
-                /> :
-                null
+                />
             );
             return (
                 <div>
                     <div
-                        className={classNames('option', 'preview-btn', {'preview-mode-on': this.state.isPreviewMode})}
+                        className={classNames('option', 'preview-btn', {'preview-mode-on': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        {this.state.isPreviewMode || this.state.isImageTraceMode ? LANG.end_preview : LANG.preview}
+                        {isPreviewMode || isImageTraceMode ? LANG.end_preview : LANG.preview}
                     </div>
                     <span id='clear-preview-graffiti-button-placeholder' />
                     <span id='printer-selector-placeholder' />

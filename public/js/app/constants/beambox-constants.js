@@ -7,7 +7,8 @@ define(function() {
         TUNE_IMAGE_TRACE            : 'TUNE_IMAGE_TRACE',
         APPLY_IMAGE_TRACE           : 'APPLY_IMAGE_TRACE',
         END_IMAGE_TRACE             : 'END_IMAGE_TRACE',
-        DRAW_PREVIEW_BLOB           : 'DRAW_PREVIEW_BLOB',
+        START_DRAWING_PREVIEW_BLOB  : 'START_DRAWING_PREVIEW_BLOB',
+        END_DRAWING_PREVIEW_BLOB    : 'END_DRAWING_PREVIEW_BLOB',
         GET_IMAGE_TRACE             : 'GET_IMAGE_TRACE'
     };
 });

@@ -5,6 +5,7 @@ define([
     'react',
     'reactPropTypes',
     'app/actions/beambox',
+    'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/stores/beambox-store',
     'helpers/i18n',
@@ -18,6 +19,7 @@ define([
     React,
     PropTypes,
     BeamboxActions,
+    PreviewModeBackgroundDrawer,
     FnWrapper,
     BeamboxStore,
     i18n,
@@ -50,7 +52,6 @@ define([
 
             this.state = {
                 currentStep: STEP_NONE,
-                previewBlobUrl: '',
                 croppedBlobUrl: '',
                 imageTrace: '',
                 cropData: {},
@@ -61,7 +62,6 @@ define([
         }
 
         componentDidMount() {
-            BeamboxStore.onDrawPreviewBlob((payload) => this.getImgBlobUrl(payload));
             BeamboxStore.onCropperShown(() => this.openCropper());
             BeamboxStore.onGetImageTrace((payload) => this.getImageTrace(payload));
 
@@ -103,7 +103,6 @@ define([
         }
 
         componentWillUnmount() {
-            BeamboxStore.removeDrawPreviewBlobListener((payload) => this.getImgBlobUrl(payload));
             BeamboxStore.removeCropperShownListener(() => this.openCropper());
             BeamboxStore.removeGetImageTraceListener((payload) => this.getImageTrace(payload));
         }
@@ -114,10 +113,6 @@ define([
             if(this.state.currentStep === STEP_TUNE) {
                 this.next();
             }
-        }
-
-        getImgBlobUrl(payload) {
-            this.setState({ previewBlobUrl: payload.previewBlobUrl })
         }
 
         openCropper() {
@@ -323,6 +318,8 @@ define([
         }
 
         _renderCropperModal() {
+            const previewBlobUrl = PreviewModeBackgroundDrawer.getCameraCanvasUrl();
+
             return (
                 <Modal>
                     <div className='cropper-panel'>
@@ -330,7 +327,7 @@ define([
                             <img
                                 id= 'previewForCropper'
                                 onLoad={()=> this._renderCropper()}
-                                src={this.state.previewBlobUrl}
+                                src={previewBlobUrl}
                             />
                         </div>
                         <div className='footer'>

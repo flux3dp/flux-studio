@@ -35,8 +35,9 @@ define([
             this.backgroundDrawerSubject.onCompleted();
         }
 
-        async draw(imgUrl, x, y) {
-            const p = this._prepareCroppedAndRotatedImgBlob(imgUrl, x, y);
+        async draw(imgUrl, x, y, last = false) {
+            const p = this._prepareCroppedAndRotatedImgBlob(imgUrl, x, y, last);
+
             this.backgroundDrawerSubject.onNext(p);
             // await p;  if you want to know the time when image transfer to Blob, which is almost the same time background is drawn.
         }
@@ -68,16 +69,19 @@ define([
             this.cameraCanvasUrl = '';
         }
 
+        getCameraCanvasUrl() {
+            return this.cameraCanvasUrl;
+        }
+
         _drawBlobToBackground(blob) {
             if (this.cameraCanvasUrl) {
                 URL.revokeObjectURL(this.cameraCanvasUrl);
             }
             this.cameraCanvasUrl = URL.createObjectURL(blob);
             window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
-            BeamboxActions.drawPreviewBlob(this.cameraCanvasUrl);
         }
 
-        _prepareCroppedAndRotatedImgBlob(imgUrl, x, y) {
+        _prepareCroppedAndRotatedImgBlob(imgUrl, x, y, last = false) {
             const img = new Image();
             img.src = imgUrl;
             return new Promise(resolve => {
@@ -92,6 +96,10 @@ define([
 
                     this.canvas.getContext('2d').drawImage(img_regulated, dstX, dstY);
                     this.canvas.toBlob(blob => resolve(blob));
+
+                    if (last) {
+                        BeamboxActions.endDrawingPreviewBlob();
+                    }
                 };
             });
         }
