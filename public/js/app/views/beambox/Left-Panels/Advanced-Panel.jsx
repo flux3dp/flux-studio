@@ -1,11 +1,17 @@
 define([
     'react',
     'jsx!widgets/Modal',
+    'jsx!widgets/Dropdown-Control',
+    'jsx!widgets/Switch-Control',
+    'jsx!widgets/Radio-Control',
     'app/actions/beambox/beambox-preference',
     'helpers/i18n',
 ], function(
     React,
     Modal,
+    DropDownControl,
+    SwitchControl,
+    RadioControl,
     BeamboxPreference,
     i18n
 ) {
@@ -56,6 +62,7 @@ define([
             super();
             this.state = {
                 engraveDpi: BeamboxPreference.read('engrave_dpi'),
+                rotaryMode: BeamboxPreference.read('rotary_mode')
             };
         }
 
@@ -65,8 +72,17 @@ define([
             });
         }
 
+        _handleRotaryModeChange(value) {
+            this.setState({
+                rotaryMode: value
+            });
+            svgCanvas.setRotaryMode(value);
+            svgCanvas.runExtensions('updateRotaryAxis');
+        }
+
         save() {
             BeamboxPreference.write('engrave_dpi', this.state.engraveDpi);
+            BeamboxPreference.write('rotary_mode', this.state.rotaryMode);
         }
 
         render() {
@@ -79,6 +95,12 @@ define([
                                 value={this.state.engraveDpi}
                                 onChange={val => this._handleEngraveDpiChange(val)}
                             />
+                            <SwitchControl
+                                id="rotary_mode"
+                                name="rotary_mode"
+                                label={LANG.rotary_mode}
+                                default={this.state.rotaryMode}
+                                onChange={(id, val) => this._handleRotaryModeChange(val)} />
                         </section>
                         <section className='footer'>
                             <button

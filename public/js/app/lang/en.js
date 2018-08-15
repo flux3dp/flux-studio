@@ -1031,8 +1031,9 @@ define(function() {
                     text: 'Text'
                 },
                 advanced_panel: {
-                    engrave_parameters: 'Engrave Parameters',
-                    engrave_dpi: 'Engraving Resolution',
+                    engrave_parameters: 'Engraving Parameters',
+                    rotary_mode: 'Rotary',
+                    engrave_dpi: 'Resolution',
                     low: 'Low',
                     medium: 'Medium',
                     high: 'High',

@@ -1030,6 +1030,7 @@ define(function() {
                 },
                 advanced_panel: {
                     engrave_parameters: '雕刻參數',
+                    rotary_mode: '旋轉軸',
                     engrave_dpi: '雕刻解析度',
                     low: '低',
                     medium: '中',

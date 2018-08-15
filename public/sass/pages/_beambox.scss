@@ -51,7 +51,6 @@
             width: 440px;
             padding: 0px;
             .main-content {
-                height: 120px;
                 padding: 20px;
                 .title {
                     color: #626262;
@@ -71,6 +70,9 @@
                     }
                     .value {
                         margin-left: 10px;
+                    }
+                    .switch-container {
+                        margin-left: 0;
                     }
                 }
             }
