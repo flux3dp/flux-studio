@@ -1,7 +1,9 @@
 define([
     'app/actions/beambox/constant',
+    'helpers/image-data',
 ], function(
-    Constant
+    Constant,
+    ImageData
 ){
     let _mm2pixel = function(mm_input) {
         const dpmm = Constant.dpmm;
@@ -75,6 +77,63 @@ define([
             }
             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
             $('#dialog_box').hide();
+        },
+        insertImage: function(insertedImageSrc, cropData) {
+
+            // let's insert the new image until we know its dimensions
+            const insertNewImage = function (img, cropData) {
+                const {
+                    x,
+                    y,
+                    width,
+                    height
+                } = cropData;
+                const newImage = svgCanvas.addSvgElementFromJson({
+                    element: 'image',
+                    attr: {
+                        x,
+                        y,
+                        width,
+                        height,
+                        id: svgCanvas.getNextId(),
+                        style: 'pointer-events:inherit',
+                        preserveAspectRatio: 'none',
+                        'data-threshold': 100,
+                        'data-shading': true,
+                        origImage: img.src
+                    }
+                });
+
+                ImageData(
+                    newImage.getAttribute('origImage'), {
+                        height: height,
+                        width: width,
+                        grayscale: {
+                            is_rgba: true,
+                            is_shading: Boolean(newImage.getAttribute('data-shading')),
+                            threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
+                            is_svg: false
+                        },
+                        onComplete: function (result) {
+                            svgCanvas.setHref(newImage, result.canvas.toDataURL());
+                        }
+                    }
+                );
+
+                svgCanvas.selectOnly([newImage]);
+
+                window.updateContextPanel();
+                $('#dialog_box').hide();
+            };
+
+            // create dummy img so we know the default dimensions
+            const img = new Image();
+
+            img.src = insertedImageSrc;
+            img.style.opacity = 0;
+            img.onload = function () {
+                insertNewImage(img, cropData);
+            };
         },
 
         //align toolbox

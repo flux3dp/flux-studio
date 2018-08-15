@@ -63,7 +63,6 @@ define([
 
         componentDidMount() {
             BeamboxStore.onCropperShown(() => this.openCropper());
-            BeamboxStore.onGetImageTrace((payload) => this.getImageTrace(payload));
 
             if (TESTING_IT) {
                 console.log('dev ! testing it-panel');
@@ -104,11 +103,10 @@ define([
 
         componentWillUnmount() {
             BeamboxStore.removeCropperShownListener(() => this.openCropper());
-            BeamboxStore.removeGetImageTraceListener((payload) => this.getImageTrace(payload));
         }
 
-        getImageTrace(payload) {
-            this.setState({ imageTrace: payload.imageTrace });
+        _getImageTrace(imageTrace) {
+            this.setState({ imageTrace });
 
             if(this.state.currentStep === STEP_TUNE) {
                 this.next();
@@ -185,11 +183,12 @@ define([
                     var fileReader = new FileReader();
                     fileReader.onloadend = (e) => {
                         imageTracerWebSocket.upload(e.target.result, { brightness: brightness/100, contrast: contrast/100, threshold })
-                            .done((resp)=>{
-                                d.resolve(resp);
+                            .done((res)=>{
+                                d.resolve(res);
+                                this._getImageTrace(res.svg);
                             })
-                            .fail((resp)=>{
-                                d.reject(resp.toString());
+                            .fail((res)=>{
+                                d.reject(res.toString());
                             });
                     };
                     fileReader.readAsArrayBuffer(blob);
@@ -281,7 +280,9 @@ define([
         }
 
         _destroyCropper() {
-            cropper.destroy();
+            if(cropper) {
+                cropper.destroy();
+            }
         }
 
         _handleImageTraceCancel() {
@@ -292,7 +293,7 @@ define([
                 imageTrace: '',
                 brightness: 100,
                 contrast: 100,
-                threshold: 90
+                threshold: 255
             });
             BeamboxActions.backToPreviewMode();
         }
@@ -301,9 +302,53 @@ define([
             this.next();
         }
 
-        _pushImageTrace() {
-            const { cropData, imageTrace } = this.state;
-            FnWrapper.insertSvg(imageTrace, cropData);
+        async _pushImageTrace() {
+            const {
+                cropData,
+                imageTrace,
+                brightness,
+                contrast,
+                threshold,
+                croppedBlobUrl
+            } = this.state;
+            const tunedImage = document.getElementById('tunedImage');
+
+            const d = $.Deferred();
+
+            fetch(croppedBlobUrl)
+                .then(res => res.blob())
+                .then((blob) => {
+                    var fileReader = new FileReader();
+                    fileReader.onloadend = (e) => {
+                        imageTracerWebSocket.basic(e.target.result, { brightness: brightness/100, contrast: contrast/100})
+                            .done((res)=>{
+                                d.resolve(res);
+                                const url = URL.createObjectURL(res);
+
+                                if (TESTING_IT) {
+                                    const testingCropData = {
+                                        x: tunedImage.x,
+                                        y: tunedImage.y,
+                                        width: tunedImage.width,
+                                        height: tunedImage.height
+                                    }
+
+                                    FnWrapper.insertSvg(imageTrace, testingCropData);
+                                    FnWrapper.insertImage(url, testingCropData);
+                                } else {
+                                    FnWrapper.insertSvg(imageTrace, cropData);
+                                    FnWrapper.insertImage(url, cropData, threshold);
+                                }
+                            })
+                            .fail((res)=>{
+                                d.reject(res.toString());
+                            });
+                    };
+                    fileReader.readAsArrayBuffer(blob);
+                })
+                .catch((err) => {
+                    d.reject(err);
+                })
             this._handleImageTraceCancel();
             BeamboxActions.endImageTrace();
         }
@@ -403,8 +448,8 @@ define([
                                         id='brightness'
                                         key='brightness'
                                         label={LANG.brightness}
-                                        min={50}
-                                        max={150}
+                                        min={60}
+                                        max={140}
                                         step={1}
                                         unit='percent'
                                         default={parseInt(brightness)}
@@ -414,8 +459,8 @@ define([
                                         id='contrast'
                                         key='contrast'
                                         label={LANG.contrast}
-                                        min={50}
-                                        max={150}
+                                        min={60}
+                                        max={140}
                                         step={1}
                                         unit='percent'
                                         default={parseInt(contrast)}

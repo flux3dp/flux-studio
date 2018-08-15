@@ -29,11 +29,6 @@ define([
             return beamboxStore;
         },
 
-        onGetImageTrace: function(callback) {
-            this.on(Constants.GET_IMAGE_TRACE, callback);
-            return beamboxStore;
-        },
-
         onBackToPreviewMode: function(callback) {
             this.on(Constants.BACK_TO_PREVIEW, callback);
             return beamboxStore;
@@ -56,11 +51,6 @@ define([
 
         removeCropperShownListener: function(callback) {
             this.removeListener(Constants.SHOW_CROPPER, callback);
-            return beamboxStore;
-        },
-
-        removeGetImageTraceListener: function(callback) {
-            this.removeListener(Constants.GET_IMAGE_TRACE, callback);
             return beamboxStore;
         },
 

@@ -28,20 +28,9 @@ define([
                 actionType: BeamboxConstants.SHOW_CROPPER,
             });
         },
-        getImageTrace: function(imageTrace) {
-            Dispatcher.dispatch({
-                actionType: BeamboxConstants.GET_IMAGE_TRACE,
-                imageTrace
-            });
-        },
         tuneParams: function() {
             Dispatcher.dispatch({
                 actionType: BeamboxConstants.TUNE_IMAGE_TRACE
-            });
-        },
-        applyImageTrace: function() {
-            Dispatcher.dispatch({
-                actionType: BeamboxConstants.APPLY_IMAGE_TRACE
             });
         },
         endImageTrace: function() {

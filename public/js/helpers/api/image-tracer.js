@@ -43,7 +43,6 @@ define([
                     switch (response.status) {
                         case 'ok':
                             d.resolve(response);
-                            BeamboxActions.getImageTrace(response.svg);
                             break;
                         case 'continue':
                             ws.send(data);
@@ -58,6 +57,27 @@ define([
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
                 ws.send(`image_trace ${data.size || data.byteLength} ${opts.brightness} ${opts.contrast} ${opts.threshold}`);
+                return d.promise();
+            },
+
+            /**
+             * @param {ArrayBuffer} data    - binary data with array buffer type
+             */
+            basic: (data, opts) => {
+                opts = opts || {};
+                let d = $.Deferred();
+                events.onMessage = (response) => {
+                    switch (response.status) {
+                        default:
+                            d.resolve(response);
+                            break;
+                    }
+                };
+
+                events.onError = (response) => { d.reject(response); console.log('on error', response); };
+                events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
+
+                ws.send(`basic_processing ${data.size || data.byteLength} ${opts.brightness} ${opts.contrast}`);
                 return d.promise();
             },
         };
