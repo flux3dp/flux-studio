@@ -121,10 +121,10 @@ define([
                 allowedOrigins: []
             },
             defaultExtensions = [
+                'ext-rotary_mode.js',
                 'ext-overview_window.js',
                 'ext-markers.js',
                 'ext-connector.js',
-                // 'ext-eyedropper.js',
                 'ext-shapes.js',
                 'ext-imagelib.js',
                 'ext-grid.js',
@@ -133,7 +133,7 @@ define([
                 'ext-panning.js',
                 'ext-multiselect.js',
                 // 'ext-storage.js',
-
+                // 'ext-eyedropper.js',
                 'ext-closepath.js',
             ],
             defaultConfig = {

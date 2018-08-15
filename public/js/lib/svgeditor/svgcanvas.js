@@ -507,7 +507,7 @@ define([
                 round_digits: 5
             },
 
-            // Boolean indicating whether or not a draw action has been started
+            // Boolean indicating whether or not a dragging action has been started
             started = false,
 
             // String with an element's initial transform attribute value
@@ -549,7 +549,10 @@ define([
             // Map of deleted reference elements
             removedElements = {},
 
-            justClearSelection = false;
+            justClearSelection = false,
+            
+            // Rotary Mode
+            rotaryMode = BeamboxPreference.read('rotary_mode');
 
         // Clipboard for cut, copy&pasted elements
         canvas.clipBoard = [];
@@ -1282,6 +1285,7 @@ define([
                 var pt = svgedit.math.transformPoint(evt.pageX, evt.pageY, root_sctm),
                     mouse_x = pt.x * current_zoom,
                     mouse_y = pt.y * current_zoom;
+                var ext_result = null;
 
                 evt.preventDefault();
 
@@ -1332,6 +1336,15 @@ define([
                         current_resize_mode = elData(grip, 'dir');
                     }
                     mouse_target = selectedElements[0];
+                }
+
+                if (ext_result = runExtensions('checkMouseTarget', { mouseTarget: mouse_target }, true)) {
+                    $.each(ext_result, function (i, r) {
+                        started = started || (r && r.started);
+                    });
+                    if (started) {
+                        return;
+                    }
                 }
 
                 startTransform = mouse_target.getAttribute('transform');
@@ -1642,7 +1655,7 @@ define([
                         break;
                 }
 
-                var ext_result = runExtensions('mouseDown', {
+                ext_result = runExtensions('mouseDown', {
                     event: evt,
                     start_x: start_x,
                     start_y: start_y,
@@ -8786,6 +8799,22 @@ define([
             selectorManager.requestSelector(selected).showGrips(true);
 
             svgedit.recalculate.recalculateDimensions(selected);
+        };
+
+        this.setRotaryMode = function(val) {
+            // True or false
+            rotaryMode = val;
+        };
+        this.getRotaryMode = function () {
+            return rotaryMode;
+        };
+
+        this.setRotaryYCoord = function (val) {
+            BeamboxPreference.write('rotary_y_coord', val);
+        };
+
+        this.getRotaryYCoord = function () {
+            return BeamboxPreference.read('rotary_y_coord') || 5;
         };
     };
 

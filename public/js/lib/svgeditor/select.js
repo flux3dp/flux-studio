@@ -415,7 +415,7 @@ svgedit.select.SelectorManager.prototype.initGroup = function() {
 			'x': 0,
 			'y': 0,
 			'overflow': (svgedit.browser.isWebkit() ? 'none' : 'visible'), // Chrome 7 has a problem with this when zooming out
-			'style': 'pointer-events:none'
+			// 'style': 'pointer-events:none'
 		}
 	});
 
