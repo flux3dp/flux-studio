@@ -26,6 +26,7 @@ requirejs.config({
         cssHome: '../css/3rd-party-plugins',
         freetrans: 'plugins/freetrans/jquery.freetrans',
         html2canvas: 'lib/html2canvas.min',
+        fuse: 'lib/fuse',
         events: 'lib/events',
         window: 'app/window',
         localStorage: 'app/local-storage',

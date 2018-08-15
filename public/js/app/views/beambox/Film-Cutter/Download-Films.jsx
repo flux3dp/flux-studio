@@ -1,5 +1,6 @@
 define([
     'react',
+    'fuse',
     'jsx!widgets/Modal',
     'app/actions/beambox/beambox-preference',
     'app/actions/film-cutter/film-database',
@@ -9,6 +10,7 @@ define([
     'helpers/i18n',
 ], function(
     React,
+    Fuse,
     Modal,
     BeamboxPreference,
     FilmDatabase,
@@ -43,16 +45,53 @@ define([
             ));
         return <div>{btns}</div>;
     };
+    const MatchedBtn = ({brand, model, onMatchedClick}) => {
+        const label = `${brand} - ${model}`;
+        return (<Btn onClick={() => onMatchedClick(brand, model)} key={label}>{label}</Btn>);
+    };
+    const SearchInput = ({value, onChange}) => {
+        return (
+            <input
+                type='text'
+                className='search-input'
+                value={value}
+                onChange={onChange}
+                onKeyUp={onChange}
+            />
+        );
+    };
 
     return class DownloadFilms extends React.Component {
         constructor() {
             super();
             this.state = {
+                fuse: null, // the object provide fuzzy search
+                searchString: '',
                 brand: undefined,
                 model: undefined,
             };
         }
-
+        componentWillMount() {
+            this.flushSearchingSource();
+        }
+        flushSearchingSource() {
+            const source = FilmDatabase.lsAll('svg');
+            this.state.fuse = new Fuse(
+                source,
+                {
+                    shouldSort: true,
+                    threshold: 0.6,
+                    location: 0,
+                    distance: 100,
+                    maxPatternLength: 32,
+                    minMatchCharLength: 1,
+                    keys: [
+                        'brand',
+                        'model'
+                    ]
+                }
+            );
+        }
         async handleDownloadClick() {
             if(!FilmDatabase.validateUsageDownload()) {
                 AlertActions.showPopupError('film-cutter', '已超过数据下载期限');
@@ -68,12 +107,11 @@ define([
                 await FilmDatabase.syncWithCloud();
                 ProgressActions.close();
                 AlertActions.showPopupInfo('film-cutter', '已成功更新数据');
-                this.forceUpdate();
+                this.flushSearchingSource();
             } catch (error) {
                 AlertActions.showPopupError('film-cutter', error.toString());
                 ProgressActions.close();
             }
-
         }
 
         handlResetClick() {
@@ -139,26 +177,56 @@ define([
                     model={this.state.model}
                     onCategoryClick={onCategoryClick}
                 />);
-
+        }
+        _renderMatchedItems() {
+            const items = this.state.fuse.search(this.state.searchString);
+            const onMatchedClick = (brand, model) => {
+                this.setState({
+                    searchString: '',
+                    brand,
+                    model
+                });
+            };
+            const btns = items.map(x =>
+                (<MatchedBtn
+                    brand={x.brand}
+                    model={x.model}
+                    onMatchedClick={onMatchedClick}
+                />));
+            return <div>{btns}</div>;
         }
         _renderMainContent() {
+            if (this.state.searchString) {
+                return this._renderMatchedItems();
+            }
+
             if(this.state.brand && this.state.model) {
                 return this._renderCategories();
-            } else if(this.state.brand) {
-                return this._renderModels();
-            } else {
-                return this._renderBrands();
             }
+
+            if(this.state.brand) {
+                return this._renderModels();
+            }
+
+            return this._renderBrands();
         }
         _renderBanner() {
-            return [this.state.brand, this.state.model].filter(x => !!x).join(' - ');
+            return <span>{[this.state.brand, this.state.model].filter(x => !!x).join(' - ') || ' '}</span>;
         }
         render() {
             return (
                 <Modal onClose={() => this.props.onClose()}>
-                    <div className='advanced-panel'>
+                    <div className='download-films-panel'>
                         <section className='main-content'>
-                            <div className='title'>{'选择手机膜'} {this._renderBanner()}</div>
+                            <div className='title'>{'选择手机膜'}</div>
+                            <div className='title-bar'>
+                                {this._renderBanner()}
+                                <SearchInput
+                                    onChange={e => this.setState({searchString: e.target.value})}
+                                    value={this.state.searchString}
+                                />
+                            </div>
+
                             {this._renderMainContent()}
                         </section>
                         <section className='footer'>

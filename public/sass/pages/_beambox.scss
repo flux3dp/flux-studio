@@ -92,6 +92,65 @@
                 }
             }
         }
+        .download-films-panel {
+            border-radius: 2px;
+            background-color: #fff;
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 440px;
+            padding: 0px;
+            .main-content {
+                padding: 20px;
+                min-height: 500px;
+                .title {
+                    color: #626262;
+                    font-size: 15px;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 15px;
+                }
+                .title-bar {
+                    display: flex;
+                    justify-content: space-between;
+                    color: #626262;
+                    font-size: 15px;
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                    margin-bottom: 15px;
+                    .search-input {
+
+                    }
+                }
+                .control {
+                    display: flex;
+                    align-items: center;
+                    .label {
+                        width: 120px;
+                    }
+                    .slider {
+                        width: 150px;
+                    }
+                    .value {
+                        margin-left: 10px;
+                    }
+                }
+            }
+
+            .footer {
+                height: 59px;
+                padding-top: 12px;
+                padding-bottom: 12px;
+                margin-bottom: 0px;
+                border-top: 1px solid #DDD;
+                .btn {
+                    margin-left: 12px;
+                    margin-right: 0px;
+                    line-height: 30px;
+                    &:first-of-type {
+                        margin-right: 12px;
+                    }
+                }
+            }
+        }
         .ui-dialog-menu-item {
             .dialog-label {
                 width: 140px;

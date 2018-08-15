@@ -290,6 +290,18 @@ ipcMain.on(events.FILE_LS , (event, {dirPath}) => {
     const items = fs.readdirSync(dirAbsPath);
     event.returnValue = items;
 });
+
+ipcMain.on(events.FILE_LS_ALL, (event, {type}) => {
+    const brands = fs.readdirSync(path.join(app.getPath('userData'), 'film-database', type));
+    const ret = brands.map(brand => {
+        const models = fs.readdirSync(path.join(app.getPath('userData'), 'film-database', type, brand));
+        return models.map(model => {
+            return {brand, model};
+        });
+    }).reduce((acc, cur) => acc ? acc.concat(cur) : []);
+    event.returnValue = ret;
+});
+
 ipcMain.on(events.FILE_RESET , (event) => {
     const dirAbsPath = path.join(app.getPath('userData'), 'film-database');
     const rmdir = (dir_path) => {

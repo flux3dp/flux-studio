@@ -23,6 +23,7 @@ module.exports = {
     FILE_READ               : 'FILE_READ',
     FILE_WRITE              : 'FILE_WRITE',
     FILE_LS                 : 'FILE_LS',
+    FILE_LS_ALL             : 'FILE_LS_ALL',
     FILE_RESET              : 'FILE_RESET',
     FILE_LS_FCODE_MTIME_GT  : 'FILE_LS_FCODE_MTIME_GT',
     FILE_PACK_FCODE         : 'FILE_PACK_FCODE',

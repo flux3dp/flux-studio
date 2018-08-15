@@ -53,6 +53,9 @@ define([
             const svg = AESCipher.decryptUint8Array(new Uint8Array(enc.data));
             return svg;
         }
+        lsAll(type) {
+            return ipc.sendSync(events.FILE_LS_ALL, { type });
+        }
         ls(type, brand, model) {
             const dirPath = [type, brand, model].filter(x => !!x).join('/');
             return ipc.sendSync(events.FILE_LS, { dirPath });
