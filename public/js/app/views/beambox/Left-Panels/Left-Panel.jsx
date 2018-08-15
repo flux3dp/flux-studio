@@ -36,14 +36,17 @@ define([
                 isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
             });
 
-            FnWrapper.clearSelection();
+            if (isOpen) { 
+                FnWrapper.clearSelection();
+            }
         }
         _toogleInsert(isOpen) {
             this.setState({
                 isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
             });
-
-            FnWrapper.clearSelection();
+            if (isOpen) { 
+                FnWrapper.clearSelection();
+            }
         }
 
         _renderInsertObject() {
