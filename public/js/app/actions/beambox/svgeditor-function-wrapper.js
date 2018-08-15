@@ -30,6 +30,9 @@ define([
     };
 
     const funcs =  {
+        clearSelection: function() {
+            svgCanvas.clearSelection();
+        },
         isAnyElementSelected: function() {
             if (!window.svgCanvas) {
                 return false;

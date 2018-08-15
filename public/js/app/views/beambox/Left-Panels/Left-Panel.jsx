@@ -1,6 +1,7 @@
 define([
     'react',
     'reactDOM',
+    'app/actions/beambox/svgeditor-function-wrapper',
     'jsx!views/beambox/Left-Panels/Insert-Object-Submenu',
     'jsx!views/beambox/Left-Panels/Preview-Button',
     'jsx!views/beambox/Left-Panels/Advanced-Panel',
@@ -8,6 +9,7 @@ define([
 ], function(
     React,
     ReactDOM,
+    FnWrapper,
     InsertObjectSubmenu,
     PreviewButton,
     AdvancedPanel,
@@ -33,11 +35,15 @@ define([
             this.setState({
                 isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
             });
+
+            FnWrapper.clearSelection();
         }
         _toogleInsert(isOpen) {
             this.setState({
                 isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
             });
+
+            FnWrapper.clearSelection();
         }
 
         _renderInsertObject() {

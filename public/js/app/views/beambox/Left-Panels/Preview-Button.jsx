@@ -141,6 +141,8 @@ define([
                 }
             };
 
+            FnWrapper.clearSelection();
+
             if(!this.state.isPreviewMode) {
                 tryToStartPreviewMode();
             } else {
