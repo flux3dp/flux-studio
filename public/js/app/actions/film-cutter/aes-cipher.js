@@ -6,7 +6,32 @@ define([
     RecordManager
 ) {
     class AESCipher {
-        encrpyt(str) {
+        async encryptBlob(blob) {
+            const key = RecordManager.read('film_secret_key');
+
+            const arrayBuffer = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.readAsArrayBuffer(blob);
+            });
+            const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
+
+            const encryptedAsBase64String = CryptoJS.AES.encrypt(wordArray, CryptoJS.enc.Utf8.parse(key), {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+
+            const byteCharacters = atob(encryptedAsBase64String);
+            var byteNumbers = new Array(byteCharacters.length);
+            for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            var byteArray = new Uint8Array(byteNumbers);
+            var blob = new Blob([byteArray], {type: 'application/encrypted_fcode'});
+
+            return blob;
+        }
+        encrypt(str) {
             const key = RecordManager.read('film_secret_key');
             var encrypt = CryptoJS.AES.encrypt(str, CryptoJS.enc.Utf8.parse(key), {
                 mode: CryptoJS.mode.ECB,

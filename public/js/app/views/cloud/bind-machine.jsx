@@ -61,6 +61,7 @@ define([
                 await FilmCutterCloud.bindMachine(stm32, pi, this.state.selectedDevice.model);
                 RecordManager.write('machine_stm32_serial_number', stm32);
                 RecordManager.write('machine_pi_serial_number', pi);
+                await FilmCutterManager.syncWithMachine();
                 location.hash = '#/studio/cloud/my-account';
             } catch (error) {
                 AlertActions.showPopupError('bind-machine', error.message || error.toString());
@@ -68,7 +69,7 @@ define([
         }
         renderDeviceList() {
             if(!this.state.deviceList.length) {
-                return (<div><br/>{'請稍待...'}</div>);
+                return (<div><br/>{'请稍待...'}</div>);
             }
 
             return this.state.deviceList.map(d => {

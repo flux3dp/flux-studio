@@ -126,7 +126,7 @@ define([
                     uniqleId="laser"
                     className="laser-device-selection-popup"
                     modelFilter={PrinterSelector.MOZU_FILTER}
-                    showExport={true}
+                    showExport={false}
                     onClose={onClose}
                     onGettingPrinter={onGettingPrinter}
                 />

@@ -2,6 +2,7 @@ define([
     'helpers/device-master',
     'helpers/i18n',
     'app/actions/beambox/beambox-preference',
+    'app/actions/film-cutter/aes-cipher',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/beambox/font-funcs',
@@ -12,6 +13,7 @@ define([
     DeviceMaster,
     i18n,
     BeamboxPreference,
+    AESCipher,
     ProgressActions,
     ProgressConstants,
     FontFuncs,
@@ -148,9 +150,10 @@ define([
     return {
         uploadFcode: async function (device) {
             const { fcodeBlob, thumbnailBlobURL } = await fetchFcode();
+            const encryptedBlob = await AESCipher.encryptBlob(fcodeBlob);
             await DeviceMaster.select(device)
                 .done(() => {
-                    GlobalActions.showMonitor(device, fcodeBlob, thumbnailBlobURL, 'LASER');
+                    GlobalActions.showMonitor(device, encryptedBlob, thumbnailBlobURL, 'LASER');
                 })
                 .fail((errMsg) => {
                     AlertActions.showPopupError('menu-item', errMsg);

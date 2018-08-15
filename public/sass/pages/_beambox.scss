@@ -53,7 +53,6 @@
             width: 440px;
             padding: 0px;
             .main-content {
-                height: 120px;
                 padding: 20px;
                 .title {
                     color: #626262;
@@ -398,6 +397,7 @@
                 padding-left: 10px;
             }
             .ui.ui-control-unit-input-v2 {
+                margin-top: 2px;
                 margin-bottom: 7px;
                 .unit {
                     margin-left: -40px;
@@ -411,8 +411,9 @@
             }
         }
         #ruler_unit_shower {
-            top: 89px;
+            top: 90px;
             right: 0px;
+            height: 14px;
             padding-left: 10px;
             padding-right: 8px;
             color: #333;

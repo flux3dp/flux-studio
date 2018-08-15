@@ -172,7 +172,6 @@ function buildDeviceMenu(callback, uuid, data) {
         ];
     } else if(modelType === 'mozu-series') {
         submenu = [
-            { id: 'DASHBOARD', uuid, serial, source, label: r.dashboard, click: callback },
             { id: 'MACHINE_INFO', uuid, serial, source, label: r.machine_info, click: callback },
             { type: 'separator' },
             { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, click: callback},

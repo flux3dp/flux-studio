@@ -279,8 +279,9 @@ define([
                         fileName = fileName.join('.');
                         ws.send(`upload text/gcode ${data.size} ${path}/${fileName}`);
                     }
-                }
-                else {
+                } else if(data.type === 'application/encrypted_fcode') {
+                    ws.send(`file upload application/encrypted_fcode ${data.size}`);
+                } else {
                     ws.send(`file upload application/fcode ${data.size}`);
                 }
                 return d.promise();
