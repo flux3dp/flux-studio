@@ -308,8 +308,13 @@ define([
                     total_length = 0,
                     blob;
 
-                if (opts && opts.model === 'fbb1p') {
+                if (opts.model === 'fbb1p') {
                     args.push('-pro');
+                }
+
+                if (svgCanvas.getRotaryMode()) {
+                    args.push('-spin');
+                    args.push(svgCanvas.runExtensions('getRotaryAxisAbsoluteCoord'));
                 }
 
                 events.onMessage = function(data) {

@@ -16,7 +16,7 @@ svgEditor.addExtension('rotary_axis', function () {
         svgdoc = document.getElementById('svgcanvas').ownerDocument,
         assignAttributes = svgCanvas.assignAttributes,
         canvBG = $('#canvasBackground'),
-        currentYRatio = svgCanvas.getRotaryYCoord();
+        currentYRatio = svgCanvas.getRotaryDisplayCoord();
 
     var rotaryAxis = svgdoc.createElementNS(NS.SVG, 'svg');
     assignAttributes(rotaryAxis, {
@@ -82,14 +82,14 @@ svgEditor.addExtension('rotary_axis', function () {
         mouseUp: function () {
             if (svgCanvas.getMode() === 'adjust-rotary-axis') {
                 svgCanvas.setMode('select');
-                svgCanvas.setRotaryYCoord(currentYRatio);
+                svgCanvas.setRotaryDisplayCoord(currentYRatio);
                 return {
                     keep: false,
                     element: null
                 };
             }
         },
-        getRotaryAxisCoord: function() {
+        getRotaryAxisAbsoluteCoord: function() {
             return $('#svgroot').attr('y') * currentYRatio / 100.0;
         },
         updateRotaryAxis: function() {

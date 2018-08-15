@@ -8809,11 +8809,11 @@ define([
             return rotaryMode;
         };
 
-        this.setRotaryYCoord = function (val) {
+        this.setRotaryDisplayCoord = function (val) {
             BeamboxPreference.write('rotary_y_coord', val);
         };
 
-        this.getRotaryYCoord = function () {
+        this.getRotaryDisplayCoord = function () {
             return BeamboxPreference.read('rotary_y_coord') || 5;
         };
     };
