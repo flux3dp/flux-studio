@@ -68,6 +68,9 @@ define([
                 let d = $.Deferred();
                 events.onMessage = (response) => {
                     switch (response.status) {
+                        case 'continue':
+                            ws.send(data);
+                            break;
                         default:
                             d.resolve(response);
                             break;
