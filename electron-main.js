@@ -130,7 +130,7 @@ function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
         width: 1024, height: 768,
-        title: `FLUX Studio - ${app.getVersion()}`,
+        title: `Mozu Studio - ${app.getVersion()}`,
         webPreferences: {
             preload: path.join(__dirname, 'src', 'main-window-entry.js'),
             devTools: FORCE_CLOSE_DEVTOOLS ? false : undefined

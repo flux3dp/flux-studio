@@ -1,12 +1,12 @@
 {
-  "name": "flux-studio",
-  "productName": "FLUX Studio",
-  "version": "0.9.18",
+  "name": "mozu-studio",
+  "productName": "Mozu Studio",
+  "version": "1.0.0",
   "author": {
     "name": "FLUX Inc.",
     "email": "dev@flux3dp.com"
   },
-  "description": "FLUX Studio",
+  "description": "Mozu Studio",
   "private": true,
   "main": "electron-main.js",
   "dependencies": {
@@ -70,7 +70,7 @@
     "dist": "build"
   },
   "build": {
-    "appId": "com.flux3dp.flux-studio",
+    "appId": "com.mozu.mozu-studio",
     "extraResources": [
       "backend"
     ],
@@ -85,13 +85,13 @@
       }
     ],
     "mac": {
-      "category": "com.flux3dp.flux-studio",
+      "category": "com.mozu.mozu-studio",
       "target": "dmg",
       "icon": "public/logo.icns"
     },
     "linux": {
       "category": "Graphics",
-      "description": "FLUX Studio",
+      "description": "Mozu Studio",
       "vendor": "FLUX Inc.",
       "target": "deb",
       "icon": "app-icons"
@@ -102,7 +102,7 @@
       "publisherName": "FLUX TECHNOLOGY CORP."
     },
     "dmg": {
-      "artifactName": "FLUX Studio ${version}.${ext}"
+      "artifactName": "Mozu Studio ${version}.${ext}"
     },
     "deb": {
       "depends": [
@@ -111,7 +111,7 @@
     },
     "nsis": {
       "include": "win-install.nsh",
-      "artifactName": "FLUX Studio Installer ${version}.${ext}"
+      "artifactName": "Mozu Studio Installer ${version}.${ext}"
     }
   }
 }

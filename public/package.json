@@ -1,12 +1,12 @@
 {
     "main": "index.html?debug",
-    "name": "FLUX Studio",
+    "name": "Mozu Studio",
     "node-remote": ["http://*/*", "*://*/*"],
-    "description": "FLUX Studio",
+    "description": "Mozu Studio",
     "version": "{Version}",
     "inject_js_start": "nw-inject-start.js",
     "window": {
-        "title": "FLUX Studio - {Version}",
+        "title": "Mozu Studio - {Version}",
         "icon": "icon.png",
         "frame": true,
         "width": 1280,

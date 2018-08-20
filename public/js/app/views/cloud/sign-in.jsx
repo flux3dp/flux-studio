@@ -90,7 +90,6 @@ define([
                     <div className='container'>
                         <div className='title'>
                             <h3>{LANG.sign_in}</h3>
-                            <h2>{LANG.flux_cloud}</h2>
                         </div>
                         <div className='controls'>
                             <div>

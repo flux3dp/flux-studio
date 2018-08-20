@@ -8,7 +8,7 @@ let r = resource[defaultLanguage];
 
 function _buildOSXAppMenu(callback) {
     return {
-        label: 'FLUX Studio',
+        label: 'Mozu Studio',
         submenu: [
             { label: r.about, role: 'about'},
             { id: 'PREFERENCE',  label: r.preferences, accelerator: 'Cmd+,', click: callback },

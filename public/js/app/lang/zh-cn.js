@@ -9,15 +9,15 @@ define(function() {
             next: '下一步'
         },
         support: {
-            no_webgl: '您的系统不支持 WebGL，建议您使用其他电脑开启 FLUX Studio',
+            no_webgl: '您的系统不支持 WebGL，建议您使用其他电脑开启 Mozu Studio',
             no_vcredist: '请安装 Visual C++ Redistributable 2015<br/>可以在flux3dp.com找到',
-            osx_10_9: 'FLUX Studio 目前不支持 OS X 10.9，敬请更新至更新的版本。'
+            osx_10_9: 'Mozu Studio 目前不支持 OS X 10.9，敬请更新至更新的版本。'
         },
         generic_error: {
-            UNKNOWN_ERROR: '[UE] 请重启 FLUX Studio',
+            UNKNOWN_ERROR: '[UE] 请重启 Mozu Studio',
             OPERATION_ERROR: '[OE] 机器发生状态冲突，请再试一次',
             SUBSYSTEM_ERROR: '[SE] 请重启机器',
-            UNKNOWN_COMMAND: '[UC] 请更新机器韧体',
+            UNKNOWN_COMMAND: '[UC] 请更新机器固件',
             RESOURCE_BUSY: '[RB] 请重新启动 Delta, 或再试一次'
         },
         device_selection: {
@@ -29,35 +29,35 @@ define(function() {
         update: {
             release_note: '版本消息:',
             firmware: {
-                caption: '有新的机器韧体更新',
-                message_pattern_1: '"%s" 有新的韧体更新。',
-                message_pattern_2: '%s 韧体 v%s 可使用 - 你的版本为 v%s.',
+                caption: '有新的机器固件更新',
+                message_pattern_1: '"%s" 有新的固件更新。',
+                message_pattern_2: '%s 固件 v%s 可使用 - 你的版本为 v%s.',
                 latest_firmware: {
-                    caption: '韧体更新',
-                    message: '韧体已经是最新版本',
+                    caption: '固件更新',
+                    message: '固件已经是最新版本',
                     still_update: '文件更新'
                 },
                 confirm: '上传',
-                upload_file: '韧体上传',
-                update_success: '韧体更新上传成功',
+                upload_file: '固件上传',
+                update_success: '固件更新上传成功',
                 update_fail: '更新失败'
             },
             software: {
-                caption: 'FLUX Studio 有新的软件更新',
-                message_pattern_1: 'FLUX Studio 有新的软件更新。',
+                caption: 'Mozu Studio 有新的软件更新',
+                message_pattern_1: 'Mozu Studio 有新的软件更新。',
                 message_pattern_2: 'FLUX Software v%s 可使用 - 你的版本为 v%s.'
             },
             toolhead: {
-                caption: 'FLUX 工具头有新的韧体更新',
-                message_pattern_1: '"%s" 有新的韧体更新。',
+                caption: 'FLUX 工具头有新的固件更新',
+                message_pattern_1: '"%s" 有新的固件更新。',
                 message_pattern_2: 'FLUX Toolhead Firmware v%s 可使用',
                 latest_firmware: {
-                    caption: '韧体更新',
-                    message: '韧体已经是最新版本'
+                    caption: '固件更新',
+                    message: '固件已经是最新版本'
                 },
                 confirm: '上传',
-                upload_file: '韧体上传',
-                update_success: '韧体更新上传成功',
+                upload_file: '固件上传',
+                update_success: '固件更新上传成功',
                 update_fail: '更新失败',
                 waiting: '请确认已安装工具头'
             },
@@ -73,10 +73,10 @@ define(function() {
         },
         topmenu: {
             version: '版本',
-            sure_to_quit: '确定要结束 FLUX Studio?',
+            sure_to_quit: '确定要结束 Mozu Studio?',
             flux: {
                 label: 'Flux',
-                about: '关于 FLUX studio',
+                about: '关于 Mozu Studio',
                 preferences: '偏好设置',
                 quit: '结束'
             },
@@ -105,17 +105,17 @@ define(function() {
                 head_info: '工具头信息',
                 change_filament: '更换线料',
                 default_device: '设为默认',
-                check_firmware_update: '韧体更新',
-                update_delta: '机器韧体',
-                update_toolhead: '工具头韧体',
+                check_firmware_update: '固件更新',
+                update_delta: '机器固件',
+                update_toolhead: '工具头固件',
                 calibrate: '校正平台',
                 set_to_origin: '回归原点',
                 movement_tests: '运行运动测试',
-                scan_laser_calibrate: '打开扫描雷射',
+                scan_laser_calibrate: '打开扫描激光',
                 clean_calibration: '校正平台（清除原始数据）',
                 commands: '指令',
                 set_to_origin_complete: '机器已回归原点',
-                scan_laser_complete: '扫描雷射已开启，点击 "完成" 以关闭雷射',
+                scan_laser_complete: '扫描激光已开启，点击 "完成" 以关闭激光',
                 movement_tests_complete: '运动测试完成',
                 movement_tests_failed: '运动测试失败。<br/>1. 请确工具头连接线被正确拉直<br/>2. 上盖工具头连接线接头没入约一半<br/>3. 可尝试将工具头连接线顺时针或逆时针旋转 180 度再插入<br/>4. 参考 <a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/115003674128">此篇文章</a>',
                 download_log: '导出机器日志',
@@ -188,8 +188,8 @@ define(function() {
             // page specific
             connect_beambox: {
                 set_beambox_connection: '设置手机切膜机连接',
-                please_goto_touchpad: '请使用手机切膜机触摸皮肤进行 WiFi 连接绑定',
-                tutorial: '1. 点击触摸皮肤 "设置" > "互联网" > "设置"\n2. 选取欲绑定的 WiFi 名称并输入密码\n3. 稍待10秒，若于 "设置" > "互联网" 成功显示无线网络 IP，即代表绑定成功\n4. 请将此无线网络 IP 输入至 "主菜单" > "偏好设置" > "机器 IP 位址"，以确保不论您使用哪一种路由器，都能顺利连接',
+                please_goto_touchpad: '请使用手机切膜机触控面板进行 WiFi 连接绑定',
+                tutorial: '1. 点击屏幕 "设置" > "连接设置" > "设置"\n2. 选取欲绑定的 WiFi 名称并输入密码\n3. 稍待10秒，若于 "设置" > "连接设置" 成功显示无线网络 IP，即代表绑定成功\n4. 请将此无线网络 IP 输入至 "主菜单" > "偏好设置" > "机器 IP 位址"，以确保不论您使用哪一种路由器，都能顺利连接',
                 please_see_tutorial_video: '观看教学影片',
                 tutorial_url: 'https://tw.flux3dp.com/beambox-tutorial/'
             },
@@ -220,7 +220,7 @@ define(function() {
                 station_ready_statement: '你的机器已成为 Wi-Fi 热点，你可以借由无线连接 “%s” 这个热点操作 FLUX',
                 brilliant: '太棒了!',
                 begin_journey: '你可以拔除 USB / Micro USB 传输线, 开始使用机器随心所欲地进行创作啰！',
-                great: '欢迎使用 FLUX Studio',
+                great: '欢迎使用 Mozu Studio',
                 upload_via_usb: '你可以稍后再设置 Wi-Fi 选项。<br/>如果你没有 Wi-Fi 环境，请参考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215998327-Connection-Guide-for-Desktop-PCs">PC连接指南</a>',
                 back: '回到 Wi-Fi 设置',
                 ok: '开始使用'
@@ -234,8 +234,8 @@ define(function() {
                 breathing: 'Breathing: 呼吸灯',
                 breathing_desc: '无线网络设置失败，请尝试重新设置',
                 successfully: '如果机器连接成功',
-                successfully_statement: '请将无线网络连接至(%s)，并且重新启动 FLUX Studio',
-                restart: '重启 FLUX Studio'
+                successfully_statement: '请将无线网络连接至(%s)，并且重新启动 Mozu Studio',
+                restart: '重启 Mozu Studio'
             },
 
             // errors
@@ -243,7 +243,7 @@ define(function() {
                 error: '错误',
                 close: '关闭',
                 not_found: '无法找到机器',
-                not_support: '请透过随身碟更新 Delta 韧体到 v1.6 以上',
+                not_support: '请透过随身碟更新 Delta 固件到 v1.6 以上',
 
                 keep_connect: {
                     caption: '无法透过 USB 连接',
@@ -328,7 +328,7 @@ define(function() {
             remove_default_machine_button: '删除',
             confirm_remove_default: '将会删除默认机器',
             reset_now: '重置所有设置',
-            confirm_reset: '确认要重置 FLUX Studio?',
+            confirm_reset: '确认要重置 Mozu Studio?',
             language: '语言',
             notifications: '通知',
             default_app: '默认功能',
@@ -372,7 +372,7 @@ define(function() {
             allow_tracking: '您是否愿意自动发送匿名用量数据，协助 FLUX 改进产品和服务？',
             flux_cloud: {
                 processing: '处理中...',
-                flux_cloud: 'FLUX CLOUD',
+                flux_cloud: 'Mozu CLOUD',
                 back: '返回',
                 next: '下一步',
                 done: '结束',
@@ -391,7 +391,7 @@ define(function() {
                 password: '密码',
                 re_enter_password: '重新输入密码',
                 forgot_password: '忘记密码?',
-                sign_up_statement: '如果尚未持有FLUX ID，可以<a href="%s">按此注册</a>',
+                sign_up_statement: '第一次使用？ <a href="%s">按此注册</a>',
                 try_sign_up_again: '请重新<a href="%s">注册</a>',
                 agreement: '同意 FLUX-Cloud <a href="#/studio/cloud/privacy">隐私权政策</a>, <a href="#/studio/cloud/terms">使用条款</a>',
                 pleaseSignIn: '请使用 FLUX ID 登录',
@@ -429,7 +429,7 @@ define(function() {
                 FORMAT_ERROR: '密码格式错误',
                 submit: '存储',
                 sign_out: '注销',
-                not_supported_firmware: '支持 FLUX cloud 需要机器韧体 v1.5＋',
+                not_supported_firmware: '支持 FLUX cloud 需要机器固件 v1.5＋',
                 unbind_device: '确认要不再绑定此机器?',
                 CLOUD_UNKNOWN_ERROR: '机器无法连接到云端服务器. 请重新启动机器. (General)',
                 CLOUD_SESSION_CONNECTION_ERROR: '机器无法连接到云端服务器. 请重新启动机器. (Session)',
@@ -736,7 +736,7 @@ define(function() {
             name: '名称',
             go: 'GO',
             showOutline: '显示<br/>轮廓',
-            do_calibrate: '看起来您似乎第一次使用雷射雕刻功能，可以透过包装里附的牛皮卡找到最佳的焦距，是否要加载焦距校正图片？（稍后亦可以于进阶皮肤中加载）',
+            do_calibrate: '看起来您似乎第一次使用激光雕刻功能，可以透过包装里附的牛皮卡找到最佳的焦距，是否要加载焦距校正图片？（稍后亦可以于进阶屏幕中加载）',
             process_caption: '输出中',
             laser_accepted_images: '雕刻支持格式：BMP/GIF/JPG/PNG/SVG',
             draw_accepted_images: '绘制支持格式：SVG',
@@ -753,8 +753,8 @@ define(function() {
             title: {
                 material: '选择正确的材质来雕刻出最好的结果',
                 object_height: '物体高度，从底盘到对象最高点之距离',
-                height_offset: '雷射高度调整，包含磁吸底版跟焦距误差，可根据焦距校正图片调整数字',
-                shading: '使用雷射渐层效果，会增加雕刻时间',
+                height_offset: '激光高度调整，包含磁吸底版跟焦距误差，可根据焦距校正图片调整数字',
+                shading: '使用激光渐层效果，会增加雕刻时间',
                 advanced: '自行调整功率大小以及速度'
             },
             print_params: {
@@ -847,7 +847,7 @@ define(function() {
                         ]
                     },
                     laser_speed: {
-                        text: '雷射速度',
+                        text: '激光速度',
                         unit: 'mm/s',
                         fast: '快',
                         slow: '慢',
@@ -856,7 +856,7 @@ define(function() {
                         step: 0.1
                     },
                     power: {
-                        text: '雷射强度',
+                        text: '激光强度',
                         high: '强',
                         low: '弱',
                         min: 0,
@@ -904,7 +904,7 @@ define(function() {
             estimating: '估计中...',
             calibrate_fail: '校正失败',
             calibration_is_running: '扫描校正中',
-            calibration_firmware_requirement: '请更新至韧体以使用此功能 (1.6.25+)',
+            calibration_firmware_requirement: '请更新至固件以使用此功能 (1.6.25+)',
             resolution: [{
                 id: 'best',
                 text: '最佳',
@@ -981,8 +981,8 @@ define(function() {
                     message: '请将扫描校正工具插在中心沟槽处，确保光源充足。'
                 },
                 'no laser': {
-                    caption: '未侦测到扫描雷射',
-                    message: '请压下，并弹出扫描雷射头，确保光源不要过亮。'
+                    caption: '未侦测到扫描激光',
+                    message: '请压下，并弹出扫描激光头，确保光源不要过亮。'
                 }
             }
         },
@@ -995,9 +995,9 @@ define(function() {
                 layer_by_layer: '依图层分层',
                 layer_by_color: '依颜色分层',
                 nolayer: '不分层',
-                no_support_text: 'FLUX Studio 目前不支持由外部导入文本标签，请由矢量绘图软件将文本转成路径后再导入。',
-                power_too_high_damage_laser_tube: '雷射管在高功率下耗损较快，使用低功率可以延长雷试管使用寿命',
-                should_update_firmware_to_continue: '您的韧体版本不支持最新的软件改善。为了更良好的使用经验与雕刻品质，请先更新手机切膜机的韧体以继续。 (主菜单 > 机器 > [ Your手机切膜机] > 韧体更新)'
+                no_support_text: 'Mozu Studio 目前不支持由外部导入文本标签，请由矢量绘图软件将文本转成路径后再导入。',
+                power_too_high_damage_laser_tube: '激光管在高功率下耗损较快，使用低功率可以延长雷试管使用寿命',
+                should_update_firmware_to_continue: '您的固件版本不支持最新的软件改善。为了更良好的使用经验与雕刻品质，请先更新手机切膜机的固件以继续。 (主菜单 > 机器 > [ Your手机切膜机] > 固件更新)'
             },
             left_panel: {
                 insert_object: '插入对象',
@@ -1063,14 +1063,14 @@ define(function() {
                 convert_to_path: '转换为路径',
                 convert_to_path_to_get_precise_result: '部分字体在不同系统间有差异，输出前请将字体转换成路径，以确保文本正确显示',
                 wait_for_parsing_font: '解析字体中... 请稍待 10 秒',
-                laser_config: '雷射设置',
+                laser_config: '激光设置',
                 shading: '渐层',
                 threshold: '曝光阈值',
                 lock_desc: '缩放时固定比例 (SHIFT)'
             },
             svg_editor: {
-                unnsupported_file_type: 'FLUX Studio 不直接支持此文件格式。请先输出成图片档或 SVG 格式',
-                unnsupport_ai_file_directly: '请先将您的 AI 档输出成 SVG 或 图片档，再导入至 FLUX Studio'
+                unnsupported_file_type: 'Mozu Studio 不直接支持此文件格式。请先输出成图片档或 SVG 格式',
+                unnsupport_ai_file_directly: '请先将您的 AI 档输出成 SVG 或 图片档，再导入至 Mozu Studio'
             },
             units: {
                 walt: 'W',
@@ -1127,7 +1127,7 @@ define(function() {
             model_name: '型号',
             IP: 'IP',
             serial_number: '序号',
-            firmware_version: '韧体版本',
+            firmware_version: '固件版本',
             UUID: 'UUID',
             select: '选择',
             deviceList: '机器列表',
@@ -1149,7 +1149,7 @@ define(function() {
                 shake: '过度摇晃',
                 tilt: '倾斜',
                 fan_failure: '风扇故障',
-                laser_down: '雷射安全锁',
+                laser_down: '激光安全锁',
                 byFile: '根据 FCODE 设置',
                 no: '关闭'
             },
@@ -1178,7 +1178,7 @@ define(function() {
             postback_url: '状态回传URL',
             disable: '关闭',
             enable: '开启',
-            beambox_should_use_touch_panel_to_adjust: '请至手机切膜机触摸皮肤调整设置。'
+            beambox_should_use_touch_panel_to_adjust: '请至手机切膜机触控面板调整设置。'
         },
         monitor: {
             change_filament                     : 'CHANGE FILLAMENT',
@@ -1243,16 +1243,16 @@ define(function() {
             extensionNotSupported               : '上传文件不支持此文件格式',
             fileExistContinue                   : '文件已存在，是否要覆盖？',
             confirmGToF                         : 'GCode 上传后会自动转档成 FCode，是否继续？',
-            updatePrintPresetSetting            : 'FLUX STUDIO 有新的默认打印参数。\n是否要更新？（会删除目前参数）',
+            updatePrintPresetSetting            : 'Mozu Studio 有新的默认打印参数。\n是否要更新？（会删除目前参数）',
             confirmFileDelete                   : '是否确定要删除这个文件？',
             task: {
                 EXTRUDER                        : '打印',
                 PRINT                           : '打印',
-                LASER                           : '雷射雕刻',
+                LASER                           : '激光雕刻',
                 DRAW                            : '数位绘图',
                 CUT                             : '贴纸切割',
                 VINYL                           : '贴纸切割',
-                BEAMBOX                         : '雷射雕刻',
+                BEAMBOX                         : '激光雕刻',
                 'N/A'                           : '自由模式'
             },
             device: {
@@ -1309,10 +1309,10 @@ define(function() {
             },
             image_is_too_small: '图档内容有误',
             monitor_too_old: {
-                caption: '韧体需要更新',
-                content: '请按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此说明</a>安装最新韧体版本'
+                caption: '固件需要更新',
+                content: '请按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此说明</a>安装最新固件版本'
             },
-            cant_establish_connection: '无法正常启动 FLUX Studio API，建议手动安装 Visual C++ Redistributable 2015，如持续发生，请<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">联系 FLUX 客服</a>',
+            cant_establish_connection: '无法正常启动 Mozu Studio API，建议手动安装 Visual C++ Redistributable 2015，如持续发生，请<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">联系 FLUX 客服</a>',
             application_occurs_error: '应用程序发生异常，请使用“功能表 > 说明 > 错误回报”',
             error_log: '错误消息',
             fcodeForLaser: '文件为雕刻工作',
@@ -1325,20 +1325,20 @@ define(function() {
             unknown_device: '无法与机器创建连接，请确认 USB 有连接于机器',
             important_update: {
                 caption: '重要更新',
-                message: 'Delta 有重要韧体更新，是否要现在更新？',
+                message: 'Delta 有重要固件更新，是否要现在更新？',
             },
             unsupport_osx_version: '不支持此 Mac OS X 版本',
             need_password: '需要密码与机器创建连接',
-            new_app_downloading: 'FLUX Studio 下载中',
-            new_app_download_canceled: 'FLUX Studio 下载已被取消',
-            new_app_downloaded: '新版FLUX Studio 下载完毕',
+            new_app_downloading: 'Mozu Studio 下载中',
+            new_app_download_canceled: 'Mozu Studio 下载已被取消',
+            new_app_downloaded: '新版Mozu Studio 下载完毕',
             ask_for_upgrade: '马上升级吗?',
             please_enter_dpi: '请输入该文件的 dpi',
-            need_1_1_7_above: '请更新 Delta 韧体到 v1.1.7 以上',
+            need_1_1_7_above: '请更新 Delta 固件到 v1.1.7 以上',
             gcode_area_too_big: '导入的 gcode 文件超过打印范围',
             empty_file: '文件内容不存在',
             usb_unplugged: 'USB 连接逾时，请确认与机器的连接',
-            launghing_from_installer_warning: 'FLUX Studio 不是从应用程序文件夹开启，可能会产生问题。请将 FLUX Studio 移到应用程序文件夹再使用。',
+            launghing_from_installer_warning: 'Mozu Studio 不是从应用程序文件夹开启，可能会产生问题。请将 Mozu Studio 移到应用程序文件夹再使用。',
             uploading_fcode: '正在上传 fcode',
             cant_connect_to_device: '无法链接机器，请确认机器是否开启，以及与机器的链接方式',
             unable_to_find_machine: '无法连接到机器 ',
@@ -1368,7 +1368,7 @@ define(function() {
         },
         head_module: {
             EXTRUDER: '打印',
-            LASER: '雷射',
+            LASER: '激光',
             UNKNOWN: '',
             error: {
                 'missing': '错误消息不足',
@@ -1429,7 +1429,7 @@ define(function() {
             start_engrave: '开始绘制校正图片',
             analyze_result_fail: '校正失败<br/>请确认:<br/>1. 校正图片完整画在 A4 纸上<br/>2. 已旋转升降平台旋钮，直到轻触焦距螺丝，完成对焦',
             drawing_calibration_image: '绘制校正图片中...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>请确认:<br/>1. 校正图片完整画在 A4 纸上<br/>2. 已旋转升降平台旋钮，直到轻触焦距螺丝，完成对焦<br/>3. 若雷射没成功射出，请至 Beambox 机器皮肤上选择"动作"，并将"功率倍率"与"速度倍率"调回正常值，再重新校正一次。',
+            please_confirm_image: '<div><img class="img-center" src=%s /></div>请确认:<br/>1. 校正图片完整画在 A4 纸上<br/>2. 已旋转升降平台旋钮，直到轻触焦距螺丝，完成对焦<br/>3. 若激光没成功射出，请至 Beambox 机器屏幕上选择"动作"，并将"功率倍率"与"速度倍率"调回正常值，再重新校正一次。',
             calibrate_done: '校正相机完成<br/>使用时请正确对焦以取得良好的预览效果。'
         },
         input_machine_password: {
@@ -1467,9 +1467,9 @@ define(function() {
                 '7': '进阶设置参数错误\n',
                 '8': '切片:: 切片结果要求早于切片结束',
                 '9': '切片:: 路径结果要求早于切片结束',
-                '10': '切片:: 原始模型不存在于切片引擎，需重启 FLUX Studio',
-                '13': '切片:: 重制错误，复制原始ID不存在，需重启 FLUX Studio',
-                '14': '切片:: 无法设置对象位置及相关信息，需重启 FLUX Studio',
+                '10': '切片:: 原始模型不存在于切片引擎，需重启 Mozu Studio',
+                '13': '切片:: 重制错误，复制原始ID不存在，需重启 Mozu Studio',
+                '14': '切片:: 无法设置对象位置及相关信息，需重启 Mozu Studio',
                 '15': '切片:: 模型文件内容无法解析',
                 '16': '切片:: 切片引擎异常结束，建议调整设置',
                 '1006': 'WS 已被强制关闭, 请于menu上方取得错误回报，寄送回FLUX'
@@ -1484,7 +1484,7 @@ define(function() {
         },
         head_info: {
             ID                  : 'ID',
-            VERSION             : '工具头韧体版本',
+            VERSION             : '工具头固件版本',
             HEAD_MODULE         : '工具头种类',
             EXTRUDER            : '打印模块',
             LASER               : '雷刻模块',

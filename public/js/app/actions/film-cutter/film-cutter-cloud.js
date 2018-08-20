@@ -9,7 +9,7 @@ define([
 ) {
     const _ip = {
         dev: 'http://0.0.0.0:8080',
-        prod: 'http://0.0.0.0:8080'
+        prod: 'http://back.52mozu.com'
     };
     const ip = window.FLUX.dev ? _ip.dev : _ip.prod;
 
