@@ -28,8 +28,8 @@ function _buildOSXAppMenu(callback) {
 function _buildFileMenu(fnKey, callback) {
     const menuItems = [
         { 'id': 'IMPORT', label: r.import || 'Import', click: callback, 'accelerator': `${fnKey}+I` },
-        { type: 'separator' },
-        { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': `${fnKey}+E` },
+        // { type: 'separator' },
+        // { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': `${fnKey}+E` },
     ];
 
     if(process.platform !== 'darwin') {

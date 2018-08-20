@@ -91,7 +91,7 @@ define([
             this.setState({
                 source: newSource,
                 currentPage: 1,
-                pageCount: Math.ceil(newSource.length / ITEM_PER_PAGE),
+                pageCount: Math.max(Math.ceil(newSource.length / ITEM_PER_PAGE), 1),
             });
         }
         async handleDownloadClick() {
@@ -109,6 +109,7 @@ define([
                 await FilmDatabase.syncWithCloud();
                 ProgressActions.close();
                 AlertActions.showPopupInfo('film-cutter', '已成功更新数据');
+                this.updateSource();
                 this.flushFuseSerachingBase();
             } catch (error) {
                 AlertActions.showPopupError('film-cutter', error.toString());
@@ -121,7 +122,7 @@ define([
                 yes: () => {
                     FilmDatabase.reset();
                     this.flushFuseSerachingBase();
-                    this.forceUpdate();
+                    this.updateSource();
                 },
                 no: () => {}
             });
@@ -193,6 +194,9 @@ define([
             }
         }
         _renderMainContent() {
+            if (!this.state.source.length) {
+                return <div style={{margin: '40% auto', textAlign: 'center'}}>请下载手机膜以开始使用</div>;
+            }
             const btns = this.sliceToCurrentPage(this.state.source).map(x => {
                 const label = this.state.searchString ? `${x.brand} - ${x.model}` : (x.category || x.model || x.brand);
                 return (<Btn

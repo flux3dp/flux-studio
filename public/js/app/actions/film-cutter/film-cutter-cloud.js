@@ -9,7 +9,7 @@ define([
 ) {
     const _ip = {
         dev: 'http://0.0.0.0:8080',
-        prod: 'http://back.52mozu.com'
+        prod: 'http://0.0.0.0:8080'
     };
     const ip = window.FLUX.dev ? _ip.dev : _ip.prod;
 
@@ -50,9 +50,12 @@ define([
     const errorHandlerWrapper = async (fetchPromise) => {
         const res = await fetchPromise.catch(error => {
             console.log(error);
-            throw new Error('伺服器错误，请联络客服人员');
+            throw new Error('无法连接至服务器，请检查网络连接，或联络客服人员');
         });
         if (!res.ok) {
+            if (res.status === 500) {
+                throw new Error('服务器內部错误，請联络客服人员');
+            }
             const err = await res.json();
             console.error(err);
             throw new Error((err.message && err.message.toString()) || JSON.stringify(err));

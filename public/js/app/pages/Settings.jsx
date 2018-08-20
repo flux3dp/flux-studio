@@ -97,8 +97,8 @@ define([
                 return (
                     <div className="studio-container settings-studio">
                         <div className="settings">
-                            {/* {tabs} */}
-                            <br/><br/>
+                            <div className='title'>偏好设置</div>
+                            <br/>
                             <div className="tab-container">
                                 {this._renderContent()}
                             </div>

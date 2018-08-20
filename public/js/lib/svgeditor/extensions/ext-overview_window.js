@@ -21,7 +21,7 @@ svgEditor.addExtension("overview_window", function(S) {
 					<svg id=\"overviewMiniView\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" viewBox=\"0 0 4800 3600\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\
 						<use x=\"0\" y=\"0\" xlink:href=\"#svgroot\"> </use>\
 					 </svg>\
-					 <div id=\"overview_window_view_box\" style=\"min-width:50px; min-height:50px; position:absolute; top:30px; left:30px; z-index:0; background-color:rgb(0,74,189); opacity: 0.3;\">\
+					 <div id=\"overview_window_view_box\" style=\"min-width:50px; min-height:50px; position:absolute; top:30px; left:30px; z-index:0; background-color:green; opacity: 0.3;\">\
 					 </div>\
 				 </div>\
 			</div>\
@@ -42,7 +42,7 @@ svgEditor.addExtension("overview_window", function(S) {
 		var windowHeight= elCanvas.clientHeight;
 		var overviewWidth=elMiniview.clientWidth;
 		var overviewHeight=elMiniview.clientHeight;
-		
+
 		var viewBoxX=portX/windowWidth*overviewWidth;
 		var viewBoxY=portY/windowHeight*overviewHeight;
 		var viewBoxWidth=portWidth/windowWidth*overviewWidth;
@@ -60,14 +60,14 @@ svgEditor.addExtension("overview_window", function(S) {
 	});
 	$("#workarea").resize(updateViewBox);
 	updateViewBox();
-	
+
 	// Compensate for changes in zoom and canvas size.
 	var updateViewDimensions= function(){
 		var viewWidth=$("#svgroot").attr("width");
 		var viewHeight=$("#svgroot").attr("height");
 		var viewX=svgEditor.curConfig.dimensions[0];
 		var viewY=svgEditor.curConfig.dimensions[1];
-		
+
 		var svgWidth_old=$("#overviewMiniView").attr("width");
 		var svgHeight_new=viewHeight/viewWidth*svgWidth_old;
 		$("#overviewMiniView").attr("viewBox",viewX+" "+viewY+" "+viewWidth+" "+viewHeight);
@@ -75,18 +75,18 @@ svgEditor.addExtension("overview_window", function(S) {
 		updateViewBox();
 	};
 	updateViewDimensions();
-	
+
 	// Set up the overview window as a controller for the view port.
 	overviewWindowGlobals.viewBoxDragging=false;
 	var updateViewPortFromViewBox = function(){
-	
+
 		var windowWidth =parseFloat($("#svgcanvas").css("width" ));
 		var windowHeight=parseFloat($("#svgcanvas").css("height"));
 		var overviewWidth =$("#overviewMiniView").attr("width" );
 		var overviewHeight=$("#overviewMiniView").attr("height");
 		var viewBoxX=parseFloat($("#overview_window_view_box").css("left"));
 		var viewBoxY=parseFloat($("#overview_window_view_box").css("top" ));
-		
+
 		var portX=viewBoxX/overviewWidth *windowWidth;
 		var portY=viewBoxY/overviewHeight*windowHeight;
 
@@ -99,7 +99,7 @@ svgEditor.addExtension("overview_window", function(S) {
 		,drag: updateViewPortFromViewBox
 		,start:function(){overviewWindowGlobals.viewBoxDragging=true; }
 		,stop :function(){overviewWindowGlobals.viewBoxDragging=false;}
-	});  
+	});
 	$("#overviewMiniView").click(function(evt){
 		// Firefox doesn't support evt.offsetX and evt.offsetY.
 		var mouseX=(evt.offsetX || evt.originalEvent.layerX);
@@ -108,7 +108,7 @@ svgEditor.addExtension("overview_window", function(S) {
 		var overviewHeight=$("#overviewMiniView").attr("height");
 		var viewBoxWidth =parseFloat($("#overview_window_view_box").css("min-width" ));
 		var viewBoxHeight=parseFloat($("#overview_window_view_box").css("min-height"));
- 
+
 		var viewBoxX=mouseX - 0.5 * viewBoxWidth;
 		var viewBoxY=mouseY- 0.5 * viewBoxHeight;
 		//deal with constraints
@@ -124,12 +124,12 @@ svgEditor.addExtension("overview_window", function(S) {
 		if(viewBoxY+viewBoxHeight>overviewHeight){
 			viewBoxY=overviewHeight-viewBoxHeight;
 		}
-		
+
 		$("#overview_window_view_box")[0].style.top = viewBoxY + "px";
 		$("#overview_window_view_box")[0].style.left = viewBoxX + "px";
 		updateViewPortFromViewBox();
 	});
-	
+
 	return {
 		name: "overview window",
 		canvasUpdated: updateViewDimensions,

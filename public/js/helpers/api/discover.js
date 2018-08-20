@@ -11,11 +11,11 @@ define([
     'helpers/smart-upnp',
     'helpers/api/cloud'
 ], function(
-    Websocket, 
-    initializeMachine, 
-    Config, 
-    DeviceList, 
-    Logger, 
+    Websocket,
+    initializeMachine,
+    Config,
+    DeviceList,
+    Logger,
     SmartUpnp,
     CloudApi) {
     'use strict';
@@ -138,21 +138,21 @@ define([
         SmartUpnp.startPoke(pokeIPs[i]);
     }
 
-    CloudApi.getDevices().then(resp => {
-        if (resp.ok) {
-            resp.json().then(content => {
-                if (content.devices) {
-                    content.devices.map(device => {
-                        console.log(device.alias, device.ip_addr);
-                        if (device.ip_addr) {
-                            // console.log("Start poking cloud device IP:", device.ip_addr);
-                            SmartUpnp.startPoke(device.ip_addr.trim().replace(/\u0000/g, ''));
-                        }
-                    });
-                }
-            });
-        }
-    });
+    // CloudApi.getDevices().then(resp => {
+    //     if (resp.ok) {
+    //         resp.json().then(content => {
+    //             if (content.devices) {
+    //                 content.devices.map(device => {
+    //                     console.log(device.alias, device.ip_addr);
+    //                     if (device.ip_addr) {
+    //                         // console.log("Start poking cloud device IP:", device.ip_addr);
+    //                         SmartUpnp.startPoke(device.ip_addr.trim().replace(/\u0000/g, ''));
+    //                     }
+    //                 });
+    //             }
+    //         });
+    //     }
+    // });
 
     return self;
 });

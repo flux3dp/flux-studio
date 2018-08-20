@@ -298,7 +298,7 @@ ipcMain.on(events.FILE_LS_ALL, (event, {type}) => {
         return models.map(model => {
             return {brand, model};
         });
-    }).reduce((acc, cur) => acc ? acc.concat(cur) : []);
+    }).reduce((acc, cur) => acc.concat(cur), []);
     event.returnValue = ret;
 });
 
