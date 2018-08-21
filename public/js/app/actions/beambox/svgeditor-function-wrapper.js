@@ -52,7 +52,7 @@ define([
             $('#tool_import input').click();
         },
         insertSvg: function(svgString, cropData) {
-            const newElement = svgCanvas.importSvgString(svgString, 'nolayer');
+            const newElement = svgCanvas.importSvgString(svgString, 'nolayer', true);
             const {
                 x,
                 y,
@@ -70,15 +70,14 @@ define([
                 svgCanvas.selectOnly([newElement]);
                 svgCanvas.setSvgElemPosition('x', x);
                 svgCanvas.setSvgElemPosition('y', y);
-                svgCanvas.setSvgElemSize('width', width);
-                svgCanvas.setSvgElemSize('height', height);
+                svgCanvas.zoomSvgElem(72/254);
             } catch(e) {
                 console.warn('Reading empty SVG');
             }
             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
             $('#dialog_box').hide();
         },
-        insertImage: function(insertedImageSrc, cropData) {
+        insertImage: function(insertedImageSrc, cropData, threshold) {
 
             // let's insert the new image until we know its dimensions
             const insertNewImage = function (img, cropData) {
@@ -98,7 +97,7 @@ define([
                         id: svgCanvas.getNextId(),
                         style: 'pointer-events:inherit',
                         preserveAspectRatio: 'none',
-                        'data-threshold': 100,
+                        'data-threshold': parseInt(threshold),
                         'data-shading': true,
                         origImage: img.src
                     }
@@ -111,7 +110,7 @@ define([
                         grayscale: {
                             is_rgba: true,
                             is_shading: Boolean(newImage.getAttribute('data-shading')),
-                            threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
+                            threshold: parseInt(newImage.getAttribute('data-threshold')),
                             is_svg: false
                         },
                         onComplete: function (result) {

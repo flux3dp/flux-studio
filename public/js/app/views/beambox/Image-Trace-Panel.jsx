@@ -333,11 +333,11 @@ define([
                                         height: tunedImage.height
                                     }
 
+                                    FnWrapper.insertImage(url, testingCropData, threshold);
                                     FnWrapper.insertSvg(imageTrace, testingCropData);
-                                    FnWrapper.insertImage(url, testingCropData);
                                 } else {
-                                    FnWrapper.insertSvg(imageTrace, cropData);
                                     FnWrapper.insertImage(url, cropData, threshold);
+                                    FnWrapper.insertSvg(imageTrace, cropData);
                                 }
                             })
                             .fail((res)=>{

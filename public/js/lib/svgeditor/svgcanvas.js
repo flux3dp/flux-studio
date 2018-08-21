@@ -5087,7 +5087,7 @@ define([
         // arbitrary transform lists, but makes some assumptions about how the transform list
         // was obtained
         // * import should happen in top-left of current zoomed viewport
-        this.importSvgString = function (xmlString, _type) {
+        this.importSvgString = function (xmlString, _type, it = false) {
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
             function parseSvg(svg, type) {
@@ -5362,12 +5362,18 @@ define([
                 }
                 return '#' + hex.toUpperCase(); // ex: #0A23C5
             }
-            function setDataXform(use_el) {
+            function setDataXform(use_el, it) {
                 const bb = svgedit.utilities.getBBox(use_el);
                 let dataXform = '';
-                $.each(bb, function (key, value) {
-                    dataXform += key + '=' + value + ' ';
-                });
+
+                if (it) {
+                    dataXform = `x=0 y=0 width=${bb.width} height=${bb.height}`
+                } else {
+                    $.each(bb, function (key, value) {
+                        dataXform += key + '=' + value + ' ';
+                    });
+                }
+
                 use_el.setAttribute('data-xform', dataXform);
                 return use_el;
             }
@@ -5411,7 +5417,7 @@ define([
             const {symbols, confirmedType} = parseSvg(svg, _type);
 
             const use_elements = symbols.map(symbol => appendUseElement(symbol, confirmedType));
-            use_elements.map(element => setDataXform(element));
+            use_elements.map(element => setDataXform(element, it));
 
             removeDefaultLayerIfEmpty();
 
@@ -8770,6 +8776,44 @@ define([
 
             translateOrigin.setTranslate(-left, -top);
             scale.setScale(sx, sy);
+            translateBack.setTranslate(left, top);
+
+            const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
+            if (hasMatrix) {
+                const pos = svgedit.utilities.getRotationAngle(selected) ? 1 : 0;
+                tlist.insertItemBefore(translateOrigin, pos);
+                tlist.insertItemBefore(scale, pos);
+                tlist.insertItemBefore(translateBack, pos);
+            } else {
+                tlist.appendItem(translateBack);
+                tlist.appendItem(scale);
+                tlist.appendItem(translateOrigin);
+            }
+
+            selectorManager.requestSelector(selected).resize();
+
+            selectorManager.requestSelector(selected).showGrips(true);
+
+            svgedit.recalculate.recalculateDimensions(selected);
+        };
+
+        this.zoomSvgElem = function (zoomScale) {
+            const selected = selectedElements[0];
+            const realLocation = this.getSvgRealLocation(selected);
+
+            startTransform = selected.getAttribute('transform'); //???maybe non need
+
+            const tlist = svgedit.transformlist.getTransformList(selected);
+            const left = realLocation.x;
+            const top = realLocation.y;
+
+            // update the transform list with translate,scale,translate
+            let translateOrigin = svgroot.createSVGTransform();
+            let scale = svgroot.createSVGTransform();
+            let translateBack = svgroot.createSVGTransform();
+
+            translateOrigin.setTranslate(-left, -top);
+            scale.setScale(zoomScale, zoomScale);
             translateBack.setTranslate(left, top);
 
             const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
