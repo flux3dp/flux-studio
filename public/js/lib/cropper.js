@@ -152,6 +152,9 @@
     // Toggle drag mode between "crop" and "move" when click twice on the cropper
     toggleDragModeOnDblclick: true,
 
+    targetWidth: 200,
+    targetHeight: 100,
+
     // Size limitation
     minCanvasWidth: 0,
     minCanvasHeight: 0,
@@ -1207,8 +1210,8 @@
       removeClass(element, CLASS_HIDDEN);
 
       var containerData = {
-        width: Math.max(640, Number(options.minContainerWidth) || 200),
-        height: Math.max(600, Number(options.minContainerHeight) || 100)
+        width: Math.max(options.targetWidth, Number(options.minContainerWidth) || 200),
+        height: Math.max(options.targetHeight, Number(options.minContainerHeight) || 100)
       };
 
       this.containerData = containerData;

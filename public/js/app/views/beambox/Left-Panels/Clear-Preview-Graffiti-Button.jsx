@@ -27,6 +27,7 @@ define([
                 title="Clear all"
                 onClick={() => {
                     if(!PreviewModeBackgroundDrawer.isClean()) {
+                        PreviewModeBackgroundDrawer.resetCoordinates();
                         this.onClick();
                         this.hide();
                     }

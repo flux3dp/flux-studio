@@ -37,6 +37,7 @@ define([
 
     //View render the following steps
     const STEP_NONE = Symbol();
+    const STEP_OPEN = Symbol();
     const STEP_CROP = Symbol();
     const STEP_TUNE = Symbol();
     const STEP_APPLY = Symbol();
@@ -53,8 +54,10 @@ define([
             this.state = {
                 currentStep: STEP_NONE,
                 croppedBlobUrl: '',
+                croppedCameraCanvasBlobUrl: '',
                 imageTrace: '',
                 cropData: {},
+                preCrop: {},
                 brightness: 100,
                 contrast: 100,
                 threshold: 255
@@ -74,7 +77,7 @@ define([
                 img.onload = () => {
                     canvas.width = img.width;
                     canvas.height = img.height;
-                    context.drawImage(img,0,0);
+                    context.drawImage(img, 0, 0);
                     canvas.toBlob((blob) => {
                         const croppedBlobUrl = URL.createObjectURL(blob);
 
@@ -122,6 +125,9 @@ define([
         next() {
             switch(this.state.currentStep) {
                 case STEP_NONE:
+                    this.setState({ currentStep: STEP_OPEN });
+                    break;
+                case STEP_OPEN:
                     this.setState({ currentStep: STEP_CROP });
                     break;
                 case STEP_CROP:
@@ -136,6 +142,7 @@ define([
                     break;
             }
         }
+
         prev() {
             switch(this.state.currentStep) {
                 case STEP_CROP:
@@ -287,9 +294,13 @@ define([
 
         _handleImageTraceCancel() {
             URL.revokeObjectURL(this.state.croppedBlobUrl);
+            if (this.state.croppedCameraCanvasBlobUrl != '') {
+                URL.revokeObjectURL(this.state.croppedCameraCanvasBlobUrl);
+            }
             this.setState({
                 currentStep: STEP_NONE,
                 croppedBlobUrl: '',
+                croppedCameraCanvasBlobUrl: '',
                 imageTrace: '',
                 brightness: 100,
                 contrast: 100,
@@ -305,6 +316,7 @@ define([
         async _pushImageTrace() {
             const {
                 cropData,
+                preCrop,
                 imageTrace,
                 brightness,
                 contrast,
@@ -332,12 +344,16 @@ define([
                                         width: tunedImage.width,
                                         height: tunedImage.height
                                     }
+                                    const testingPreCrop = {
+                                        offsetX: 100,
+                                        offsetY: 100
+                                    }
 
-                                    FnWrapper.insertImage(url, testingCropData, threshold);
-                                    FnWrapper.insertSvg(imageTrace, testingCropData);
+                                    FnWrapper.insertImage(url, testingCropData, testingPreCrop, threshold);
+                                    FnWrapper.insertSvg(imageTrace, testingCropData, testingPreCrop);
                                 } else {
-                                    FnWrapper.insertImage(url, cropData, threshold);
-                                    FnWrapper.insertSvg(imageTrace, cropData);
+                                    FnWrapper.insertImage(url, cropData, preCrop, threshold);
+                                    FnWrapper.insertSvg(imageTrace, cropData, preCrop);
                                 }
                             })
                             .fail((res)=>{
@@ -353,18 +369,49 @@ define([
             BeamboxActions.endImageTrace();
         }
 
-        _renderCropper() {
-            const previewForCropper = document.getElementById('previewForCropper');
+        _renderImageToCrop() {
+            const previewBlobUrl = PreviewModeBackgroundDrawer.getCameraCanvasUrl();
 
-            cropper = new Cropper(previewForCropper, {
-                zoomable: false,
-                viewMode: 0,
+            return (
+                <img
+                    id= 'previewForCropper'
+                    onLoad={()=> this._renderCropper()}
+                    src={previewBlobUrl}
+                />);
+        }
+
+        _renderCropper() {
+            const imageObj = document.getElementById('previewForCropper');
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            const coordinates = PreviewModeBackgroundDrawer.getCoordinates();
+            const sourceWidth = (coordinates.maxX - coordinates.minX) + 465.17;
+            const sourceHeight = (coordinates.maxY - coordinates.minY) + 465.17;
+            const reference = (640/sourceWidth < 600/sourceHeight) ? 'w' : 'h';
+            const ratio = (reference === 'w') ? sourceHeight/sourceWidth : sourceWidth/sourceHeight;
+            const destWidth = (reference === 'w') ? 640 : 640 * ratio;
+            const destHeight = (reference === 'h') ? 600 : 600 * ratio;
+
+            this.setState({
+                preCrop: {
+                    offsetX: coordinates.minX,
+                    offsetY: coordinates.minY,
+                },
             });
+
+            cropper = new Cropper(
+                imageObj,
+                {
+                    zoomable: false,
+                    viewMode: 0,
+                    targetWidth: destWidth,
+                    targetHeight: destHeight
+                }
+            );
+
         }
 
         _renderCropperModal() {
-            const previewBlobUrl = PreviewModeBackgroundDrawer.getCameraCanvasUrl();
-
             return (
                 <Modal>
                     <div className='cropper-panel'>
@@ -372,7 +419,7 @@ define([
                             <img
                                 id= 'previewForCropper'
                                 onLoad={()=> this._renderCropper()}
-                                src={previewBlobUrl}
+                                src={this.state.croppedCameraCanvasBlobUrl}
                             />
                         </div>
                         <div className='footer'>
@@ -421,6 +468,41 @@ define([
             );
 
         }
+
+        _cropCameraCanvas() {
+            const imageObj = document.getElementById('cameraCanvas');
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            const canvasBackground = document.getElementById('canvasBackground');
+            const coordinates = PreviewModeBackgroundDrawer.getCoordinates();
+            const sourceX = coordinates.minX;
+            const sourceY = coordinates.minY;
+            const sourceWidth = (coordinates.maxX - coordinates.minX)  + 465.17;
+            const sourceHeight = (coordinates.maxY - coordinates.minY) + 465.17 ;
+            const destX = 0;
+            const destY = 0;
+            const destWidth = (coordinates.maxX - coordinates.minX)/6.286 + 74;
+            const destHeight = (coordinates.maxY - coordinates.minY)/6.286+ 74;
+
+            canvas.width = sourceWidth;
+            canvas.height = sourceHeight;
+
+            context.drawImage(imageObj, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, sourceWidth, sourceHeight);
+            canvas.toBlob((blob) => {
+                const url = URL.createObjectURL(blob);
+
+                if (this.state.croppedCameraCanvasBlobUrl != '') {
+                    URL.revokeObjectURL(this.state.croppedCameraCanvasBlobUrl);
+                }
+
+                this.setState({ croppedCameraCanvasBlobUrl: url });
+
+                if (this.state.currentStep === STEP_OPEN) {
+                    this.next();
+                }
+            });
+        }
+
 
         _renderImageTraceModal() {
             const {
@@ -486,7 +568,6 @@ define([
         }
 
         _renderImageTraceFooter() {
-
             if (this.state.currentStep === STEP_TUNE) {
                 return (
                     <div className='footer'>
@@ -564,9 +645,16 @@ define([
 
         render() {
             const renderContent = this._renderContent();
+            const canvasBackgroundUrl = PreviewModeBackgroundDrawer.getCameraCanvasUrl() || ''  ;
+
             return (
                 <div id='image-trace-panel-outer'>
                     {renderContent}
+                    <img
+                        id= 'cameraCanvas'
+                        onLoad={() => this._cropCameraCanvas()}
+                        src={canvasBackgroundUrl}
+                    />
                 </div>
             );
         }

@@ -1,5 +1,11 @@
 #image-trace-panel-placeholder {
     position: absolute;
+    top: 1000px;
+}
+
+#cameraCanvas {
+    position: relative;
+    top:300px;
 }
 
 #tunedImage {
@@ -302,11 +308,11 @@
 }
 
 #previewForCropper {
-    width: 640px;
-    height: 600px;
+    // width: 640px;
+    // height: 600px;
     position: relative;
     opacity: 0.8;
-    top: 800px;
+    top: 900px;
 }
 
 .image-trace-panel {

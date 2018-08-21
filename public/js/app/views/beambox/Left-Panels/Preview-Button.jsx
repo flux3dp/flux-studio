@@ -44,7 +44,8 @@ define([
             this.state = {
                 isPreviewMode: false,
                 isImageTraceMode: false,
-                isDrawing: false
+                isDrawing: false,
+                isDrawn: false
             };
         }
 
@@ -90,12 +91,12 @@ define([
 
         endDrawing() {
             ClearPreviewGraffitiButton.show();
-            this.setState({ isDrawing: false });
+            this.setState({ isDrawing: false, isDrawn: true });
         }
 
         startDrawing() {
             ClearPreviewGraffitiButton.hide();
-            this.setState({ isDrawing: true });
+            this.setState({ isDrawing: true, isDrawn: false });
         }
 
         _handlePreviewClick() {
@@ -230,7 +231,8 @@ define([
             const {
                 isPreviewMode,
                 isImageTraceMode,
-                isDrawing
+                isDrawing,
+                isDrawn
             } = this.state;
             const ImageTrace = (
                 PreviewModeBackgroundDrawer.isClean() || isDrawing ?
@@ -239,6 +241,7 @@ define([
                     onClick={() => this.handleImageTraceClick()}
                 />
             );
+
             return (
                 <div>
                     <div

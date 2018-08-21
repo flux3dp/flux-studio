@@ -51,7 +51,8 @@ define([
         importImage: function() {
             $('#tool_import input').click();
         },
-        insertSvg: function(svgString, cropData) {
+
+        insertSvg: function(svgString, cropData, preCrop) {
             const newElement = svgCanvas.importSvgString(svgString, 'nolayer', true);
             const {
                 x,
@@ -59,6 +60,10 @@ define([
                 width,
                 height
             } = cropData;
+            const {
+                offsetX,
+                offsetY,
+            } = preCrop;
 
             svgCanvas.ungroupSelectedElement();
             svgCanvas.ungroupSelectedElement();
@@ -68,8 +73,8 @@ define([
             // highlight imported element, otherwise we get strange empty selectbox
             try {
                 svgCanvas.selectOnly([newElement]);
-                svgCanvas.setSvgElemPosition('x', x);
-                svgCanvas.setSvgElemPosition('y', y);
+                svgCanvas.setSvgElemPosition('x', offsetX + x);
+                svgCanvas.setSvgElemPosition('y', offsetY + y);
                 svgCanvas.zoomSvgElem(72/254);
             } catch(e) {
                 console.warn('Reading empty SVG');
@@ -77,23 +82,27 @@ define([
             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
             $('#dialog_box').hide();
         },
-        insertImage: function(insertedImageSrc, cropData, threshold) {
+        insertImage: function(insertedImageSrc, cropData, preCrop, threshold) {
 
             // let's insert the new image until we know its dimensions
-            const insertNewImage = function (img, cropData) {
+            const insertNewImage = function (img, cropData, preCrop, threshold) {
                 const {
                     x,
                     y,
                     width,
                     height
                 } = cropData;
+                const {
+                    offsetX,
+                    offsetY,
+                } = preCrop;
                 const newImage = svgCanvas.addSvgElementFromJson({
                     element: 'image',
                     attr: {
-                        x,
-                        y,
-                        width,
-                        height,
+                        x: offsetX + x,
+                        y: offsetY + y,
+                        width: width,
+                        height: height,
                         id: svgCanvas.getNextId(),
                         style: 'pointer-events:inherit',
                         preserveAspectRatio: 'none',
@@ -105,8 +114,8 @@ define([
 
                 ImageData(
                     newImage.getAttribute('origImage'), {
-                        height: height,
-                        width: width,
+                        height,
+                        width,
                         grayscale: {
                             is_rgba: true,
                             is_shading: Boolean(newImage.getAttribute('data-shading')),
@@ -131,7 +140,7 @@ define([
             img.src = insertedImageSrc;
             img.style.opacity = 0;
             img.onload = function () {
-                insertNewImage(img, cropData);
+                insertNewImage(img, cropData, preCrop, threshold);
             };
         },
 

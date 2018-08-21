@@ -16,6 +16,13 @@ define([
             this.canvas = document.createElement('canvas');
             this.cameraCanvasUrl = '';
 
+            this.coordinates = {
+                maxX : 0,
+                maxY : 0,
+                minX : 10000,
+                minY : 10000
+            }
+
             this.canvas.width = Constant.dimension.width;
             this.canvas.height = Constant.dimension.height;
 
@@ -29,6 +36,7 @@ define([
             this.backgroundDrawerSubject
                 .concatMap(p => Rx.Observable.fromPromise(p))
                 .subscribe(blob => this._drawBlobToBackground(blob));
+
         }
 
         end() {
@@ -73,6 +81,17 @@ define([
             return this.cameraCanvasUrl;
         }
 
+        getCoordinates() {
+            return this.coordinates;
+        }
+
+        resetCoordinates() {
+            this.coordinates.maxX = 0;
+            this.coordinates.maxY = 0;
+            this.coordinates.minX = 10000;
+            this.coordinates.minY = 10000;
+        }
+
         _drawBlobToBackground(blob) {
             if (this.cameraCanvasUrl) {
                 URL.revokeObjectURL(this.cameraCanvasUrl);
@@ -94,12 +113,26 @@ define([
                     const dstX = x - img_regulated.width/2;
                     const dstY = y - img_regulated.height/2;
 
-                    this.canvas.getContext('2d').drawImage(img_regulated, dstX, dstY);
-                    this.canvas.toBlob(blob => resolve(blob));
-
-                    if (last) {
-                        BeamboxActions.endDrawingPreviewBlob();
+                    if (dstX > this.coordinates.maxX) {
+                        this.coordinates.maxX = dstX;
                     }
+                    if (dstX < this.coordinates.minX) {
+                        this.coordinates.minX = dstX;
+                    }
+                    if (dstY > this.coordinates.maxY) {
+                        this.coordinates.maxY = dstY;
+                    }
+                    if (dstY < this.coordinates.minY) {
+                        this.coordinates.minY = dstY;
+                    }
+
+                    this.canvas.getContext('2d').drawImage(img_regulated, dstX, dstY);
+                    this.canvas.toBlob( (blob) => {
+                        resolve(blob);
+                        if (last) {
+                            setTimeout(() => BeamboxActions.endDrawingPreviewBlob(), 1000);
+                        }
+                    });
                 };
             });
         }
