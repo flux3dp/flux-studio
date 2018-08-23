@@ -16,6 +16,27 @@ define([
     const events = electron.events;
     const activeLang = i18n.getActiveLang();
 
+    // a simple memoize function that takes in a function
+    // and returns a memoized function
+    const memoize = (fn) => {
+        let cache = {};
+        return (...args) => {
+            let n = args[0];  // just taking one argument here
+            if (n in cache) {
+                // console.log('Fetching from cache');
+                return cache[n];
+            }
+            else {
+                // console.log('Calculating result');
+                let result = fn(n);
+                cache[n] = result;
+                return result;
+            }
+        };
+    };
+
+
+
     const hashCode = function(s) {
         var h = 0, l = s.length, i = 0;
         if ( l > 0 ){
@@ -44,7 +65,7 @@ define([
             return 0;
         });
     })();
-    const requestFontStylesOfTheFontFamily = (family) => {
+    const requestFontStylesOfTheFontFamily = memoize((family) => {
         // if you don't specify italic, it will just return fonts that are not italic
         const fontsNoItalic = ipc.sendSync(events.FIND_FONTS, { family: family, italic: false });
         const fontsItalic = ipc.sendSync(events.FIND_FONTS, { family: family, italic: true });
@@ -52,7 +73,7 @@ define([
         const fontStyles = Array.from(fonts).map(font => font.style);
 
         return fontStyles;
-    };
+    });
     const requestFontByFamilyAndStyle = ({family, style, weight, italic}) => {
         const font = ipc.sendSync(events.FIND_FONT, {
             family: family,
