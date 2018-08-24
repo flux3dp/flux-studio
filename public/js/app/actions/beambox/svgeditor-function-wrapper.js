@@ -141,6 +141,7 @@ define([
             img.src = insertedImageSrc;
             img.style.opacity = 0;
             img.onload = function () {
+                svgCanvas.createLayer('Traced Image');
                 insertNewImage(img, cropData, preCrop, threshold);
             };
         },

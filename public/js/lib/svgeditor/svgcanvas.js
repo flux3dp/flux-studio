@@ -5318,7 +5318,7 @@ define([
                 if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
 
                     const color = symbol.getAttribute('data-color');
-                    const layerName = (type === 'image-trace') ? 'Image Trace' : symbol.getAttribute('data-id') || rgbToHex(color);
+                    const layerName = (type === 'image-trace') ? 'Traced Path' : symbol.getAttribute('data-id') || rgbToHex(color);
 
                     const isLayerExist = svgCanvas.setCurrentLayer(layerName);
                     if(!isLayerExist) {

@@ -365,7 +365,19 @@ define([
                 .catch((err) => {
                     d.reject(err);
                 })
-            this._handleImageTraceCancel();
+            URL.revokeObjectURL(this.state.croppedBlobUrl);
+            if (this.state.croppedCameraCanvasBlobUrl != '') {
+                URL.revokeObjectURL(this.state.croppedCameraCanvasBlobUrl);
+            }
+            this.setState({
+                currentStep: STEP_NONE,
+                croppedBlobUrl: '',
+                croppedCameraCanvasBlobUrl: '',
+                imageTrace: '',
+                brightness: 100,
+                contrast: 100,
+                threshold: 255
+            });
             BeamboxActions.endImageTrace();
         }
 
