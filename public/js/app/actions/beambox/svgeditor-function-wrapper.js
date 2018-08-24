@@ -53,7 +53,7 @@ define([
         },
 
         insertSvg: function(svgString, cropData, preCrop) {
-            const newElement = svgCanvas.importSvgString(svgString, 'nolayer', true);
+            const newElement = svgCanvas.importSvgString(svgString, 'image-trace');
             const {
                 x,
                 y,
@@ -80,6 +80,7 @@ define([
                 console.warn('Reading empty SVG');
             }
             // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+            $('#svg_editor').addClass('color');
             $('#dialog_box').hide();
         },
         insertImage: function(insertedImageSrc, cropData, preCrop, threshold) {

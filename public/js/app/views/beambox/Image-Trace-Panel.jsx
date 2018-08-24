@@ -463,7 +463,7 @@ define([
                 <img
                     id = 'imageTrace'
                     style = {imgStyle}
-                    src = {'data:image/svg+xml; utf8, ' + encodeURIComponent(this.state.imageTrace.replace('black', '#ff00ff'))}
+                    src = {'data:image/svg+xml; utf8, ' + encodeURIComponent(this.state.imageTrace)}
                 />
             );
 

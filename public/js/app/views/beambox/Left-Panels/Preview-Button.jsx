@@ -72,7 +72,9 @@ define([
 
         handleImageTraceClick() {
             try {
-                PreviewModeController.end();
+                if (this.state.isPreviewMode) {
+                    PreviewModeController.end();
+                }
             } catch (error) {
                 console.log(error);
             } finally {

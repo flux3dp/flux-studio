@@ -5087,7 +5087,7 @@ define([
         // arbitrary transform lists, but makes some assumptions about how the transform list
         // was obtained
         // * import should happen in top-left of current zoomed viewport
-        this.importSvgString = function (xmlString, _type, it = false) {
+        this.importSvgString = function (xmlString, _type) {
             const batchCmd = new svgedit.history.BatchCommand('Import Image');
 
             function parseSvg(svg, type) {
@@ -5302,6 +5302,11 @@ define([
                                 confirmedType: 'nolayer'
                             };
                         }
+                    case 'image-trace':
+                        return {
+                            symbols: _parseSvgByColor(svg),
+                            confirmedType: 'color'
+                        };
                 }
             }
             function appendUseElement(symbol, type) {
@@ -5310,10 +5315,10 @@ define([
                 use_el.id = getNextId();
                 setHref(use_el, '#' + symbol.id);
                 //switch currentLayer, and create layer if necessary
-                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color'))) {
+                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
 
                     const color = symbol.getAttribute('data-color');
-                    const layerName = symbol.getAttribute('data-id') || rgbToHex(color);
+                    const layerName = (type === 'image-trace') ? 'Image Trace' : symbol.getAttribute('data-id') || rgbToHex(color);
 
                     const isLayerExist = svgCanvas.setCurrentLayer(layerName);
                     if(!isLayerExist) {
@@ -5325,7 +5330,7 @@ define([
                 // append ~~~~~ ya
                 getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
-                if(type !== 'color') {
+                if(type !== 'color' || type !== 'image-trace') {
                     use_el.setAttribute('data-wireframe', true);
                 }
 
@@ -5416,8 +5421,8 @@ define([
             const svg = svgdoc.adoptNode(newDoc.documentElement);
             const {symbols, confirmedType} = parseSvg(svg, _type);
 
-            const use_elements = symbols.map(symbol => appendUseElement(symbol, confirmedType));
-            use_elements.map(element => setDataXform(element, it));
+            const use_elements = symbols.map(symbol => appendUseElement(symbol, _type));
+            use_elements.map(element => setDataXform(element, _type === 'image-trace'));
 
             removeDefaultLayerIfEmpty();
 
