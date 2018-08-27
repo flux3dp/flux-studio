@@ -108,7 +108,7 @@ define([
                 const size = (() => {
                     const h = Constant.camera.imgHeight;
                     const a = this._getCameraOffset().angle;
-                    const s = this._getCameraOffset().scaleRatio;
+                    const s = this._getCameraOffset().scaleRatioY;
                     const c = h / (Math.cos(a) + Math.sin(a));
                     // overlap a little bit to fix empty area between pictures
                     // (some machine will have it, maybe due to cameraOffset.angle).
@@ -187,36 +187,17 @@ define([
                 x:          Number(/X:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
                 y:          Number(/Y:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
                 angle:      Number(/R:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
-                scaleRatio: Number(/S:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
+                scaleRatioX: Number((/SX:\s?(\-?\d+\.?\d+)/.exec(resp.value) || (/S:\s?(\-?\d+\.?\d+)/.exec(resp.value))[1])),
+                scaleRatioY: Number((/SY:\s?(\-?\d+\.?\d+)/.exec(resp.value) || (/S:\s?(\-?\d+\.?\d+)/.exec(resp.value))[1])),
             };
-
-            await (async () => {
-                // --------------------------------------------------
-                // [Backward Compatile]
-                // For user using FLUX Studio >= 0.9.15 but did calibrate camera at Beambox Firmware <= 1.4.3
-                // --------------------------------------------------
-                // We modify firmware 1.4.4 to speed up camera image,
-                // so ideal scale ratio is double after firmware 1.4.4.
-                // Some user's beambox is very old, so when you press reset firmware,
-                // it will reset to 1.4.0 or even older, but that is not the case we need to consider,
-                // beacuse when you reset firmware, the wrongly generated scale ratio will be erased.
-                // We only consider who did not upgrade firmware but did camera calibration before FLUX Studio 0.9.15
-                // I think these people are rare few months after,
-                // and this IIFE(Immediately Invoked Function Expression) can absolutely be removed after 3 months (2018/9/7).
-                // Arthor: Jeff Chen, 2018/6/7 midnight, at FLUX Nangang office
-                const {x, y, angle, scaleRatio} = this.cameraOffset;
-                const idealScaleRatioAtFirmware1_4_3 = (585 / 720);
-                if (0.8 < scaleRatio / idealScaleRatioAtFirmware1_4_3 && scaleRatio / idealScaleRatioAtFirmware1_4_3 < 1.2) {
-                    await DeviceMaster.setDeviceSetting('camera_offset', `Y:${y} X:${x} R:${angle} S:${scaleRatio * 2}`);
-                }
-            })();
 
             if ((this.cameraOffset.x === 0) && (this.cameraOffset.y === 0)) {
                 this.cameraOffset = {
                     x: Constant.camera.offsetX_ideal,
                     y: Constant.camera.offsetY_ideal,
                     angle: 0,
-                    scaleRatio: Constant.camera.scaleRatio_ideal,
+                    scaleRatioX: Constant.camera.scaleRatio_ideal,
+                    scaleRatioY: Constant.camera.scaleRatio_ideal,
                 };
             }
         }

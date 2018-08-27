@@ -8,6 +8,7 @@ define([
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
     'helpers/device-master',
+    'helpers/version-checker',
     'app/constants/device-constants',
     'app/actions/alert-actions',
     'helpers/check-device-status',
@@ -26,6 +27,7 @@ define([
     Modal,
     Alert,
     DeviceMaster,
+    VersionChecker,
     DeviceConstants,
     AlertActions,
     CheckDeviceStatus,
@@ -195,11 +197,11 @@ define([
     const StepBeforeAnalyzePicture = ({imgBlobUrl, gotoNextStep, onClose}) => {
         const sendPictureThenSetConfig = async () => {
             const resp = await _doSendPictureTask();
-            const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.size);
+            const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.width, resp.height);
             if(!result) {
                 throw new Error(LANG.analyze_result_fail);
             }
-            await _doSetConfigTask(result.X, result.Y, result.R, result.S);
+            await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
         };
 
         const _doSendPictureTask = async () => {
@@ -209,7 +211,7 @@ define([
                 .then((blob) => {
                     var fileReader = new FileReader();
                     fileReader.onloadend = (e) => {
-                        cameraCalibrationWebSocket.upload(e.target.result, { flip: cameraOffset.flip })
+                        cameraCalibrationWebSocket.upload(e.target.result)
                             .done((resp)=>{
                                 d.resolve(resp);
                             })
@@ -225,7 +227,7 @@ define([
             return await d.promise();
         };
 
-        const _doAnalyzeResult = async (x, y, angle, squareSize) => {
+        const _doAnalyzeResult = async (x, y, angle, squareWidth, squareHeight) => {
             const blobImgSize = await new Promise(resolve => {
                 const img = new Image();
                 img.src = imgBlobUrl;
@@ -242,14 +244,18 @@ define([
             const scaleRatio_ideal = Constant.camera.scaleRatio_ideal;
             const square_size = Constant.camera.calibrationPicture.size; // mm
 
-            const scaleRatio = (square_size * Constant.dpmm) / squareSize;
+            const scaleRatioX = (square_size * Constant.dpmm) / squareWidth;
+            const scaleRatioY = (square_size * Constant.dpmm) / squareHeight;
             const deviationX = x - blobImgSize.width/2; // pixel
             const deviationY = y - blobImgSize.height/2; // pixel
 
-            const offsetX = -deviationX * scaleRatio / Constant.dpmm + offsetX_ideal;
-            const offsetY = -deviationY * scaleRatio / Constant.dpmm + offsetY_ideal;
+            const offsetX = -deviationX * scaleRatioX / Constant.dpmm + offsetX_ideal;
+            const offsetY = -deviationY * scaleRatioY / Constant.dpmm + offsetY_ideal;
 
-            if ((0.8 > scaleRatio/scaleRatio_ideal) || (scaleRatio/scaleRatio_ideal > 1.2)) {
+            if ((0.8 > scaleRatioX/scaleRatio_ideal) || (scaleRatioX/scaleRatio_ideal > 1.2)) {
+                return false;
+            }
+            if ((0.8 > scaleRatioY/scaleRatio_ideal) || (scaleRatioY/scaleRatio_ideal > 1.2)) {
                 return false;
             }
             if ((Math.abs(deviationX) > 400) || (Math.abs(deviationY) > 400)) {
@@ -262,12 +268,19 @@ define([
                 X: offsetX,
                 Y: offsetY,
                 R: -angle,
-                S: scaleRatio
+                SX: scaleRatioX,
+                SY: scaleRatioY
             };
         };
 
-        const _doSetConfigTask = async (X, Y, R, S) => {
-            await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${S}`);
+        const _doSetConfigTask = async (X, Y, R, SX, SY) => {
+            const deviceInfo = await DeviceMaster.getDeviceInfo();
+            const vc = VersionChecker(deviceInfo.version);
+            if(vc.meetRequirement('BEAMBOX_CAMERA_CALIBRATION_XY_RATIO')) {
+                await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${(SX+SY)/2} SX:${SX} SY:${SY}`);
+            } else {
+                await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${(SX+SY)/2}`);
+            }
         };
 
         return (
