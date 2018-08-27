@@ -487,7 +487,7 @@ define([
 
     });
 
-    View.BEAMBOX_FILTER = "laser-b1,laser-b2,fbb1b,fbb1p";
+    View.BEAMBOX_FILTER = "laser-b1,laser-b2,fbb1b,fbb1p,mozu1";
     View.DELTA_FILTER = "delta-1,delta-1p";
     return View;
 });
