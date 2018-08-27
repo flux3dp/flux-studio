@@ -53,6 +53,7 @@ define([
             BeamboxStore.onStartDrawingPreviewBlob(() => this.startDrawing());
             BeamboxStore.onEndDrawingPreviewBlob(() => this.endDrawing());
             BeamboxStore.onBackToPreviewMode(() => this.backToPreviewMode());
+            BeamboxStore.onClearCameraCanvas(() => this.hideImageTraceButton());
             BeamboxStore.onEndImageTrace(() => this.endImageTrace());
         }
 
@@ -60,6 +61,7 @@ define([
             BeamboxStore.removeStartDrawingPreviewBlobListener(() => this.startDrawing());
             BeamboxStore.removeEndDrawingPreviewBlobListener(() => this.endDrawing());
             BeamboxStore.removeBackToPreviewModeListener(() => this.backToPreviewMode());
+            BeamboxStore.removeClearCameraCanvasListener(() => this.hideImageTraceButton())
             BeamboxStore.removeEndImageTraceListener(() => this.endImageTrace());
         }
 
@@ -68,6 +70,10 @@ define([
                 isPreviewMode: false,
                 isImageTraceMode: false
             });
+        }
+
+        hideImageTraceButton() {
+            this.setState({ isDrawn: false });
         }
 
         handleImageTraceClick() {

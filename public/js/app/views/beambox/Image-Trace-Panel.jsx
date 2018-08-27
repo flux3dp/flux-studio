@@ -389,7 +389,8 @@ define([
                     id= 'previewForCropper'
                     onLoad={()=> this._renderCropper()}
                     src={previewBlobUrl}
-                />);
+                />
+            );
         }
 
         _renderCropper() {
@@ -637,8 +638,18 @@ define([
 
         _renderContent() {
             let renderContent = null;
+            const canvasBackgroundUrl = PreviewModeBackgroundDrawer.getCameraCanvasUrl() || ''  ;
 
             switch(this.state.currentStep) {
+                case STEP_OPEN:
+                    renderContent = (
+                        <img
+                            id= 'cameraCanvas'
+                            onLoad={() => this._cropCameraCanvas()}
+                            src={canvasBackgroundUrl}
+                        />
+                    );
+                    break;
                 case STEP_CROP:
                     renderContent = this._renderCropperModal();
                     break;
@@ -662,11 +673,6 @@ define([
             return (
                 <div id='image-trace-panel-outer'>
                     {renderContent}
-                    <img
-                        id= 'cameraCanvas'
-                        onLoad={() => this._cropCameraCanvas()}
-                        src={canvasBackgroundUrl}
-                    />
                 </div>
             );
         }

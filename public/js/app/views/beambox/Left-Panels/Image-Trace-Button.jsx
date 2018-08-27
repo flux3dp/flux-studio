@@ -9,6 +9,7 @@ define([
     'app/actions/beambox',
     'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
+    'app/stores/beambox-store',
     'helpers/api/image-tracer',
 ], function(
     $,
@@ -19,6 +20,7 @@ define([
     BeamboxActions,
     PreviewModeBackgroundDrawer,
     PreviewModeController,
+    BeamboxStore,
     ImageTracerApi
 ) {
     const LANG = i18n.lang.beambox.left_panel;
@@ -26,18 +28,11 @@ define([
     class ImageTraceButton extends React.Component {
         constructor(props) {
             super(props);
-
-            this.state = {
-                isWorking: false,
-            };
         }
 
         _handleClick() {
-            if (!PreviewModeBackgroundDrawer.isClean()) {
-                this.props.onClick();
-                this.setState({ isWorking: true });
-                BeamboxActions.showCropper();
-            }
+            this.props.onClick();
+            BeamboxActions.showCropper();
         }
 
         _renderButton() {
@@ -52,7 +47,7 @@ define([
         }
 
         render() {
-            const button = this._renderButton();
+            const button = PreviewModeBackgroundDrawer.isClean() ? null : this._renderButton();
 
             return (
                 <div>

@@ -1,10 +1,12 @@
 define([
     'react',
     'reactDOM',
+    'app/actions/beambox',
     'app/actions/beambox/preview-mode-background-drawer'
 ], function (
     React,
     ReactDOM,
+    BeamboxActions,
     PreviewModeBackgroundDrawer
 ) {
     const rootId = 'clear-preview-graffiti-button-placeholder';
@@ -30,6 +32,7 @@ define([
                         PreviewModeBackgroundDrawer.resetCoordinates();
                         this.onClick();
                         this.hide();
+                        BeamboxActions.clearCameraCanvas();
                     }
                 }}
             />);

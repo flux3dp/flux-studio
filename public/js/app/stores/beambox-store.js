@@ -39,6 +39,11 @@ define([
             return beamboxStore;
         },
 
+        onClearCameraCanvas: function(callback) {
+            this.on(Constants.CLEAR_CAMERA_CANVAS, callback);
+            return beamboxStore;
+        },
+
         removeEndDrawingPreviewBlobListener: function(callback) {
             this.removeListener(Constants.END_DRAWINGk_PREVIEW_BLOB, callback);
             return beamboxStore;
@@ -61,6 +66,11 @@ define([
 
         removeEndImageTraceListener: function(callback) {
             this.removeListener(Constants.END_IMAGE_TRACE, callback);
+            return beamboxStore;
+        },
+
+        removeClearCameraCanvasListener: function(callback) {
+            this.removeListener(Constants.CLEAR_CAMERA_CANVAS, callback);
             return beamboxStore;
         },
 

@@ -28,14 +28,14 @@ define([
                 actionType: BeamboxConstants.SHOW_CROPPER,
             });
         },
-        tuneParams: function() {
-            Dispatcher.dispatch({
-                actionType: BeamboxConstants.TUNE_IMAGE_TRACE
-            });
-        },
         endImageTrace: function() {
             Dispatcher.dispatch({
                 actionType: BeamboxConstants.END_IMAGE_TRACE
+            });
+        },
+        clearCameraCanvas: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.CLEAR_CAMERA_CANVAS
             });
         },
     };
