@@ -188,7 +188,6 @@ define([
                 y:          Number(/Y:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
                 angle:      Number(/R:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
                 scaleRatio: Number(/S:\s?(\-?\d+\.?\d+)/.exec(resp.value)[1]),
-                flip:       Number((/F:\s?(\-?\d+\.?\d+)/.exec(resp.value) || ['',''])[1])
             };
 
             await (async () => {
@@ -218,7 +217,6 @@ define([
                     y: Constant.camera.offsetY_ideal,
                     angle: 0,
                     scaleRatio: Constant.camera.scaleRatio_ideal,
-                    flip: this.cameraOffset.flip
                 };
             }
         }

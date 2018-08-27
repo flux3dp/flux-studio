@@ -94,12 +94,12 @@ define([
         }
 
         _cropAndRotateImg(imageObj) {
-            const {angle, scaleRatio, flip} = this.cameraOffset;
+            const {angle, scaleRatio} = this.cameraOffset;
 
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');
-            
-            const a = angle + (flip ? Math.PI : 0);
+
+            const a = angle;
             const s = scaleRatio;
             const w = imageObj.width;
             const h = imageObj.height;

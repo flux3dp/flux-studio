@@ -52,7 +52,7 @@ define([
                 events.onError = (response) => { d.reject(response); console.log('on error', response); };
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
-                ws.send(`upload ${data.size || data.byteLength}${opts.flip ? ' flip' : ''}`);
+                ws.send(`upload ${data.size || data.byteLength}`);
                 return d.promise();
             },
         };

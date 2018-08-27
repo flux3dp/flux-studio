@@ -19,6 +19,7 @@ define([
     const LANG = i18n.lang;
     class Camera {
         constructor() {
+            this.cameraNeedFlip = undefined;
             this._device = '';
             this._ws = null;
             this._wsSubject = new Rx.Subject();
@@ -41,11 +42,7 @@ define([
         async createWs(device) {
             this._device = device;
             console.assert(device.version, 'device miss version!', device);
-            const method = (() => {
-                const isUsb = device.source === 'h2h';
-                const uuid = device.uuid;
-                return isUsb ? `camera/usb/${parseInt(uuid)}` : `camera/${uuid}`;
-            })();
+            const method = (device.source === 'h2h') ? `camera/usb/${parseInt(device.uuid)}` : `camera/${device.uuid}`;
 
             this._ws = new Websocket({
                 method: method,
@@ -57,11 +54,40 @@ define([
                 autoReconnect: false
             });
 
-            return await this._wsSubject
+            // if response.status === 'connected' within TIMEOUT, the promise resolve. and the websocket will keep listening.
+            await this._wsSubject
                 .filter(res => res.status === 'connected')
                 .take(1)
                 .timeout(TIMEOUT)
                 .toPromise();
+
+            // check whether the camera need flip
+            this.cameraNeedFlip = !!(Number((/F:\s?(\-?\d+\.?\d+)/.exec(await this._getCameraOffset()) || ['',''])[1]));
+        }
+
+        async _getCameraOffset() {
+            const tempWsSubject = new Rx.Subject();
+            const tempWs = new Websocket({
+                method: (this._device.source === 'h2h') ? `control/usb/${parseInt(this._device.uuid)}` : `control/${this._device.uuid}`,
+                onOpen: () => tempWs.send(rsaKey()),
+                onMessage: (res) => tempWsSubject.onNext(res),
+                onError: (res) => tempWsSubject.onError(new Error(res.error?res.error.toString():res)),
+                onFatal: (res) => tempWsSubject.onError(new Error(res.error?res.error.toString():res)),
+                onClose: () => tempWsSubject.onCompleted(),
+                autoReconnect: false
+            });
+            await tempWsSubject
+                .filter(res => res.status === 'connected')
+                .take(1)
+                .timeout(TIMEOUT)
+                .toPromise();
+
+            tempWs.send('config get camera_offset');
+            const camera_offset = await tempWsSubject
+                .take(1)
+                .timeout(TIMEOUT)
+                .toPromise();
+            return camera_offset.value;
         }
 
         async oneShot() {
@@ -84,17 +110,25 @@ define([
         }
 
         async preprocessImage(blob) {
-            if (!['fbb1b', 'fbb1p', 'laser-b1'].includes(this._device.model)) {
-                return blob;
-            }
-
+            // load blob and flip if necessary
             const imageLoadBlob = async () => {
                 const img = new Image();
                 const imgUrl = URL.createObjectURL(blob);
                 img.src = imgUrl;
                 await new Promise(resolve => img.onload = resolve);
                 URL.revokeObjectURL(imgUrl);
-                return img;
+
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                if (this.cameraNeedFlip) {
+                    canvas.getContext('2d').scale(-1, -1);
+                    canvas.getContext('2d').drawImage(img, -img.width, -img.height, img.width, img.height);
+                } else {
+                    canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+                }
+                return canvas;
             };
             const resize1280x720ImageTo640x280 = async () => {
                 const img = await imageLoadBlob();
@@ -104,9 +138,7 @@ define([
                 canvas.width = 640;
                 canvas.height = 280;
                 canvas.getContext('2d').drawImage(img, 0, -40, 640, 360); // resize
-                const preprocessedBlob = await new Promise(resolve =>
-                    canvas.toBlob(b => resolve(b))
-                );
+                const preprocessedBlob = await new Promise(resolve => canvas.toBlob(b => resolve(b)));
                 return preprocessedBlob;
             };
 
@@ -118,11 +150,13 @@ define([
                 canvas.width = 640;
                 canvas.height = 280;
                 canvas.getContext('2d').drawImage(img, 0, -100, 640, 480); // crop top and bottom
-                const preprocessedBlob = await new Promise(resolve =>
-                    canvas.toBlob(b => resolve(b))
-                );
+                const preprocessedBlob = await new Promise(resolve => canvas.toBlob(b => resolve(b)));
                 return preprocessedBlob;
             };
+
+            if (!['fbb1b', 'fbb1p', 'laser-b1'].includes(this._device.model)) {
+                return blob;
+            }
 
             if (VersionChecker(this._device.version).meetRequirement('BEAMBOX_CAMERA_SPEED_UP')) {
                 return await crop640x480ImageTo640x280();
