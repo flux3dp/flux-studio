@@ -60,7 +60,7 @@ define([
                 preCrop: {},
                 brightness: 100,
                 contrast: 100,
-                threshold: 255
+                threshold: 128
             };
         }
 
@@ -90,7 +90,7 @@ define([
                                 grayscale: {
                                     is_rgba: true,
                                     is_shading: true,
-                                    threshold: 255,
+                                    threshold: 128,
                                     is_svg: false
                                 },
                                 onComplete: (result) => {
@@ -165,7 +165,7 @@ define([
             this.setState({
                 brightness: 100,
                 contrast: 100,
-                threshold: 255
+                threshold: 128
             });
         }
 
@@ -222,7 +222,7 @@ define([
                         grayscale: {
                             is_rgba: true,
                             is_shading: true,
-                            threshold: 255,
+                            threshold: 128,
                             is_svg: false
                         },
                         onComplete: (result) => {
@@ -239,7 +239,7 @@ define([
         _handleCropperCancel() {
             this._destroyCropper();
             this.prev();
-            BeamboxActions.backToPreviewMode();
+            BeamboxActions.endImageTrace();
         }
 
         _handleParameterChange(id, value) {
@@ -304,9 +304,9 @@ define([
                 imageTrace: '',
                 brightness: 100,
                 contrast: 100,
-                threshold: 255
+                threshold: 128
             });
-            BeamboxActions.backToPreviewMode();
+            BeamboxActions.endImageTrace();
         }
 
         _handleImageTraceComplete() {
@@ -376,7 +376,7 @@ define([
                 imageTrace: '',
                 brightness: 100,
                 contrast: 100,
-                threshold: 255
+                threshold: 128
             });
             BeamboxActions.endImageTrace();
         }
