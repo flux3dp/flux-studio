@@ -58,8 +58,6 @@ define([
                 imageTrace: '',
                 cropData: {},
                 preCrop: {},
-                brightness: 100,
-                contrast: 100,
                 threshold: 128
             };
         }
@@ -164,8 +162,6 @@ define([
             this.prev();
             URL.revokeObjectURL(this.state.croppedBlobUrl);
             this.setState({
-                brightness: 100,
-                contrast: 100,
                 threshold: 128
             });
         }
@@ -178,8 +174,6 @@ define([
         async _calculateImageTrace() {
             const {
                 croppedBlobUrl,
-                brightness,
-                contrast,
                 threshold
             } = this.state;
             const d = $.Deferred();
@@ -190,7 +184,7 @@ define([
                 .then((blob) => {
                     var fileReader = new FileReader();
                     fileReader.onloadend = (e) => {
-                        imageTracerWebSocket.upload(e.target.result, { brightness: brightness/100, contrast: contrast/100, threshold })
+                        imageTracerWebSocket.upload(e.target.result, { threshold })
                             .done((res)=>{
                                 d.resolve(res);
                                 this._getImageTrace(res.svg);
@@ -228,6 +222,9 @@ define([
                             is_svg: false
                         },
                         onComplete: (result) => {
+                            if (grayscaleCroppedImg) {
+                                URL.revokeObjectURL(grayscaleCroppedImg);
+                            }
                             grayscaleCroppedImg = result.canvas.toDataURL('image/png');
                             this.next();
                         }
@@ -246,14 +243,6 @@ define([
 
         _handleParameterChange(id, value) {
             switch(id) {
-                case 'brightness':
-                    this.setState({ brightness: value });
-                    this._applyFilterEffect();
-                    break;
-                case 'contrast':
-                    this.setState({ contrast: value });
-                    this._applyFilterEffect();
-                    break;
                 case 'threshold':
                     ImageData(
                         this.state.croppedBlobUrl,
@@ -268,6 +257,9 @@ define([
                                 is_svg: false
                             },
                             onComplete: (result) => {
+                                if (grayscaleCroppedImg) {
+                                    URL.revokeObjectURL(grayscaleCroppedImg);
+                                }
                                 grayscaleCroppedImg = result.canvas.toDataURL('image/png');
                                 this.setState({ threshold: value });
                             }
@@ -275,16 +267,6 @@ define([
                     );
                     break;
             }
-        }
-
-        _applyFilterEffect() {
-            const { brightness, contrast } = this.state;
-            const img = document.getElementById('tunedImage');
-            const filterValue = `brightness(${brightness}%) contrast(${contrast}%)`;
-
-            $(img).css({
-                '-webkit-filter': filterValue,
-            });
         }
 
         _destroyCropper() {
@@ -303,8 +285,6 @@ define([
                 croppedBlobUrl: '',
                 croppedCameraCanvasBlobUrl: '',
                 imageTrace: '',
-                brightness: 100,
-                contrast: 100,
                 threshold: 128
             });
             BeamboxActions.endImageTrace();
@@ -319,8 +299,6 @@ define([
                 cropData,
                 preCrop,
                 imageTrace,
-                brightness,
-                contrast,
                 threshold,
                 croppedBlobUrl
             } = this.state;
@@ -328,45 +306,27 @@ define([
 
             const d = $.Deferred();
 
-            fetch(croppedBlobUrl)
-                .then(res => res.blob())
-                .then((blob) => {
-                    var fileReader = new FileReader();
-                    fileReader.onloadend = (e) => {
-                        imageTracerWebSocket.basic(e.target.result, { brightness: brightness/100, contrast: contrast/100})
-                            .done((res)=>{
-                                d.resolve(res);
-                                const url = URL.createObjectURL(res);
+            if (TESTING_IT) {
+                const testingCropData = {
+                    x: tunedImage.x,
+                    y: tunedImage.y,
+                    width: tunedImage.width,
+                    height: tunedImage.height
+                }
+                const testingPreCrop = {
+                    offsetX: 100,
+                    offsetY: 100
+                }
 
-                                if (TESTING_IT) {
-                                    const testingCropData = {
-                                        x: tunedImage.x,
-                                        y: tunedImage.y,
-                                        width: tunedImage.width,
-                                        height: tunedImage.height
-                                    }
-                                    const testingPreCrop = {
-                                        offsetX: 100,
-                                        offsetY: 100
-                                    }
+                FnWrapper.insertImage(grayscaleCroppedImg, testingCropData, testingPreCrop, threshold);
+                FnWrapper.insertSvg(imageTrace, testingCropData, testingPreCrop);
+            } else {
+                FnWrapper.insertImage(grayscaleCroppedImg, cropData, preCrop, threshold);
+                FnWrapper.insertSvg(imageTrace, cropData, preCrop);
+            }
 
-                                    FnWrapper.insertImage(url, testingCropData, testingPreCrop, threshold);
-                                    FnWrapper.insertSvg(imageTrace, testingCropData, testingPreCrop);
-                                } else {
-                                    FnWrapper.insertImage(url, cropData, preCrop, threshold);
-                                    FnWrapper.insertSvg(imageTrace, cropData, preCrop);
-                                }
-                            })
-                            .fail((res)=>{
-                                d.reject(res.toString());
-                            });
-                    };
-                    fileReader.readAsArrayBuffer(blob);
-                })
-                .catch((err) => {
-                    d.reject(err);
-                })
             URL.revokeObjectURL(this.state.croppedBlobUrl);
+            URL.revokeObjectURL(grayscaleCroppedImg);
             if (this.state.croppedCameraCanvasBlobUrl != '') {
                 URL.revokeObjectURL(this.state.croppedCameraCanvasBlobUrl);
             }
@@ -375,8 +335,6 @@ define([
                 croppedBlobUrl: '',
                 croppedCameraCanvasBlobUrl: '',
                 imageTrace: '',
-                brightness: 100,
-                contrast: 100,
                 threshold: 128
             });
             BeamboxActions.endImageTrace();
@@ -520,8 +478,6 @@ define([
 
         _renderImageTraceModal() {
             const {
-                brightness,
-                contrast,
                 threshold,
                 currentStep,
                 imageTrace
@@ -540,28 +496,6 @@ define([
                                 <div className='right-part'>
                                 <div className='scroll-bar-container'>
                                     <div className='title'>{LANG.tuning}</div>
-                                    <SliderControl
-                                        id='brightness'
-                                        key='brightness'
-                                        label={LANG.brightness}
-                                        min={60}
-                                        max={140}
-                                        step={1}
-                                        unit='percent'
-                                        default={parseInt(brightness)}
-                                        onChange={(id, val) => this._handleParameterChange(id, val)}
-                                    />
-                                    <SliderControl
-                                        id='contrast'
-                                        key='contrast'
-                                        label={LANG.contrast}
-                                        min={60}
-                                        max={140}
-                                        step={1}
-                                        unit='percent'
-                                        default={parseInt(contrast)}
-                                        onChange={(id, val) => this._handleParameterChange(id, val)}
-                                    />
                                     <SliderControl
                                         id='threshold'
                                         key='threshold'
