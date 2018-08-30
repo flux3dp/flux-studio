@@ -88,6 +88,7 @@ define([
                                 height: 0,
                                 width: 0,
                                 grayscale: {
+                                    is_binary: true,
                                     is_rgba: true,
                                     is_shading: false,
                                     threshold: 128,
@@ -184,7 +185,7 @@ define([
             const d = $.Deferred();
             const img = document.getElementById('tunedImage');
 
-            fetch(croppedBlobUrl)
+            fetch(grayscaleCroppedImg)
                 .then(res => res.blob())
                 .then((blob) => {
                     var fileReader = new FileReader();
@@ -220,6 +221,7 @@ define([
                         height: 0,
                         width: 0,
                         grayscale: {
+                            is_binary: true,
                             is_rgba: true,
                             is_shading: false,
                             threshold: 128,
@@ -259,15 +261,14 @@ define([
                             height: 0,
                             width: 0,
                             grayscale: {
+                                is_binary: true,
                                 is_rgba: true,
                                 is_shading: false,
                                 threshold: parseInt(value),
                                 is_svg: false
                             },
                             onComplete: (result) => {
-                                const img = document.getElementById('tunedImage');
-
-                                img.src = result.canvas.toDataURL('image/png');
+                                grayscaleCroppedImg = result.canvas.toDataURL('image/png');
                                 this.setState({ threshold: value });
                             }
                         }
