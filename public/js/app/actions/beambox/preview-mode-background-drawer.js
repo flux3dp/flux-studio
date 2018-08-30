@@ -143,8 +143,7 @@ define([
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');
 
-            const a = angle + (flip ? Math.PI : 0);
-            const s = scaleRatio;
+            const a = angle;
             const w = imageObj.width;
             const h = imageObj.height;
 
