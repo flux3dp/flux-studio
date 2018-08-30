@@ -1015,6 +1015,7 @@ define(function() {
                 insert_object: 'Insert Object',
                 preview: 'Preview',
                 advanced: 'Advanced',
+                image_trace: 'Image Trace',
                 suggest_calibrate_camera_first: 'Please calibrate the camera. (Menu > Machine > [Your Machine] > Calibrate Camera)\nRefocus platform properly everytime using it to perform better preview result.',
                 end_preview: 'End Preview Mode',
                 unpreviewable_area: 'The area is not allowed to preview',
@@ -1057,6 +1058,17 @@ define(function() {
             },
             bottom_right_panel: {
                 convert_text_to_path_before_export: 'Convert Text to Path...'
+            },
+            image_trace_panel: {
+                apply: 'Apply',
+                back: 'Back',
+                cancel: 'Cancel',
+                next: 'Next',
+                brightness: 'Brightness',
+                contrast: 'Contrast',
+                threshold: 'Threshold',
+                okay: 'Okay',
+                tuning: 'Parameters'
             },
             object_panels: {
                 position: 'Position',

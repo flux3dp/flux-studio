@@ -10,6 +10,7 @@ define(function() {
         opts.threshold = ('number' === typeof opts.threshold ? opts.threshold : 128);
         opts.is_shading = ('boolean' === typeof opts.is_shading ? opts.is_shading : true);
         opts.is_svg = ('boolean' === typeof opts.is_svg ? opts.is_svg : false);
+        opts.is_binary = ('boolean' === typeof opts.is_binary ? opts.is_binary : false);
         var binary = new Uint8Array(opts.is_rgba ? data.length : data.length / 4),
             WHITE = 255,
             BLACK = 0,
@@ -34,6 +35,16 @@ define(function() {
 
                 if (false === opts.is_rgba) {
                     binary[binaryIndex] = data[i + 3] === 0 ? WHITE : grayscale;
+                }
+                else if (opts.is_binary) {
+                    const grayscaleValue = (1 - alpha) * WHITE + alpha * Math.round(0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2]);
+
+                    if (grayscaleValue > opts.threshold) {
+                        binary[i] = binary[i+1] = binary[i+2] = binary[i+3] = 255;
+                    } else {
+                        binary[i] = binary[i+1] = binary[i+2] = 0;
+                        binary[i+3] = 255;
+                    }
                 }
                 else {
                     binary[i] = binary[i + 1] = binary[i + 2] = grayscale;

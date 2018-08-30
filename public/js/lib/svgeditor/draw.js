@@ -605,7 +605,7 @@
     svgedit.draw.Drawing.prototype.getLayerColor = function (layername) {
         var layer = this.layer_map[layername];
         if (layer && !layer.color) {
-            layer.color = layername;
+            layer.color = (layername == 'Traced Path') ? '#ff00ff' : layername;
         }
         return layer ? layer.color : false;
     };

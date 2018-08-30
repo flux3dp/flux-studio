@@ -1,15 +1,19 @@
 /**
- * API camera calibration
+ * API image tracer
  * Ref: none
  */
 define([
     'helpers/websocket',
-], function(Websocket) {
+    'app/actions/beambox'
+], function(
+    Websocket,
+    BeamboxActions
+) {
     'use strict';
 
     return function() {
         var ws = new Websocket({
-                method: 'camera-calibration',
+                method: 'image-tracer',
                 onMessage: (data) => {
                     events.onMessage(data);
                 },
@@ -52,9 +56,14 @@ define([
                 events.onError = (response) => { d.reject(response); console.log('on error', response); };
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
-                ws.send(`upload ${data.size || data.byteLength}`);
+                ws.send(`image_trace ${data.size || data.byteLength} ${opts.threshold}`);
                 return d.promise();
             },
+
+            /**
+             * @param {ArrayBuffer} data    - binary data with array buffer type
+             */
+
         };
     };
 });

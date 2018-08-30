@@ -33,13 +33,14 @@ define([
     'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
-
+    'app/actions/beambox'
 ], function (
     i18n,
     BeamboxPreference,
     AlertActions,
     ObjectPanelsController,
-    PreviewModeController
+    PreviewModeController,
+    BeamboxActions
 ) {
     const LANG = i18n.lang.beambox;
     // Class: SvgCanvas
@@ -550,7 +551,7 @@ define([
             removedElements = {},
 
             justClearSelection = false,
-            
+
             // Rotary Mode
             rotaryMode = BeamboxPreference.read('rotary_mode');
 
@@ -2166,8 +2167,10 @@ define([
                         if (justClearSelection) {
                             justClearSelection = false;
                         } else {
+                            BeamboxActions.startDrawingPreviewBlob();
+
                             if (start_x === real_x && start_y === real_y) {
-                                PreviewModeController.preview(real_x, real_y);
+                                PreviewModeController.preview(real_x, real_y, true);
                             } else {
                                 PreviewModeController.previewRegion(start_x, start_y, real_x, real_y);
                             }
@@ -5312,6 +5315,11 @@ define([
                                 confirmedType: 'nolayer'
                             };
                         }
+                    case 'image-trace':
+                        return {
+                            symbols: _parseSvgByColor(svg),
+                            confirmedType: 'color'
+                        };
                 }
             }
             function appendUseElement(symbol, type) {
@@ -5320,10 +5328,10 @@ define([
                 use_el.id = getNextId();
                 setHref(use_el, '#' + symbol.id);
                 //switch currentLayer, and create layer if necessary
-                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color'))) {
+                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
 
                     const color = symbol.getAttribute('data-color');
-                    const layerName = symbol.getAttribute('data-id') || rgbToHex(color);
+                    const layerName = (type === 'image-trace') ? 'Traced Path' : symbol.getAttribute('data-id') || rgbToHex(color);
 
                     const isLayerExist = svgCanvas.setCurrentLayer(layerName);
                     if(!isLayerExist) {
@@ -5335,7 +5343,7 @@ define([
                 // append ~~~~~ ya
                 getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
-                if(type !== 'color') {
+                if(type !== 'color' || type !== 'image-trace') {
                     use_el.setAttribute('data-wireframe', true);
                 }
 
@@ -5372,12 +5380,18 @@ define([
                 }
                 return '#' + hex.toUpperCase(); // ex: #0A23C5
             }
-            function setDataXform(use_el) {
+            function setDataXform(use_el, it) {
                 const bb = svgedit.utilities.getBBox(use_el);
                 let dataXform = '';
-                $.each(bb, function (key, value) {
-                    dataXform += key + '=' + value + ' ';
-                });
+
+                if (it) {
+                    dataXform = `x=0 y=0 width=${bb.width} height=${bb.height}`
+                } else {
+                    $.each(bb, function (key, value) {
+                        dataXform += key + '=' + value + ' ';
+                    });
+                }
+
                 use_el.setAttribute('data-xform', dataXform);
                 return use_el;
             }
@@ -5420,8 +5434,8 @@ define([
             const svg = svgdoc.adoptNode(newDoc.documentElement);
             const {symbols, confirmedType} = parseSvg(svg, _type);
 
-            const use_elements = symbols.map(symbol => appendUseElement(symbol, confirmedType));
-            use_elements.map(element => setDataXform(element));
+            const use_elements = symbols.map(symbol => appendUseElement(symbol, _type));
+            use_elements.map(element => setDataXform(element, _type === 'image-trace'));
 
             removeDefaultLayerIfEmpty();
 
@@ -8815,6 +8829,44 @@ define([
 
         this.getRotaryDisplayCoord = function () {
             return BeamboxPreference.read('rotary_y_coord') || 5;
+        }
+
+        this.zoomSvgElem = function (zoomScale) {
+            const selected = selectedElements[0];
+            const realLocation = this.getSvgRealLocation(selected);
+
+            startTransform = selected.getAttribute('transform'); //???maybe non need
+
+            const tlist = svgedit.transformlist.getTransformList(selected);
+            const left = realLocation.x;
+            const top = realLocation.y;
+
+            // update the transform list with translate,scale,translate
+            let translateOrigin = svgroot.createSVGTransform();
+            let scale = svgroot.createSVGTransform();
+            let translateBack = svgroot.createSVGTransform();
+
+            translateOrigin.setTranslate(-left, -top);
+            scale.setScale(zoomScale, zoomScale);
+            translateBack.setTranslate(left, top);
+
+            const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
+            if (hasMatrix) {
+                const pos = svgedit.utilities.getRotationAngle(selected) ? 1 : 0;
+                tlist.insertItemBefore(translateOrigin, pos);
+                tlist.insertItemBefore(scale, pos);
+                tlist.insertItemBefore(translateBack, pos);
+            } else {
+                tlist.appendItem(translateBack);
+                tlist.appendItem(scale);
+                tlist.appendItem(translateOrigin);
+            }
+
+            selectorManager.requestSelector(selected).resize();
+
+            selectorManager.requestSelector(selected).showGrips(true);
+
+            svgedit.recalculate.recalculateDimensions(selected);
         };
     };
 

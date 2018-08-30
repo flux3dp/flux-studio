@@ -1,11 +1,13 @@
 define([
     'Rx',
     'helpers/i18n',
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
+    'app/actions/beambox'
 ], function (
     Rx,
     i18n,
-    Constant
+    Constant,
+    BeamboxActions
 ) {
     const LANG = i18n.lang.beambox.left_panel;
 
@@ -13,6 +15,13 @@ define([
         constructor() {
             this.canvas = document.createElement('canvas');
             this.cameraCanvasUrl = '';
+
+            this.coordinates = {
+                maxX : 0,
+                maxY : 0,
+                minX : 10000,
+                minY : 10000
+            }
 
             this.canvas.width = Constant.dimension.width;
             this.canvas.height = Constant.dimension.height;
@@ -27,14 +36,16 @@ define([
             this.backgroundDrawerSubject
                 .concatMap(p => Rx.Observable.fromPromise(p))
                 .subscribe(blob => this._drawBlobToBackground(blob));
+
         }
 
         end() {
             this.backgroundDrawerSubject.onCompleted();
         }
 
-        async draw(imgUrl, x, y) {
-            const p = this._prepareCroppedAndRotatedImgBlob(imgUrl, x, y);
+        async draw(imgUrl, x, y, last = false) {
+            const p = this._prepareCroppedAndRotatedImgBlob(imgUrl, x, y, last);
+
             this.backgroundDrawerSubject.onNext(p);
             // await p;  if you want to know the time when image transfer to Blob, which is almost the same time background is drawn.
         }
@@ -66,6 +77,21 @@ define([
             this.cameraCanvasUrl = '';
         }
 
+        getCameraCanvasUrl() {
+            return this.cameraCanvasUrl;
+        }
+
+        getCoordinates() {
+            return this.coordinates;
+        }
+
+        resetCoordinates() {
+            this.coordinates.maxX = 0;
+            this.coordinates.maxY = 0;
+            this.coordinates.minX = 10000;
+            this.coordinates.minY = 10000;
+        }
+
         _drawBlobToBackground(blob) {
             if (this.cameraCanvasUrl) {
                 URL.revokeObjectURL(this.cameraCanvasUrl);
@@ -74,7 +100,7 @@ define([
             window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
         }
 
-        _prepareCroppedAndRotatedImgBlob(imgUrl, x, y) {
+        _prepareCroppedAndRotatedImgBlob(imgUrl, x, y, last = false) {
             const img = new Image();
             img.src = imgUrl;
             return new Promise(resolve => {
@@ -87,8 +113,26 @@ define([
                     const dstX = x - img_regulated.width/2;
                     const dstY = y - img_regulated.height/2;
 
+                    if (dstX > this.coordinates.maxX) {
+                        this.coordinates.maxX = dstX;
+                    }
+                    if (dstX < this.coordinates.minX) {
+                        this.coordinates.minX = dstX;
+                    }
+                    if (dstY > this.coordinates.maxY) {
+                        this.coordinates.maxY = dstY;
+                    }
+                    if (dstY < this.coordinates.minY) {
+                        this.coordinates.minY = dstY;
+                    }
+
                     this.canvas.getContext('2d').drawImage(img_regulated, dstX, dstY);
-                    this.canvas.toBlob(blob => resolve(blob));
+                    this.canvas.toBlob( (blob) => {
+                        resolve(blob);
+                        if (last) {
+                            setTimeout(() => BeamboxActions.endDrawingPreviewBlob(), 1000);
+                        }
+                    });
                 };
             });
         }
@@ -99,7 +143,8 @@ define([
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');
 
-            const a = angle;
+            const a = angle + (flip ? Math.PI : 0);
+            const s = scaleRatio;
             const w = imageObj.width;
             const h = imageObj.height;
 

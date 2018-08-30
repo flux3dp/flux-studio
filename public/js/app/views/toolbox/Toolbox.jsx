@@ -32,7 +32,7 @@ define([
             TopbarStore.onImageToolboxClosed(() => this.closeImage());
         }
 
-        componentDidUnMount() {
+        componentWillUnmount() {
             TopbarStore.removeAlignToolboxShowedListener(() => this.showAlign());
             TopbarStore.removeAlignToolboxClosedListener(() => this.closeAlign());
             TopbarStore.removeDistributeToolboxShowedListener(() => this.showDistribute());

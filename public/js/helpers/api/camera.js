@@ -1,6 +1,6 @@
 /**
- * API control
- * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-control
+ * API camera
+ * Ref: https://github.com/flux3dp/fluxghost/wiki/websocket-camera(monitoring)
  */
 define([
     'Rx',

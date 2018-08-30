@@ -1,7 +1,9 @@
 define([
     'app/actions/beambox/constant',
+    'helpers/image-data',
 ], function(
-    Constant
+    Constant,
+    ImageData
 ){
     let _mm2pixel = function(mm_input) {
         const dpmm = Constant.dpmm;
@@ -51,6 +53,100 @@ define([
         //main panel
         importImage: function() {
             $('#tool_import input').click();
+        },
+
+        insertSvg: function(svgString, cropData, preCrop) {
+            const newElement = svgCanvas.importSvgString(svgString, 'image-trace');
+            const {
+                x,
+                y,
+                width,
+                height
+            } = cropData;
+            const {
+                offsetX,
+                offsetY,
+            } = preCrop;
+
+            svgCanvas.ungroupSelectedElement();
+            svgCanvas.ungroupSelectedElement();
+            svgCanvas.groupSelectedElements();
+            svgCanvas.alignSelectedElements('m', 'page');
+            svgCanvas.alignSelectedElements('c', 'page');
+            // highlight imported element, otherwise we get strange empty selectbox
+            try {
+                svgCanvas.selectOnly([newElement]);
+                svgCanvas.setSvgElemPosition('x', offsetX + x);
+                svgCanvas.setSvgElemPosition('y', offsetY + y);
+                svgCanvas.zoomSvgElem(72/254);
+            } catch(e) {
+                console.warn('Reading empty SVG');
+            }
+            // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
+            $('#svg_editor').addClass('color');
+            $('#dialog_box').hide();
+        },
+        insertImage: function(insertedImageSrc, cropData, preCrop, threshold) {
+
+            // let's insert the new image until we know its dimensions
+            const insertNewImage = function (img, cropData, preCrop, threshold) {
+                const {
+                    x,
+                    y,
+                    width,
+                    height
+                } = cropData;
+                const {
+                    offsetX,
+                    offsetY,
+                } = preCrop;
+                const newImage = svgCanvas.addSvgElementFromJson({
+                    element: 'image',
+                    attr: {
+                        x: offsetX + x,
+                        y: offsetY + y,
+                        width: width,
+                        height: height,
+                        id: svgCanvas.getNextId(),
+                        style: 'pointer-events:inherit',
+                        preserveAspectRatio: 'none',
+                        'data-threshold': parseInt(threshold)*100/255,
+                        'data-shading': false,
+                        origImage: img.src
+                    }
+                });
+
+                ImageData(
+                    newImage.getAttribute('origImage'), {
+                        height,
+                        width,
+                        grayscale: {
+                            is_rgba: true,
+                            is_shading: false,
+                            threshold: parseInt(threshold),
+                            is_svg: false
+                        },
+                        onComplete: function (result) {
+                            svgCanvas.setHref(newImage, result.canvas.toDataURL());
+                        }
+                    }
+                );
+
+                svgCanvas.selectOnly([newImage]);
+
+                window.updateContextPanel();
+                $('#dialog_box').hide();
+            };
+
+            // create dummy img so we know the default dimensions
+            const img = new Image();
+
+            img.src = insertedImageSrc;
+            img.style.opacity = 0;
+            img.onload = function () {
+                svgCanvas.createLayer('Traced Image');
+                insertNewImage(img, cropData, preCrop, threshold);
+            };
         },
 
         //align toolbox
