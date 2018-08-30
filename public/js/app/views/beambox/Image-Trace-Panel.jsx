@@ -89,7 +89,7 @@ define([
                                 width: 0,
                                 grayscale: {
                                     is_rgba: true,
-                                    is_shading: true,
+                                    is_shading: false,
                                     threshold: 128,
                                     is_svg: false
                                 },
@@ -221,7 +221,7 @@ define([
                         width: 0,
                         grayscale: {
                             is_rgba: true,
-                            is_shading: true,
+                            is_shading: false,
                             threshold: 128,
                             is_svg: false
                         },
@@ -260,7 +260,7 @@ define([
                             width: 0,
                             grayscale: {
                                 is_rgba: true,
-                                is_shading: true,
+                                is_shading: false,
                                 threshold: parseInt(value),
                                 is_svg: false
                             },
