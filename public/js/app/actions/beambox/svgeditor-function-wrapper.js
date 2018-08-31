@@ -1,9 +1,11 @@
 define([
     'app/actions/beambox/constant',
     'helpers/image-data',
+    'lib/cropper'
 ], function(
     Constant,
-    ImageData
+    ImageData,
+    Cropper
 ){
     let _mm2pixel = function(mm_input) {
         const dpmm = Constant.dpmm;
@@ -144,7 +146,9 @@ define([
             img.src = insertedImageSrc;
             img.style.opacity = 0;
             img.onload = function () {
-                svgCanvas.createLayer('Traced Image');
+                if (!svgCanvas.setCurrentLayer('Traced Image')) {
+                    svgCanvas.createLayer('Traced Image');
+                }
                 insertNewImage(img, cropData, preCrop, threshold);
             };
         },
