@@ -1968,7 +1968,7 @@ define([
                 multiselected = (elems.length >= 2 && elems[1] != null);
                 const isAlignToolboxShowed = (elems.length >= 1) && (elems[0] !== null );
                 const isDistributeToolboxShowed = multiselected && elems.length >=3 ;
-                const isImageToolboxShowed = (elems.length === 1) && elems[0] && elems[0].nodeName === "image";
+                const isImageToolboxShowed = !multiselected && elems[0] && elems[0].nodeName === "image";
                 if (selectedElement != null) {
                     // unless we're already in always set the mode of the editor to select because
                     // upon creation of a text element the editor is switched into
