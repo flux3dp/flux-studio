@@ -112,7 +112,7 @@ define([
                         id: svgCanvas.getNextId(),
                         style: 'pointer-events:inherit',
                         preserveAspectRatio: 'none',
-                        'data-threshold': Math.round(parseInt(threshold)*100/255),
+                        'data-threshold': parseInt(threshold),
                         'data-shading': false,
                         origImage: img.src
                     }

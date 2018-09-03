@@ -16,7 +16,7 @@ define([
             threshold: PropTypes.number.isRequired,
             $me: PropTypes.object.isRequired
         },
-        
+
         getInitialState: function() {
             return {
                 shading: this.props.shading,
@@ -47,7 +47,7 @@ define([
                     grayscale: {
                         is_rgba: true,
                         is_shading: Boolean(this.state.shading),
-                        threshold: parseInt(this.state.threshold*255/100),
+                        threshold: parseInt(this.state.threshold),
                         is_svg: false
                     },
                     onComplete: function(result) {
@@ -70,7 +70,7 @@ define([
             this.setState({threshold: val}, function(){
                 this._writeThreshold(val);
                 this._refreshImage();
-            });        
+            });
         },
         render: function() {
             return (
@@ -79,7 +79,7 @@ define([
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
                         {LANG.laser_config}
-                        <span className="value">{this.state.shading ? LANG.shading + ', ' : ''}{this.state.threshold}%</span>
+                        <span className="value">{this.state.shading ? LANG.shading + ', ' : ''}{this.state.threshold}</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
@@ -90,14 +90,14 @@ define([
                         </div>
                         <div className="control">
                             <span className="text-center header">{LANG.threshold}</span>
-                            <input type="range" min={0} max={100} value={this.state.threshold} onChange={this._handleThresholdChange} />
+                            <input type="range" min={0} max={255} value={this.state.threshold} onChange={this._handleThresholdChange} />
                         </div>
                     </label>
                 </label>
             </div>
             );
         }
-        
+
     });
 
 });

@@ -318,14 +318,13 @@ define([
                     offsetY: 100
                 }
 
-                FnWrapper.insertImage(grayscaleCroppedImg, testingCropData, testingPreCrop, threshold);
+                FnWrapper.insertImage(croppedBlobUrl, testingCropData, testingPreCrop, threshold);
                 FnWrapper.insertSvg(imageTrace, testingCropData, testingPreCrop);
             } else {
-                FnWrapper.insertImage(grayscaleCroppedImg, cropData, preCrop, threshold);
+                FnWrapper.insertImage(croppedBlobUrl, cropData, preCrop, threshold);
                 FnWrapper.insertSvg(imageTrace, cropData, preCrop);
             }
 
-            URL.revokeObjectURL(this.state.croppedBlobUrl);
             URL.revokeObjectURL(grayscaleCroppedImg);
             if (this.state.croppedCameraCanvasBlobUrl != '') {
                 URL.revokeObjectURL(this.state.croppedCameraCanvasBlobUrl);

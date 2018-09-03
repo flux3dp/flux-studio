@@ -5343,7 +5343,7 @@ define([
                                         id: svgCanvas.getNextId(),
                                         style: 'pointer-events:inherit',
                                         preserveAspectRatio: 'none',
-                                        'data-threshold': 100,
+                                        'data-threshold': 255,
                                         'data-shading': true,
                                         origImage: img.src
                                     }
@@ -5356,7 +5356,7 @@ define([
                                         grayscale: {
                                             is_rgba: true,
                                             is_shading: Boolean(newImage.getAttribute('data-shading')),
-                                            threshold: parseInt(newImage.getAttribute('data-threshold') * 255 / 100),
+                                            threshold: parseInt(newImage.getAttribute('data-threshold')),
                                             is_svg: false
                                         },
                                         onComplete: function (result) {
