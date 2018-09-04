@@ -467,7 +467,7 @@ define([
             const destX = 0;
             const destY = 0;
             const destWidth = (coordinates.maxX - coordinates.minX)/6.286 + 74;
-            const destHeight = (coordinates.maxY - coordinates.minY)/6.286+ 74;
+            const destHeight = (coordinates.maxY - coordinates.minY)/6.286 + 74;
 
             canvas.width = sourceWidth;
             canvas.height = sourceHeight;
@@ -493,16 +493,18 @@ define([
             const {
                 threshold,
                 currentStep,
-                imageTrace
+                imageTrace,
+                cropData
             } = this.state;
             const footer = this._renderImageTraceFooter();
             const it = ((currentStep === STEP_APPLY) && (imageTrace!=='')) ? this._getImageTraceDom() : null;
+            const containerStyle = (TESTING_IT || (cropData.width > cropData.height)) ? { width: '400px' } : { height: '520px' };
 
             return (
                 <Modal>
                     <div className='image-trace-panel'>
                         <div className='main-content'>
-                                <div className='cropped-container'>
+                                <div className='cropped-container' style={containerStyle} >
                                     <img id='tunedImage' src={grayscaleCroppedImg} />
                                     {it}
                                 </div>
