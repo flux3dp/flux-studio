@@ -63,6 +63,7 @@ define([
         }
 
         componentDidMount() {
+            window.addEventListener('resize', () => this._handleResizeWindow());
             BeamboxStore.onCropperShown(() => this.openCropper());
 
             if (TESTING_IT) {
@@ -104,7 +105,20 @@ define([
         }
 
         componentWillUnmount() {
+            window.removeEventListener('resize', () => this._handleResizeWindow());
             BeamboxStore.removeCropperShownListener(() => this.openCropper());
+        }
+
+        _handleResizeWindow() {
+            if (this.state.currentStep !== STEP_APPLY) {
+                return;
+            }
+
+            const imageTrace = document.getElementById('imageTrace');
+            const tunedImage = document.getElementById('tunedImage');
+            const style = `left: ${tunedImage.x}px; top: ${tunedImage.y}px; width: ${tunedImage.width}px; height: ${tunedImage.height}px;`;
+
+            imageTrace.style = style;
         }
 
         _getImageTrace(imageTrace) {
@@ -310,8 +324,8 @@ define([
                 const testingCropData = {
                     x: tunedImage.x,
                     y: tunedImage.y,
-                    width: tunedImage.width,
-                    height: tunedImage.height
+                    width: 1150,
+                    height: 918
                 }
                 const testingPreCrop = {
                     offsetX: 100,
