@@ -29,8 +29,8 @@ define([
             offsetY_ideal: 30,    //mm
             scaleRatio_ideal: (585 / 720) * 2, // pixel on studio / pixel on beambox machine; 與焦距成正比
             calibrationPicture: {
-                centerX: 70, //mm
-                centerY: 70, //mm
+                centerX: 90, //mm
+                centerY: 80, //mm
                 size: 25 //mm
             }
         }
