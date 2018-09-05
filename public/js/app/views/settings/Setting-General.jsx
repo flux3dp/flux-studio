@@ -91,6 +91,7 @@ define([
 
         _updateOptions: function(id, e) {
             Config().write(id, e.target.value);
+            this.forceUpdate();
         },
 
         _updateBeamboxPreference: function(item_key, val) {
@@ -100,6 +101,7 @@ define([
                 val = false;
             }
             BeamboxPreference.write(item_key, val);
+            this.forceUpdate();
         },
 
         _removeDefaultMachine: function() {
