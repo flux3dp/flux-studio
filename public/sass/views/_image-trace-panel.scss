@@ -5,11 +5,13 @@
 
 #cameraCanvas {
     position: relative;
-    top:300px;
+    top: 300px;
 }
 
 #tunedImage {
     z-index: 1;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 #imageTrace {
@@ -326,23 +328,7 @@
         display: flex;
         padding: 20px;
 
-        .left-part {
-            display: inline;
-
-            .cropped-container {
-                // margin: 0 auto;
-                width: 400px;
-            }
-        }
-
-
         .cropped-container {
-            width: 400px;
-            display: inline-block;
-        }
-
-        .right-part {
-            max-height: 100%;
             display: inline-block;
         }
 
@@ -385,6 +371,7 @@
     }
 
     .footer {
+        background: #fff;
         height: 59px;
         padding-top: 12px;
         padding-bottom: 12px;

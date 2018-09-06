@@ -61,9 +61,7 @@ define([
             const newElement = svgCanvas.importSvgString(svgString, 'image-trace');
             const {
                 x,
-                y,
-                width,
-                height
+                y
             } = cropData;
             const {
                 offsetX,

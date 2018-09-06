@@ -63,6 +63,7 @@ define([
         }
 
         componentDidMount() {
+            window.addEventListener('resize', () => this._handleResizeWindow());
             BeamboxStore.onCropperShown(() => this.openCropper());
 
             if (TESTING_IT) {
@@ -104,7 +105,20 @@ define([
         }
 
         componentWillUnmount() {
+            window.removeEventListener('resize', () => this._handleResizeWindow());
             BeamboxStore.removeCropperShownListener(() => this.openCropper());
+        }
+
+        _handleResizeWindow() {
+            if (this.state.currentStep !== STEP_APPLY) {
+                return;
+            }
+
+            const imageTrace = document.getElementById('imageTrace');
+            const tunedImage = document.getElementById('tunedImage');
+            const style = `left: ${tunedImage.x}px; top: ${tunedImage.y}px; width: ${tunedImage.width}px; height: ${tunedImage.height}px;`;
+
+            imageTrace.style = style;
         }
 
         _getImageTrace(imageTrace) {
@@ -310,8 +324,8 @@ define([
                 const testingCropData = {
                     x: tunedImage.x,
                     y: tunedImage.y,
-                    width: tunedImage.width,
-                    height: tunedImage.height
+                    width: 1150,
+                    height: 918
                 }
                 const testingPreCrop = {
                     offsetX: 100,
@@ -453,7 +467,7 @@ define([
             const destX = 0;
             const destY = 0;
             const destWidth = (coordinates.maxX - coordinates.minX)/6.286 + 74;
-            const destHeight = (coordinates.maxY - coordinates.minY)/6.286+ 74;
+            const destHeight = (coordinates.maxY - coordinates.minY)/6.286 + 74;
 
             canvas.width = sourceWidth;
             canvas.height = sourceHeight;
@@ -479,16 +493,18 @@ define([
             const {
                 threshold,
                 currentStep,
-                imageTrace
+                imageTrace,
+                cropData
             } = this.state;
             const footer = this._renderImageTraceFooter();
             const it = ((currentStep === STEP_APPLY) && (imageTrace!=='')) ? this._getImageTraceDom() : null;
+            const containerStyle = (TESTING_IT || (cropData.width > cropData.height)) ? { width: '400px' } : { height: '520px' };
 
             return (
                 <Modal>
                     <div className='image-trace-panel'>
                         <div className='main-content'>
-                                <div className='cropped-container'>
+                                <div className='cropped-container' style={containerStyle} >
                                     <img id='tunedImage' src={grayscaleCroppedImg} />
                                     {it}
                                 </div>

@@ -101,7 +101,9 @@ define([
                 return true;
             } catch (error) {
                 console.log(error);
-                this.errorCallback(error.message);
+                if (!PreviewModeBackgroundDrawer.isClean()) {
+                    BeamboxActions.endDrawingPreviewBlob();
+                }
                 this.end();
             }
         }
