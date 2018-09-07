@@ -392,6 +392,284 @@
                     padding: 3px 0px 3px 12px;
                 }
             }
+
+            .controls {
+                overflow: hidden;
+
+                .control {
+                    line-height: 0;
+                }
+                .label {
+                    font-size: 10pt;
+                    color: #000;
+                    line-height: 16px;
+                    padding-left: 10px;
+                }
+                .dropdown-container {
+                    position: relative;
+                    top: 0;
+                    left: 0;
+
+                    :focus {
+                        outline: none;
+                    }
+
+                    select {
+                        background-color: #fff;
+                        background-image: url("../img/icon-3d-arrow-down.png");
+                        background-position: calc(100% - 4px) center;
+                        background-repeat: no-repeat;
+                        background-size: 8px 8px;
+                        height: 24px;
+                        font-size: 9pt;
+                        color: #000;
+                        width: 110px;
+                        padding-left: 5px;
+                        margin-left: 10px;
+                        margin-top: 0;
+                        margin-bottom: 7px;
+                        border: 1px #333 solid;
+                    }
+                }
+            }
+
+            .more-config-panel {
+                box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+                border-radius: 2px;
+                background: #FFF;
+                padding: 20px 20px 0;
+                width: 440px;
+
+                .title {
+                    color: #626262;
+                    font-size: 15px;
+                    font-weight: 600;
+                    line-height: 18px;
+                }
+
+                .config-list {
+                    border: 2px solid #E0E0DF;
+                    height: 110px;
+                    margin-top: 20px;
+                    overflow-y: auto;
+                    width: 100%;
+
+                    .config-entry {
+                        border-bottom: 1px solid #E0E0DF;
+                        color: $primaryColor;
+                        cursor: pointer;
+                        height: 40px;
+                        line-height: 40px;
+
+                        span {
+                            margin-left: 10px;
+                        }
+                    }
+                    .selected {
+                        background-color: #E0E0E0;
+                        color: #555;
+                    }
+                }
+
+                .controls {
+                    padding: 20px 0;
+
+                    .control {
+                        color: #888;
+                        display: flex;
+                        font-size: 13px;
+                        height: 40px;
+                        align-items: center;
+                        justify-content: space-around;
+
+                        .label {
+                            font-size: 11px;
+                            text-transform: uppercase;
+                            color: #888;
+                            line-height: 1em;
+                            width: 100px;
+                            align-self: center;
+                        }
+
+                        .value-text {
+                            width: 120px;
+                            margin: 5px 0 5px 5px;
+                            padding: 0 5px;
+
+                            &::after {
+                                content: attr(data-tail);
+                            }
+                        }
+                    }
+                }
+
+                .form {
+                    margin: 0 0 10px 0;
+                }
+
+                .footer {
+                    border: none;
+                    border-top: 1px solid #ccc;
+                    position: static;
+                    border-bottom-left-radius: 2px;
+                    border-bottom-right-radius: 2px;
+
+                    div {
+                        line-height: 10px;
+                    }
+
+                    .right {
+                        float: right;
+                        padding: 4% 0;
+                    }
+
+                    .left {
+                        float: left;
+                        padding: 4% 0;
+                    }
+
+                    .btn {
+                        border-radius: 0;
+                        font-size: 15px;
+                        line-height: 30px;
+                        margin: 0;
+                        &:hover {
+                            border: 2px solid #424242;
+                            color: #424242;
+                        }
+                    }
+
+                    .btn:first-child {
+                        margin: 0 10px 0 0;
+                    }
+                }
+            }
+
+            .save-config-panel {
+                box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+                border-radius: 2px;
+                background: #FFF;
+                padding: 20px 20px 0;
+                width: 440px;
+
+                .title {
+                    color: #626262;
+                    font-size: 15px;
+                    font-weight: 600;
+                    line-height: 18px;
+                }
+
+                .name {
+                    color: #909090;
+                    font-size: 16px;
+                    height: 40px;
+                    line-height: 40px;
+                    margin-top: 20px;
+                    margin-bottom: 20px;
+                    display: flex;
+
+                    span {
+                        flex: 1;
+                    }
+
+                    input {
+                        border: 2px solid #ccc;
+                        flex: 2;
+                        padding: 3px;
+                        margin-left: 30px;
+                    }
+                }
+
+                .form {
+                    margin: 0 0 10px 0;
+                }
+
+                .footer {
+                    padding: 10px 0;
+                    border: none;
+                    border-top: 1px solid #ccc;
+                    position: static;
+
+                    .btn {
+                        margin: 0;
+                        min-width: 40px;
+                        line-height: 30px;
+                        flex: initial;
+
+                        &.btn-apply {
+                            margin: 0;
+                        }
+                    }
+                }
+            }
+
+            .custom-presets-wrapper {
+                background: #FFF;
+                overflow: scroll;
+                padding: 0 20px;
+                width: 440px;
+
+                .custom-presets-list {
+                    border: 2px solid $backgroundColor;
+                    height: 110px;
+                    list-style: none;
+                    overflow: scroll;
+                    padding: 0;
+
+                    &:empty {
+                        @include flexbox();
+                        background: $primaryColor;
+                        color: $backgroundColor;
+                        align-items: center;
+                        justify-content: center;
+
+                        &::after {
+                            content: attr(data-empty-message);
+                        }
+                    }
+
+                    input[type="radio"] {
+                        display: none;
+
+                        &:checked + .preset-item-name {
+                            background-color: #E0E0E0;
+                            color: #FFF;
+                            i {
+                            visibility: visible;
+                            }
+                        }
+                    }
+
+                    .preset-item-name {
+                        border-bottom: 1px solid $backgroundColor;
+                        color: $primaryColor;
+                        cursor: pointer;
+                        height: 40px;
+                        line-height: 40px;
+                        margin: 0;
+                        padding: 0 0 0 10px;
+                        i {
+                        float: right;
+                        visibility: hidden;
+
+                        }
+                    }
+                }
+
+                .custom-preset-buttons {
+                    height: 69px;
+                    position: static;
+                    justify-content: flex-end;
+
+                    .btn-default {
+                        border-radius: 0;
+                        font-size: 15px;
+                        height: 30px;
+                        line-height: 26px;
+                        min-width: 66px;
+                    }
+                }
+            }
         }
         #ruler_unit_shower {
             top: 89px;

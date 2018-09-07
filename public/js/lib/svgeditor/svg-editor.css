@@ -290,7 +290,7 @@ select {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background: white;
-	height: calc(100vh - 510px);
+	height: calc(100vh - 530px);
 }
 #layerlist_container::-webkit-scrollbar {
 	-webkit-appearance: none;

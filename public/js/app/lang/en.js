@@ -1048,12 +1048,57 @@ define(function() {
                     layer_bitmap: 'Bitmap'
                 },
                 laser_panel: {
+                    parameters: 'Parameters',
                     strength: 'Power',
                     speed: 'Speed',
                     repeat: 'Execute',
                     times: 'times',
                     cut: 'Cut',
-                    engrave: 'Engrave'
+                    engrave: 'Engrave',
+                    more: 'More',
+                    delete: 'DELETE',
+                    apply: 'APPLY',
+                    cancel: 'CANCEL',
+                    save: 'SAVE',
+                    name: 'Name',
+                    dropdown: {
+                        wood_3mm_cutting: 'Wood - 3mm Cutting',
+                        wood_5mm_cutting: 'Wood - 5mm Cutting',
+                        wood_bw_engraving: 'Wood - BW Engraving',
+                        wood_shading_engraving: 'Wood - Shading Engraving',
+                        acrylic_3mm_cutting: 'Acrylic - 3mm Cutting',
+                        acrylic_5mm_cutting: 'Acrylic - 5mm Cutting',
+                        acrylic_bw_engraving: 'Acrylic - BW Engraving',
+                        acrylic_shading_engraving: 'Acrylic - Shading Engraving',
+                        leather_3mm_cutting: 'Leather - 3mm Cutting',
+                        leather_5mm_cutting: 'Leather - 5mm Cutting',
+                        leather_bw_engraving: 'Leather - BW Engraving',
+                        leather_shading_engraving: 'Leather - Shading Engraving',
+                        fabric_3mm_cutting: 'Fabric - 3mm Cutting',
+                        fabric_5mm_cutting: 'Fabric - 5mm Cutting',
+                        fabric_bw_engraving: 'Fabric - BW Engraving',
+                        fabric_shading_engraving: 'Fabric - Shading Engraving',
+                        save: 'Save',
+                        more: 'More...',
+                        parameters: 'Parameters...'
+                    },
+                    laser_speed: {
+                        text: 'Laser Speed',
+                        unit: 'mm/s',
+                        fast: 'Fast',
+                        slow: 'Slow',
+                        min: 3,
+                        max: 300,
+                        step: 0.1
+                    },
+                    power: {
+                        text: 'Power',
+                        high: 'High',
+                        low: 'Low',
+                        min: 1,
+                        max: 100,
+                        step: 0.1
+                    }
                 },
             },
             bottom_right_panel: {

@@ -1046,12 +1046,57 @@ define(function() {
                     layer_bitmap: '點陣圖層'
                 },
                 laser_panel: {
+                    parameters: '選擇參數',
                     strength: '功率',
                     speed: '速度',
                     repeat: '執行次數',
                     times: '次',
                     cut: '切割',
-                    engrave: '雕刻'
+                    engrave: '雕刻',
+                    more: '管理',
+                    delete: '刪除',
+                    apply: '套用',
+                    cancel: '取消',
+                    save: '儲存參數',
+                    name: '名稱',
+                    dropdown: {
+                        wood_3mm_cutting: '木板 - 3mm 切割',
+                        wood_5mm_cutting: '木板 - 5mm 切割',
+                        wood_bw_engraving: '木板 - 雙色刻印',
+                        wood_shading_engraving: '木板 - 漸層刻印',
+                        acrylic_3mm_cutting: '壓克力 - 3mm 切割',
+                        acrylic_5mm_cutting: '壓克力 - 5mm 切割',
+                        acrylic_bw_engraving: '壓克力 - 雙色刻印',
+                        acrylic_shading_engraving: '壓克力 - 漸層刻印',
+                        leather_3mm_cutting: '皮革 - 3mm 切割',
+                        leather_5mm_cutting: '皮革 - 5mm 切割',
+                        leather_bw_engraving: '皮革 - 雙色刻印',
+                        leather_shading_engraving: '皮革 - 漸層刻印',
+                        fabric_3mm_cutting: '布料 - 3mm 切割',
+                        fabric_5mm_cutting: '布料 - 5mm 切割',
+                        fabric_bw_engraving: '布料 - 雙色刻印',
+                        fabric_shading_engraving: '布料 - 漸層刻印',
+                        save: '儲存參數',
+                        more: '管理',
+                        parameters: '選擇參數'
+                    },
+                    laser_speed: {
+                        text: '雷射速度',
+                        unit: 'mm/s',
+                        fast: '快',
+                        slow: '慢',
+                        min: 1,
+                        max: 300,
+                        step: 0.1
+                    },
+                    power: {
+                        text: '雷射強度',
+                        high: '強',
+                        low: '弱',
+                        min: 1,
+                        max: 100,
+                        step: 0.1
+                    }
                 },
             },
             bottom_right_panel: {

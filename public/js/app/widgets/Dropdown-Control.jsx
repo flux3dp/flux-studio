@@ -29,7 +29,11 @@ define([
         },
 
         _fireChange: function(newValue, selectedIndex) {
-            this.props.onChange(this.props.id, newValue, selectedIndex);
+            if (this.props.id) {
+                this.props.onChange(this.props.id, newValue, selectedIndex);
+            } else {
+                this.props.onChange(newValue, selectedIndex);
+            }
         },
 
         _handleChange: function(e) {
@@ -62,7 +66,7 @@ define([
                     <div className="label pull-left">{this.props.label}</div>
                     <div className="control">
                         <div className="dropdown-container">
-                            <select onChange={this._handleChange} defaultValue={self.props.default}>
+                            <select id={this.props.id} onChange={this._handleChange} defaultValue={self.props.default}>
                                 {_options}
                             </select>
                         </div>
