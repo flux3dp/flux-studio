@@ -204,6 +204,9 @@ define([
         },
         insertText: function() {
             $('#tool_text').click();
+            if (svgedit.browser.isTouch()) {
+                $('#tool_text').mousedown();
+            }
             $('#workarea').css('cursor', 'text');
         },
         saveFile: function() {
