@@ -179,6 +179,7 @@ define(function() {
             via_usb: '使用 USB',
             via_wifi: '使用 WiFi',
             select_machine_type: '請選擇您的機種',
+            select_beambox_type: '請選擇您 Beambox 的種類',
             name_your_flux: '為你的機器取一個獨特的名字',
             wifi_setup: '設定無線網路',
             select_preferred_wifi: '選擇你偏好的網路',
