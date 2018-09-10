@@ -179,6 +179,7 @@ define(function() {
             via_usb: 'Using USB Cable',
             via_wifi: 'Using Wi-Fi',
             select_machine_type: 'Please select the machine',
+            select_beambox_type: 'Please select the beambox type',
             name_your_flux: 'Name Your Machine',
             wifi_setup: 'Wi-Fi Setup',
             select_preferred_wifi: 'Select your preferred network.',

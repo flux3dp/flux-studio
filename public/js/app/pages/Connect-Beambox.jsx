@@ -3,6 +3,7 @@ define([
     'jsx!widgets/Modal',
     'jsx!widgets/Button-Group',
     'app/actions/initialize-machine',
+    'app/actions/beambox/beambox-preference',
     'helpers/api/config',
     'helpers/i18n'
 ], function (
@@ -10,6 +11,7 @@ define([
     Modal,
     ButtonGroup,
     initializeMachine,
+    BeamboxPreference,
     Config,
     i18n
 ) {
@@ -18,8 +20,15 @@ define([
     return function () {
         return React.createClass({
             onStart: function() {
+                const splitUrl = location.href.split('#');
+                if (splitUrl.length > 2 && splitUrl[2] === 'Pro') {
+                    BeamboxPreference.write('model', 'fbb1p');
+                } else {
+                    BeamboxPreference.write('model', 'fbb1b');
+                }
                 Config().write('default-app', 'beambox');
                 initializeMachine.completeSettingUp(true);
+                location.reload();
             },
             onOpenTutorialLink: function() {
                 const url = LANG.tutorial_url;
