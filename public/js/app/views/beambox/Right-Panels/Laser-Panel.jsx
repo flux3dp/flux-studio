@@ -78,10 +78,15 @@ define([
         },
 
         componentWillReceiveProps: function(nextProps) {
+            document.getElementById('laser-config-dropdown').value = defaultLaserOptions[0];
+
             this.setState({
                 speed:      nextProps.speed,
                 strength:   nextProps.strength,
-                repeat:   nextProps.repeat
+                repeat:   nextProps.repeat,
+                original:       defaultLaserOptions[0],
+                modal:          '',
+                selectedItem:   LocalStorage.get('customizedLaserConfigs')[0] ? LocalStorage.get('customizedLaserConfigs')[0].name : ''
             });
         },
 
@@ -158,10 +163,15 @@ define([
                     case 'fbb1b':
                         this.setState({
                             original: value,
-                            speed: RightPanelConstants.BEAMBOX[value].speed,
-                            strength: RightPanelConstants.BEAMBOX[value].power,
+                            speed: defaultSpeed,
+                            strength: defaultPower,
                             repeat: 1
                         });
+
+                        this.props.funcs.writeSpeed(this.props.layerName, RightPanelConstants.BEAMBOX[value].speed);
+                        this.props.funcs.writeStrength(this.props.layerName, RightPanelConstants.BEAMBOX[value].power);
+                        this.props.funcs.writeRepeat(this.props.layerName, 1);
+
                         break;
                     case 'fbb1p':
                         this.setState({
@@ -170,6 +180,11 @@ define([
                             strength: RightPanelConstants.BEAMBOX_PRO[value].power,
                             repeat: 1
                         });
+
+                        this.props.funcs.writeSpeed(this.props.layerName, RightPanelConstants.BEAMBOX_PRO[value].speed);
+                        this.props.funcs.writeStrength(this.props.layerName, RightPanelConstants.BEAMBOX_PRO[value].power);
+                        this.props.funcs.writeRepeat(this.props.layerName, 1);
+
                         break;
                     default:
                         console.error('wrong machine', model);
@@ -180,13 +195,23 @@ define([
                 this.setState({ modal: 'more' });
             } else {
                 const customizedConfigs = LocalStorage.get('customizedLaserConfigs').find((e) => e.name === value);
+                const {
+                    speed,
+                    power,
+                    repeat
+                } = customizedConfigs;
 
                 if (customizedConfigs) {
                     this.setState({
-                        speed: customizedConfigs.speed,
-                        strength: customizedConfigs.power,
-                        repeat: customizedConfigs.repeat
+                        speed,
+                        strength: power,
+                        repeat
                     })
+
+                    this.props.funcs.writeSpeed(this.props.layerName, speed);
+                    this.props.funcs.writeStrength(this.props.layerName, power);
+                    this.props.funcs.writeRepeat(this.props.layerName, repeat);
+
                 } else {
                     console.error('No such value', value);
                 }

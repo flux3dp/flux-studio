@@ -28,6 +28,7 @@ define([
     }
 
     const _getConfig = function(name) {
+        console.log('testingtesting NNNNONO');
         switch (name) {
             case 'Traced Image':
                 return _tracedImageConfig;
@@ -39,6 +40,7 @@ define([
     }
 
     const _getLayer = function(name) {
+        console.log('testingtesting YOYOYO');
         const layer = $('#svgcontent').find('g.layer').filter(function(){
             return $(this).find('title').text() === name;
         });
