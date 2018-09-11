@@ -78,7 +78,15 @@ define([
         },
 
         componentWillReceiveProps: function(nextProps) {
-            document.getElementById('laser-config-dropdown').value = defaultLaserOptions[0];
+            if (nextProps.configName != '') {
+                if (defaultLaserOptions.indexOf(nextProps.configName) > 0 || LocalStorage.get('customizedLaserConfigs').findIndex((e) => e.name === nextProps.configName) > -1) {
+                    document.getElementById('laser-config-dropdown').value = nextProps.configName;
+                } else {
+                    document.getElementById('laser-config-dropdown').value = defaultLaserOptions[0];
+                }
+            } else {
+                document.getElementById('laser-config-dropdown').value = defaultLaserOptions[0];
+            }
 
             this.setState({
                 speed:      nextProps.speed,
@@ -128,6 +136,7 @@ define([
             }
 
             this.setState({ modal: '' });
+            this.props.funcs.writeConfigName(this.props.layerName, name);
         },
 
         _handleDeleteConfig: function() {
@@ -171,6 +180,7 @@ define([
                         this.props.funcs.writeSpeed(this.props.layerName, RightPanelConstants.BEAMBOX[value].speed);
                         this.props.funcs.writeStrength(this.props.layerName, RightPanelConstants.BEAMBOX[value].power);
                         this.props.funcs.writeRepeat(this.props.layerName, 1);
+                        this.props.funcs.writeConfigName(this.props.layerName, value);
 
                         break;
                     case 'fbb1p':
@@ -184,6 +194,7 @@ define([
                         this.props.funcs.writeSpeed(this.props.layerName, RightPanelConstants.BEAMBOX_PRO[value].speed);
                         this.props.funcs.writeStrength(this.props.layerName, RightPanelConstants.BEAMBOX_PRO[value].power);
                         this.props.funcs.writeRepeat(this.props.layerName, 1);
+                        this.props.funcs.writeConfigName(this.props.layerName, value);
 
                         break;
                     default:
@@ -211,6 +222,7 @@ define([
                     this.props.funcs.writeSpeed(this.props.layerName, speed);
                     this.props.funcs.writeStrength(this.props.layerName, power);
                     this.props.funcs.writeRepeat(this.props.layerName, repeat);
+                    this.props.funcs.writeConfigName(this.props.layerName, value);
 
                 } else {
                     console.error('No such value', value);

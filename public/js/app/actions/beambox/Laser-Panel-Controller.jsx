@@ -10,18 +10,21 @@ define([
 ){
 
     const _defaultConfig = {
+        configName: '',
         speed: 50,
         strength: 15,
         repeat: 1
     }
 
     const _tracedImageConfig = {
+        configName: '',
         speed: 200,
         strength: 20,
         repeat: 1
     }
 
     const _tracedPathConfig = {
+        configName: '',
         speed: 5,
         strength: 70,
         repeat: 1
@@ -40,7 +43,6 @@ define([
     }
 
     const _getLayer = function(name) {
-        console.log('testingtesting YOYOYO');
         const layer = $('#svgcontent').find('g.layer').filter(function(){
             return $(this).find('title').text() === name;
         });
@@ -67,6 +69,14 @@ define([
         return _getData(name, 'repeat');
     }
 
+    const getConfigName = function(name) {
+        return _getData(name, 'configName');
+    }
+
+    const resetConfigName = function(name) {
+        return _writeData(nane, '', val);
+    }
+
     const writeSpeed = function(name, val) {
         return _writeData(name, 'speed', val);
     }
@@ -79,6 +89,10 @@ define([
         return _writeData(name, 'repeat', val);
     }
 
+    const writeConfigName = function(name, val) {
+        return _writeData(name, 'configName', val);
+    }
+
     class LaserPanelController {
         constructor() {
             this.reactRoot = '';
@@ -86,6 +100,7 @@ define([
                 writeSpeed: writeSpeed,
                 writeStrength: writeStrength,
                 writeRepeat: writeRepeat,
+                writeConfigName: writeConfigName
             }
         }
         init(reactRoot) {
@@ -102,15 +117,18 @@ define([
             writeSpeed(name, _getSpeed(baseName));
             writeStrength(name, _getStrength(baseName));
             writeRepeat(name, _getRepeat(baseName));
+            writeConfigName(name, getConfigName(baseName));
         }
 
         render(name) {
             const speed = _getSpeed(name);
             const strength = _getStrength(name);
             const repeat = _getRepeat(name);
+            const configName = getConfigName(name);
 
             ReactDOM.render(
                 <LaserPanel
+                    configName={configName}
                     layerName={name}
                     speed={speed}
                     strength={strength}
