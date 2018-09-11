@@ -4,9 +4,13 @@
 // Warning: Do not include any electron module here
 // Warning: Do not include any electron module here
 
+const app = require('electron').app;
+const path = require('path');
 const EventEmitter = require('events');
 const WebSocketClient = require('websocket').client;
 const spawn = require('child_process').spawn;
+const appHtmlPath = path.join(app.getAppPath(), 'public').replace('app.asar', 'app.asar.unpacked');
+
 
 function uglyJsonParser(data) {
     try {
@@ -32,8 +36,14 @@ class BackendManager extends EventEmitter {
         // on_device_updated, callback (sender, deviceProfile) => {}
         // on_stderr: callback, (sender, data) => {}
         // on_stopped: callback, (sender) => {}
-
-        this._args = ['--port', '0'];
+        if(options.server) {
+            this._args = ['--ip', '0.0.0.0'];
+            this._args = this._args.concat(['--port', '8000']);
+            this._args = this._args.concat(['--assets', path.join(app.getAppPath(), 'public')]);
+            this._args = this._args.concat(['--allow-foreign']);
+        } else {
+            this._args = ['--port', '0'];
+        }
 
         if(!options.location) { throw 'backend location not given'; }
         this._ghost_location = options.location;
@@ -55,6 +65,7 @@ class BackendManager extends EventEmitter {
             this.on('stopped', options.on_stopped);
         }
 
+        console.log('Backend parameters: ', this._args);
         this._running = false;
         this._proc = undefined;
         this._ws = undefined;

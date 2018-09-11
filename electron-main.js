@@ -111,6 +111,7 @@ require('./src/bootstrap.js');
 const backendManager = new BackendManager({
     location: process.env.BACKEND,
     trace_pid: process.pid,
+    server: process.argv.indexOf('--server') > 0,
     on_ready: onGhostUp,
     on_device_updated: onDeviceUpdated,
     on_stderr: (data) => logger.write(`${data}`),
