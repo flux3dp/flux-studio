@@ -61,11 +61,14 @@ define([
                 }
             });
 
+            const firstChildSelected = this.props.options ? (this.state.selectedValue === this.props.options[0].value) : false ;
+            const classNames =  (firstChildSelected) ? 'dropdown-container first-child-selected' : 'dropdown-container';
+
             return (
                 <div className="controls">
                     <div className="label pull-left">{this.props.label}</div>
                     <div className="control">
-                        <div className="dropdown-container">
+                        <div className={classNames}>
                             <select id={this.props.id} onChange={this._handleChange} defaultValue={self.props.default}>
                                 {_options}
                             </select>

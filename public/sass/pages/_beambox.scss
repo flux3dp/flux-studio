@@ -416,10 +416,6 @@
 
                     select {
                         background-color: #fff;
-                        background-image: url("../img/icon-3d-arrow-down.png");
-                        background-position: calc(100% - 4px) center;
-                        background-repeat: no-repeat;
-                        background-size: 8px 8px;
                         height: 24px;
                         font-size: 9pt;
                         color: #000;
@@ -429,6 +425,15 @@
                         margin-top: 0;
                         margin-bottom: 7px;
                         border: 1px #333 solid;
+                    }
+                }
+
+                .first-child-selected {
+                    select {
+                        background-image: url("../img/icon-3d-arrow-down.png");
+                        background-position: calc(100% - 4px) center;
+                        background-repeat: no-repeat;
+                        background-size: 8px 8px;
                     }
                 }
             }

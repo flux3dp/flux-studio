@@ -445,7 +445,7 @@ define([
                     <div>
                         <DropdwonControl
                             id='laser-config-dropdown'
-                            default={LANG.dropdown.parameters}
+                            default={defaultLaserOptions[0]}
                             onChange={this._handleParameterTypeChanged}
                             options={dropdownOptions}
                         />
