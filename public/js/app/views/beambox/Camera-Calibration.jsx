@@ -143,8 +143,18 @@ define([
         };
         const _doCuttingTask = async () => {
             await DeviceMaster.select(device);
+            const laserPower = Number((await DeviceMaster.getLaserPower()).value);
+
+            if (laserPower !== 1) {
+                await DeviceMaster.setLaserPower(1);
+            }
+
             await CheckDeviceStatus(device);
             await DeviceMaster.runBeamboxCameraTest();
+
+            if (laserPower !== 1) {
+                await DeviceMaster.setLaserPower(Number(laserPower));
+            }
         };
         const _doCaptureTask = async () => {
             try {

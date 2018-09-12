@@ -31,7 +31,6 @@ define([
     }
 
     const _getConfig = function(name) {
-        console.log('testingtesting NNNNONO');
         switch (name) {
             case 'Traced Image':
                 return _tracedImageConfig;

@@ -814,8 +814,16 @@ define([
         return SocketMaster.addTask('endMaintainMode');
     }
 
+    function getLaserPower() {
+        return SocketMaster.addTask('getLaserPower');
+    }
+
     function getLaserSpeed() {
         return SocketMaster.addTask('getLaserSpeed');
+    }
+
+    function setLaserPower(power) {
+        return SocketMaster.addTask('setLaserPower', power);
     }
 
     function setLaserSpeed(speed) {
@@ -1613,7 +1621,9 @@ define([
             this.detectHead = detectHead;
             this.enterMaintainMode = enterMaintainMode;
             this.endMaintainMode = endMaintainMode;
+            this.getLaserPower = getLaserPower;
             this.getLaserSpeed = getLaserSpeed;
+            this.setLaserPower = setLaserPower;
             this.setLaserSpeed = setLaserSpeed;
             this.getDeviceList = getDeviceList;
             this.getDeviceSettings = getDeviceSettings;

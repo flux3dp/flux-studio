@@ -542,6 +542,27 @@ define([
                 return d.promise();
             },
 
+            getLaserPower: () => {
+                let d = $.Deferred();
+
+                events.onMessage = (response) => {
+                    switch (response.status) {
+                        case 'ok':
+                            d.resolve(response);
+                            break;
+                        default:
+                            console.log('strange message', response);
+                            break;
+                    }
+                };
+
+                events.onError = (response) => { d.reject(response); console.log('on error', response); };
+                events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
+
+                ws.send('play get_laser_power');
+                return d.promise();
+            },
+
             getLaserSpeed: () => {
                 let d = $.Deferred();
 
@@ -560,6 +581,27 @@ define([
                 events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
 
                 ws.send('play get_laser_speed');
+                return d.promise();
+            },
+
+            setLaserPower: (power) => {
+                let d = $.Deferred();
+
+                events.onMessage = (response) => {
+                    switch (response.status) {
+                        case 'ok':
+                            d.resolve(response);
+                            break;
+                        default:
+                            console.log('strange message', response);
+                            break;
+                    }
+                };
+
+                events.onError = (response) => { d.reject(response); console.log('on error', response); };
+                events.onFatal = (response) => { d.reject(response); console.log('on fatal', response); };
+
+                ws.send(`play set_laser_power ${power}`);
                 return d.promise();
             },
 

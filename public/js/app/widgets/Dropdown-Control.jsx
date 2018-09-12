@@ -55,9 +55,9 @@ define([
 
             _options = this.props.options.map(function(option) {
                 if (typeof option === 'object') {
-                    return (<option value={option.value}>{option.label}</option>);
+                    return (<option key={option.value} value={option.value}>{option.label}</option>);
                 } else {
-                    return (<option value={option}>{option}</option>);
+                    return (<option key={option} value={option}>{option}</option>);
                 }
             });
 
