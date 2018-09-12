@@ -814,6 +814,14 @@ define([
         return SocketMaster.addTask('endMaintainMode');
     }
 
+    function getLaserSpeed() {
+        return SocketMaster.addTask('getLaserSpeed');
+    }
+
+    function setLaserSpeed(speed) {
+        return SocketMaster.addTask('setLaserSpeed', speed);
+    }
+
     function reconnect() {
         let d = $.Deferred();
         _devices.some(function (device, i) {
@@ -1605,6 +1613,8 @@ define([
             this.detectHead = detectHead;
             this.enterMaintainMode = enterMaintainMode;
             this.endMaintainMode = endMaintainMode;
+            this.getLaserSpeed = getLaserSpeed;
+            this.setLaserSpeed = setLaserSpeed;
             this.getDeviceList = getDeviceList;
             this.getDeviceSettings = getDeviceSettings;
             this.getDeviceSetting = getDeviceSetting;

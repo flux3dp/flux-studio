@@ -32,6 +32,7 @@ define([
 
     class PreviewModeController {
         constructor() {
+            this.originalSpeed = 1;
             this.storedPrinter = null;
             this.isPreviewModeOn = false;
             this.isPreviewBlocked = false;
@@ -53,6 +54,12 @@ define([
 
             try {
                 await this._retrieveCameraOffset();
+                const laserSpeed = await DeviceMaster.getLaserSpeed();
+
+                if (Number(laserSpeed.value) !== 1) {
+                    this.originalSpeed = Number(laserSpeed.value);
+                    await DeviceMaster.setLaserSpeed(1);
+                }
                 await DeviceMaster.enterMaintainMode();
                 if (await FirmwareVersionChecker.check(selectedPrinter, 'CLOSE_FAN')) {
                     DeviceMaster.maintainCloseFan(); // this is async function, but we don't have to wait it
@@ -79,6 +86,10 @@ define([
             await this._reset();
             await DeviceMaster.select(storedPrinter);
             await DeviceMaster.endMaintainMode();
+            if (this.originalSpeed !== 1) {
+                await DeviceMaster.setLaserSpeed(this.originalSpeed);
+                this.originalSpeed = 1;
+            }
         }
 
         async preview(x, y, last = false) {
