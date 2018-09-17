@@ -5563,15 +5563,15 @@ define([
                         return;
                     }
                     const fileType = (function() {
+                        if (file.name.toLowerCase().includes('.bvg')) {
+                            return 'bvg';
+                        }
                         if (file.type.toLowerCase().includes('image')) {
                             if (file.type.toLowerCase().includes('svg')) {
                                 return 'svg';
                             } else {
                                 return 'bitmap';
                             }
-                        }
-                        if (file.name.toLowerCase().includes('.bvg')) {
-                            return 'bvg';
                         }
                         if (file.name.toLowerCase().includes('.dxf')) {
                             return 'dxf';
@@ -5581,6 +5581,7 @@ define([
                         }
                         return 'unknown';
                     })();
+                    console.log("File type name:", fileType);
                     switch (fileType) {
                         case 'bvg':
                             importBvg(file);
