@@ -182,9 +182,10 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
         console.error('Recv async-status request but main window not exist');
     }
 });
-
+var fontsListCache = [];
 ipcMain.on(events.GET_AVAILABLE_FONTS , (event, arg) => {
     const fonts = FontManager.getAvailableFontsSync();
+	fontsListCache = fonts;
     event.returnValue = fonts;
 });
 
@@ -201,7 +202,6 @@ ipcMain.on(events.FIND_FONT , (event, arg) => {
 });
 
 ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
-
     const substitutedFamily = (function(){
 
         //if only contain basic character (123abc!@#$...), don't substitute.
@@ -241,14 +241,23 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
             return familyList[0];
         }
     })();
-
-    const font = FontManager.findFontSync({
+    let font = FontManager.findFontSync({
         family: substitutedFamily,
         style: fontStyle
     });
     let fontPath = font.path;
-
-    if(fontPath.toLowerCase().endsWith('.ttc') || fontPath.toLowerCase().endsWith('.ttcf')) {
+	if (fontFamily.indexOf("華康") >= 0 && (fontPath.toLowerCase().indexOf("arial") > 0 || fontPath.toLowerCase().indexOf("meiryo") > 0)) {
+		// This is a hotfix for 華康系列 fonts, because fontmanager does not support
+		for (var i in fontsListCache) {
+			const fontInfo = fontsListCache[i];
+			if (fontInfo.family == fontFamily) {
+				fontPath = fontInfo.path;
+				font = fontInfo;
+			}
+		}
+	}
+	console.log("New Font path ", fontPath);
+    if (fontPath.toLowerCase().endsWith('.ttc') || fontPath.toLowerCase().endsWith('.ttcf')) {
         fontPath = await TTC2TTF(fontPath, font.postscriptName);
     }
     const pathD = TextToSVG.loadSync(fontPath).getD(text, {
