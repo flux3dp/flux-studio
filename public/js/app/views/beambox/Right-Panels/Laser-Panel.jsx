@@ -172,8 +172,8 @@ define([
                     case 'fbb1b':
                         this.setState({
                             original: value,
-                            speed: defaultSpeed,
-                            strength: defaultPower,
+                            speed: RightPanelConstants.BEAMBOX[value].speed,
+                            strength: RightPanelConstants.BEAMBOX[value].power,
                             repeat: 1
                         });
 
