@@ -312,7 +312,7 @@ define([
                     args.push('-pro');
                 }
 
-                if (svgCanvas.getRotaryMode()) {
+                if (window.svgCanvas && svgCanvas.getRotaryMode()) {
                     args.push('-spin');
                     args.push(svgCanvas.runExtensions('getRotaryAxisAbsoluteCoord'));
                 }
