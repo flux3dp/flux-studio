@@ -244,7 +244,6 @@ define([
                 lastOrder = 'compute';
 
                 args.forEach(function(obj) {
-                    console.log('args obj', obj)
                     requestHeader = [
                         lastOrder,
                         obj.name,
