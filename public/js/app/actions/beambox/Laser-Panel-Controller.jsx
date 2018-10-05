@@ -107,9 +107,9 @@ define([
         }
 
         initConfig(name) {
-            _getSpeed(name, _getConfig[name].speed);
-            _getStrength(name, _getConfig[name].strength);
-            _getRepeat(name, _getConfig[name].repeat);
+            _getSpeed(name, _getConfig(name).speed);
+            _getStrength(name, _getConfig(name).strength);
+            _getRepeat(name, _getConfig(name).repeat);
         }
 
         cloneConfig(name, baseName) {

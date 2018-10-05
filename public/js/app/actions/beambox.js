@@ -8,6 +8,11 @@ define([
     Dispatcher
 ) {
     return {
+        updateLaserPanel: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.UPDATE_LASER_PANEL,
+            });
+        },
         backToPreviewMode: function() {
             Dispatcher.dispatch({
                 actionType: BeamboxConstants.BACK_TO_PREVIEW,

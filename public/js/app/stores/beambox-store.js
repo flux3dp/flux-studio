@@ -14,6 +14,11 @@ define([
 
     beamboxStore = Object.assign(EventEmitter.prototype, {
 
+        onUpdateLaserPanel: function(callback) {
+            this.on(Constants.UPDATE_LASER_PANEL, callback);
+            return beamboxStore;
+        },
+
         onEndDrawingPreviewBlob: function(callback) {
             this.on(Constants.END_DRAWING_PREVIEW_BLOB, callback);
             return beamboxStore;
@@ -36,6 +41,12 @@ define([
 
         onClearCameraCanvas: function(callback) {
             this.on(Constants.CLEAR_CAMERA_CANVAS, callback);
+            return beamboxStore;
+        },
+
+
+        removeUpdateLaserPanelListener: function(callback) {
+            this.removeListener(Constants.UPDATE_LASER_PANEL, callback);
             return beamboxStore;
         },
 

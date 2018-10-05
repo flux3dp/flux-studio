@@ -57,8 +57,8 @@ define([
             $('#tool_import input').click();
         },
 
-        insertSvg: function(svgString, cropData, preCrop) {
-            const newElement = svgCanvas.importSvgString(svgString, 'image-trace');
+        insertSvg: function(svgString, type, cropData = { x: 0, y: 0 }, preCrop = { offsetX: 0, offsetY: 0 }) {
+            const newElement = svgCanvas.importSvgString(svgString, type);
             const {
                 x,
                 y
@@ -76,9 +76,11 @@ define([
             // highlight imported element, otherwise we get strange empty selectbox
             try {
                 svgCanvas.selectOnly([newElement]);
-                svgCanvas.setSvgElemPosition('x', offsetX + x);
-                svgCanvas.setSvgElemPosition('y', offsetY + y);
-                svgCanvas.zoomSvgElem(72/254);
+                if (type === 'image-trace') {
+                    svgCanvas.setSvgElemPosition('x', offsetX + x);
+                    svgCanvas.setSvgElemPosition('y', offsetY + y);
+                    svgCanvas.zoomSvgElem(72/254);
+                }
             } catch(e) {
                 console.warn('Reading empty SVG');
             }
@@ -149,6 +151,26 @@ define([
                 }
                 insertNewImage(img, cropData, preCrop, threshold);
             };
+        },
+
+        getCurrentLayerData: function() {
+            const drawing = svgCanvas.getCurrentDrawing();
+            const currentLayer = drawing.getCurrentLayer();
+            const layerData = {
+                speed: currentLayer.getAttribute('data-speed'),
+                power: currentLayer.getAttribute('data-strength'),
+                repeat: currentLayer.getAttribute('data-repeat')
+            };
+
+            return layerData;
+        },
+
+        renameLayer: function(oldName, newName) {
+            console.log('oldName', oldName, newName);
+            if (svgCanvas.setCurrentLayer(oldName)) {
+                console.log('in1');
+                svgCanvas.renameCurrentLayer(newName);
+            }
         },
 
         //align toolbox
