@@ -140,23 +140,10 @@ define([
 
             events.onMessage = (response) => {
                 if ('continue' === response.status) {
-                    let fileReader, chunk;
-
                     for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
-                        chunk = data.slice(i, i + CHUNK_PKG_SIZE);
-
-                        if (data instanceof Array) {
-                            chunk = convertToTypedArray(chunk, Uint8Array);
-                        }
-
-                        fileReader = new FileReader();
-
-                        fileReader.onloadend = (e) => {
-                            step++;
-                            ws.send(e.target.result);
-                        };
-
-                        fileReader.readAsArrayBuffer(chunk);
+                        let chunk = data.slice(i, i + CHUNK_PKG_SIZE);
+                        step++;
+                        ws.send(chunk);
                     }
                 }
                 else if (response.status === 'uploading') {
