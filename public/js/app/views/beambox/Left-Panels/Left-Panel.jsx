@@ -5,6 +5,7 @@ define([
     'jsx!views/beambox/Left-Panels/Insert-Object-Submenu',
     'jsx!views/beambox/Left-Panels/Preview-Button',
     'jsx!views/beambox/Left-Panels/Advanced-Panel',
+    'helpers/api/inter-process',
     'helpers/i18n',
 ], function(
     React,
@@ -13,9 +14,11 @@ define([
     InsertObjectSubmenu,
     PreviewButton,
     AdvancedPanel,
+    InterProcessApi,
     i18n
 ) {
     const LANG = i18n.lang.beambox.left_panel;
+    const interProcessWebSocket = InterProcessApi() ;
 
     class LeftPanel extends React.Component {
         constructor() {
@@ -36,7 +39,7 @@ define([
                 isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
             });
 
-            if (isOpen) { 
+            if (isOpen) {
                 FnWrapper.clearSelection();
             }
         }
@@ -44,7 +47,7 @@ define([
             this.setState({
                 isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
             });
-            if (isOpen) { 
+            if (isOpen) {
                 FnWrapper.clearSelection();
             }
         }

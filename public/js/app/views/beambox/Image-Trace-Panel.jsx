@@ -333,10 +333,10 @@ define([
                 }
 
                 FnWrapper.insertImage(croppedBlobUrl, testingCropData, testingPreCrop, threshold);
-                FnWrapper.insertSvg(imageTrace, testingCropData, testingPreCrop);
+                FnWrapper.insertSvg(imageTrace, 'image-trace', testingCropData, testingPreCrop);
             } else {
                 FnWrapper.insertImage(croppedBlobUrl, cropData, preCrop, threshold);
-                FnWrapper.insertSvg(imageTrace, cropData, preCrop);
+                FnWrapper.insertSvg(imageTrace, 'image-trace', cropData, preCrop);
             }
 
             URL.revokeObjectURL(grayscaleCroppedImg);
