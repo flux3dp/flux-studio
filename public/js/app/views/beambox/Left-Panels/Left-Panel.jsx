@@ -74,7 +74,7 @@ define([
             return (
                 <div className='ui ui-dialog-menu'>
                     <div className='ui-dialog-menu-item'>
-                        <div className='dialog-label' onClick={() => this._toogleInsert(true)}>
+                        <div className='dialog-label' style={{width: 'auto'}} onClick={() => this._toogleInsert(true)}>
                             {LANG.insert_object}
                         </div>
                         {this.state.isInsertObjectMenuOpen ? insertObjectPanel : ''}
