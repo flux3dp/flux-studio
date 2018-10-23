@@ -2,6 +2,7 @@ define([
     'react',
     'reactDOM',
     'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/global-actions',
     'app/stores/beambox-store',
     'jsx!views/beambox/Left-Panels/Insert-Object-Submenu',
     'jsx!views/beambox/Left-Panels/Preview-Button',
@@ -12,6 +13,7 @@ define([
     React,
     ReactDOM,
     FnWrapper,
+    GlobalActions,
     BeamboxStore,
     InsertObjectSubmenu,
     PreviewButton,
@@ -33,8 +35,24 @@ define([
         }
 
         componentDidMount() {
+            // Selection Management
             $('#svgcanvas').mouseup(() => {
-                this._toogleInsert(false);
+                this._toggleInsert(false);
+                GlobalActions.monitorClosed();
+            });
+
+            $('#sidepanels').mouseup(() => {
+                this._toggleInsert(false);
+                this._toggleAdvanced(false);
+                GlobalActions.monitorClosed();
+                FnWrapper.clearSelection()
+            });
+_
+            $('#tools_top').mouseup(() => {
+                this._toggleInsert(false);
+                this._toggleAdvanced(false);
+                GlobalActions.monitorClosed();
+                FnWrapper.clearSelection()
             });
 
             BeamboxStore.onCloseInsertObjectSubmenu(() => this.closeInsertObjectSubmenu());
@@ -45,36 +63,38 @@ define([
         }
 
         closeInsertObjectSubmenu() {
-            this._toogleInsert(false);
+            this._toggleInsert(false);
         }
 
-        _toogleAdvanced(isOpen) {
+        _toggleAdvanced(isOpen) {
             this.setState({
                 isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
             });
 
             if (isOpen) {
                 FnWrapper.clearSelection();
-                this._toogleInsert(false)
+                this._toggleInsert(false)
+                GlobalActions.monitorClosed();
             }
         }
 
-        _toogleInsert(isOpen) {
+        _toggleInsert(isOpen) {
             this.setState({
                 isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
             });
 
             if (isOpen) {
                 FnWrapper.clearSelection();
+                GlobalActions.monitorClosed();
             }
         }
 
         _renderInsertObject() {
-            const insertObjectPanel = <InsertObjectSubmenu onClose={() => this._toogleInsert(false)}/>;
+            const insertObjectPanel = <InsertObjectSubmenu onClose={() => this._toggleInsert(false)}/>;
             return (
                 <div className='ui ui-dialog-menu'>
                     <div className='ui-dialog-menu-item'>
-                        <div className='dialog-label' style={{width: 'auto'}} onClick={() => this._toogleInsert(true)}>
+                        <div className='dialog-label' style={{width: 'auto'}} onClick={() => this._toggleInsert(true)}>
                             {LANG.insert_object}
                         </div>
                         {this.state.isInsertObjectMenuOpen ? insertObjectPanel : ''}
@@ -84,11 +104,11 @@ define([
         }
 
         _renderAdvanced() {
-            const advancedPanel = <AdvancedPanel onClose={() => this._toogleAdvanced(false)}/>;
+            const advancedPanel = <AdvancedPanel onClose={() => this._toggleAdvanced(false)}/>;
 
             return (
                 <div>
-                    <div className='option' onClick={() => this._toogleAdvanced(true)} style={{display: 'inline-block', width: 'unset'}}>
+                    <div className='option' onClick={() => this._toggleAdvanced(true)} style={{display: 'inline-block', width: 'unset'}}>
                         {LANG.advanced}
                     </div>
                     {this.state.isAdvancedPanelOpen ? advancedPanel : ''}

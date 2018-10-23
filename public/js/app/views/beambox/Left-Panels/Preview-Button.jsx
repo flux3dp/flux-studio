@@ -12,6 +12,7 @@ define([
     'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-preference',
     'app/actions/beambox',
+    'app/actions/global-actions',
     'app/stores/beambox-store',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
@@ -31,6 +32,7 @@ define([
     BeamboxVersionMaster,
     BeamboxPreference,
     BeamboxActions,
+    GlobalActions,
     BeamboxStore,
     ImageTracePanelController,
     classNames,
@@ -87,6 +89,7 @@ define([
                 FnWrapper.useSelectTool();
                 FnWrapper.clearSelection();
                 BeamboxActions.closeInsertObjectSubmenu();
+                GlobalActions.monitorClosed();
                 this.setState({
                     isPreviewMode: false,
                     isImageTraceMode: true
@@ -218,6 +221,7 @@ define([
 
             FnWrapper.clearSelection();
             BeamboxActions.closeInsertObjectSubmenu();
+            GlobalActions.monitorClosed();
 
             if(!this.state.isPreviewMode) {
                 tryToStartPreviewMode();
