@@ -67,6 +67,10 @@ define([
         }
 
         clear() {
+            if (this.isClean()) {
+                return;
+            }
+
             window.svgCanvas.setBackground('#fff');
 
             // clear canvas

@@ -26,7 +26,9 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/constants/global-constants',
-    'app/actions/initialize-machine'
+    'app/actions/initialize-machine',
+    'app/actions/beambox/preview-mode-background-drawer',
+    'app/actions/beambox/preview-mode-controller'
 ], function(
     $,
     React,
@@ -55,7 +57,9 @@ define([
     ProgressActions,
     ProgressConstants,
     GlobalConstants,
-    InitializeMachine
+    InitializeMachine,
+    PreviewModeBackgroundDrawer,
+    PreviewModeController
 ) {
     'use strict';
 
@@ -732,11 +736,15 @@ define([
             },
 
             _handleNavigation: function(address) {
-
                 if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
                     AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
                 }
                 else {
+                    if (location.hash.indexOf('beambox') > 0 && address !== 'beambox') {
+                        PreviewModeController.end();
+                        PreviewModeBackgroundDrawer.clear();
+                    }
+
                     location.hash = '#studio/' + address;
                 }
             },
