@@ -4,7 +4,13 @@ define([
     'app/constants/keycode-constants',
     'helpers/round',
     'plugins/classnames/index'
-], function(React, PropTypes, keyCodeConstants, round, ClassNames) {
+], function(
+    React,
+    PropTypes,
+    keyCodeConstants,
+    round,
+    ClassNames
+) {
     'use strict';
 
     return React.createClass({
@@ -43,12 +49,12 @@ define([
 
         componentWillReceiveProps: function (nextProps) {
             const val = this._validateValue(nextProps.defaultValue);
+
             this.setState({
                 displayValue: val,
                 savedValue: val
             });
         },
-
 
         //always return valid value
         _validateValue: function(val) {
@@ -85,13 +91,21 @@ define([
             this.setState({displayValue: e.target.value});
         },
 
-
         _handleKeyDown: function(e) {
-            e.stopPropagation();
             const step = Math.abs(this.props.step);
+
+            e.stopPropagation();
+
             switch (e.keyCode) {
                 case keyCodeConstants.KEY_RETURN:
+                    const activeElement = document.activeElement;
+
                     this._updateValue(e.target.value);
+
+                    if (activeElement.tagName === 'INPUT') {
+                        activeElement.blur();
+                    }
+
                     return;
                 case keyCodeConstants.KEY_ESC:
                     this.setState({displayValue: this.state.savedValue});
@@ -102,12 +116,9 @@ define([
                 case keyCodeConstants.KEY_DOWN:
                     this._updateValue(Math.round( parseFloat(this.state.savedValue / step) ) * step - step);
                     return;
-
                 default:
                     return;
             }
-
-
         },
 
         render: function() {

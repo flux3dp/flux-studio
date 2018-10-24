@@ -11,6 +11,8 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-preference',
+    'app/actions/beambox',
+    'app/actions/global-actions',
     'app/stores/beambox-store',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
@@ -29,6 +31,8 @@ define([
     PreviewModeController,
     BeamboxVersionMaster,
     BeamboxPreference,
+    BeamboxActions,
+    GlobalActions,
     BeamboxStore,
     ImageTracePanelController,
     classNames,
@@ -83,6 +87,9 @@ define([
                 console.log(error);
             } finally {
                 FnWrapper.useSelectTool();
+                FnWrapper.clearSelection();
+                BeamboxActions.closeInsertObjectSubmenu();
+                GlobalActions.monitorClosed();
                 this.setState({
                     isPreviewMode: false,
                     isImageTraceMode: true
@@ -213,6 +220,8 @@ define([
             };
 
             FnWrapper.clearSelection();
+            BeamboxActions.closeInsertObjectSubmenu();
+            GlobalActions.monitorClosed();
 
             if(!this.state.isPreviewMode) {
                 tryToStartPreviewMode();
@@ -250,7 +259,7 @@ define([
                         className={classNames('option', 'preview-btn', {'preview-mode-on': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        {isPreviewMode || isImageTraceMode ? LANG.end_preview : LANG.preview}
+                        {isPreviewMode ? LANG.end_preview : LANG.preview}
                     </div>
                     <span id='clear-preview-graffiti-button-placeholder' />
                     <span id='printer-selector-placeholder' />

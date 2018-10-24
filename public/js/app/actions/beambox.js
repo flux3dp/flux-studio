@@ -43,5 +43,10 @@ define([
                 actionType: BeamboxConstants.CLEAR_CAMERA_CANVAS
             });
         },
+        closeInsertObjectSubmenu: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.CLOSE_INSERT_OBJECT_SUBMENU
+            });
+        }
     };
 });
