@@ -5343,8 +5343,8 @@ define([
                                         id: svgCanvas.getNextId(),
                                         style: 'pointer-events:inherit',
                                         preserveAspectRatio: 'none',
-                                        'data-threshold': 255,
-                                        'data-shading': true,
+                                        'data-threshold': 128,
+                                        'data-shading': false,
                                         origImage: img.src
                                     }
                                 });
@@ -5355,7 +5355,7 @@ define([
                                         width: width,
                                         grayscale: {
                                             is_rgba: true,
-                                            is_shading: Boolean(newImage.getAttribute('data-shading')),
+                                            is_shading: false,
                                             threshold: parseInt(newImage.getAttribute('data-threshold')),
                                             is_svg: false
                                         },
