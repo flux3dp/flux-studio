@@ -5454,7 +5454,7 @@ define([
                         '',
                         [
                             () => {
-                                $('#svg_editor').removeClass('color');
+                                $('#svg_editor').addClass('color');
                                 importAs('layer');
                             },
                             () => {
@@ -5462,7 +5462,6 @@ define([
                                 importAs('color');
                             },
                             () => {
-                                $('#svg_editor').removeClass('color');
                                 importAs('nolayer');
                             }
                         ]

@@ -525,7 +525,7 @@ define([
                                         if (args.length === $ft_controls.length) {
                                             // sending data
                                             if (fileFormat === 'svg') {
-                                               console.log('imageData', args, settings, _callback, fileMode);
+                                                // console.log('imageData', args, settings, _callback, fileMode);
                                                 sendToSVGAPI(args, settings, _callback, fileMode);
                                             }
                                             else {

@@ -5328,22 +5328,21 @@ define([
                 use_el.id = getNextId();
                 setHref(use_el, '#' + symbol.id);
                 //switch currentLayer, and create layer if necessary
-                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
+                if ((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
 
                     const color = symbol.getAttribute('data-color');
                     const layerName = (type === 'image-trace') ? 'Traced Path' : symbol.getAttribute('data-id') || rgbToHex(color);
 
                     const isLayerExist = svgCanvas.setCurrentLayer(layerName);
-                    if(!isLayerExist) {
+                    if (!isLayerExist) {
                         const layer = svgCanvas.createLayer(layerName);
                         layer.color = color;
                     }
                 }
 
-                // append ~~~~~ ya
                 getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
-                if(type !== 'color' || type !== 'image-trace') {
+                if (type === 'nolayer') {
                     use_el.setAttribute('data-wireframe', true);
                 }
 
@@ -5421,7 +5420,7 @@ define([
 
                 const unit = val.substr(-2);
                 const num = val.substr(0, val.length-2);
-                if(!unitMap[unit]) {
+                if (!unitMap[unit]) {
                     console.log('unsupported unit', unit, 'for', val, ' use pixel instead');
                 }
 
