@@ -235,6 +235,8 @@ define([
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                     GlobalStore.onSliceComplete(this._handleSliceReport);
+
+                    document.addEventListener('mouseup', () => GlobalActions.monitorClosed());
                 },
 
                 componentWillUnmount: function() {
@@ -246,6 +248,8 @@ define([
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                     GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
+
+                    document.removeEventListener('mouseup', () => GlobalActions.monitorClosed());
                 },
 
                 _startTutorial: function() {
