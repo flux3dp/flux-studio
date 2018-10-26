@@ -5400,10 +5400,52 @@ define([
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
                             let svgString = e.target.result;
+
                             if (blob.path) {
                                 svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(blob.path) + '/../');
                                 svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
                             }
+
+                            // Insert CSS style into the node
+                            if (type === 'layer') {
+                                const indexStyle = svgString.indexOf('<style');
+
+                                if (indexStyle > -1) {
+                                    const styleString = svgString.slice(indexStyle, svgString.indexOf('/style>'));
+                                    let classPrefix = '';
+
+                                    if (styleString.indexOf('.st') > -1) {
+                                        classPrefix = 'st';
+                                    } else if (styleString.indexOf('.cls-') > -1) {
+                                        classPrefix = 'cls-';
+                                    } else {
+                                        console.log('Unknown Class Prefix');
+                                    }
+
+                                    if (classPrefix !== '') {
+                                        const styleStrings = styleString.split(`.${classPrefix}`);
+
+                                        for (let i = 1; i < styleStrings.length; i++) {
+                                            const className = `class="${classPrefix}${i-1}"`;
+                                            const leftBrace = styleStrings[i].indexOf('{') + 1;
+                                            const rightBrace = styleStrings[i].indexOf('}');
+                                            const style = `style="${styleStrings[i].slice(leftBrace, rightBrace)}"`;
+                                            const split = svgString.split(className);
+
+                                            if (split.length === 1){
+                                                continue;
+                                            }
+
+                                            svgString = split[0];
+
+                                            for (let j = 1; j < split.length; j++) {
+                                                svgString += `${style}${split[j]}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             var newElement = svgCanvas.importSvgString(svgString, type);
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
