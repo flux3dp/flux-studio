@@ -41,18 +41,36 @@ define([
                 GlobalActions.monitorClosed();
             });
 
-            $('#sidepanels').mouseup(() => {
+            $('#layerpanel').mouseup(() => {
                 this._toggleInsert(false);
                 this._toggleAdvanced(false);
+                FnWrapper.clearSelection();
                 GlobalActions.monitorClosed();
-                FnWrapper.clearSelection()
+            });
+
+            $('#layerpanel').mouseup(() => {
+                this._toggleInsert(false);
+                this._toggleAdvanced(false);
+                FnWrapper.clearSelection();
+                GlobalActions.monitorClosed();
+            });
+
+            $('#layer-laser-panel-placeholder').mouseup(() => {
+                this._toggleInsert(false);
+                this._toggleAdvanced(false);
+                FnWrapper.clearSelection();
+                GlobalActions.monitorClosed();
+            });
+
+            $('.selLayerBlock').mouseup(() => {
+                GlobalActions.monitorClosed();
             });
 _
             $('#tools_top').mouseup(() => {
-                this._toggleInsert(false);
                 this._toggleAdvanced(false);
+                this._toggleInsert(false);
+                FnWrapper.clearSelection();
                 GlobalActions.monitorClosed();
-                FnWrapper.clearSelection()
             });
 
             BeamboxStore.onCloseInsertObjectSubmenu(() => this.closeInsertObjectSubmenu());
@@ -67,21 +85,25 @@ _
         }
 
         _toggleAdvanced(isOpen) {
-            this.setState({
-                isAdvancedPanelOpen: isOpen === undefined ? !this.state.isAdvancedPanelOpen : isOpen
-            });
+            if (this.state.isAdvancedPanelOpen === isOpen) {
+                return;
+            }
+
+            this.setState({ isAdvancedPanelOpen: isOpen });
 
             if (isOpen) {
+                this._toggleInsert(false);
                 FnWrapper.clearSelection();
-                this._toggleInsert(false)
                 GlobalActions.monitorClosed();
             }
         }
 
         _toggleInsert(isOpen) {
-            this.setState({
-                isInsertObjectMenuOpen: isOpen === undefined ? !this.state.isInsertObjectMenuOpen : isOpen
-            });
+            if (this.state.isInsertObjectMenuOpen === isOpen) {
+                return;
+            }
+
+            this.setState({ isInsertObjectMenuOpen: isOpen });
 
             if (isOpen) {
                 FnWrapper.clearSelection();
@@ -91,6 +113,7 @@ _
 
         _renderInsertObject() {
             const insertObjectPanel = <InsertObjectSubmenu onClose={() => this._toggleInsert(false)}/>;
+
             return (
                 <div className='ui ui-dialog-menu'>
                     <div className='ui-dialog-menu-item'>
