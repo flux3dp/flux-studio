@@ -28,7 +28,8 @@ define([
     'app/constants/global-constants',
     'app/actions/initialize-machine',
     'app/actions/beambox/preview-mode-background-drawer',
-    'app/actions/beambox/preview-mode-controller'
+    'app/actions/beambox/preview-mode-controller',
+    'app/actions/beambox/svgeditor-function-wrapper'
 ], function(
     $,
     React,
@@ -59,7 +60,8 @@ define([
     GlobalConstants,
     InitializeMachine,
     PreviewModeBackgroundDrawer,
-    PreviewModeController
+    PreviewModeController,
+    FnWrapper
 ) {
     'use strict';
 
@@ -741,6 +743,7 @@ define([
                 }
                 else {
                     if (location.hash.indexOf('beambox') > 0 && address !== 'beambox') {
+                        FnWrapper.clearSelection();
                         PreviewModeController.end();
                         PreviewModeBackgroundDrawer.clear();
                     }
