@@ -73,10 +73,15 @@ _
                 GlobalActions.monitorClosed();
             });
 
+            // Add class color to #svg_editor
+            $('#svg_editor').addClass('color');
+
             BeamboxStore.onCloseInsertObjectSubmenu(() => this.closeInsertObjectSubmenu());
         }
 
         componentWillUnmount() {
+            $('#svg_editor').removeClass('color');
+
             BeamboxStore.removeCloseInsertObjectSubmenuListener(() => this.closeInsertObjectSubmenu());
         }
 
