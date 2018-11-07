@@ -119,7 +119,14 @@ define([
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
         await svgeditorParser.uploadToSvgeditorAPI([uploadFile], {
             model: BeamboxPreference.read('model'),
-            engraveDpi: BeamboxPreference.read('engrave_dpi')
+            engraveDpi: BeamboxPreference.read('engrave_dpi'),
+            onProgressing: (data) => {
+                ProgressActions.open(ProgressConstants.STEPPING);
+                ProgressActions.updating(data.message, data.percentage * 100);
+            },
+            onFinished: () => {
+                ProgressActions.updating(lang.message.uploading_fcode, 100);
+            }
         });
         const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for
