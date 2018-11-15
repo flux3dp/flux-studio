@@ -121,7 +121,7 @@ define([
             model: BeamboxPreference.read('model'),
             engraveDpi: BeamboxPreference.read('engrave_dpi'),
             onProgressing: (data) => {
-                ProgressActions.open(ProgressConstants.STEPPING);
+                ProgressActions.open(ProgressConstants.STEPPING, '', data.message, false);
                 ProgressActions.updating(data.message, data.percentage * 100);
             },
             onFinished: () => {
@@ -134,7 +134,7 @@ define([
                 names,
                 {
                     onProgressing: (data) => {
-                        ProgressActions.open(ProgressConstants.STEPPING);
+                        ProgressActions.open(ProgressConstants.STEPPING, '', data.message, false);
                         ProgressActions.updating(data.message, data.percentage * 100);
                     },
                     onFinished: function (blob, fileName, fileTimeCost) {
