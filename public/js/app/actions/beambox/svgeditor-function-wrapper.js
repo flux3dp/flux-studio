@@ -60,7 +60,8 @@ define([
         },
 
         insertSvg: function(svgString, type, cropData = { x: 0, y: 0 }, preCrop = { offsetX: 0, offsetY: 0 }) {
-            const newElement = svgCanvas.importSvgString(svgString.replace(/fill: ?#fff;/g, 'fill:none;'), type);
+            const modifiedSvgString = svgString.replace(/fill(: ?#(fff(fff)?|FFF(FFF)?));/g, 'fill: none;').replace(/fill= ?"#(fff(fff)?|FFF(FFF))"/g, 'fill="none"');
+            const newElement = svgCanvas.importSvgString(modifiedSvgString, type);
             const { x, y } = cropData;
             const { offsetX, offsetY } = preCrop;
 

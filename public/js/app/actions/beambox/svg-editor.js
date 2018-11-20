@@ -5437,7 +5437,7 @@ define([
                                             for (let i = 1; i < splitStyleString.length; i++) {
                                                 const leftBrace = splitStyleString[i].indexOf('{') + 1;
                                                 const rightBrace = splitStyleString[i].indexOf('}');
-                                                const style = `${splitStyleString[i].slice(leftBrace, rightBrace).trim().replace(/fill: ?#fff;/, 'fill:none;')}`;
+                                                const style = `${splitStyleString[i].slice(leftBrace, rightBrace).trim()}`;
 
                                                 classStyle += style;
                                             }
@@ -5465,7 +5465,9 @@ define([
                                 }
                             }
 
-                            var newElement = svgCanvas.importSvgString(svgString, type);
+                            const modifiedSvgString = svgString.replace(/fill(: ?#(fff(fff)?|FFF(FFF)?));/g, 'fill: none;').replace(/fill= ?"#(fff(fff)?|FFF(FFF))"/g, 'fill="none"');
+                            const newElement = svgCanvas.importSvgString(modifiedSvgString, type);
+
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
