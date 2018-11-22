@@ -8812,6 +8812,8 @@ define([
             selectorManager.requestSelector(selected).showGrips(true);
 
             svgedit.recalculate.recalculateDimensions(selected);
+
+            window.updateContextPanel();
         };
 
         this.setRotaryMode = function(val) {

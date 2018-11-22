@@ -24,7 +24,7 @@ define([
                 y: this.props.y
             };
         },
-        
+
         componentWillReceiveProps: function(nextProps) {
             this.setState({
                 x: nextProps.x,
@@ -46,7 +46,7 @@ define([
             } else {
                 FnWrapper.update_selected_y(y);
             }
-            this.setState({y: y});            
+            this.setState({y: y});
         },
         render: function() {
             return (
@@ -55,7 +55,7 @@ define([
                     <input type="checkbox" className="accordion-switcher" defaultChecked={true}/>
                     <p className="caption">
                         {LANG.position}
-                        <span className="value">{this.state.x}, {this.state.y} mm</span>
+                        <span className="value">{this.state.x} mm, {this.state.y} mm</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
@@ -79,7 +79,7 @@ define([
             </div>
             );
         }
-        
+
     });
 
 });
