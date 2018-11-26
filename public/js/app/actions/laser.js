@@ -760,7 +760,7 @@ define([
             refreshImagePanelPos();
         });
 
-        return {
+        var laserHelper = {
             runCommand: function(settings, command) {
                 if (command === 'start') {
                     getToolpath(
@@ -905,15 +905,17 @@ define([
                 console.log('loading laser c');
                 bitmapWebSocket = bitmapWebSocket || bitmapLaserParser();
                 oReq.onload = function(oEvent) {
-                    console.log('on load laser c');
                     var blob = oReq.response;
+                    console.log('Loading calibration image ', blob);
                     blob.name = calibrationLocation;
                     var file = {
                         blob: blob,
                         name: calibrationLocation,
-                        type: 'image/png'
-                    }
-                    bitmapWebSocket.upload([file]).always(_onUploadResponse).done(_onUploaded);
+                        type: 'image/png',
+                        url: calibrationLocation
+                    };
+                    laserHelper.onFileReadEnd({}, [file]);
+                    //bitmapWebSocket.upload([file]).always(_onUploadResponse).done(_onUploaded);
                 };
 
                 oReq.open('GET', calibrationLocation, true);
@@ -1031,5 +1033,6 @@ define([
             },
             clearScene: clearScene
         };
+        return laserHelper;
     };
 });
