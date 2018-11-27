@@ -41,6 +41,7 @@ define([
         // let subject get response from websocket
         async createWs(device) {
             this._device = device;
+            console.log("Device ", device);
             console.assert(device.version, 'device miss version!', device);
             const method = (device.source === 'h2h') ? `camera/usb/${parseInt(device.uuid)}` : `camera/${device.uuid}`;
 
@@ -62,7 +63,9 @@ define([
                 .toPromise();
 
             // check whether the camera need flip
-            this.cameraNeedFlip = !!(Number((/F:\s?(\-?\d+\.?\d+)/.exec(await this._getCameraOffset()) || ['',''])[1]));
+            if (device && device['model'].indexOf('delta-') < 0) {
+                this.cameraNeedFlip = !!(Number((/F:\s?(\-?\d+\.?\d+)/.exec(await this._getCameraOffset()) || ['',''])[1]));
+            }
         }
 
         async _getCameraOffset() {
