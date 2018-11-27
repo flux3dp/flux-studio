@@ -1238,7 +1238,7 @@ define([
             var clickSelect = editor.clickSelect = function () {
                 if (toolButtonClick('#tool_select')) {
                     svgCanvas.setMode('select');
-                    $('#styleoverrides').text('#svgcanvas svg *{cursor:move;pointer-events:all}, #svgcanvas svg{cursor:default}');
+                    $('#styleoverrides').text('#svgcanvas svg *{cursor:move;pointer-events:all;stroke-width:1px;vector-effect:non-scaling-stroke;}, #svgcanvas svg{cursor:default}');
                 }
             };
 
