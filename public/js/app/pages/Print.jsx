@@ -431,7 +431,7 @@ define([
                         DeviceMaster.getDeviceBySerial(device.serial, false, callback);
                     }
                     else if(answer === 'print-setting-version') {
-                        advancedSettings.load(DefaultPrintSettings);
+                        advancedSettings.load(DefaultPrintSettings.cura2);
                         Config().write('slicing-config', advancedSettings.toString());
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
@@ -884,7 +884,7 @@ define([
 
                 _checkDefaultPrintSettingsVersion: function() {
                     var version = Config().read('print-setting-version');
-                    if(version && version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
+                    if(version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
                         AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
                     }
                 },

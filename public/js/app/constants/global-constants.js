@@ -23,6 +23,6 @@ define([], function(){
         CAMERA                          : 'CAMERA',
         FILE_PREVIEW                    : 'FILE_PREVIEW',
 
-        DEFAULT_PRINT_SETTING_VERSION   : '1.0'
+        DEFAULT_PRINT_SETTING_VERSION   : '0.75'
     };
 });
