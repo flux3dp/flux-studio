@@ -10,79 +10,114 @@ define([
 
     const LANG = i18n.lang.beambox.object_panels;
 
-    const update_width_funcs = {
-        rect:   FnWrapper.update_rect_width,
-        image:  FnWrapper.update_image_width,
-        use:    val => svgCanvas.setSvgElemSize('width', val * Constant.dpmm),
-    };
-    const update_height_funcs = {
-        rect:   FnWrapper.update_rect_height,
-        image:  FnWrapper.update_image_height,
-        use:    val => svgCanvas.setSvgElemSize('height', val * Constant.dpmm),
-    };
-    let _update_width = ()=>{};
-    let _update_height = ()=>{};
+    class SizePanel extends React.Component{
 
-    return React.createClass({
-        propTypes: {
-            width: PropTypes.number.isRequired,
-            height: PropTypes.number.isRequired,
-            type: PropTypes.oneOf(['rect', 'image', 'use']).isRequired,
-        },
+        constructor(props) {
+            super(props);
 
-        getInitialState: function() {
-            return {
-                width: this.props.width,
-                height: this.props.height,
-                isRatioPreserve: (this.props.type!=='rect')?true:false
+            this.state = {
+                width: props.width,
+                height: props.height,
+                isRatioPreserve: (props.type !== 'rect')
             };
-        },
 
-        componentWillMount: function() {
-            _update_width = update_width_funcs[this.props.type];
-            _update_height = update_height_funcs[this.props.type];
-        },
+            this.propTypes = {
+                width: PropTypes.number.isRequired,
+                height: PropTypes.number.isRequired,
+                type: PropTypes.oneOf(['rect', 'image', 'use']).isRequired
+            };
+        }
 
-        componentWillReceiveProps: function(nextProps) {
+        componentWillReceiveProps(nextProps) {
             this.setState({
                 width: nextProps.width,
                 height: nextProps.height
             });
-        },
+        }
 
-        _update_width_handler: function(val) {
-            if(this.state.isRatioPreserve) {
-                const height = val * (this.state.height/this.state.width);
-                _update_height(height);
-                this.setState({height: height});
+        _updateWidth(val) {
+            switch(this.props.type) {
+                case 'rect':
+                    FnWrapper.update_rect_width(val);
+                    break;
+                case 'image':
+                    FnWrapper.update_image_width(val);
+                    break;
+                case 'use':
+                    svgCanvas.setSvgElemSize('width', val * Constant.dpmm);
+                    break;
             }
-            _update_width(val);
-            this.setState({width: val});
-        },
-        _update_height_handler: function(val) {
-            if(this.state.isRatioPreserve) {
-                const width = val * (this.state.width/this.state.height);
-                _update_width(width);
-                this.setState({width: width});
+
+            this.setState({ width: val });
+        }
+
+        _updateHeight(val) {
+            switch(this.props.type) {
+                case 'rect':
+                    FnWrapper.update_rect_height(val);
+                    break;
+                case 'image':
+                    FnWrapper.update_image_height(val);
+                    break;
+                case 'use':
+                    svgCanvas.setSvgElemSize('height', val * Constant.dpmm);
+                    break;
             }
-            _update_height(val);
-            this.setState({height: val});
-        },
-        _ratio_handler: function(e) {
-            this.setState({
-                isRatioPreserve: e.target.checked
-            });
-        },
-        render: function() {
+
+            this.setState({ height: val });
+        }
+
+        handleUpdateWidth(val) {
+            const {
+                width,
+                height,
+                isRatioPreserve
+            } = this.state;
+
+            if (isRatioPreserve) {
+                const constraintHeight = Number((val * height / width).toFixed(2));
+
+                this._updateHeight(constraintHeight);
+            }
+
+            this._updateWidth(val);
+        }
+
+        handleUpdateHeight(val) {
+            const {
+                width,
+                height,
+                isRatioPreserve
+            } = this.state;
+
+            if (isRatioPreserve) {
+                const constraintWidth = Number((val * width / height).toFixed(2));
+
+                this._updateWidth(constraintWidth);
+            }
+
+            this._updateHeight(val);
+        }
+
+        handleRatio(e) {
+            this.setState({ isRatioPreserve: e.target.checked });
+        }
+
+        render() {
+            const {
+                width,
+                height,
+                isRatioPreserve
+            } = this.state;
+
             return (
                 <div className='object-panel'>
                     <label className='controls accordion'>
                         <input type='checkbox' className='accordion-switcher' defaultChecked={true}/>
                         <p className='caption'>
                             {LANG.size}
-                            <span className='value'>{this.state.width} x {this.state.height} mm</span>
+                            <span className='value'>{width} mm x {height} mm</span>
                         </p>
-
 
                         <label className='accordion-body with-lock'>
                             <div>
@@ -91,8 +126,8 @@ define([
                                     <UnitInput
                                         min={0}
                                         unit='mm'
-                                        defaultValue={this.state.width}
-                                        getValue={this._update_width_handler}
+                                        defaultValue={width}
+                                        getValue={(val) => this.handleUpdateWidth(val)}
                                     />
                                 </div>
                                 <div className='control'>
@@ -100,15 +135,15 @@ define([
                                     <UnitInput
                                         min={0}
                                         unit='mm'
-                                        defaultValue={this.state.height}
-                                        getValue={this._update_height_handler}
+                                        defaultValue={height}
+                                        getValue={(val) => this.handleUpdateHeight(val)}
                                     />
                                 </div>
                             </div>
 
                             <div className='lock'>
-                                <input type='checkbox' checked={this.state.isRatioPreserve} id='togglePreserveRatio' onChange={this._ratio_handler} hidden/>
-                                <label htmlFor='togglePreserveRatio' title={LANG.lock_desc}><div>┐</div><i className={this.state.isRatioPreserve?'fa fa-lock locked':'fa fa-unlock-alt unlocked'} /><div>┘</div></label>
+                                <input type='checkbox' checked={isRatioPreserve} id='togglePreserveRatio' onChange={this.handleRatio} hidden/>
+                                <label htmlFor='togglePreserveRatio' title={LANG.lock_desc}><div>┐</div><i className={isRatioPreserve?'fa fa-lock locked':'fa fa-unlock-alt unlocked'} /><div>┘</div></label>
                             </div>
 
                         </label>
@@ -116,7 +151,7 @@ define([
                 </div>
             );
         }
+    };
 
-    });
-
+    return SizePanel;
 });

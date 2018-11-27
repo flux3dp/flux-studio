@@ -5423,30 +5423,51 @@ define([
                                     }
 
                                     if (classPrefix !== '') {
-                                        const styleStrings = styleString.split(`.${classPrefix}`);
+                                        let styleStrings = [];
+                                        let index = (classPrefix === 'st' ? 0 : 1);
 
-                                        for (let i = 1; i < styleStrings.length; i++) {
-                                            const className = `class="${classPrefix}${i-1}"`;
-                                            const leftBrace = styleStrings[i].indexOf('{') + 1;
-                                            const rightBrace = styleStrings[i].indexOf('}');
-                                            const style = `style="${styleStrings[i].slice(leftBrace, rightBrace)}"`;
+                                        while(true) {
+                                            const splitStyleString = styleString.split(`.${classPrefix}${index}`);
+                                            let classStyle = 'style="';
+
+                                            if (splitStyleString.length === 1) {
+                                                break;
+                                            }
+
+                                            for (let i = 1; i < splitStyleString.length; i++) {
+                                                const leftBrace = splitStyleString[i].indexOf('{') + 1;
+                                                const rightBrace = splitStyleString[i].indexOf('}');
+                                                const style = `${splitStyleString[i].slice(leftBrace, rightBrace).trim()}`;
+
+                                                classStyle += style;
+                                            }
+
+                                            classStyle += '"';
+                                            styleStrings[index] = classStyle;
+                                            index += 1;
+                                        }
+
+                                        for (let i = (classPrefix === 'st' ? 0 : 1); i < styleStrings.length; i++) {
+                                            const className = `class="${classPrefix}${i}"`;
                                             const split = svgString.split(className);
 
-                                            if (split.length === 1){
+                                            if (split.length === 1) {
                                                 continue;
                                             }
 
                                             svgString = split[0];
 
                                             for (let j = 1; j < split.length; j++) {
-                                                svgString += `${style}${split[j]}`;
+                                                svgString += `${styleStrings[i]}${split[j]}`;
                                             }
                                         }
                                     }
                                 }
                             }
 
-                            var newElement = svgCanvas.importSvgString(svgString, type);
+                            const modifiedSvgString = svgString.replace(/fill(: ?#(fff(fff)?|FFF(FFF)?));/g, 'fill: none;').replace(/fill= ?"#(fff(fff)?|FFF(FFF))"/g, 'fill="none"');
+                            const newElement = svgCanvas.importSvgString(modifiedSvgString, type);
+
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
@@ -5496,11 +5517,9 @@ define([
                         '',
                         [
                             () => {
-                                $('#svg_editor').addClass('color');
                                 importAs('layer');
                             },
                             () => {
-                                $('#svg_editor').addClass('color');
                                 importAs('color');
                             },
                             () => {

@@ -7,7 +7,7 @@ define([
     'helpers/websocket',
     'helpers/convertToTypedArray',
     'helpers/data-history',
-    'helpers/api/set-params',
+    'helpers/api/set-params'
 ], function(
     $,
     Websocket,
@@ -96,21 +96,21 @@ define([
                         events.onMessage = function(data) {
 
                             switch (data.status) {
-                            case 'continue':
-                                ws.send(file.data);
-                                break;
-                            case 'ok':
-                                self.get(file).done(function(response) {
-                                    file.blob = response.blob;
-                                    file.imgSize = response.size;
+                                case 'continue':
+                                    ws.send(file.data);
+                                    break;
+                                case 'ok':
+                                    self.get(file).done(function(response) {
+                                        file.blob = response.blob;
+                                        file.imgSize = response.size;
 
-                                    file = setMessages(file, false, warningCollection);
-                                    $deferred.notify('next');
-                                });
-                                break;
-                            case 'warning':
-                                warningCollection.push(data.message);
-                                break;
+                                        file = setMessages(file, false, warningCollection);
+                                        $deferred.notify('next');
+                                    });
+                                    break;
+                                case 'warning':
+                                    warningCollection.push(data.message);
+                                    break;
                             }
 
                         };
@@ -142,12 +142,10 @@ define([
                                 return 'bad' === file.status;
                             });
                             $deferred.resolve({files: files, hasBadFiles: hasBadFiles });
-                        }
-                        else if (file.extension && 'svg' === file.extension.toLowerCase()) {
+                        } else if (file.extension && 'svg' === file.extension.toLowerCase()) {
                             sendFile(file);
                             currIndex += 1;
-                        }
-                        else {
+                        } else {
                             setMessages(file, true, ['NOT_SUPPORT']);
                             currIndex += 1;
                             $deferred.notify('next');
@@ -188,8 +186,7 @@ define([
                         total_length = data.length;
                         size.height = data.height;
                         size.width = data.width;
-                    }
-                    else if (true === data instanceof Blob) {
+                    } else if (true === data instanceof Blob) {
                         blobs.push(data);
                         blob = new Blob(blobs, { type: file.type });
 
@@ -320,12 +317,10 @@ define([
 
                     if ('computing' === data.status) {
                         opts.onProgressing(data);
-                    }
-                    else if ('complete' === data.status) {
+                    } else if ('complete' === data.status) {
                         total_length = data.length;
                         duration = data.time + 1;
-                    }
-                    else if (true === data instanceof Blob) {
+                    } else if (true === data instanceof Blob) {
                         blobs.push(data);
                         blob = new Blob(blobs);
 
@@ -408,11 +403,11 @@ define([
                         svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(file.path) + '/../');
                         svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(file.path) + '/');
                     }
-                    
+
                     file = new Blob([svgString], {
                         type: 'text/plain'
                     });
-                    
+
                     ws.send([
                         'upload_plain_svg',
                         encodeURIComponent(file.name),
@@ -420,7 +415,6 @@ define([
                     ].join(' '));
                 };
                 reader.readAsText(file);
-
 
                 return $deferred.promise();
             },
@@ -432,6 +426,7 @@ define([
                         file.status = (0 < warningCollection.length ? 'bad' : 'good');
                         file.messages = warningCollection;
                         file.isBroken = isBroken;
+
                         return file;
                     },
 
@@ -440,15 +435,19 @@ define([
 
                         events.onMessage = function(data) {
                             switch (data.status) {
-                            case 'continue':
-                                ws.send(file.data);
-                                break;
-                            case 'ok':
-                                $deferred.resolve();
-                                break;
-                            case 'warning':
-                                warningCollection.push(data.message);
-                                break;
+                                case 'computing':
+                                    opts.onProgressing(data);
+                                    break;
+                                case 'continue':
+                                    ws.send(file.data);
+                                    break;
+                                case 'ok':
+                                    opts.onFinished();
+                                    $deferred.resolve();
+                                    break;
+                                case 'warning':
+                                    warningCollection.push(data.message);
+                                    break;
                             }
                         };
 
@@ -494,13 +493,11 @@ define([
                                 return 'bad' === file.status;
                             });
                             $deferred.resolve({files: files, hasBadFiles: hasBadFiles });
-                        }
-                        else if (file.extension && 'svg' === file.extension.toLowerCase()) {
+                        } else if (file.extension && 'svg' === file.extension.toLowerCase()) {
                             sendFile(file);
                             currIndex += 1;
                             console.log('currIndex', currIndex)
-                        }
-                        else {
+                        } else {
                             setMessages(file, true, ['NOT_SUPPORT']);
                             currIndex += 1;
                             $deferred.notify('next');

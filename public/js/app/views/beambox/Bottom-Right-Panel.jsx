@@ -35,10 +35,12 @@ define([
             this._handleStartClick = this._handleStartClick.bind(this);
             this._renderPrinterSelectorWindow = this._renderPrinterSelectorWindow.bind(this);
         }
+
         async _handleStartClick() {
             if (PreviewModeController.isPreviewMode()) {
                 await PreviewModeController.end();
             }
+
             const isPowerTooHigh = $('#svgcontent > g.layer')
                 .toArray()
                 .map(layer => layer.getAttribute('data-strength'))
@@ -55,6 +57,7 @@ define([
                 isPrinterSelectorOpen: true
             });
         }
+
         _renderPrinterSelectorWindow() {
             const onGettingPrinter = async (selected_item) => {
                 //export fcode
@@ -63,6 +66,7 @@ define([
                     this.setState({
                         isPrinterSelectorOpen: false
                     });
+
                     return;
                 }
 
@@ -73,6 +77,7 @@ define([
                     this.setState({
                         isPrinterSelectorOpen: false
                     });
+
                     return;
                 }
 
@@ -82,12 +87,13 @@ define([
                 });
                 BottomRightFuncs.uploadFcode(selected_item);
             };
+
             const onClose = () => {
                 this.setState({
                     isPrinterSelectorOpen: false
                 });
             };
-            
+
             const content = (
                 <PrinterSelector
                     uniqleId="laser"
@@ -98,6 +104,7 @@ define([
                     onGettingPrinter={onGettingPrinter}
                 />
             );
+
             return (
                 <Modal content={content} onClose={onClose} />
             );
@@ -120,9 +127,13 @@ define([
             ];
 
             return (
-                <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons" />
+                <ButtonGroup
+                    buttons={buttons}
+                    className="beehive-buttons action-buttons"
+                />
             );
         }
+
         render() {
             const actionButtons = this._renderActionButtons();
             const printerSelector = this._renderPrinterSelectorWindow();
@@ -135,6 +146,6 @@ define([
             );
         }
     }
-    return BottomRightPanel;
 
+    return BottomRightPanel;
 });

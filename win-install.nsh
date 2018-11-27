@@ -14,7 +14,8 @@
 
   ${If} $R4 == ""
     ExecWait $R2 $R5
-    ${If} $R5 > 0
+    ${If} $R5 == 1638
+    ${ElseIf} $R5 > 0
       MessageBox MB_OK "Visual C++ Redistributable install failed. Maybe you have to install manually. (Return $R5)"
     ${Else}
     ${EndIf}
@@ -22,7 +23,8 @@
   ${EndIf}
 
   ExecWait $R3 $R5
-  ${If} $R5 > 0
+  ${If} $R5 == 1638
+  ${ElseIf} $R5 > 0
       MessageBox MB_OK "FLUX USB Link Cable driver install failed. Maybe you have to install manually. (Return $R5)"
   ${Else}
   ${EndIf}

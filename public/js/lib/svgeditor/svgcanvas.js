@@ -5135,7 +5135,7 @@ define([
                         const resizeH = rootHeight / rootViewBox.split(' ')[3];
                         transformList.unshift(`scale(${resizeW}, ${resizeH})`);
                     } else {
-                        console.log('resize with 72 dpi');
+                        // console.log('resize with 72 dpi');
 
                         const svgUnitScaling = unit2Pixel('1px');
                         transformList.unshift(`scale(${svgUnitScaling})`);
@@ -8812,6 +8812,8 @@ define([
             selectorManager.requestSelector(selected).showGrips(true);
 
             svgedit.recalculate.recalculateDimensions(selected);
+
+            window.updateContextPanel();
         };
 
         this.setRotaryMode = function(val) {

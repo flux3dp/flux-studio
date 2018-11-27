@@ -9,6 +9,7 @@ define([
 ){
     let _mm2pixel = function(mm_input) {
         const dpmm = Constant.dpmm;
+
         return mm_input*dpmm;
     };
 
@@ -41,6 +42,7 @@ define([
             if (!window.svgCanvas) {
                 return false;
             }
+
             const selectedElements = window.svgCanvas.getSelectedElems();
 
             return ((selectedElements.length > 0) && (selectedElements[0] !== null));
@@ -58,15 +60,10 @@ define([
         },
 
         insertSvg: function(svgString, type, cropData = { x: 0, y: 0 }, preCrop = { offsetX: 0, offsetY: 0 }) {
-            const newElement = svgCanvas.importSvgString(svgString, type);
-            const {
-                x,
-                y
-            } = cropData;
-            const {
-                offsetX,
-                offsetY,
-            } = preCrop;
+            const modifiedSvgString = svgString.replace(/fill(: ?#(fff(fff)?|FFF(FFF)?));/g, 'fill: none;').replace(/fill= ?"#(fff(fff)?|FFF(FFF))"/g, 'fill="none"');
+            const newElement = svgCanvas.importSvgString(modifiedSvgString, type);
+            const { x, y } = cropData;
+            const { offsetX, offsetY } = preCrop;
 
             svgCanvas.ungroupSelectedElement();
             svgCanvas.ungroupSelectedElement();
@@ -76,6 +73,7 @@ define([
             // highlight imported element, otherwise we get strange empty selectbox
             try {
                 svgCanvas.selectOnly([newElement]);
+
                 if (type === 'image-trace') {
                     svgCanvas.setSvgElemPosition('x', offsetX + x);
                     svgCanvas.setSvgElemPosition('y', offsetY + y);
@@ -84,24 +82,15 @@ define([
             } catch(e) {
                 console.warn('Reading empty SVG');
             }
-            // svgCanvas.ungroupSelectedElement(); //for flatten symbols (convertToGroup)
-            $('#svg_editor').addClass('color');
+
             $('#dialog_box').hide();
         },
         insertImage: function(insertedImageSrc, cropData, preCrop, threshold) {
 
             // let's insert the new image until we know its dimensions
             const insertNewImage = function (img, cropData, preCrop, threshold) {
-                const {
-                    x,
-                    y,
-                    width,
-                    height
-                } = cropData;
-                const {
-                    offsetX,
-                    offsetY,
-                } = preCrop;
+                const { x, y, width, height } = cropData;
+                const { offsetX, offsetY } = preCrop;
                 const newImage = svgCanvas.addSvgElementFromJson({
                     element: 'image',
                     attr: {
@@ -149,6 +138,7 @@ define([
                 if (!svgCanvas.setCurrentLayer('Traced Image')) {
                     svgCanvas.createLayer('Traced Image');
                 }
+
                 insertNewImage(img, cropData, preCrop, threshold);
             };
         },
@@ -166,9 +156,7 @@ define([
         },
 
         renameLayer: function(oldName, newName) {
-            console.log('oldName', oldName, newName);
             if (svgCanvas.setCurrentLayer(oldName)) {
-                console.log('in1');
                 svgCanvas.renameCurrentLayer(newName);
             }
         },
