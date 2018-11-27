@@ -71,6 +71,7 @@ define([], function() {
     const bindDevice = (uuid, token, accessId, signature) => {
         let body = constructBody({ token, accessId, signature }),
             bindDeviceUrl = `${ip}${deviceProtocol}/${uuid}/bind`;
+        console.log("Trying to bind ", body);
         return post(bindDeviceUrl, body);
     };
 
