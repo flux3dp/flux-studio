@@ -4,7 +4,7 @@ define([
     'reactPropTypes',
     'app/actions/beambox/svgeditor-function-wrapper',
     'helpers/image-data',
-    'helpers/i18n',
+    'helpers/i18n'
 ], function($, React, PropTypes, FnWrapper, ImageData, i18n) {
     'use strict';
 
@@ -34,11 +34,14 @@ define([
         _writeShading: function(val) {
             FnWrapper.write_image_data_shading(this.props.$me, val);
         },
+
         _writeThreshold: function(val) {
             FnWrapper.write_image_data_threshold(this.props.$me, val);
         },
+
         _refreshImage: function() {
             const $me = this.props.$me;
+
             ImageData(
                 $me.attr("origImage"),
                 {
@@ -57,44 +60,54 @@ define([
             );
         },
 
-        _handleShadingClick: function(event) {
-            const currentShading = this.state.shading;
-            const newShading = !currentShading;
-            this.setState({shading: newShading}, function(){
-                this._writeShading(newShading);
+        handleShadingClick: function(event) {
+            const { shading } = this.state;
+            const threshold = (shading ? 128 : 255);
+
+            this.setState({
+                shading: !shading,
+                threshold: threshold
+            }, () => {
+                this._writeShading(!shading);
+                this._writeThreshold(threshold);
                 this._refreshImage();
             });
         },
-        _handleThresholdChange: function(event) {
+
+        handleThresholdChange: function(event) {
             const val = event.target.value;
+
             this.setState({threshold: val}, function(){
                 this._writeThreshold(val);
                 this._refreshImage();
             });
         },
+
         render: function() {
+            const { shading, threshold } = this.state;
+
             return (
                 <div className="object-panel">
                     <label className="controls accordion">
-                    <input type="checkbox" className="accordion-switcher"/>
-                    <p className="caption">
-                        {LANG.laser_config}
-                        <span className="value">{this.state.shading ? LANG.shading + ', ' : ''}{this.state.threshold}</span>
-                    </p>
-                    <label className="accordion-body">
-                        <div className="control">
-                            <span className="text-center header">{LANG.shading}</span>
-                            <label className='shading-checkbox' onClick={this._handleShadingClick}>
-                                <i className={this.state.shading ? "fa fa-toggle-on" : "fa fa-toggle-off"}></i>
-                            </label>
-                        </div>
-                        <div className="control">
-                            <span className="text-center header">{LANG.threshold}</span>
-                            <input type="range" min={0} max={255} value={this.state.threshold} onChange={this._handleThresholdChange} />
-                        </div>
+                        <input type="checkbox" className="accordion-switcher"/>
+                        <p className="caption">
+                            {LANG.laser_config}
+                            <span className="value">{shading ? LANG.shading + ', ' : ''}{threshold}</span>
+                        </p>
+                        <label className="accordion-body">
+                            <div className="control">
+                                <span className="text-center header">{LANG.shading}</span>
+                                <label className='shading-checkbox' onClick={(e) => this.handleShadingClick(e)}>
+                                    <i className={shading ? "fa fa-toggle-on" : "fa fa-toggle-off"}></i>
+                                </label>
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">{LANG.threshold}</span>
+                                <input type="range" min={0} max={255} value={threshold} onChange={(e) => this.handleThresholdChange(e)} />
+                            </div>
+                        </label>
                     </label>
-                </label>
-            </div>
+                </div>
             );
         }
 
