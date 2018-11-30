@@ -6,7 +6,6 @@ define([
     Dispatcher
 ) {
     return {
-
         showMonitor: function(printer, fcode, previewUrl, opener) {
             Dispatcher.dispatch({
                 actionType: GlobalConstants.SHOW_MONITOR, printer, fcode, previewUrl, opener
@@ -41,7 +40,12 @@ define([
             Dispatcher.dispatch({
                 actionType: GlobalConstants.MONITOR_CLOSED
             });
-        }
+        },
 
+        resetDialogMenuIndex: function() {
+            Dispatcher.dispatch({
+                actionType: GlobalConstants.RESET_DIALOG_MENU_INDEX
+            });
+        }
     };
 });

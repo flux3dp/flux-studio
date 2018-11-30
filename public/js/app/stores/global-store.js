@@ -37,6 +37,10 @@ define([
             this.on(GlobalConstants.MONITOR_CLOSED, callback);
         },
 
+        onResetDialogMenuIndex(callback) {
+            this.on(GlobalConstants.RESET_DIALOG_MENU_INDEX, callback);
+        },
+
         removeShowMoniotorListener(callback) {
             this.removeListener(GlobalConstants.SHOW_MONITOR, callback);
         },
@@ -59,6 +63,10 @@ define([
 
         removeMonitorClosedListener(callback) {
             this.removeListener(GlobalConstants.MONITOR_CLOSED, callback);
+        },
+
+        removeResetDialogMenuIndexListener(callback) {
+            this.removeListener(GlobalConstants.RESET_DIALOG_MENU_INDEX, callback);
         },
 
         dispatcherIndex: Dispatcher.register(function(payload) {

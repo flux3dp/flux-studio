@@ -9,6 +9,7 @@ define([], function(){
         EXIT_PREVIEW                    : 'EXIT_PREVIEW',
         IMPORT_FCODE                    : 'IMPORT_FCODE',
         IMPORT_SCENE                    : 'IMPORT_SCENE',
+        RESET_DIALOG_MENU_INDEX         : 'RESET_DIALOG_MENU_INDEX',
 
         // Monitor Open source
         PRINT                           : 'PRINT',

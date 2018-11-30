@@ -236,7 +236,10 @@ define([
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                     GlobalStore.onSliceComplete(this._handleSliceReport);
 
-                    document.addEventListener('mouseup', () => GlobalActions.monitorClosed());
+                    document.addEventListener('mouseup', () => {
+                        GlobalActions.monitorClosed();
+                        GlobalActions.resetDialogMenuIndex();
+                    });
                 },
 
                 componentWillUnmount: function() {
@@ -249,7 +252,10 @@ define([
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                     GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
 
-                    document.removeEventListener('mouseup', () => GlobalActions.monitorClosed());
+                    document.removeEventListener('mouseup', () => {
+                        GlobalActions.monitorClosed();
+                        GlobalActions.resetDialogMenuIndex();
+                    });
                 },
 
                 _startTutorial: function() {
