@@ -40,6 +40,12 @@ define([
                         case 'ok':
                             d.resolve(response);
                             break;
+                        case 'fail':
+                            d.resolve(response);
+                            break;
+                        case 'none':
+                            d.resolve(response);
+                            break;
                         case 'continue':
                             ws.send(data);
                             break;
