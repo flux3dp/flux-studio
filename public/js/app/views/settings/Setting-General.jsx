@@ -62,7 +62,7 @@ define([
             var me = e.currentTarget,
                 lang = this.state.lang,
                 originalIP = Config().read('poke-ip-addr'),
-                ips = me.value.split(','),
+                ips = me.value.split(/[,;] ?/),
                 ipv4Pattern = /^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/g,
                 isCorrectFormat = true;
 
@@ -117,7 +117,6 @@ define([
                 location.hash = '#';
             }
         },
-
 
         render: function() {
             let { supported_langs } = this.props,

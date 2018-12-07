@@ -105,12 +105,25 @@ define([
                             .progress(tryAgain)
                             .done((response) => {
                                 if (response.action === 'GOOD') {
-                                  config().write('poke-ip-addr', response.ipaddr[0]);
-                                  location.hash = '#initialize/wifi/setup-complete';
-                                  usb.close();
+                                    let pokeIPAddr = localStorage.getItem('poke-ip-addr');
+
+                                    if (pokeIPAddr || pokeIPAddr !== '') {
+                                        if (pokeIPAddr.indexOf(response.ipaddr[0]) === -1) {
+                                            while (pokeIPAddr.match(/[,;] ?/g).length > 18) {
+                                                pokeIPAddr = pokeIPAddr.substring(pokeIPAddr.search(/[,;] ?/) + 1).trim();
+                                            }
+
+                                            localStorage.setItem('poke-ip-addr', `${ipAddr}, ${response.ipaddr[0]}`);
+                                        }
+                                    } else {
+                                        localStorage.setItem('poke-ip-addr', response.ipaddr[0]);
+                                    }
+
+                                    location.hash = '#initialize/wifi/setup-complete';
+                                    usb.close();
                                 } else if (response.action === 'PREVIOUS_SSID') {
-                                  genericPerviousSSIDError();
-                                  location.hash = '#initialize/wifi/select';
+                                    genericPerviousSSIDError();
+                                    location.hash = '#initialize/wifi/select';
                                 };
                             });
                         }, 2000);

@@ -190,7 +190,7 @@ define([
                             } catch (error) {
                                 console.log(error);
                                 ProgressActions.close();
-                                AlertActions.showPopupError('menu-item', error.message || 'Fail to cut and capture');
+                                AlertActions.showPopupRetry('menu-item', error.message || 'Fail to cut and capture');
                             }
                         }
                     },
@@ -207,11 +207,21 @@ define([
     const StepBeforeAnalyzePicture = ({imgBlobUrl, gotoNextStep, onClose}) => {
         const sendPictureThenSetConfig = async () => {
             const resp = await _doSendPictureTask();
-            const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.width, resp.height);
-            if(!result) {
-                throw new Error(LANG.analyze_result_fail);
+
+            switch (resp.status) {
+                case 'ok':
+                    const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.width, resp.height);
+
+                    await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
+                    break;
+                case 'fail':
+                    throw new Error(LANG.analyze_result_fail);
+                    break;
+                case 'none':
+                    throw new Error(LANG.no_lines_detected);
+                default:
+                    break;
             }
-            await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
         };
 
         const _doSendPictureTask = async () => {
@@ -307,7 +317,7 @@ define([
                                 gotoNextStep(STEP_FINISH);
                             } catch (error) {
                                 console.log(error);
-                                AlertActions.showPopupError('menu-item', error.toString().replace('Error: ', ''));
+                                AlertActions.showPopupRetry('menu-item', error.toString().replace('Error: ', ''));
                                 gotoNextStep(STEP_REFOCUS);
                             }
                         }
