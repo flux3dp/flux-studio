@@ -5406,6 +5406,11 @@ define([
                                 svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
                             }
 
+                            if (type !== 'color') {
+                                svgString = svgString.replace(/<image.+\/image>/g, '');
+                                svgString = svgString.replace(/<image.+\/>/g, '');
+                            }
+
                             // Insert CSS style into the node
                             if (type === 'layer') {
                                 const indexStyle = svgString.indexOf('<style');
@@ -5489,23 +5494,22 @@ define([
                 const importSvg = file => {
                     svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
                     async function importAs(type) {
-                        if (type === 'color') {
-                            await svgWebSocket.uploadPlainSVG(file);
-                            const outputs = await svgWebSocket.divideSVG();
+                        await svgWebSocket.uploadPlainSVG(file);
+                        const outputs = await svgWebSocket.divideSVG();
 
+                        if (type === 'color') {
                             await readSVG(outputs['strokes'], type);
-                            console.log('Loading colors');
 
                             await readSVG(outputs['colors'], type);
-                            console.log('Loading bitmap', outputs['bitmap']);
-
-                            if (outputs['bitmap'].size > 0) {
-                                svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
-                            }
-                            console.log('Load complete');
                         } else {
                             readSVG(file, type);
+                        }
+
+                        if (outputs['bitmap'].size > 0) {
+                            console.log('Loading bitmap', outputs['bitmap']);
+
+                            svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                            await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
                         }
                     }
 
