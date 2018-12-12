@@ -5407,8 +5407,8 @@ define([
                             }
 
                             if (type !== 'color') {
-                                svgString = svgString.replace(/<image.+\/image>/g, '');
-                                svgString = svgString.replace(/<image.+\/>/g, '');
+                                svgString = svgString.replace(/<image(.|\n)+\/image>/g, '');
+                                svgString = svgString.replace(/<image(.|\n)+\/>/g, '');
                             }
 
                             // Insert CSS style into the node
@@ -5502,13 +5502,16 @@ define([
 
                             await readSVG(outputs['colors'], type);
                         } else {
-                            readSVG(file, type);
+                            await readSVG(file, type);
                         }
 
                         if (outputs['bitmap'].size > 0) {
-                            console.log('Loading bitmap', outputs['bitmap']);
+                            const layerName = LANG.right_panel.layer_panel.layer_bitmap;
 
-                            svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
+                            if (!svgCanvas.setCurrentLayer(layerName)) {
+                                svgCanvas.createLayer(layerName);
+                            }
+
                             await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
                         }
                     }

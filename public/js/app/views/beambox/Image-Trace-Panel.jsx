@@ -332,10 +332,10 @@ define([
                     offsetY: 100
                 }
 
-                FnWrapper.insertImage(croppedBlobUrl, testingCropData, testingPreCrop, threshold);
+                FnWrapper.insertImage(croppedBlobUrl, testingCropData, testingPreCrop, 1, threshold, true);
                 FnWrapper.insertSvg(imageTrace, 'image-trace', testingCropData, testingPreCrop);
             } else {
-                FnWrapper.insertImage(croppedBlobUrl, cropData, preCrop, threshold);
+                FnWrapper.insertImage(croppedBlobUrl, cropData, preCrop, 1, threshold, true);
                 FnWrapper.insertSvg(imageTrace, 'image-trace', cropData, preCrop);
             }
 
