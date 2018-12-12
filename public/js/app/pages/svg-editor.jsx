@@ -1,4 +1,5 @@
 requirejs.config({
+    waitSeconds: 30,
     paths: {
         svgEditor: 'app/actions/beambox/svg-editor',
 
