@@ -212,7 +212,12 @@ define([
                 case 'ok':
                     const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.width, resp.height);
 
-                    await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
+                    if (result) {
+                        await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
+                    } else {
+                        throw new Error(LANG.analyze_result_fail);
+                    }
+
                     break;
                 case 'fail':
                     throw new Error(LANG.analyze_result_fail);
