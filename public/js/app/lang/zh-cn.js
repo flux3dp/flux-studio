@@ -996,7 +996,9 @@ define(function() {
                 layer_by_color: '依颜色分层',
                 nolayer: '不分层',
                 no_support_text: 'Mozu Studio 目前不支持由外部导入文本标签，请由矢量绘图软件将文本转成路径后再导入。',
-                power_too_high_damage_laser_tube: '激光管在高功率下耗损较快，使用低功率可以延长雷试管使用寿命',
+                power_too_high_damage_laser_tube: '激光管在高功率下耗损较快，使用低功率可以延长雷试管使用寿命。',
+                speed_too_high_lower_the_quality: '在此雕刻分辨率使用过高速度，可能导致渐层雕刻較差品质。',
+                both_power_and_speed_too_high: '激光管在高功率下耗损较快，使用低功率可以延长雷试管使用寿命。\n同时在此雕刻分辨率使用过高速度，可能导致渐层雕刻較差品质。',
                 should_update_firmware_to_continue: '您的固件版本不支持最新的软件改善。为了更良好的使用经验与雕刻品质，请先更新手机切膜机的固件以继续。 (主菜单 > 机器 > [ Your手机切膜机] > 固件更新)'
             },
             left_panel: {
