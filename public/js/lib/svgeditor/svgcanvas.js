@@ -8039,15 +8039,15 @@ define([
             let indexMax = -1,
                 indexMin = -1;
 
-            const len = selectedElements.length;
+            const realSelectedElements = selectedElements.filter(e => e);
+            const len = realSelectedElements.length;
+
             if (len < 3) {
                 return;
             }
+
             for (let i = 0; i < len; i=i+1) {
-                if (selectedElements[i] == null) {
-                    break;
-                }
-                const elem = selectedElements[i];
+                const elem = realSelectedElements[i];
 
                 let centerX = this.getCenter(elem).x;
                 centerXs[i] = centerX;
@@ -8074,9 +8074,9 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition((minX + dx*j) - centerXs[i], 0, selectedElements[i]);
+                    this.moveElemPosition((minX + dx*j) - centerXs[i], 0, realSelectedElements[i]);
                 } else {
-                    this.moveElemPosition((minX + dx*j) - centerXs[i-len], 0, selectedElements[i-len]);
+                    this.moveElemPosition((minX + dx*j) - centerXs[i-len], 0, realSelectedElements[i-len]);
                 }
                 j = j+1;
             }
@@ -8090,15 +8090,15 @@ define([
             let indexMax = -1,
                 indexMin = -1;
 
-            const len = selectedElements.length;
+            const realSelectedElements = selectedElements.filter(e => e);
+            const len = realSelectedElements.length;
+
             if (len < 3) {
                 return;
             }
+
             for (let i = 0; i < len; i=i+1) {
-                if (selectedElements[i] == null) {
-                    break;
-                }
-                const elem = selectedElements[i];
+                const elem = realSelectedElements[i];
 
                 let centerY = this.getCenter(elem).y;
                 centerYs[i] = centerY;
@@ -8125,9 +8125,9 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i], selectedElements[i]);
+                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i], realSelectedElements[i]);
                 } else {
-                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i-len], selectedElements[i-len]);
+                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i-len], realSelectedElements[i-len]);
                 }
                 j = j+1;
             }
@@ -8146,17 +8146,19 @@ define([
                 indexMaxX = -1,
                 indexMaxY = -1;
 
-            const len = selectedElements.length;
+            const realSelectedElements = selectedElements.filter(e => e);
+            const len = realSelectedElements.length;
+
             if (len < 3) {
                 return;
             }
 
             for (let i = 0; i < len; i=i+1) {
-                if (selectedElements[i] == null) {
+                if (realSelectedElements[i] == null) {
                     console.error('distributing null');
                     break;
                 }
-                const elem = selectedElements[i];
+                const elem = realSelectedElements[i];
 
                 let center = this.getCenter(elem);
                 centerXs[i] = center.x;
@@ -8206,9 +8208,9 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition((startX + dx*j) - centerXs[i], (startY + dy*j) - centerYs[i], selectedElements[i]);
+                    this.moveElemPosition((startX + dx*j) - centerXs[i], (startY + dy*j) - centerYs[i], realSelectedElements[i]);
                 } else {
-                    this.moveElemPosition((startX + dx*j) - centerXs[i-len], (startY + dy*j) - centerYs[i-len], selectedElements[i-len]);
+                    this.moveElemPosition((startX + dx*j) - centerXs[i-len], (startY + dy*j) - centerYs[i-len], realSelectedElements[i-len]);
                 }
                 j = j+1;
             }
