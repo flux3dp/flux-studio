@@ -50,9 +50,11 @@ define([
                 let pokeIPAddr = localStorage.getItem('poke-ip-addr');
 
                 if (pokeIPAddr || pokeIPAddr !== '') {
-                    if (pokeIPAddr.indexOf(device.ipaddr) === -1) {
-                        while (pokeIPAddr.match(/[,;] ?/g).length > 18) {
-                            pokeIPAddr = pokeIPAddr.substring(pokeIPAddr.search(/[,;] ?/) + 1).trim();
+                    const pokeIPAddrArr = pokeIPAddr.split(/[,;] ?/);
+
+                    if (pokeIPAddrArr.indexOf(device.ipaddr) === -1) {
+                        if (pokeIPAddrArr.length > 19) {
+                            pokeIPAddr = pokeIPAddrArr.slice(pokeIPAddrArr.length - 19, pokeIPAddrArr.length);
                         }
 
                         localStorage.setItem('poke-ip-addr', `${pokeIPAddr}, ${device.ipaddr}`);

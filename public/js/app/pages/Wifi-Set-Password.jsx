@@ -108,12 +108,14 @@ define([
                                     let pokeIPAddr = localStorage.getItem('poke-ip-addr');
 
                                     if (pokeIPAddr || pokeIPAddr !== '') {
-                                        if (pokeIPAddr.indexOf(response.ipaddr[0]) === -1) {
-                                            while (pokeIPAddr.match(/[,;] ?/g).length > 18) {
-                                                pokeIPAddr = pokeIPAddr.substring(pokeIPAddr.search(/[,;] ?/) + 1).trim();
+                                        const pokeIPAddrArr = pokeIPAddr.split(/[,;] ?/);
+
+                                        if (pokeIPAddrArr.indexOf(response.ipaddr[0]) === -1) {
+                                            if (pokeIPAddrArr.length > 19) {
+                                                pokeIPAddr = pokeIPAddrArr.slice(pokeIPAddrArr.length - 19, pokeIPAddrArr.length);
                                             }
 
-                                            localStorage.setItem('poke-ip-addr', `${ipAddr}, ${response.ipaddr[0]}`);
+                                            localStorage.setItem('poke-ip-addr', `${pokeIPAddr}, ${response.ipaddr[0]}`);
                                         }
                                     } else {
                                         localStorage.setItem('poke-ip-addr', response.ipaddr[0]);

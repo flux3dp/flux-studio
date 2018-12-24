@@ -79,12 +79,15 @@ define([
         _handleActions: function(source, arg, e) {
             if (this.props.previewModeOnly === true) {
                 e.preventDefault();
+
                 if (source === 'PREVIEW') {
                     $('#preview').parents('label').find('input').prop('checked',true);
                     AlertActions.showPopupYesNo(GlobalConstants.EXIT_PREVIEW, lang.confirmExitFcodeMode);
                 }
+
                 return;
             }
+
             var self = this,
                 actions = {
                     'MODEL': function() {
