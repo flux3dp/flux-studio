@@ -171,8 +171,16 @@ define([
         exportFcode: async function () {
             const { fcodeBlob } = await fetchFcode();
             const defaultFCodeName = svgCanvas.getLatestImportFileName() || 'untitled';
+            const langFile = i18n.lang.topmenu.file;
+            const fileReader = new FileReader();
+
             ProgressActions.close();
-            saveAs(fcodeBlob,  defaultFCodeName + '.fc');
+
+            fileReader.onload = function () {
+                window.electron.ipc.send('save-dialog', langFile.save_fcode, langFile.all_files, langFile.fcode_files, ['fc'], defaultFCodeName, new Uint8Array(this.result));
+            };
+
+            fileReader.readAsArrayBuffer(fcodeBlob);
         },
     };
 });

@@ -1,4 +1,4 @@
-const {app, ipcMain, BrowserWindow} = require('electron');
+const {app, ipcMain, BrowserWindow, dialog} = require('electron');
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
 
 const BackendManager = require('./src/backend-manager.js');
@@ -10,7 +10,6 @@ const TTC2TTF = require('./src/ttc2ttf.js');
 
 const FontManager = require('font-manager');
 const TextToSVG = require('text-to-svg');
-
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
@@ -200,6 +199,48 @@ ipcMain.on(events.FIND_FONT , (event, arg) => {
     const font = FontManager.findFontSync(arg);
     event.returnValue = font;
 });
+
+ipcMain.on('save-dialog', function (event, title, allFiles, extensionName, extensions, filename, file) {
+    const isMac = (process.platform === 'darwin');
+    const options = {
+        defaultPath: filename,
+        title,
+        filters: [
+            { name: isMac ? `${extensionName} (*.${extensions[0]})` : extensionName , extensions },
+            { name: allFiles, extensions: ['*'] }
+        ]
+    }
+
+    dialog.showSaveDialog(options, function (filePath) {
+        if (!filePath) {
+            return;
+        }
+
+        switch (typeof(file)) {
+            case 'string':
+                fs.writeFile(filePath, file, function(err) {
+                    if (err) {
+                        dialog.showErrorBox('Error', err);
+
+                        return;
+                    }
+                });
+                break;
+            case 'object':
+                fs.writeFileSync(filePath, file, function(err) {
+                    if(err) {
+                        dialog.showErrorBox('Error', err);
+
+                        return;
+                    }
+                });
+                break;
+            default:
+                dialog.showErrorBox('Error: something wrong, please contact FLUX Support');
+                break;
+        }
+    })
+})
 
 ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
     const substitutedFamily = (function(){

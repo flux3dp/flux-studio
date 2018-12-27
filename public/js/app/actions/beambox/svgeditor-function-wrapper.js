@@ -251,7 +251,9 @@ define([
         saveFile: function() {
             const output = svgCanvas.getSvgString();
             const defaultFileName = svgCanvas.getLatestImportFileName() || 'untitled';
-            saveAs(new Blob([output], {type: 'text/plain'}), defaultFileName + '.bvg');
+            const langFile = i18n.lang.topmenu.file;
+
+            window.electron.ipc.send('save-dialog', langFile.save_scene, langFile.all_files, langFile.bvg_files, ['bvg'], defaultFileName, output, localStorage.getItem('lang'));
         },
 
         //top panel

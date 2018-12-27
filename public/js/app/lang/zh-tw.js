@@ -85,6 +85,10 @@ define(function() {
                 import: '匯入',
                 save_fcode: '匯出工作',
                 save_scene: '匯出場景',
+                all_files: '所有檔案',
+                bvg_files: 'Beambox 雷雕場景',
+                fcode_files: 'FLUX Code',
+                fsc_files: 'Delta 列印場景',
                 confirmReset: '是否確定要重置所有設定?'
             },
             edit: {

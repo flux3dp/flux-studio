@@ -85,6 +85,10 @@ define(function() {
                 import: '导入',
                 save_fcode: '导出工作',
                 save_scene: '导出场景',
+                all_files: '所有文件',
+                bvg_files: 'Beambox 激光雕刻场景',
+                fcode_files: 'FLUX Code',
+                fsc_files: 'Delta 打印场景',
                 confirmReset: '是否确定要重置所有设置?'
             },
             edit: {

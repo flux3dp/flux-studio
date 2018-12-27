@@ -46,7 +46,7 @@ define([
     ProgressConstants,
     ErrorConstants,
     Packer,
-    I18n,
+    i18n,
     Config,
     MenuFactory,
     GlobalActions,
@@ -158,7 +158,7 @@ define([
         uploadProgress,
         fineSettings = {},
         history = [],
-        lang = I18n.get();
+        lang = i18n.get();
 
     let s = {
         diameter: 170,
@@ -2071,13 +2071,20 @@ define([
         selectObject(null);
         let d = $.Deferred();
         if(objects.length > 0) {
+            const langFile = i18n.lang.topmenu.file;
+            const fileReader = new FileReader();
+
+            fileReader.onload = function () {
+                window.electron.ipc.send('save-dialog', langFile.save_fcode, langFile.all_files, langFile.fcode_files, ['fc'], fileName, new Uint8Array(this.result));
+            };
+
             if (!blobExpired) {
                 if(hasPreviewImage) {
-                    d.resolve(saveAs(responseBlob, fileName));
+                    d.resolve(fileReader.readAsArrayBuffer(responseBlob));
                 }
                 else {
                     takeSnapShot().then(() => {
-                        d.resolve(saveAs(responseBlob, fileName));
+                        d.resolve(fileReader.readAsArrayBuffer(responseBlob));
                     });
                 }
             }
@@ -2086,7 +2093,7 @@ define([
                     if (blob instanceof Blob) {
                         takeSnapShot().then(() => {
                             ProgressActions.close();
-                            d.resolve(saveAs(responseBlob, fileName));
+                            d.resolve(fileReader.readAsArrayBuffer(responseBlob));
                         });
                     }
                 });
@@ -2478,7 +2485,16 @@ define([
             });
         }
 
-        saveAs(packer.pack(), 'scene.fsc');
+        const langFile = i18n.lang.topmenu.file;
+        const fileReader = new FileReader();
+
+        ProgressActions.close();
+
+        fileReader.onload = function () {
+            window.electron.ipc.send('save-dialog', langFile.save_scene, langFile.all_files, langFile.fsc_files, ['fsc'], 'scene.fsc', new Uint8Array(this.result));
+        };
+
+        fileReader.readAsArrayBuffer(packer.pack());
     }
 
     function loadScene() {
@@ -2487,8 +2503,6 @@ define([
     }
 
     function _handleLoadScene(sceneFile) {
-        let packer = require('helpers/packer');
-
         packer.unpack(sceneFile).then(function(_sceneFile) {
             let files = _sceneFile[0];
 

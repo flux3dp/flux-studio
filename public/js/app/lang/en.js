@@ -85,6 +85,10 @@ define(function() {
                 import: 'Import',
                 save_fcode: 'Export FLUX Task',
                 save_scene: 'Save Scene',
+                all_files: 'All Files',
+                bvg_files: 'Beambox Scene',
+                fcode_files: 'FLUX Code',
+                fsc_files: '3D Printing Scene',
                 confirmReset: 'Are you sure you want to reset all settings?'
             },
             edit: {

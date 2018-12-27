@@ -869,10 +869,16 @@ define([
                             // split by . and get unless the last then join as string
                             fileName = self.state.images[0].name.split('.').slice(0, -1).join(''),
                             fullName = fileName + '.' + extension;
+                        const langFile = i18n.lang.topmenu.file;
+                        const fileReader = new FileReader();
 
                         ProgressActions.close();
-                        saveAs(blob, fullName);
 
+                        fileReader.onload = function () {
+                            window.electron.ipc.send('save-dialog', langFile.save_fcode, langFile.all_files, langFile.fcode_files, ['fc'], fullName, new Uint8Array(this.result));
+                        };
+
+                        fileReader.readAsArrayBuffer(blob);
                     },
                     ProgressConstants.STEPPING,
                     fileMode || '-f'
