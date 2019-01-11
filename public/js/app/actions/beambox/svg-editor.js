@@ -5612,7 +5612,7 @@ define([
                     const parsedSvg = await new Promise(resolve => {
                         const reader = new FileReader();
                         reader.onloadend = (evt) => {
-                            editor.loadFromString(evt.target.result);
+                            editor.loadFromString(evt.target.result.replace(/STYLE>/g, 'style>'));
                         };
                         reader.readAsText(file);
                     });
