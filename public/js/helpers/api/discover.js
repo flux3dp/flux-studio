@@ -49,7 +49,7 @@ define([
 
                 let pokeIPAddr = localStorage.getItem('poke-ip-addr');
 
-                if (pokeIPAddr || pokeIPAddr !== '') {
+                if (pokeIPAddr && pokeIPAddr !== '') {
                     const pokeIPAddrArr = pokeIPAddr.split(/[,;] ?/);
 
                     if (pokeIPAddrArr.indexOf(device.ipaddr) === -1) {
@@ -90,7 +90,8 @@ define([
             ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));
         },
         BUFFER = 100,
-        pokeIPs = localStorage.getItem('poke-ip-addr').split(/[,;] ?/),
+        pokeIPAddr = localStorage.getItem('poke-ip-addr'),
+        pokeIPs = (pokeIPAddr ? pokeIPAddr.split(/[,;] ?/) : ['']),
         timer;
 
     if ('' === pokeIPs[0]) {

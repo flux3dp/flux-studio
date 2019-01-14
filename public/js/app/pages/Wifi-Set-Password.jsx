@@ -107,7 +107,7 @@ define([
                                 if (response.action === 'GOOD') {
                                     let pokeIPAddr = localStorage.getItem('poke-ip-addr');
 
-                                    if (pokeIPAddr || pokeIPAddr !== '') {
+                                    if (pokeIPAddr && pokeIPAddr !== '') {
                                         const pokeIPAddrArr = pokeIPAddr.split(/[,;] ?/);
 
                                         if (pokeIPAddrArr.indexOf(response.ipaddr[0]) === -1) {
