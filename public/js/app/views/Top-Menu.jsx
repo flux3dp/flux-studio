@@ -800,7 +800,7 @@ define([
             },
 
             _handleContextMenu: function(event) {
-                electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY});
+                electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY}, {});
             },
             _renderStudioFunctions: function(groupName = 'delta') {
                 var itemClass = '',
