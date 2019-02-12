@@ -792,12 +792,16 @@ define([
 
     function maintainMove(args) {
         let d = $.Deferred();
+
         SocketMaster.addTask('maintainMove', args)
             .then((result) => {
                 if (result.status === 'ok') {
-                    return d.resolve();
+                    d.resolve();
                 }
+            }).fail(() => {
+                d.reject();
             });
+
         return d.promise();
     }
 

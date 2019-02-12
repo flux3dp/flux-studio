@@ -116,6 +116,7 @@ define([
                     BeamboxActions.endDrawingPreviewBlob();
                 }
                 this.end();
+                BeamboxActions.resetPreviewButton();
             }
         }
 
@@ -252,6 +253,7 @@ define([
         _getPhotoAfterMove(x, y) {
             const movementX = x / Constant.dpmm - this._getCameraOffset().x;
             const movementY = y / Constant.dpmm - this._getCameraOffset().y;
+
             return this._getPhotoAfterMoveTo(movementX, movementY);
         }
 
@@ -266,7 +268,9 @@ define([
             await DeviceMaster.select(this.storedPrinter);
             await DeviceMaster.maintainMove(movement);
             await this._waitUntilEstimatedMovementTime(movementX, movementY);
+
             const imgUrl = await this._getPhotoFromMachine();
+
             return imgUrl;
         }
 

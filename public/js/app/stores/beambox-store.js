@@ -49,6 +49,11 @@ define([
             return beamboxStore;
         },
 
+        onResetPreviewButton: function(callback) {
+            this.on(Constants.RESET_PREVIEW_BUTTON, callback);
+            return beamboxStore;
+        },
+
         removeUpdateLaserPanelListener: function(callback) {
             this.removeListener(Constants.UPDATE_LASER_PANEL, callback);
             return beamboxStore;
@@ -81,6 +86,11 @@ define([
 
         removeCloseInsertObjectSubmenuListener: function(callback) {
             this.removeListener(Constants.CLOSE_INSERT_OBJECT_SUBMENU, callback);
+            return beamboxStore;
+        },
+
+        removeResetPreviewButton: function(callback) {
+            this.removeListener(Constants.RESET_PREVIEW_BUTTON, callback);
             return beamboxStore;
         },
 

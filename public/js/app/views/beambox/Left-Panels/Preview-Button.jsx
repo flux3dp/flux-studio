@@ -58,6 +58,7 @@ define([
             BeamboxStore.onEndDrawingPreviewBlob(() => this.endDrawing());
             BeamboxStore.onClearCameraCanvas(() => this.hideImageTraceButton());
             BeamboxStore.onEndImageTrace(() => this.endImageTrace());
+            BeamboxStore.onResetPreviewButton(() => this.resetPreviewButton());
         }
 
         componentWillUnmount() {
@@ -65,6 +66,7 @@ define([
             BeamboxStore.removeEndDrawingPreviewBlobListener(() => this.endDrawing());
             BeamboxStore.removeClearCameraCanvasListener(() => this.hideImageTraceButton())
             BeamboxStore.removeEndImageTraceListener(() => this.endImageTrace());
+            BeamboxStore.removeResetPreviewButton(() => this.resetPreviewButton());
         }
 
         endImageTrace() {
@@ -211,11 +213,7 @@ define([
                 } catch (error) {
                     console.log(error);
                 } finally {
-                    FnWrapper.useSelectTool();
-                    this.setState({
-                        isPreviewMode: false,
-                        isImageTraceMode: false
-                    });
+                    this.resetPreviewButton()
                 }
             };
 
@@ -236,6 +234,14 @@ define([
             } else {
                 return null;
             }
+        }
+
+        resetPreviewButton() {
+            FnWrapper.useSelectTool();
+            this.setState({
+                isPreviewMode: false,
+                isImageTraceMode: false
+            });
         }
 
         render() {
