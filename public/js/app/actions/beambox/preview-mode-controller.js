@@ -116,7 +116,6 @@ define([
                     BeamboxActions.endDrawingPreviewBlob();
                 }
                 this.end();
-                BeamboxActions.resetPreviewButton();
             }
         }
 

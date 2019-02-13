@@ -3,6 +3,7 @@ define([
     'helpers/i18n',
     'helpers/sprintf',
     'app/actions/alert-actions',
+    'app/actions/beambox',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
@@ -26,6 +27,7 @@ define([
     i18n,
     sprintf,
     AlertActions,
+    BeamboxActions,
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
@@ -220,6 +222,10 @@ define([
                     };
 
                     removeTimedOutConnection(availableUsbChannel);
+
+                    if (response.reason === 'error [\'KICKED\']') {
+                        BeamboxActions.resetPreviewButton();
+                    }
                 }
             });
         };
