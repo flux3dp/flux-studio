@@ -282,6 +282,24 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
             return familyList[0];
         }
     })();
+
+    // Font Manager won't return PingFang Semibold if input PingFang Bold
+    if (substitutedFamily.indexOf('PingFang') > -1) {
+        switch(fontStyle) {
+            case 'Bold':
+                fontStyle = 'Semibold';
+                break;
+            case 'Italic':
+                fontStyle = 'Regular';
+                break;
+            case 'Bold Italic':
+                fontStyle = 'Semibold';
+                break;
+            default:
+                break;
+        }
+    }
+
     let font = FontManager.findFontSync({
         family: substitutedFamily,
         style: fontStyle
