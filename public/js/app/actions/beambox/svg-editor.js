@@ -5406,6 +5406,13 @@ define([
                                 svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
                             }
 
+                            if (svgString.indexOf('<![CDATA[') > -1) {
+                                const indexLeft = svgString.indexOf('<![CDATA[');
+                                const indexRight = svgString.indexOf(']]>');
+
+                                svgString = svgString.substr(0, indexLeft) + svgString.substring(indexLeft+9, indexRight) + svgString.substr(indexRight + 3);
+                            }
+
                             if (type !== 'color') {
                                 svgString = svgString.replace(/<image(.|\n)+\/image>/g, '');
                                 svgString = svgString.replace(/<image(.|\n)+\/>/g, '');
