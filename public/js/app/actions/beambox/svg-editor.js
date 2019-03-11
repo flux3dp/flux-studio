@@ -5413,6 +5413,14 @@ define([
                                 svgString = svgString.substr(0, indexLeft) + svgString.substring(indexLeft+9, indexRight) + svgString.substr(indexRight + 3);
                             }
 
+
+                            if (svgString.indexOf('<switch>') > -1) {
+                                const indexLeft = svgString.indexOf('<switch>');
+                                const indexRight = svgString.indexOf('</switch>');
+
+                                svgString = svgString.substr(0, indexLeft) + svgString.substring(indexLeft+8, indexRight) + svgString.substr(indexRight+9);
+                            }
+
                             if (type !== 'color') {
                                 svgString = svgString.replace(/<image(.|\n)+\/image>/g, '');
                                 svgString = svgString.replace(/<image(.|\n)+\/>/g, '');
