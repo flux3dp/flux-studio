@@ -40,7 +40,7 @@ var gripRadius = svgedit.browser.isTouch() ? 10 : 4;
 // bbox - Optional bbox to use for initialization (prevents duplicate getBBox call).
 svgedit.select.Selector = function(id, elem, bbox) {
 	// this is the selector's unique number
-	this.id = id;
+    this.id = id;
 
 	// this holds a reference to the element for which this selector is being used
 	this.selectedElement = elem;
@@ -96,7 +96,7 @@ svgedit.select.Selector.prototype.reset = function(e, bbox) {
 	this.locked = true;
 	this.selectedElement = e;
 	this.resize(bbox);
-	this.selectorGroup.setAttribute('display', 'inline');
+    this.selectorGroup.setAttribute('display', 'inline');
 };
 
 
@@ -108,7 +108,8 @@ svgedit.select.Selector.prototype.reset = function(e, bbox) {
 svgedit.select.Selector.prototype.updateGripCursors = function(angle) {
 	var dir,
 		dir_arr = [],
-		steps = Math.round(angle / 45);
+        steps = Math.round(angle / 45);
+
 	if (steps < 0) {steps += 8;}
 	for (dir in selectorManager_.selectorGrips) {
 		dir_arr.push(dir);
@@ -123,7 +124,7 @@ svgedit.select.Selector.prototype.updateGripCursors = function(angle) {
 			switch(dir_arr[i]) {
 				case 'e':
 				case 'w':
-					return 'ew';				
+					return 'ew';
 				case 'n':
 				case 's':
 					return 'ns';
@@ -153,7 +154,7 @@ svgedit.select.Selector.prototype.showGrips = function(show) {
 	if (elem && show) {
 		this.selectorGroup.appendChild(selectorManager_.selectorGripsGroup);
 		this.updateGripCursors(svgedit.utilities.getRotationAngle(elem));
-	}
+    }
 
 	ObjectPanelsController.setVisibility(show);
 	ObjectPanelsController.render();
@@ -447,14 +448,15 @@ svgedit.select.SelectorManager.prototype.initGroup = function() {
 // elem - DOM element to get the selector for
 // bbox - Optional bbox to use for reset (prevents duplicate getBBox call).
 svgedit.select.SelectorManager.prototype.requestSelector = function(elem, bbox) {
-	if (elem == null) {return null;}
+    if (elem == null) { return null; }
 	var i,
 		N = this.selectors.length;
 	// If we've already acquired one for this element, return it.
 	if (typeof(this.selectorMap[elem.id]) == 'object') {
 		this.selectorMap[elem.id].locked = true;
 		return this.selectorMap[elem.id];
-	}
+    }
+
 	for (i = 0; i < N; ++i) {
 		if (this.selectors[i] && !this.selectors[i].locked) {
 			this.selectors[i].locked = true;
@@ -479,8 +481,8 @@ svgedit.select.SelectorManager.prototype.releaseSelector = function(elem) {
 	if (elem == null) {return;}
 	var i,
 		N = this.selectors.length,
-		sel = this.selectorMap[elem.id];
-	if (!sel.locked) {
+        sel = this.selectorMap[elem.id];
+	if (!sel || !sel.locked) {
 		// TODO(codedread): Ensure this exists in this module.
 		console.log('WARNING! selector was released but was already unlocked');
 	}
@@ -489,7 +491,7 @@ svgedit.select.SelectorManager.prototype.releaseSelector = function(elem) {
 			delete this.selectorMap[elem.id];
 			sel.locked = false;
 			sel.selectedElement = null;
-			sel.showGrips(false);
+            sel.showGrips(false);
 
 			// remove from DOM and store reference in JS but only if it exists in the DOM
 			try {
@@ -499,7 +501,7 @@ svgedit.select.SelectorManager.prototype.releaseSelector = function(elem) {
 			break;
 		}
 	}
-	
+
 	ObjectPanelsController.unmount();
 };
 

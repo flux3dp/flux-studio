@@ -177,6 +177,7 @@ define([
         // Array with all the currently selected elements
         // default size of 1 until it needs to grow bigger
         var selectedElements = [];
+        var tempGroup = false;
 
         // Function: addSvgElementFromJson
         // Create a new SVG element based on the given object keys/values and add it to the current layer
@@ -965,6 +966,12 @@ define([
                         break;
                     }
                     selectorManager.releaseSelector(elem);
+
+                    if (tempGroup) {
+                        tempGroup = false;
+                        svgCanvas.ungroupTempGroup();
+                    }
+
                     selectedElements[i] = null;
                 }
                 //		selectedBBoxes[0] = null;
@@ -1358,6 +1365,7 @@ define([
                         if (right_click) {
                             started = false;
                         }
+
                         if ($('#selectorGroup0').css('display') === 'inline') {
                             justClearSelection = true;
                         }
@@ -2157,6 +2165,15 @@ define([
                 started = false;
                 var attrs, t;
 
+                selectedElems = selectedElements.filter((e) => e !== null);
+
+                if (selectedElems.length > 1) {
+                    svgCanvas.groupSelectedElements();
+                    tempGroup = true;
+                    window.updateContextPanel();
+
+                    console.log('temp group created');
+                }
 
                 switch (current_mode) {
                     case 'preview':
@@ -5898,6 +5915,12 @@ define([
             return selectedElements;
         };
 
+        // Function: getTempGroup
+        // Returns flag denoted the state of temp group
+        this.getTempGroup = function () {
+            return tempGroup;
+        };
+
         // Function: getResolution
         // Returns the current dimensions and zoom level in an object
         var getResolution = this.getResolution = function () {
@@ -7558,7 +7581,7 @@ define([
                 g.appendChild(elem);
                 batchCmd.addSubCommand(new svgedit.history.MoveElementCommand(elem, oldNextSibling, oldParent));
             }
-            if (!batchCmd.isEmpty()) {
+            if (!batchCmd.isEmpty() && !tempGroup) {
                 addCommandToHistory(batchCmd);
             }
 
@@ -7837,6 +7860,62 @@ define([
 
                 // update selection
                 addToSelection(children);
+            }
+        };
+
+        // Function: ungroupTempGroup
+        // Unwraps all the elements in a selected group (g) element. This requires
+        // significant recalculations to apply group's transforms, etc to its children
+        this.ungroupTempGroup = function () {
+            var g = selectedElements[0];
+            if (!g) {
+                return;
+            }
+            if ($(g).data('gsvg') || $(g).data('symbol')) {
+                // Is svg, so actually convert to group
+                convertToGroup(g);
+                return;
+            }
+            if (g.tagName === 'use') {
+                // Somehow doesn't have data set, so retrieve
+                var symbol = svgedit.utilities.getElem(getHref(g).substr(1));
+                $(g).data('symbol', symbol).data('ref', symbol);
+                convertToGroup(g);
+                return;
+            }
+            var parents_a = $(g).parents('a');
+            if (parents_a.length) {
+                g = parents_a[0];
+            }
+
+            // Look for parent "a"
+            if (g.tagName === 'g' || g.tagName === 'a') {
+                var parent = g.parentNode;
+                var anchor = g.nextSibling;
+                var children = new Array(g.childNodes.length);
+
+                var i = 0;
+
+                while (g.firstChild) {
+                    var elem = g.firstChild;
+                    var oldNextSibling = elem.nextSibling;
+                    var oldParent = elem.parentNode;
+
+                    // Remove child title elements
+                    if (elem.tagName === 'title') {
+                        var nextSibling = elem.nextSibling;
+                        oldParent.removeChild(elem);
+                        continue;
+                    }
+
+                    children[i++] = elem = parent.insertBefore(elem, anchor);
+                }
+
+                // remove the group from the selection
+                clearSelection();
+
+                var gNextSibling = g.nextSibling;
+                g = parent.removeChild(g);
             }
         };
 
