@@ -46,12 +46,15 @@ function createLogFile() {
 var DEBUG = false;
 const logger = process.stderr.isTTY ? process.stderr : createLogFile();
 
-if(process.argv.indexOf('--debug') > 0) {
+if (process.argv.indexOf('--debug') > 0) {
     DEBUG = true;
     console.log('DEBUG Mode');
     // require('electron-reload')(__dirname);
 }
 
+if (process.platform === 'linux') {
+    app.disableHardwareAcceleration();
+}
 
 function onGhostUp(data) {
     global.backend.alive = true;
