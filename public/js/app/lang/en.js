@@ -1502,7 +1502,7 @@ define(function() {
             back: 'BACK',
             finish: 'DONE',
             please_goto_beambox_first: 'Please switch to Engraving Mode ( Beambox ) in order to use this feature.',
-            please_place_paper: 'Please place an A4 white paper at left-top corner of workarea',
+            please_place_paper: 'Please place an A4 or Letter size white paper at left-top corner of workarea',
             please_refocus: 'Please focus the platform properly',
             taking_picture: 'Taking Picture...',
             start_engrave: 'START ENGRAVE',
