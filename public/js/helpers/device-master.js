@@ -561,23 +561,23 @@ define([
     }
 
     function resume() {
-        return _do(DeviceConstants.RESUME);
+        return SocketMaster.addTask('resume')
     }
 
     function pause() {
-        return _do(DeviceConstants.PAUSE);
+        return SocketMaster.addTask('pause');
     }
 
     function stop() {
         let d = $.Deferred();
-        _do(DeviceConstants.STOP).then(r => {
+        SocketMaster.addTask('abort').then(r => {
             d.resolve(r);
         });
         return d.promise();
     }
 
     function quit() {
-        return _do(DeviceConstants.QUIT);
+        return SocketMaster.addTask('quit');
     }
 
     function quitTask(mode) {
@@ -589,7 +589,7 @@ define([
     }
 
     function kick() {
-        return _do(DeviceConstants.KICK);
+        return SocketMaster.addTask('kick');
     }
 
     function killSelf() {
@@ -867,9 +867,29 @@ define([
     }
 
     // get functions
-
     function getReport() {
-        return _do(DeviceConstants.REPORT);
+        // Jim Kang's code below
+        let d = $.Deferred();
+        let timeout;
+
+        SocketMaster.addTask('report').then((result) => {
+            // Set timeout
+            timeout = setTimeout(() => {
+                d.reject({ status: 'fatal', error: ['TIMEOUT'] });
+            }, 10 * 1000);
+
+            // Force update st_label for a backend inconsistancy
+            let s = result.device_status;
+            if (s.st_id === DeviceConstants.status.ABORTED) {
+                s.st_label = 'ABORTED';
+            }
+            d.resolve(s);
+        }).fail((error) => {
+            d.reject(error);
+        }).always(() => {
+            clearTimeout(timeout);
+        });
+        return d.promise();;
     }
 
     function getSelectedDevice() {
@@ -921,61 +941,6 @@ define([
     }
 
     // Private Functions
-
-    function _do(command) {
-        let actions = {
-            'RESUME': () => SocketMaster.addTask('resume'),
-            'PAUSE': () => SocketMaster.addTask('pause'),
-            'STOP': () => SocketMaster.addTask('abort'),
-            'QUIT': () => SocketMaster.addTask('quit'),
-            'KICK': () => SocketMaster.addTask('kick'),
-            'QUIT_TASK': () => SocketMaster.addTask('quitTask'),
-
-            'REPORT': () => {
-                let d = $.Deferred(),
-                    timeout;
-
-                SocketMaster.addTask('report').then((result) => {
-                    // set timeout
-                    timeout = setTimeout(() => {
-                        d.reject({ status: 'fata', error: ['TIMEOUT'] });
-                    }, 10 * 1000);
-
-                    // force update st_label for a backend inconsistancy
-                    let s = result.device_status;
-                    if (s.st_id === DeviceConstants.status.ABORTED) {
-                        s.st_label = 'ABORTED';
-                    }
-                    d.resolve(s);
-                }).fail((error) => {
-                    d.reject(error);
-                }).always(() => {
-                    clearTimeout(timeout);
-                });
-                return d.promise();
-            }
-        };
-
-        return actions[command]();
-    }
-
-    function updateNWProgress(deviceStatus) {
-        if (FLUX.isNW) {
-            if (!nwConsole) {
-                nwConsole = nw.Window.get();
-            }
-            let stId = deviceStatus.st_id;
-            if (stId !== 0 && stId !== 64 && stId !== 128) {
-                if (deviceStatus.st_prog) {
-                    nwConsole.setProgressBar(-1);
-                    nwConsole.setProgressBar(deviceStatus.st_prog);
-                }
-            }
-            else if (stId === 64 || stId === 128) {
-                nwConsole.setProgressBar(-1);
-            }
-        }
-    }
 
     function _existConnection(uuid, source) {
         return _devices.some(function (d) {
@@ -1323,8 +1288,6 @@ define([
                             defaultPrinterWarningShowed = false;
                         }
                     }
-
-                    updateNWProgress(device);
                 }
             }
         });
