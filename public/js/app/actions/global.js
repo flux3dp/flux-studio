@@ -79,12 +79,17 @@ define([
             });
 
             var FN_KEY = process.platform === "darwin" ? "cmd" : "ctrl";
+            const PLUS_CODE = String.fromCharCode(187);
+            const MINUS_CODE = String.fromCharCode(189);
 
             // shortcuts.on([FN_KEY, 'r'], function() { forceReload(); });
             shortcuts.on([FN_KEY, 'c'], function() { window.document.execCommand('copy'); });
             shortcuts.on([FN_KEY, 'a'], function() { window.document.execCommand('selectAll'); });
             shortcuts.on([FN_KEY, 'x'], function() { window.document.execCommand('cut'); });
             shortcuts.on([FN_KEY, 'v'], function() { window.document.execCommand('paste'); });
+            shortcuts.on([FN_KEY, '0'], function() { console.log("Reset View!"); window.svgEditor.resetView(); });
+            shortcuts.on([FN_KEY, PLUS_CODE], function() { console.log("Zoom In"); window.svgEditor.zoomIn(); });
+            shortcuts.on([FN_KEY, MINUS_CODE], function() { console.log("Zoom Out"); window.svgEditor.zoomOut(); });
 
             shortcuts.on(['ctrl', 'alt', 'd'], function(e) {
                 if(electron) {
