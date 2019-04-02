@@ -20,7 +20,7 @@ define([
         opts.onConnect = opts.onConnect || function() {};
 
         let timeout = 12 * 1000,
-            timmer,
+            timer,
             isConnected = false,
             lang = i18n.get(),
             ws,
@@ -47,11 +47,11 @@ define([
                     switch (data.status) {
                     case 'connecting':
                         opts.onConnect(data);
-                        clearTimeout(timmer);
-                        timmer = setTimeout(isTimeout, timeout);
+                        clearTimeout(timer);
+                        timer = setTimeout(isTimeout, timeout);
                         break;
                     case 'connected':
-                        clearTimeout(timmer);
+                        clearTimeout(timer);
                         createDedicatedWs(fileInfoWsId);
                         opts.onConnect(data, wsOptions);
                         break;
@@ -67,11 +67,11 @@ define([
                     }
                 },
                 onError: (response) => {
-                    clearTimeout(timmer);
+                    clearTimeout(timer);
                     events.onError(response);
                 },
                 onFatal: (response) => {
-                    clearTimeout(timmer);
+                    clearTimeout(timer);
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
                         setTimeout(() => {
                             createWs();
@@ -96,12 +96,12 @@ define([
                         opts.onFatal(response);
                     }
                     else {
-                        clearTimeout(timmer);
+                        clearTimeout(timer);
                         events.onError(response);
                     }
                 },
                 onClose: (response) => {
-                    clearTimeout(timmer);
+                    clearTimeout(timer);
                     isConnected = false;
                     opts.onFatal(response);
                 },
