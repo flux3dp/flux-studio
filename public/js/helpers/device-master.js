@@ -57,10 +57,9 @@ define([
         _stopChangingFilamentCallback,
         _selectedDevice = {},
         _deviceNameMap = {},
-        _actionMap = {},
+        _controllerMap = {},
         _device,
         _wasKilled = false,
-        nwConsole,
         usbDeviceReport = {},
         _devices = [],
         _availableDevices = [],
@@ -69,7 +68,7 @@ define([
         usbEventListeners = {},
         self = this;
 
-        // Better select device
+    // Better select device
     function select(device, opts) {
         let d = $.Deferred();
         selectDevice(device).then((result) => {
@@ -78,9 +77,9 @@ define([
             } else {
                 d.reject(lang.message.connectionTimeout);
             }
-        },
-        (errmsg) => { console.log('Device Master Select Error. Should handle errMsg here', errmsg); }
-        );
+        }, (errmsg) => { 
+            console.error('Selectio error in DeviceMaster. Should handle errMsg here', errmsg); 
+        });
 
         return d.promise();
     }
@@ -121,7 +120,7 @@ define([
 
             InputLightboxActions.open('auth', callback);
         };
-        const createDeviceActions = (uuid, availableUsbChannel = -1, success) => {
+        const createDeviceController = (uuid, availableUsbChannel = -1, success) => {
             return DeviceController(device.uuid, {
                 availableUsbChannel: availableUsbChannel,
                 onConnect: function (response, options) {
@@ -139,7 +138,7 @@ define([
                     }
                 },
                 onError: function (response) {
-                    console.log('createDeviceActions onError', response);
+                    console.log('createDeviceController onError', response);
                     ProgressActions.close();
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
@@ -204,7 +203,7 @@ define([
                     }
                 },
                 onFatal: function (response) {
-                    console.log('createDeviceActions onFatal', response);
+                    console.log('createDeviceController onFatal', response);
                     // process fatal
                     if (!_wasKilled) {
                         _selectedDevice = {};
@@ -230,8 +229,8 @@ define([
             });
         };
         const initSocketMaster = () => {
-            if (typeof _actionMap[device.uuid] !== 'undefined') {
-                _device.actions = _actionMap[device.uuid];
+            if (typeof _controllerMap[device.uuid] !== 'undefined') {
+                _device.controller = _controllerMap[device.uuid];
                 return;
             }
 
@@ -257,19 +256,19 @@ define([
                     typeof self.availableUsbChannel !== 'undefined' &&
                     device.source === 'h2h'
             ) {
-                _device.actions = createDeviceActions(null, this.availableUsbChannel, (success) => {
-                    console.log('_device.actions', _device.actions);
+                _device.controller = createDeviceController(null, this.availableUsbChannel, (success) => {
+                    console.log('_device.controller', _device.controller);
                     console.log('success', success);
                     if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
                     else {
-                        // createDeviceActions will auto reject with errors
+                        // createDeviceController will auto reject with errors
                     }
                 });
             }
             else {
-                _device.actions = createDeviceActions(device.uuid, null, (success) => {
+                _device.controller = createDeviceController(device.uuid, null, (success) => {
                     if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
@@ -296,11 +295,11 @@ define([
                 });
             }
 
-            _actionMap[device.uuid] = _device.actions;
-            SocketMaster.setWebSocket(_device.actions);
+            _controllerMap[device.uuid] = _device.controller;
+            SocketMaster.setWebSocket(_device.controller);
         };
 
-            // match the device from the newest received device list
+        // Match the device from the newest received device list
         let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
             self = this;
 
@@ -308,18 +307,19 @@ define([
         let d = deferred || $.Deferred();
 
         if (_existConnection(device.uuid, device.source)) {
-            _device = _switchDevice(device.uuid);
-            SocketMaster.setWebSocket(_actionMap[device.uuid]);
+            this._device = _switchDevice(device.uuid);
+            SocketMaster.setWebSocket(_controllerMap[device.uuid]);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
             ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
-            _device = {};
-            _device.uuid = device.uuid;
-            _device.source = device.source;
-            _device.name = device.name;
-            _device.serial = device.serial;
-            delete _actionMap[device.uuid];
+            this._device = {
+                uuid: device.uuid,
+                source: device.source,
+                name: device.name,
+                serial: device.serial
+            };
+            delete _controllerMap[device.uuid];
         }
 
         initSocketMaster();
@@ -353,7 +353,7 @@ define([
 
     function reconnectWs() {
         let d = $.Deferred();
-        _device.actions = DeviceController(_selectedDevice.uuid, {
+        _device.controller = DeviceController(_selectedDevice.uuid, {
             availableUsbChannel: _selectedDevice.source === 'h2h' ? _selectedDevice.addr : -1,
             onConnect: function (response) {
                 d.notify(response);
@@ -406,13 +406,13 @@ define([
             },
             onFatal: function (response) {
                 // if channel is not available, (opcode -1),
-                // default in createDeviceActions will catch first
+                // default in createDeviceController will catch first
             }
         });
 
         SocketMaster = new Sm();
         SocketMaster.onTimeout(handleSMTimeout);
-        SocketMaster.setWebSocket(_device.actions);
+        SocketMaster.setWebSocket(_device.controller);
         return d.promise();
     }
 
@@ -595,7 +595,7 @@ define([
     function killSelf() {
         _wasKilled = true;
         let d = $.Deferred();
-        _device.actions.killSelf().then(response => {
+        _device.controller.killSelf().then(response => {
             d.resolve(response);
         }).always(() => {
             reconnectWs();
@@ -608,7 +608,7 @@ define([
     }
 
     function downloadLog(log) {
-        return _device.actions.downloadLog(log);
+        return _device.controller.downloadLog(log);
     }
 
     function fileInfo(path, fileName) {
@@ -928,7 +928,7 @@ define([
     }
 
     function closeConnection() {
-        _device.actions.connection.close();
+        _device.controller.connection.close();
         _removeConnection(_device.uuid);
     }
 
@@ -1369,7 +1369,7 @@ define([
     }
 
     function downloadErrorLog() {
-        return _device.actions.downloadErrorLog();
+        return _device.controller.downloadErrorLog();
     }
 
     function setHeadTemperature(temperature) {
@@ -1546,7 +1546,7 @@ define([
 
     function DeviceSingleton() {
         if (_instance !== null) {
-            throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.getInstance()');
+            throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.get_instance()');
         }
 
         this.init();
@@ -1643,7 +1643,7 @@ define([
         }
     };
 
-    DeviceSingleton.getInstance = function () {
+    DeviceSingleton.get_instance = function () {
         if (_instance === null) {
             _instance = new DeviceSingleton();
         }
@@ -1651,5 +1651,5 @@ define([
         return _instance;
     };
 
-    return DeviceSingleton.getInstance();
+    return DeviceSingleton.get_instance();
 });
