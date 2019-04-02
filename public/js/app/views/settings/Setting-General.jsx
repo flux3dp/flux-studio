@@ -181,6 +181,19 @@ define([
                 },
             ];
 
+            const defaultUnitsOptions = [
+                {
+                    value: 'mm',
+                    label: lang.menu.mm,
+                    selected: Config().read('default-units') === 'mm'
+                },
+                {
+                    value: 'inches',
+                    label: lang.menu.inches,
+                    selected: Config().read('default-units') === 'inches'
+                },
+            ];
+
             const projectionOptions = [
                 {
                     value: 'Perspective',
@@ -313,6 +326,14 @@ define([
                             className='font3'
                             options={defaultAppOptions}
                             onChange={this._updateOptions.bind(null, 'default-app')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.default_units}>
+                        <SelectView
+                            className='font3'
+                            options={defaultUnitsOptions}
+                            onChange={this._updateOptions.bind(null, 'default-units')}
                         />
                     </Controls>
 

@@ -103,6 +103,17 @@ define([
             this.setState({ isRatioPreserve: e.target.checked });
         }
 
+        getValueCaption() {
+            const width = this.state.width, 
+                height = this.state.height,
+                units = localStorage.getItem('default-units', 'mm') ;
+            if (units === 'inches') {
+                return `${Number(width/25.4).toFixed(3)}\" x ${Number(height/25.4).toFixed(3)}\"`;
+            } else {
+                return `${width} x ${height} mm`;
+            }
+        }
+
         render() {
             const {
                 width,
@@ -116,7 +127,7 @@ define([
                         <input type='checkbox' className='accordion-switcher' defaultChecked={true}/>
                         <p className='caption'>
                             {LANG.size}
-                            <span className='value'>{width} mm x {height} mm</span>
+                            <span className='value'>{this.getValueCaption()}</span>
                         </p>
 
                         <label className='accordion-body with-lock'>

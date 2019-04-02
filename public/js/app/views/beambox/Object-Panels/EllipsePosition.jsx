@@ -40,6 +40,16 @@ define([
             FnWrapper.update_ellipse_cy(val);
             this.setState({cy: val});            
         },
+        getValueCaption: function() {
+            const cx = this.state.cx, 
+                cy = this.state.cy,
+                units = localStorage.getItem('default-units', 'mm') ;
+            if (units === 'inches') {
+                return `${Number(cx/25.4).toFixed(3)}\", ${Number(cy/25.4).toFixed(3)}\"`;
+            } else {
+                return `${cx}, ${cy} mm`;
+            }
+        },
         render: function() {
             return (
                 <div className="object-panel">
@@ -47,7 +57,7 @@ define([
                     <input type="checkbox" className="accordion-switcher" defaultChecked={true} />
                     <p className="caption">
                         {LANG.center}
-                        <span className="value">{this.state.cx}, {this.state.cy} mm</span>
+                        <span className="value">{this.getValueCaption()}</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">

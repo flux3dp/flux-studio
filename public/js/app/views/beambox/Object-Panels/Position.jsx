@@ -48,6 +48,18 @@ define([
             }
             this.setState({y: y});
         },
+
+        getValueCaption: function() {
+            const x = this.state.x, 
+                y = this.state.y,
+                units = localStorage.getItem('default-units', 'mm') ;
+            if (units === 'inches') {
+                return `${Number(x/25.4).toFixed(3)}\", ${Number(y/25.4).toFixed(3)}\"`;
+            } else {
+                return `${x}, ${y} mm`;
+            }
+        },
+
         render: function() {
             return (
                 <div className="object-panel">
@@ -55,7 +67,7 @@ define([
                     <input type="checkbox" className="accordion-switcher" defaultChecked={true}/>
                     <p className="caption">
                         {LANG.position}
-                        <span className="value">{this.state.x} mm, {this.state.y} mm</span>
+                        <span className="value">{this.getValueCaption()}</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">

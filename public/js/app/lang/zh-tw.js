@@ -309,7 +309,9 @@ define(function() {
             draw: '繪圖',
             cut: '切割',
             beambox: 'BEAMBOX',
-            mill: 'MILL'
+            mill: 'MILL',
+            mm: '毫米',
+            inches: '英吋'
         },
         settings: {
             on: '開',
@@ -337,6 +339,7 @@ define(function() {
             language: '語言',
             notifications: '通知',
             default_app: '預設功能',
+            default_units: '預設單位',
             delta_series: 'Delta 系列',
             beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',

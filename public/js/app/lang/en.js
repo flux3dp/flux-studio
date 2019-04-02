@@ -309,7 +309,9 @@ define(function() {
             draw: 'DRAW',
             cut: 'CUT',
             beambox: 'BEAMBOX',
-            mill: 'MILL'
+            mill: 'MILL',
+            mm: 'mm',
+            inches: 'Inches'
         },
         settings: {
             on: 'On',
@@ -336,7 +338,8 @@ define(function() {
             confirm_reset: 'Confirm reset FLUX Studio?',
             language: 'Language',
             notifications: 'Notifications',
-            default_app: 'Default app',
+            default_app: 'Default App',
+            default_units: 'Default Units',
             delta_series: 'Delta Family',
             beambox_series: 'Beambox Family',
             default_model: 'Default Model<br />(For Print Settings)',
