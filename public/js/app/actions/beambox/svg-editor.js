@@ -5840,7 +5840,19 @@ define([
             });
             $('#workarea')[0].scrollLeft = svgCanvas.defaultScroll.x;
             $('#workarea')[0].scrollTop = svgCanvas.defaultScroll.y;
-        }
+        };
+
+        editor.zoomIn = function() {
+            editor.zoomChanged(window, {
+                zoomLevel: svgCanvas.getZoom() * 1.1
+            });
+        };
+
+        editor.zoomOut = function() {
+            editor.zoomChanged(window, {
+                zoomLevel: svgCanvas.getZoom() / 1.1
+            });
+        };
 
         editor.ready = function (cb) {
             if (!isReady) {
