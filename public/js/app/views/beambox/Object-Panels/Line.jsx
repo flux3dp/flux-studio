@@ -62,7 +62,7 @@ define([
             if (units === 'inches') {
                 return `A (${Number(x1/25.4).toFixed(2)}, ${Number(y1/25.4).toFixed(2)}), B (${Number(x2/25.4).toFixed(2)}, ${Number(y2/25.4).toFixed(2)})`;
             } else {
-                return `A (${x}, ${y}), B (${x}, ${y})`;
+                return `A (${x1}, ${y1}), B (${x2}, ${y2})`;
             } 
         },
         render: function() {
