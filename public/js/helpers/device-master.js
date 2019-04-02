@@ -854,7 +854,7 @@ define([
         return d.promise();
     }
 
-    function KickChangeFilament() {
+    function kickChangeFilament() {
         let d = $.Deferred();
         //return result is success always even the USB disconnected on device side.
         //need to be figure it out.
@@ -1546,7 +1546,7 @@ define([
 
     function DeviceSingleton() {
         if (_instance !== null) {
-            throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.get_instance()');
+            throw new Error('Cannot instantiate more than one DeviceSingleton, use DeviceSingleton.getInstance()');
         }
 
         this.init();
@@ -1554,80 +1554,80 @@ define([
 
     DeviceSingleton.prototype = {
         init: function () {
-            this.KickChangeFilament = KickChangeFilament;
-            this.select = select;
-            this.selectDevice = selectDevice;
-            this.uploadToDirectory = uploadToDirectory;
-            this.go = go;
-            this.goFromFile = goFromFile;
-            this.resume = resume;
-            this.pause = pause;
-            this.stop = stop;
-            this.quit = quit;
-            this.quitTask = quitTask;
-            this.kick = kick;
-            this.getReport = getReport;
-            this.getSelectedDevice = getSelectedDevice;
-            this.readyCamera = readyCamera;
-            this.ls = ls;
-            this.fileInfo = fileInfo;
-            this.deleteFile = deleteFile;
-            this.downloadFile = downloadFile;
-            this.getPreviewInfo = getPreviewInfo;
+            this.calibrate = calibrate;
             this.changeFilament = changeFilament;
-            this.reconnect = reconnect;
-            this.getDeviceByName = getDeviceByName;
-            this.getFirstDevice = getFirstDevice;
-            this.updateFirmware = updateFirmware;
-            this.updateToolhead = updateToolhead;
-            this.headInfo = headInfo;
+            this.changeFilamentDuringPause = changeFilamentDuringPause;
+            this.cleanCalibration = cleanCalibration;
             this.closeConnection = closeConnection;
             this.connectCamera = connectCamera;
-            this.streamCamera = streamCamera;
-            this.takeOnePicture = takeOnePicture;
-            this.disconnectCamera = disconnectCamera;
-            this.calibrate = calibrate;
-            this.showOutline = showOutline;
-            this.zprobe = zprobe;
-            this.home = home;
-            this.cleanCalibration = cleanCalibration;
+            this.deleteFile = deleteFile;
             this.detectHead = detectHead;
-            this.enterMaintainMode = enterMaintainMode;
+            this.disconnectCamera = disconnectCamera;
+            this.downloadErrorLog = downloadErrorLog;
+            this.downloadFile = downloadFile;
+            this.downloadLog = downloadLog;
+            this.enableCloud = enableCloud;
+            this.endLoadingDuringPause = endLoadingDuringPause;
             this.endMaintainMode = endMaintainMode;
+            this.endToolheadOperation = endToolheadOperation;
+            this.enterMaintainMode = enterMaintainMode;
+            this.existDevice = existDevice;
+            this.fileInfo = fileInfo;
+            this.getAvailableDevices = getAvailableDevices;
+            this.getAvailableUsbChannel = getAvailableUsbChannel;
+            this.getCloudValidationCode = getCloudValidationCode;
+            this.getDeviceByName = getDeviceByName;
+            this.getDeviceBySerial = getDeviceBySerial;
+            this.getDeviceInfo = getDeviceInfo;
+            this.getDeviceList = getDeviceList;
+            this.getDeviceSetting = getDeviceSetting;
+            this.getDeviceSettings = getDeviceSettings;
+            this.getFirstDevice = getFirstDevice;
+            this.getHeadStatus = getHeadStatus;
             this.getLaserPower = getLaserPower;
             this.getLaserSpeed = getLaserSpeed;
+            this.getPreviewInfo = getPreviewInfo;
+            this.getReport = getReport;
+            this.getSelectedDevice = getSelectedDevice;
+            this.go = go;
+            this.goFromFile = goFromFile;
+            this.headInfo = headInfo;
+            this.home = home;
+            this.kick = kick;
+            this.kickChangeFilament = kickChangeFilament;
+            this.killSelf = killSelf;
+            this.ls = ls;
+            this.maintainCloseFan = maintainCloseFan;
+            this.maintainMove = maintainMove;
+            this.pause = pause;
+            this.quit = quit;
+            this.quitTask = quitTask;
+            this.readyCamera = readyCamera;
+            this.reconnect = reconnect;
+            this.registerUsbEvent = registerUsbEvent;
+            this.resume = resume;
+            this.runBeamboxCameraTest = runBeamboxCameraTest;
+            this.runMovementTests = runMovementTests;
+            this.select = select;
+            this.selectDevice = selectDevice;
+            this.setDeviceSetting = setDeviceSetting;
+            this.setHeadTemperature = setHeadTemperature;
+            this.setHeadTemperatureDuringPause = setHeadTemperatureDuringPause;
             this.setLaserPower = setLaserPower;
             this.setLaserSpeed = setLaserSpeed;
-            this.getDeviceList = getDeviceList;
-            this.getDeviceSettings = getDeviceSettings;
-            this.getDeviceSetting = getDeviceSetting;
-            this.setDeviceSetting = setDeviceSetting;
-            this.getCloudValidationCode = getCloudValidationCode;
-            this.enableCloud = enableCloud;
-            this.getDeviceInfo = getDeviceInfo;
-            this.downloadLog = downloadLog;
-            this.downloadErrorLog = downloadErrorLog;
-            this.killSelf = killSelf;
-            this.setHeadTemperature = setHeadTemperature;
-            this.getHeadStatus = getHeadStatus;
+            this.showOutline = showOutline;
             this.startMonitoringUsb = startMonitoringUsb;
-            this.getAvailableUsbChannel = getAvailableUsbChannel;
-            this.registerUsbEvent = registerUsbEvent;
-            this.unregisterUsbEvent = unregisterUsbEvent;
-            this.changeFilamentDuringPause = changeFilamentDuringPause;
             this.startToolheadOperation = startToolheadOperation;
-            this.endToolheadOperation = endToolheadOperation;
-            this.endLoadingDuringPause = endLoadingDuringPause;
-            this.setHeadTemperatureDuringPause = setHeadTemperatureDuringPause;
-            this.runMovementTests = runMovementTests;
-            this.runBeamboxCameraTest = runBeamboxCameraTest;
-            this.getDeviceBySerial = getDeviceBySerial;
-            this.getAvailableDevices = getAvailableDevices;
-            this.usbDefaultDeviceCheck = usbDefaultDeviceCheck;
+            this.stop = stop;
             this.stopChangingFilament = stopChangingFilament;
-            this.existDevice = existDevice;
-            this.maintainMove = maintainMove;
-            this.maintainCloseFan = maintainCloseFan;
+            this.streamCamera = streamCamera;
+            this.takeOnePicture = takeOnePicture;
+            this.unregisterUsbEvent = unregisterUsbEvent;
+            this.updateFirmware = updateFirmware;
+            this.updateToolhead = updateToolhead;
+            this.uploadToDirectory = uploadToDirectory;
+            this.usbDefaultDeviceCheck = usbDefaultDeviceCheck;
+            this.zprobe = zprobe;
 
             Discover(
                 'device-master',
@@ -1643,7 +1643,7 @@ define([
         }
     };
 
-    DeviceSingleton.get_instance = function () {
+    DeviceSingleton.getInstance = function () {
         if (_instance === null) {
             _instance = new DeviceSingleton();
         }
@@ -1651,5 +1651,5 @@ define([
         return _instance;
     };
 
-    return DeviceSingleton.get_instance();
+    return DeviceSingleton.getInstance();
 });
