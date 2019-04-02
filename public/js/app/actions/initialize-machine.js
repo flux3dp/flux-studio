@@ -3,12 +3,10 @@
  */
 define([
     'helpers/api/config',
-    'helpers/nwjs/menu-factory',
     'helpers/local-storage',
     'app/app-settings'
 ], function(
     config,
-    menuFactory,
     _localStorage,
     settings
 ) {
@@ -37,10 +35,6 @@ define([
 
                     methods.settingPrinter.clear();
                     methods.settingWifi.clear();
-
-                    if (false === completed && 'undefined' !== typeof menuFactory) {
-                        menuFactory.methods.refresh();
-                    }
 
                     if (true === redirect) {
                         location.hash = '#studio/' + (config().read('default-app')||'print');

@@ -11,7 +11,6 @@ define([
     'helpers/image-data',
     'helpers/i18n',
     'helpers/round',
-    'helpers/nwjs/menu-factory',
     'app/actions/alert-actions',
     'app/actions/global-actions',
     'app/constants/global-constants',
@@ -23,7 +22,7 @@ define([
     'helpers/check-device-status',
     'freetrans',
     'helpers/jquery.box',
-    'plugins/file-saver/file-saver.min',
+    'plugins/file-saver/file-saver.min'
 ], function(
     $,
     bitmapLaserParser,
@@ -37,7 +36,6 @@ define([
     imageData,
     i18n,
     round,
-    menuFactory,
     AlertActions,
     GlobalActions,
     GlobalConstants,
@@ -52,7 +50,6 @@ define([
 
     return function(args) {
         args = args || {};
-
         var self = this,    // react component
             IMAGE_REAL_RATIO = 4.7244094488, // 1mm = 4.72px
             DIAMETER = 170,    // 170mm
@@ -117,12 +114,6 @@ define([
 
                 self.state.images = self.state.images.concat(goodFiles);
 
-                menuFactory.items.alignCenter.enabled = hasImage;
-                menuFactory.items.execute.enabled = hasImage;
-                menuFactory.items.saveTask.enabled = hasImage;
-                menuFactory.items.clear.enabled = true;
-                menuFactory.methods.refresh();
-
                 self.setState({
                     images: self.state.images,
                     hasImage: hasImage,
@@ -154,12 +145,6 @@ define([
                         $target_image = null;
                         state.hasImage = false;
                         state.images = [];
-
-                        menuFactory.items.alignCenter.enabled = false;
-                        menuFactory.items.duplicate.enabled = false;
-                        menuFactory.items.execute.enabled = false;
-                        menuFactory.items.saveTask.enabled = false;
-                        menuFactory.methods.refresh();
                         fileFormat = '';
                     }
                     else {
@@ -175,7 +160,6 @@ define([
                     images: [],
                     hasImage: false
                 });
-                menuFactory.items.clear.enabled = false;
             },
             refreshImage = function($img, threshold) {
                 var freetrans = $img.data('freetrans'),
@@ -648,14 +632,6 @@ define([
 
                             $img.addClass('image-active');
                         }
-                        setTimeout(() => {
-                            // Async heavy call
-                            menuFactory.items.duplicate.enabled = true;
-                            menuFactory.items.duplicate.onClick = clone;
-                            menuFactory.items.alignCenter.enabled = true;
-                            menuFactory.items.alignCenter.onClick = alignCenter;
-                            menuFactory.methods.refresh();
-                        }, 50);
                     });
                 })(file, size, originalUrl, $img);
             });
@@ -697,12 +673,6 @@ define([
                 $imageActive = $imageActive.not($exclude);
             }
             $imageActive.removeClass('image-active');
-
-            if (!dontRefresh) {
-                menuFactory.items.duplicate.enabled = false;
-                menuFactory.items.alignCenter.enabled = false;
-                menuFactory.methods.refresh();
-            }
 
             if (!$exclude || ($exclude && $('img.image-active').length === 0)) {
                 $target_image = null;
@@ -1024,7 +994,6 @@ define([
                 self.setState(params);
                 $target_image.freetrans(args);
             },
-            menuFactory: menuFactory,
             setPlatform: function(el) {
                 $laser_platform = $(el);
                 console.log('laser_platform', $laser_platform);

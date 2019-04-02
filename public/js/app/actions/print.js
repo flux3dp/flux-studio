@@ -5,7 +5,7 @@ define([
     'helpers/api/fcode-reader',
     'app/actions/alert-actions',
     'app/actions/progress-actions',
-    'app/actions/global-interaction',
+    'app/actions/delta/print-global-interactions',
     'app/stores/progress-store',
     'app/constants/global-constants',
     'app/constants/device-constants',
@@ -14,7 +14,6 @@ define([
     'helpers/packer',
     'helpers/i18n',
     'helpers/api/config',
-    'helpers/nwjs/menu-factory',
     'app/actions/global-actions',
     'helpers/sprintf',
     'helpers/packer',
@@ -39,7 +38,7 @@ define([
     fcodeReader,
     AlertActions,
     ProgressActions,
-    GlobalInteraction,
+    PrintGlobalInteraction,
     ProgressStore,
     GlobalConstants,
     DeviceConstants,
@@ -48,7 +47,6 @@ define([
     Packer,
     i18n,
     Config,
-    MenuFactory,
     GlobalActions,
     Sprintf,
     packer,
@@ -58,51 +56,6 @@ define([
     SocketMaster
 ) {
     'use strict';
-
-    class PrintGlobalInteraction extends GlobalInteraction {
-        constructor() {
-            super();
-            this._actions = {
-                "IMPORT": () => {
-                    if(electron) {
-                        electron.trigger_file_input_click("stl_import")
-                    }
-                },
-                "SAVE_SCENE": () => reactSrc._handleDownloadScene(),
-                "EXPORT_FLUX_TASK": () => downloadFCode(),
-                "UNDO": () => undo(),
-                "DUPLICATE": () => duplicateSelected(),
-                "ROTATE": () => reactSrc._handleModeChange('rotate'),
-                "SCALE": () => reactSrc._handleModeChange('scale'),
-                "RESET": () => resetObject(),
-                "ALIGN_CENTER": () => alignCenterPosition(),
-                "CLEAR_SCENE": () => clearScene(),
-                "TUTORIAL": () => reactSrc._startTutorial()
-            }
-        }
-        attach() {
-            super.attach(["IMPORT", "TUTORIAL"]);
-        }
-        onObjectFocus() {
-            this.enableMenuItems(["DUPLICATE", "SCALE", "ROTATE", "RESET", "ALIGN_CENTER"]);
-        }
-        onObjectBlur() {
-            this.disableMenuItems(["DUPLICATE", "SCALE", "ROTATE", "RESET", "ALIGN_CENTER"]);
-        }
-        onObjectChanged(canUndo) {
-            if(canUndo) {
-                this.enableMenuItems(["UNDO"]);
-            } else {
-                this.disableMenuItems(["UNDO"]);
-            }
-        }
-        onSceneImport() {
-            this.enableMenuItems(["CLEAR_SCENE", "SAVE_SCENE", "EXPORT_FLUX_TASK"]);
-        }
-        onSceneClear() {
-            this.disableMenuItems(["CLEAR_SCENE", "SAVE_SCENE", "EXPORT_FLUX_TASK"]);
-        }
-    }
 
     let THREE = window.THREE || {},
         container, slicer, fcodeConsole;
@@ -210,14 +163,11 @@ define([
         vertexColors: THREE.VertexColors
     });
 
-    let globalInteraction;
-
     function init(src) {
-        globalInteraction = new PrintGlobalInteraction();
-        globalInteraction.attach();
-
         reactSrc = src;
         container = document.getElementById('model-displayer');
+        printControl.reactSrc = src;
+        PrintGlobalInteraction.attach(printControl);
 
         let width = container.offsetWidth, height = container.offsetHeight;
 
@@ -385,7 +335,7 @@ define([
 
             uploadStl(mesh.uuid, file, ext).then(() => {
                 addToScene();
-                globalInteraction.onSceneImport();
+                PrintGlobalInteraction.onSceneImport();
                 callback();
             }).progress((steps, total) => {
                 console.log(steps, total);
@@ -936,7 +886,7 @@ define([
     }
 
     function willUnmount() {
-        globalInteraction.detach();
+        PrintGlobalInteraction.detach();
         previewMode = false;
         importFromFCode = false;
         importFromGCode = false;
@@ -1602,7 +1552,7 @@ define([
         SELECTED = obj || {};
 
         if (!$.isEmptyObject(obj)) {
-            globalInteraction.onObjectFocus()
+            PrintGlobalInteraction.onObjectFocus()
 
             objects.forEach(function(o) {
                 o.outlineMesh.visible = false;
@@ -1628,7 +1578,7 @@ define([
             }
         }
         else {
-            globalInteraction.onObjectBlur()
+            PrintGlobalInteraction.onObjectBlur()
             transformMode = false;
             removeFromScene('TransformControl');
             _removeAllMeshOutline();
@@ -2653,7 +2603,7 @@ define([
                 Object.assign(entry.scale, SELECTED.scale);
             }
 
-            globalInteraction.onObjectChanged(true);
+            PrintGlobalInteraction.onObjectChanged(true);
             history.push(entry);
         }
     }
@@ -2704,7 +2654,7 @@ define([
                 });
             }
             if(history.length == 0) {
-                globalInteraction.onObjectChanged(false);
+                PrintGlobalInteraction.onObjectChanged(false);
             }
         }
     }
@@ -2734,9 +2684,9 @@ define([
             leftPanelReady: true
         });
         if (objects.length === 0) {
-            globalInteraction.onSceneClear();
+            PrintGlobalInteraction.onSceneClear();
         } else {
-            globalInteraction.onSceneImport();
+            PrintGlobalInteraction.onSceneImport();
         }
         _clearPath();
         render();
@@ -3107,7 +3057,7 @@ define([
         return { box: box3, size };
     }
 
-    return {
+    let printControl = {
         alignCenterPosition : alignCenterPosition,
         init                : init,
         appendModel         : appendModel,
@@ -3147,4 +3097,5 @@ define([
         startSlicing        : startSlicing,
         resetObject         : resetObject
     };
+    return printControl;
 });

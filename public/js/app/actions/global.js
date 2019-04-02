@@ -4,9 +4,7 @@ define([
     'helpers/local-storage',
     'helpers/shortcuts',
     'helpers/api/config',
-    'helpers/nwjs/menu-factory',
     'helpers/logger',
-    'helpers/force-reload',
     'helpers/device-master',
     'app/actions/alert-actions',
     'app/stores/alert-store'
@@ -16,9 +14,7 @@ define([
     localStorage,
     shortcuts,
     config,
-    menuFactory,
     Logger,
-    forceReload,
     DeviceMaster,
     AlertActions,
     AlertStore
@@ -84,7 +80,7 @@ define([
 
             var FN_KEY = process.platform === "darwin" ? "cmd" : "ctrl";
 
-            shortcuts.on([FN_KEY, 'r'], function() { forceReload(); });
+            // shortcuts.on([FN_KEY, 'r'], function() { forceReload(); });
             shortcuts.on([FN_KEY, 'c'], function() { window.document.execCommand('copy'); });
             shortcuts.on([FN_KEY, 'a'], function() { window.document.execCommand('selectAll'); });
             shortcuts.on([FN_KEY, 'x'], function() { window.document.execCommand('cut'); });
@@ -111,7 +107,6 @@ define([
         }
         shortcuts.disableAll();
         // TODO
-        // menuFactory.methods.refresh();
         defaultKeyBehavior();
     });
 
