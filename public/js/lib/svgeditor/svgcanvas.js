@@ -3235,6 +3235,7 @@ define([
                                 attr: {
                                     d: d_attr,
                                     id: getNextId(),
+                                    'stroke-width' : 1,
                                     opacity: cur_shape.opacity / 2
                                 }
                             });
