@@ -340,6 +340,7 @@ define(function() {
             notifications: 'Notifications',
             default_app: 'Default App',
             default_units: 'Default Units',
+            loop_compensation: 'Loop Compensation',
             delta_series: 'Delta Family',
             beambox_series: 'Beambox Family',
             default_model: 'Default Model<br />(For Print Settings)',

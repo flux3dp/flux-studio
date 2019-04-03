@@ -340,6 +340,7 @@ define(function() {
             notifications: '通知',
             default_app: '預設功能',
             default_units: '預設單位',
+            loop_compensation: '封閉路徑補償',
             delta_series: 'Delta 系列',
             beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',

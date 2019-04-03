@@ -329,14 +329,6 @@ define([
                         />
                     </Controls>
 
-                    <Controls label={lang.settings.default_units}>
-                        <SelectView
-                            className='font3'
-                            options={defaultUnitsOptions}
-                            onChange={this._updateOptions.bind(null, 'default-units')}
-                        />
-                    </Controls>
-
                     <Controls label={lang.settings.default_machine}>
                         <table style={tableStyle}>
                             <tr>
@@ -405,6 +397,25 @@ define([
                     </Controls>
 
                     <div className='subtitle'>{lang.settings.beambox_series}</div>
+
+                    <Controls label={lang.settings.default_units}>
+                        <SelectView
+                            className='font3'
+                            options={defaultUnitsOptions}
+                            onChange={this._updateOptions.bind(null, 'default-units')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.default_units}>
+                        <UnitInput
+                            unit='mm'
+                            min={0}
+                            max={20}
+                            defaultValue={Number(localStorage.getItem('loop_compensation', '10')) / 10}
+                            getValue={val => localStorage.setItem('loop_compensation', Number(val) * 10)}
+                            className={{half: true}}
+                        />
+                    </Controls>
 
                     <Controls label={lang.settings.default_beambox_model}>
                         <SelectView
