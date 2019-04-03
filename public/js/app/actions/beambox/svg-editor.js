@@ -1722,12 +1722,12 @@ define([
                             var x, y;
 
                             // Get BBox vals for g, polyline and path
-                            if (['g', 'polyline', 'path'].indexOf(elname) >= 0) {
+                            if (['g', 'polyline', 'path', 'polygon'].indexOf(elname) >= 0) {
                                 var bb = svgCanvas.getStrokedBBox([elem]);
                                 if (bb) {
                                     x = bb.x;
                                     y = bb.y;
-                                    if (elname === 'path') {
+                                    if (elname === 'path' || elname === 'polygon') {
                                         let bbox = elem.getBBox();
                                         ObjectPanelsController.setWidth(bbox.width);
                                         ObjectPanelsController.setHeight(bbox.height);
@@ -1789,6 +1789,7 @@ define([
                         ellipse: ['cx', 'cy', 'rx', 'ry'],
                         line: ['x1', 'y1', 'x2', 'y2'],
                         path: [],
+                        polygon: [],
                         text: [],
                         use: []
                     };

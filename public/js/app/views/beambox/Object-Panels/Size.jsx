@@ -43,6 +43,7 @@ define([
                 case 'image':
                     FnWrapper.update_image_width(val);
                     break;
+                case 'polygon':
                 case 'path':
                     svgCanvas.setSvgElemSize('width', val * Constant.dpmm);
                     break;
@@ -62,6 +63,7 @@ define([
                 case 'image':
                     FnWrapper.update_image_height(val);
                     break;
+                case 'polygon':
                 case 'path':
                     svgCanvas.setSvgElemSize('height', val * Constant.dpmm);
                     break;

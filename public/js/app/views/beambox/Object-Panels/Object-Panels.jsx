@@ -29,6 +29,7 @@ define([
     const validPanelsMap = {
         'unknown':  [],
         'path':     ['position', 'size', 'rotation'],
+        'polygon':     ['position', 'size', 'rotation'],
         'rect':     ['position', 'size', 'rotation', 'rectRoundedCorner'],
         'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
