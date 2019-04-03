@@ -1727,6 +1727,11 @@ define([
                                 if (bb) {
                                     x = bb.x;
                                     y = bb.y;
+                                    if (elname === 'path') {
+                                        let bbox = elem.getBBox();
+                                        ObjectPanelsController.setWidth(bbox.width);
+                                        ObjectPanelsController.setHeight(bbox.height);
+                                    }
                                 }
                             } else {
                                 x = elem.getAttribute('x');
@@ -1783,6 +1788,7 @@ define([
                         circle: ['cx', 'cy', 'r'],
                         ellipse: ['cx', 'cy', 'rx', 'ry'],
                         line: ['x1', 'y1', 'x2', 'y2'],
+                        path: [],
                         text: [],
                         use: []
                     };
@@ -1901,6 +1907,9 @@ define([
                                 ObjectPanelsController.setWidth(location.width);
                                 ObjectPanelsController.setHeight(location.height);
                             }
+                        }
+                        else if (el_name === 'path') {
+                            //$('#container_panel').show();
                         }
                     }
                     menu_items[(el_name === 'g' ? 'en' : 'dis') + 'ableContextMenuItems']('#ungroup');
@@ -4702,7 +4711,8 @@ define([
                 {
                     sel: '#tool_path',
                     fn: clickPath,
-                    evt: 'click',
+                    evt: 'mouseup',
+                    parent: '#tool_path',
                     key: ['P', true]
                 },
                 {
@@ -5032,6 +5042,16 @@ define([
                         });
                         Shortcuts.on(['right'], () => {
                             moveSelected(1, 0);
+                        });
+                        // -
+                        Shortcuts.on(['plus'], () => {
+                            console.log('on plus');
+                            window.polygonAddSides();
+                        });
+                        // +
+                        Shortcuts.on(['minus'], () => {
+                            console.log('on minus');
+                            window.polygonDecreaseSides();
                         });
                         Shortcuts.on(['esc'], clickSelect);
 
