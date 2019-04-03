@@ -331,6 +331,10 @@ define([
 
                 };
 
+                let loop_compensation = Number(localStorage.getItem('loop_compensation', '0'));
+                if (loop_compensation > 0) {
+                    ws.send(['set_params', 'loop_compensation', loop_compensation].join(' '));    
+                }
                 ws.send(args.join(' '));
             },
             divideSVG: function() {
