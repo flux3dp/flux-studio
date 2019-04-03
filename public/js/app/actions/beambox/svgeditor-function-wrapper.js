@@ -237,6 +237,14 @@ define([
             $('#tool_ellipse').mouseup();
             _setCrosshairCursor();
         },
+        insertPath: function() {
+            $('#tool_path').mouseup();
+            _setCrosshairCursor();
+        },
+        insertPolygon: function() {
+            svgCanvas.setMode('polygon');
+            _setCrosshairCursor();
+        },
         insertLine: function() {
             $('#tool_line').mouseup();
             _setCrosshairCursor();

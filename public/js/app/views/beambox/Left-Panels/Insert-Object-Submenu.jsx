@@ -40,6 +40,12 @@ define([
                             <li onClick={FnWrapper.insertText} key='text'>
                                 {LANG.text}
                             </li>
+                            <li onClick={FnWrapper.insertPath} key='path'>
+                                {LANG.path}
+                            </li>
+                            <li onClick={FnWrapper.insertPolygon} key='polygon'>
+                                {LANG.polygon}
+                            </li>
                         </ul>
                     </div>
                 </div>

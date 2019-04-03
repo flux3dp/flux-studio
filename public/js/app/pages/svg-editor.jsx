@@ -1004,6 +1004,8 @@ define([
                                 <div id="tool_square" title="Square" />
                                 <div id="tool_fhrect" title="Free-Hand Rectangle" />
                                 <div id="tool_ellipse" title="Ellipse" />
+                                <div id="tool_path" title="Path" />
+                                <div id="tool_polygon" title="Polygon" />
                                 <div id="tool_circle" title="Circle" />
                                 <div id="tool_fhellipse" title="Free-Hand Ellipse" />
                             </div>

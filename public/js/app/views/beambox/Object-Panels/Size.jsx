@@ -43,6 +43,9 @@ define([
                 case 'image':
                     FnWrapper.update_image_width(val);
                     break;
+                case 'path':
+                    svgCanvas.setSvgElemSize('width', val * Constant.dpmm);
+                    break;
                 case 'use':
                     svgCanvas.setSvgElemSize('width', val * Constant.dpmm);
                     break;
@@ -58,6 +61,9 @@ define([
                     break;
                 case 'image':
                     FnWrapper.update_image_height(val);
+                    break;
+                case 'path':
+                    svgCanvas.setSvgElemSize('height', val * Constant.dpmm);
                     break;
                 case 'use':
                     svgCanvas.setSvgElemSize('height', val * Constant.dpmm);

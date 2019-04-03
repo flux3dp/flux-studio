@@ -1037,7 +1037,9 @@ define(function() {
                     ellipse: '橢圓形',
                     line: '線段',
                     image: '圖片',
-                    text: '文字'
+                    text: '文字',
+                    path: '路徑',
+                    polygon: '多邊形'
                 },
                 advanced_panel: {
                     engrave_parameters: '雕刻參數',

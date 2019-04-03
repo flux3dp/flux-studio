@@ -1039,7 +1039,9 @@ define(function() {
                     ellipse: 'Ellipse',
                     line: 'Line',
                     image: 'Image',
-                    text: 'Text'
+                    text: 'Text',
+                    path: 'Path',
+                    polygon: 'Polygon'
                 },
                 advanced_panel: {
                     engrave_parameters: 'Engraving Parameters',
