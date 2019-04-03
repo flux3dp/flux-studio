@@ -411,7 +411,7 @@ define([
                             unit='mm'
                             min={0}
                             max={20}
-                            defaultValue={Number(localStorage.getItem('loop_compensation', '10')) / 10}
+                            defaultValue={Number(localStorage.getItem('loop_compensation') || '10') / 10}
                             getValue={val => localStorage.setItem('loop_compensation', Number(val) * 10)}
                             className={{half: true}}
                         />

@@ -128,7 +128,7 @@ define([
 
         getLengthUnit() {
             if (this.props.unit === 'mm') {
-                let unit = localStorage.getItem('default-units', 'mm');
+                let unit = localStorage.getItem('default-units') || 'mm';
                 if (unit === 'mm') {
                     return this.props.abbr ? '' : 'mm';
                 } else {
