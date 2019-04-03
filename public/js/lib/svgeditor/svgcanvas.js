@@ -87,6 +87,7 @@ define([
             '<feMergeNode in="SourceGraphic"/>' +
             '</feMerge>' +
             '</filter>' +
+            /*'<clipPath id="scene_mask"><rect x="0" y="0" width="2700" height="2000" /></clipPath>' +*/
             '</defs>' +
             '</svg>').documentElement, true);
         container.appendChild(svgroot);
@@ -1271,6 +1272,7 @@ define([
             // - when we are in select mode, select the element, remember the position
             // and do nothing else
             var mouseDown = function (evt) {
+                console.log("Scene Mousedown");
                 if (canvas.spaceKey || evt.button === 1) {
                     return;
                 }
@@ -1299,7 +1301,7 @@ define([
                 //		if (['select', 'resize'].indexOf(current_mode) == -1) {
                 //			setGradient();
                 //		}
-
+                console.log("Mousedown mid")
                 var x = mouse_x / current_zoom,
                     y = mouse_y / current_zoom,
                     mouse_target = getMouseTarget(evt);
@@ -1340,10 +1342,11 @@ define([
                 }
 
                 if (ext_result = runExtensions('checkMouseTarget', { mouseTarget: mouse_target }, true)) {
+                    let extensionEvent = false;
                     $.each(ext_result, function (i, r) {
-                        started = started || (r && r.started);
+                        extensionEvent = extensionEvent || (r && r.started);
                     });
-                    if (started) {
+                    if (extensionEvent) {
                         return;
                     }
                 }
@@ -1351,6 +1354,9 @@ define([
                 startTransform = mouse_target.getAttribute('transform');
                 var i, stroke_w,
                     tlist = svgedit.transformlist.getTransformList(mouse_target);
+                
+                console.log("Mousedown mode switch");
+
                 switch (current_mode) {
                     case 'select':
                         started = true;
@@ -2575,6 +2581,33 @@ define([
                         //panning is default behavior when pressing middle button
                     }
 
+                    function _zoomProcess() {
+                        // End of animation
+                        const currentZoom = svgCanvas.getZoom();
+                        if ((currentZoom === targetZoom) || (Date.now() - trigger > 500)) {
+                            clearInterval(timer);
+                            timer = undefined;
+                            return;
+                        }
+
+                        // Calculate next animation zoom level
+                        var nextZoom = currentZoom + (targetZoom - currentZoom) / 5;
+
+                        if (Math.abs(targetZoom - currentZoom) < 0.005) {
+                            nextZoom = targetZoom;
+                        }
+
+                        const cursorPosition = {
+                            x: evt.pageX,
+                            y: evt.pageY
+                        };
+
+                        call('zoomed', {
+                            zoomLevel: nextZoom,
+                            staticPoint: cursorPosition
+                        });
+                    }
+
                     function _zoomAsIllustrator() {
                         const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 
@@ -2595,33 +2628,6 @@ define([
                         if (Date.now() - trigger > 20) {
                             _zoomProcess();
                             trigger = Date.now();
-                        }
-
-                        function _zoomProcess() {
-                            // End of animation
-                            const currentZoom = svgCanvas.getZoom();
-                            if ((currentZoom === targetZoom) || (Date.now() - trigger > 500)) {
-                                clearInterval(timer);
-                                timer = undefined;
-                                return;
-                            }
-
-                            // Calculate next animation zoom level
-                            var nextZoom = currentZoom + (targetZoom - currentZoom) / 5;
-
-                            if (Math.abs(targetZoom - currentZoom) < 0.005) {
-                                nextZoom = targetZoom;
-                            }
-
-                            const cursorPosition = {
-                                x: evt.pageX,
-                                y: evt.pageY
-                            };
-
-                            call('zoomed', {
-                                zoomLevel: nextZoom,
-                                staticPoint: cursorPosition
-                            });
                         }
                     }
 
@@ -3188,6 +3194,7 @@ define([
 
             return {
                 mouseDown: function (evt, mouse_target, start_x, start_y) {
+                    console.log("Path mouseDown");
                     var id;
                     if (current_mode === 'path') {
                         mouse_x = start_x;
@@ -3554,7 +3561,7 @@ define([
                     }
                 },
                 mouseUp: function (evt, element, mouse_x, mouse_y) {
-
+                    console.log("Path mouseUp");
                     // Create mode
                     if (current_mode === 'path') {
                         newPoint = null;
@@ -4160,6 +4167,9 @@ define([
                 });
             }
 
+
+            console.log(output);
+            
             return output;
         };
 
@@ -6220,6 +6230,7 @@ define([
         // Parameters:
         // name - String with the new mode to change to
         this.setMode = function (name) {
+            console.log("Set Mode", name);
             pathActions.clear(true);
             textActions.clear();
             cur_properties = (selectedElements[0] && selectedElements[0].nodeName === 'text') ? cur_text : cur_shape;
@@ -8560,6 +8571,9 @@ define([
 
 
         this.getSvgRealLocation = function (elem) {
+            if (elem.tagName === 'path' || elem.tagName === 'polygon') {
+                return elem.getBBox();
+            }
             const ts = $(elem).attr('transform') || '';
             const xform = $(elem).attr('data-xform');
             const elemX = parseFloat($(elem).attr('x') || '0');
@@ -8593,6 +8607,9 @@ define([
         };
 
         this.getSvgRealLocation = function (elem) {
+            if (elem.tagName === 'path' || elem.tagName === 'polygon') {
+                return elem.getBBox();
+            }
             const ts = $(elem).attr('transform') || '';
             const xform = $(elem).attr('data-xform');
             const elemX = parseFloat($(elem).attr('x') || '0');
