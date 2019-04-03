@@ -77,8 +77,8 @@ define([
             } else {
                 d.reject(lang.message.connectionTimeout);
             }
-        }, (errmsg) => { 
-            console.error('Selectio error in DeviceMaster. Should handle errMsg here', errmsg); 
+        }, (error) => { 
+            console.error('Selection error in DeviceMaster. Should handle error here', error); 
         });
 
         return d.promise();
@@ -307,13 +307,13 @@ define([
         let d = deferred || $.Deferred();
 
         if (_existConnection(device.uuid, device.source)) {
-            this._device = _switchDevice(device.uuid);
+            _device = _switchDevice(device.uuid);
             SocketMaster.setWebSocket(_controllerMap[device.uuid]);
             d.resolve(DeviceConstants.CONNECTED);
         }
         else {
             ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
-            this._device = {
+            _device = {
                 uuid: device.uuid,
                 source: device.source,
                 name: device.name,
