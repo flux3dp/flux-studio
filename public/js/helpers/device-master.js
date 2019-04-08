@@ -77,8 +77,8 @@ define([
             } else {
                 d.reject(lang.message.connectionTimeout);
             }
-        }, (error) => { 
-            console.error('Selection error in DeviceMaster. Should handle error here', error); 
+        }, (error) => {
+            console.error('Selection error in DeviceMaster. Should handle error here', error);
         });
 
         return d.promise();
@@ -229,7 +229,7 @@ define([
             });
         };
         const initSocketMaster = () => {
-            if (typeof _controllerMap[device.uuid] !== 'undefined') {
+            if (device && typeof _controllerMap[device.uuid] !== 'undefined') {
                 _device.controller = _controllerMap[device.uuid];
                 return;
             }
@@ -299,30 +299,33 @@ define([
             SocketMaster.setWebSocket(_device.controller);
         };
 
-        // Match the device from the newest received device list
-        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
-            self = this;
-
-        Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred();
 
-        if (_existConnection(device.uuid, device.source)) {
-            _device = _switchDevice(device.uuid);
-            SocketMaster.setWebSocket(_controllerMap[device.uuid]);
-            d.resolve(DeviceConstants.CONNECTED);
-        }
-        else {
-            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
-            _device = {
-                uuid: device.uuid,
-                source: device.source,
-                name: device.name,
-                serial: device.serial
-            };
-            delete _controllerMap[device.uuid];
-        }
+        if (device) {
+        // Match the device from the newest received device list
+            let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
+                self = this;
 
-        initSocketMaster();
+            Object.assign(_selectedDevice, latestDevice[0]);
+
+            if (_existConnection(device.uuid, device.source)) {
+                _device = _switchDevice(device.uuid);
+                SocketMaster.setWebSocket(_controllerMap[device.uuid]);
+                d.resolve(DeviceConstants.CONNECTED);
+            }
+            else {
+                ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
+                _device = {
+                    uuid: device.uuid,
+                    source: device.source,
+                    name: device.name,
+                    serial: device.serial
+                };
+                delete _controllerMap[device.uuid];
+            }
+
+            initSocketMaster();
+        }
 
         return d.promise();
     }
@@ -983,7 +986,7 @@ define([
     }
 
     function disconnectCamera() {
-        if (!_device.camera) {
+        if (!_device || !_device.camera) {
             return;
         }
         _device.camera.closeWs();
