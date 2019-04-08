@@ -406,7 +406,7 @@ define([
                         />
                     </Controls>
 
-                    <Controls label={lang.settings.default_units}>
+                    <Controls label={lang.settings.loop_compensation}>
                         <UnitInput
                             unit='mm'
                             min={0}
