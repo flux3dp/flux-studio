@@ -280,7 +280,7 @@ define([
             const defaultBeamboxModelOptions = [
                 {
                     value: 'fbm1',
-                    label: 'Beambox',
+                    label: 'Beamo',
                     selected: BeamboxPreference.read('model') === 'fbm1'
                 },
                 {
