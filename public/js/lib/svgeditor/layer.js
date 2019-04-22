@@ -59,6 +59,7 @@ var Layer = svgedit.draw.Layer = function(name, group, svgElem) {
 
 	addLayerClass(this.group_);
 	svgedit.utilities.walkTree(this.group_, function(e){e.setAttribute("style", "pointer-events:inherit");});
+	// this.group_.setAttribute('clip-path', 'url(#scene_mask)')
 	// this.group_.setAttribute("style", svgElem ? "pointer-events:all" : "pointer-events:none");
 };
 

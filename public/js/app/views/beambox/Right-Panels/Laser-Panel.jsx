@@ -191,6 +191,7 @@ define([
             if (defaultLaserOptions.indexOf(value) > -1) {
                 const model = BeamboxPreference.read('model');
                 switch(model) {
+                    case 'fbm1':
                     case 'fbb1b':
                         this.setState({
                             original: value,

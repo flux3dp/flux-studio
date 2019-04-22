@@ -157,7 +157,7 @@ define([
                 return preprocessedBlob;
             };
 
-            if (!['fbb1b', 'fbb1p', 'laser-b1'].includes(this._device.model)) {
+            if (!['mozu1', 'fbm1', 'fbb1b', 'fbb1p', 'laser-b1'].includes(this._device.model)) {
                 return blob;
             }
 
