@@ -1289,6 +1289,7 @@ define(function() {
         message: {
             connecting: '连接中...',
             connectingMachine: '连接 %s 中...',
+            tryingToConenctMachine: '连接机器中...',
             connected: '已连接',
             authenticating: '密码验证中...',
             runningTests: '运动测试中...',

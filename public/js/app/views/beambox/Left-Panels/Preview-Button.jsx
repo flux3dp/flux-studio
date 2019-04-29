@@ -13,6 +13,8 @@ define([
     'app/actions/beambox/beambox-preference',
     'app/actions/beambox',
     'app/actions/global-actions',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'app/stores/beambox-store',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
@@ -33,6 +35,8 @@ define([
     BeamboxPreference,
     BeamboxActions,
     GlobalActions,
+    ProgressActions,
+    ProgressConstants,
     BeamboxStore,
     ImageTracePanelController,
     classNames,
@@ -199,11 +203,14 @@ define([
                     return;
                 };
 
+                ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.message.tryingToConenctMachine);
+
                 if (!(await isFirmwareVersionValid(device))) {
                     alertUserToUpdateFirmware();
                     return;
                 }
 
+                ProgressActions.close();
                 startPreviewMode(device);
             };
 

@@ -1366,6 +1366,7 @@ define(function() {
         message: {
             connecting: '連線中...',
             connectingMachine: '連接 %s 中...',
+            tryingToConenctMachine: '嘗試連接機器中...',
             connected: '已連線',
             authenticating: '密碼驗證中...',
             runningTests: '運動測試中...',

@@ -1367,6 +1367,7 @@ define(function() {
         message: {
             connecting: 'Connecting...',
             connectingMachine: 'Connecting %s...',
+            tryingToConenctMachine: 'Trying to connect to machine...',
             connected: 'Connected',
             authenticating: 'Authenticating...',
             runningTests: 'Running tests...',
