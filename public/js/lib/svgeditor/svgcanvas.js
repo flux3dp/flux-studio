@@ -1344,9 +1344,9 @@ define([
                 if (ext_result = runExtensions('checkMouseTarget', { mouseTarget: mouse_target }, true)) {
                     let extensionEvent = false;
                     $.each(ext_result, function (i, r) {
-                        extensionEvent = extensionEvent || (r && r.started);
+                        started = started || (r && r.started);
                     });
-                    if (extensionEvent) {
+                    if (started && current_mode !== 'path') {
                         return;
                     }
                 }
@@ -1354,7 +1354,7 @@ define([
                 startTransform = mouse_target.getAttribute('transform');
                 var i, stroke_w,
                     tlist = svgedit.transformlist.getTransformList(mouse_target);
-                
+
                 console.log("Mousedown mode switch");
 
                 switch (current_mode) {
@@ -4168,9 +4168,8 @@ define([
                 });
             }
 
-
             console.log(output);
-            
+
             return output;
         };
 
