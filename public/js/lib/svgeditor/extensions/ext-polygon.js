@@ -15,7 +15,7 @@ svgEditor.addExtension('polygon', function (S) {
         started,
         newPoly,
         polygonSides = 5;
-    
+
     window.polygonAddSides = () => {
         polygonSides++;
         polygonExt.renderPolygon();
@@ -109,7 +109,7 @@ svgEditor.addExtension('polygon', function (S) {
                     } else {
                         endChanges();
                     }
-                    // setSelectMode();	
+                    // setSelectMode();
                 });
 
                 var cancel = $('#tool_source_cancel').clone().hide().attr('id', 'polygon_cancel').unbind().appendTo('#tool_source_back').click(function () {
@@ -119,7 +119,6 @@ svgEditor.addExtension('polygon', function (S) {
             }, 3000);
         },
         mouseDown: function (opts) {
-            console.log('Polygon mouseDown');
             // var e = opts.event;
             var sRgb = svgCanvas.getColor('stroke');
             // ccSRgbEl = sRgb.substring(1, rgb.length);

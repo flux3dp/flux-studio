@@ -1272,7 +1272,6 @@ define([
             // - when we are in select mode, select the element, remember the position
             // and do nothing else
             var mouseDown = function (evt) {
-                console.log("Scene Mousedown");
                 if (canvas.spaceKey || evt.button === 1) {
                     return;
                 }
@@ -1301,7 +1300,6 @@ define([
                 //		if (['select', 'resize'].indexOf(current_mode) == -1) {
                 //			setGradient();
                 //		}
-                console.log("Mousedown mid")
                 var x = mouse_x / current_zoom,
                     y = mouse_y / current_zoom,
                     mouse_target = getMouseTarget(evt);
@@ -1354,8 +1352,6 @@ define([
                 startTransform = mouse_target.getAttribute('transform');
                 var i, stroke_w,
                     tlist = svgedit.transformlist.getTransformList(mouse_target);
-
-                console.log("Mousedown mode switch");
 
                 switch (current_mode) {
                     case 'select':
@@ -6230,7 +6226,6 @@ define([
         // Parameters:
         // name - String with the new mode to change to
         this.setMode = function (name) {
-            console.log("Set Mode", name);
             pathActions.clear(true);
             textActions.clear();
             cur_properties = (selectedElements[0] && selectedElements[0].nodeName === 'text') ? cur_text : cur_shape;
