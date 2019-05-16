@@ -126,7 +126,6 @@ svgEditor.addExtension('polygon', function (S) {
 
             if (svgCanvas.getMode() == 'polygon') {
                 started = true;
-                console.log('Start', opts);
                 newPoly = S.addSvgElementFromJson({
                     'element': 'polygon',
                     'attr': {
@@ -165,7 +164,6 @@ svgEditor.addExtension('polygon', function (S) {
 
                 points.push(x + ',' + y);
             }
-            console.log("Render ", points);
             newPoly.setAttributeNS(null, 'points', points.join(' '));
         },
         mouseMove: function (opts) {

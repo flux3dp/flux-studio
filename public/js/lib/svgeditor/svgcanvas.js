@@ -3190,7 +3190,6 @@ define([
 
             return {
                 mouseDown: function (evt, mouse_target, start_x, start_y) {
-                    console.log("Path mouseDown");
                     var id;
                     if (current_mode === 'path') {
                         mouse_x = start_x;
@@ -3558,7 +3557,6 @@ define([
                     }
                 },
                 mouseUp: function (evt, element, mouse_x, mouse_y) {
-                    console.log("Path mouseUp");
                     // Create mode
                     if (current_mode === 'path') {
                         newPoint = null;

@@ -52,6 +52,7 @@ if (process.argv.indexOf('--debug') > 0) {
     // require('electron-reload')(__dirname);
 }
 
+// Solve transparent window issue
 if (process.platform === 'linux') {
     app.disableHardwareAcceleration();
 }
@@ -209,7 +210,7 @@ ipcMain.on('save-dialog', function (event, title, allFiles, extensionName, exten
         defaultPath: filename,
         title,
         filters: [
-            { name: isMac ? `${extensionName} (*.${extensions[0]})` : extensionName , extensions },
+            { name: isMac ? `${extensionName} (*.${extensions[0]})` : extensionName ,extensions },
             { name: allFiles, extensions: ['*'] }
         ]
     }
@@ -287,7 +288,7 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
     })();
 
     // Font Manager won't return PingFang Semibold if input PingFang Bold
-    if (substitutedFamily.indexOf('PingFang') > -1) {
+    if (substitutedFamily && substitutedFamily.indexOf('PingFang') > -1) {
         switch(fontStyle) {
             case 'Bold':
                 fontStyle = 'Semibold';
