@@ -5648,7 +5648,29 @@ define([
                     const parsedSvg = await new Promise(resolve => {
                         const reader = new FileReader();
                         reader.onloadend = (evt) => {
-                            editor.loadFromString(evt.target.result.replace(/STYLE>/g, 'style>'));
+                            let str = evt.target.result;
+                            editor.loadFromString(str.replace(/STYLE>/g, 'style>'));
+
+                            // loadFromString will lose data-xform and data-wireframe of `use` so set it back here
+                            if (typeof(str) === 'string') {
+                                let tmp = str.substr(str.indexOf('<use')).split('<use');
+
+                                for(let i = 1; i < tmp.length; ++i) {
+                                    let elem, match, id, wireframe, xform;
+
+                                    tmp[i] = tmp[i].substring(0, tmp[i].indexOf('/>'))
+                                    match = tmp[i].match(/id="svg_\d+"/)[0];
+                                    id = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+                                    match = tmp[i].match(/data-xform="[^"]*"/)[0];
+                                    xform = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+                                    match = tmp[i].match(/data-wireframe="[a-z]*"/)[0];
+                                    wireframe = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+
+                                    elem = document.getElementById(id);
+                                    elem.setAttribute('data-xform', xform);
+                                    elem.setAttribute('data-wireframe', wireframe === 'true');
+                                }
+                            }
                         };
                         reader.readAsText(file);
                     });
