@@ -5,7 +5,8 @@ define([
     'jquery',
     'helpers/i18n',
     'html2canvas',
-    'helpers/logger'
+    'helpers/logger',
+    'plugins/file-saver/file-saver.min'
 ], function(
     $,
     i18n,
