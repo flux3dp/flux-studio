@@ -72,6 +72,10 @@ define([
                 this.errorCallback = errCallback;
                 this.isPreviewModeOn = true;
             } catch (error) {
+                if (this.originalSpeed !== 1) {
+                    await DeviceMaster.setLaserSpeed(this.originalSpeed);
+                    this.originalSpeed = 1;
+                }
                 throw error;
             } finally {
                 ProgressActions.close();
