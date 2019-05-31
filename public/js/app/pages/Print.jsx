@@ -236,9 +236,12 @@ define([
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                     GlobalStore.onSliceComplete(this._handleSliceReport);
 
+                    $('.print-studio').mouseup(() => {
+                        GlobalActions.resetDialogMenuIndex();
+                    });
+
                     document.addEventListener('mouseup', () => {
                         GlobalActions.monitorClosed();
-                        GlobalActions.resetDialogMenuIndex();
                     });
                 },
 
@@ -254,7 +257,7 @@ define([
 
                     document.removeEventListener('mouseup', () => {
                         GlobalActions.monitorClosed();
-                        GlobalActions.resetDialogMenuIndex();
+                        //GlobalActions.resetDialogMenuIndex();
                     });
                 },
 
