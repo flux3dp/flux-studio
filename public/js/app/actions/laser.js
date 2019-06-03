@@ -969,6 +969,7 @@ define([
                 switch (type) {
                 case 'x':
                 case 'y':
+                    val = (-1) * val;
                     val = convertToHtmlCoordinate(val, type);
                     args[type] = val;
                     break;
