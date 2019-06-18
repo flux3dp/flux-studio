@@ -37,7 +37,7 @@ define([
                     methods.settingWifi.clear();
 
                     if (true === redirect) {
-                        location.hash = '#studio/' + (config().read('default-app')||'print');
+                        location.hash = '#studio/beambox';
                     }
                     d.resolve();
                 }

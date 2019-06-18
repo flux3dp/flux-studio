@@ -9,12 +9,12 @@ define(function() {
             next: '下一步'
         },
         support: {
-            no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 FLUX Studio',
+            no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 Beam Studio',
             no_vcredist: '請安裝 Visual C++ Redistributable 2015<br/>可以在flux3dp.com找到',
-            osx_10_9: 'FLUX Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
+            osx_10_9: 'Beam Studio 目前不支援 OS X 10.9，敬請更新至更新的版本。'
         },
         generic_error: {
-            UNKNOWN_ERROR: '[UE] 請重啟 FLUX Studio',
+            UNKNOWN_ERROR: '[UE] 請重啟 Beam Studio',
             OPERATION_ERROR: '[OE] 機器發生狀態衝突，請再試一次',
             SUBSYSTEM_ERROR: '[SE] 請重啟機器',
             UNKNOWN_COMMAND: '[UC] 請更新機器韌體',
@@ -43,8 +43,8 @@ define(function() {
                 update_fail: '更新失敗'
             },
             software: {
-                caption: 'FLUX Studio 有新的軟體更新',
-                message_pattern_1: 'FLUX Studio 有新的軟體更新。',
+                caption: 'Beam Studio 有新的軟體更新',
+                message_pattern_1: 'Beam Studio 有新的軟體更新。',
                 message_pattern_2: 'FLUX Software v%s 可使用 - 你的版本為 v%s.'
             },
             toolhead: {
@@ -73,10 +73,10 @@ define(function() {
         },
         topmenu: {
             version: '版本',
-            sure_to_quit: '確定要結束 FLUX Studio?',
+            sure_to_quit: '確定要結束 Beam Studio?',
             flux: {
                 label: 'Flux',
-                about: '關於 FLUX studio',
+                about: '關於 Beam studio',
                 preferences: '偏好設定',
                 quit: '結束'
             },
@@ -225,7 +225,7 @@ define(function() {
                 station_ready_statement: '你的機器已成為 Wi-Fi 熱點，你可以藉由無線連接 “%s” 這個熱點操作 FLUX',
                 brilliant: '太棒了!',
                 begin_journey: '你可以拔除 USB / Micro USB 傳輸線, 開始使用機器隨心所欲地進行創作囉！',
-                great: '歡迎使用 FLUX Studio',
+                great: '歡迎使用 Beam Studio',
                 upload_via_usb: '你可以稍後再設定 Wi-Fi 選項。<br/>如果你沒有 Wi-Fi 環境，請參考<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/articles/215998327-Connection-Guide-for-Desktop-PCs">PC連線指南</a>',
                 back: '回到 Wi-Fi 設定',
                 ok: '開始使用'
@@ -239,8 +239,8 @@ define(function() {
                 breathing: 'Breathing: 呼吸燈',
                 breathing_desc: '無線網路設定失敗，請嘗試重新設定',
                 successfully: '如果機器連線成功',
-                successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 FLUX Studio',
-                restart: '重啟 FLUX Studio'
+                successfully_statement: '請將無線網路連線至(%s)，並且重新啟動 Beam Studio',
+                restart: '重啟 Beam Studio'
             },
 
             // errors
@@ -335,7 +335,7 @@ define(function() {
             remove_default_machine_button: '刪除',
             confirm_remove_default: '將會刪除預設機器',
             reset_now: '重置所有設定',
-            confirm_reset: '確認要重置 FLUX Studio?',
+            confirm_reset: '確認要重置 Beam Studio?',
             language: '語言',
             notifications: '通知',
             default_app: '預設功能',
@@ -1014,7 +1014,7 @@ define(function() {
                 layer_by_layer: '依圖層分層',
                 layer_by_color: '依顏色分層',
                 nolayer: '不分層',
-                no_support_text: 'FLUX Studio 目前不支援由外部匯入文字標籤，請由向量繪圖軟體將文字轉成路徑後再匯入。',
+                no_support_text: 'Beam Studio 目前不支援由外部匯入文字標籤，請由向量繪圖軟體將文字轉成路徑後再匯入。',
                 power_too_high_damage_laser_tube: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命。',
                 speed_too_high_lower_the_quality: '在此雕刻解析度使用過快的速度，可能導致漸層雕刻的品質較差。',
                 both_power_and_speed_too_high: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命。\n並且在此雕刻解析度使用過快的速度可能導致漸層雕刻的品質較差。',
@@ -1150,8 +1150,8 @@ define(function() {
                 lock_desc: '縮放時固定比例 (SHIFT)'
             },
             svg_editor: {
-                unnsupported_file_type: 'FLUX Studio 不直接支援此檔案格式。請先輸出成圖片檔或 SVG 格式',
-                unnsupport_ai_file_directly: '請先將您的 AI 檔輸出成 SVG 或 圖片檔，再匯入至 FLUX Studio'
+                unnsupported_file_type: 'Beam Studio 不直接支援此檔案格式。請先輸出成圖片檔或 SVG 格式',
+                unnsupport_ai_file_directly: '請先將您的 AI 檔輸出成 SVG 或 圖片檔，再匯入至 Beam Studio'
             },
             units: {
                 walt: 'W',
@@ -1326,7 +1326,7 @@ define(function() {
             extensionNotSupported               : '上傳檔案不支援此檔案格式',
             fileExistContinue                   : '檔案已存在，是否要覆蓋？',
             confirmGToF                         : 'GCode 上傳後會自動轉檔成 FCode，是否繼續？',
-            updatePrintPresetSetting            : 'FLUX STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
+            updatePrintPresetSetting            : 'Beam STUDIO 有新的預設列印參數。\n是否要更新？（會刪除目前參數）',
             confirmFileDelete                   : '是否確定要刪除這個檔案？',
             task: {
                 EXTRUDER                        : '列印',
@@ -1396,7 +1396,7 @@ define(function() {
                 caption: '韌體需要更新',
                 content: '請按照<a target="_blank" href="http://helpcenter.flux3dp.com/hc/zh-tw/articles/216251077">此說明</a>安裝最新韌體版本'
             },
-            cant_establish_connection: '無法正常啟動 FLUX Studio API，建議手動安裝 Visual C++ Redistributable 2015，如持續發生，請<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
+            cant_establish_connection: '無法正常啟動 Beam Studio API，建議手動安裝 Visual C++ Redistributable 2015，如持續發生，請<a target="_blank" href="https://flux3dp.zendesk.com/hc/zh-tw/requests/new" target="_blank">聯繫 FLUX 客服</a>',
             application_occurs_error: '應用程式發生異常，請使用「功能表 > 說明 > 錯誤回報」',
             error_log: '錯誤訊息',
             fcodeForLaser: '檔案為雕刻工作',
@@ -1413,16 +1413,16 @@ define(function() {
             },
             unsupport_osx_version: '不支援此 Mac OS X 版本',
             need_password: '需要密碼與機器建立連線',
-            new_app_downloading: 'FLUX Studio 下載中',
-            new_app_download_canceled: 'FLUX Studio 下載已被取消',
-            new_app_downloaded: '新版FLUX Studio 下載完畢',
+            new_app_downloading: 'Beam Studio 下載中',
+            new_app_download_canceled: 'Beam Studio 下載已被取消',
+            new_app_downloaded: '新版Beam Studio 下載完畢',
             ask_for_upgrade: '馬上升級嗎?',
             please_enter_dpi: '請輸入該檔案的 dpi',
             need_1_1_7_above: '請更新 Delta 韌體到 v1.1.7 以上',
             gcode_area_too_big: '匯入的 gcode 檔案超過列印範圍',
             empty_file: '檔案內容不存在',
             usb_unplugged: 'USB 連線逾時，請確認與機器的連接',
-            launghing_from_installer_warning: 'FLUX Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 FLUX Studio 移到應用程式資料夾再使用。',
+            launghing_from_installer_warning: 'Beam Studio 不是從應用程式資料夾開啟，可能會產生問題。請將 Beam Studio 移到應用程式資料夾再使用。',
             uploading_fcode: '正在上傳 fcode',
             cant_connect_to_device: '無法連結機器，請確認機器是否開啟，以及與機器的連結方式',
             unable_to_find_machine: '無法連接到機器 ',
@@ -1552,9 +1552,9 @@ define(function() {
                 '7': '進階設定參數錯誤\n',
                 '8': '切片:: 切片結果要求早於切片結束',
                 '9': '切片:: 路徑結果要求早於切片結束',
-                '10': '切片:: 原始模型不存在於切片引擎，需重啟 FLUX Studio',
-                '13': '切片:: 重制錯誤，複製原始ID不存在，需重啟 FLUX Studio',
-                '14': '切片:: 無法設定物件位置及相關資訊，需重啟 FLUX Studio',
+                '10': '切片:: 原始模型不存在於切片引擎，需重啟 Beam Studio',
+                '13': '切片:: 重制錯誤，複製原始ID不存在，需重啟 Beam Studio',
+                '14': '切片:: 無法設定物件位置及相關資訊，需重啟 Beam Studio',
                 '15': '切片:: 模型檔案內容無法解析',
                 '16': '切片:: 切片引擎異常結束，建議調整設定',
                 '1006': 'WS 已被強制關閉, 請於menu上方取得錯誤回報，寄送回FLUX'

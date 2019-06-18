@@ -1,8 +1,8 @@
 module.exports = {
     'en': {
         preferences: 'Preferences',
-        about: 'About FLUX Studio',
-        hide: 'Hide FLUX Studio',
+        about: 'About Beam Studio',
+        hide: 'Hide Beam Studio',
         hideothers: 'Hide Others',
         service: 'Services',
         reload_app: 'Reload App',
@@ -74,8 +74,8 @@ module.exports = {
     },
     'zh-tw': {
         preferences: '偏好設定',
-        about: '關於 FLUX Studio',
-        hide: '隱藏 FLUX Studio',
+        about: '關於 Beam Studio',
+        hide: '隱藏 Beam Studio',
         hideothers: '隱藏其他',
         service: '服務',
         reload_app: '重新整理',

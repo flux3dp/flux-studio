@@ -7,7 +7,7 @@ let r = resource['en'];
 
 function _buildOSXAppMenu(callback) {
     return {
-        label: 'FLUX Studio',
+        label: 'Beam Studio',
         submenu: [
             { label: r.about, role: 'about'},
             { id: 'PREFERENCE',  label: r.preferences, accelerator: 'Cmd+,', click: callback },
@@ -77,31 +77,6 @@ function buildMenu(callback) {
         submenu: [
             { 'id': 'ADD_NEW_MACHINE', label: r.add_new_machine || 'Add New Machine', 'accelerator': `${fnKey}+N`, click: callback},
             {type: 'separator'}
-        ]
-    });
-
-    menu.push({
-        id: '_account',
-        label: r.account,
-        submenu: [
-            {
-                id: 'MY_ACCOUNT',
-                label: r.my_account || 'My Account',
-                click: callback
-            },
-            {
-                type: 'separator'
-            },
-            {
-                id: 'SIGN_IN',
-                label: r.sign_in || 'Sign In',
-                click: callback
-            },
-            {
-                id: 'SIGN_OUT',
-                label: r.sign_out || 'Sign Out',
-                click: callback
-            }
         ]
     });
 
@@ -238,18 +213,7 @@ class MenuManager extends EventEmitter {
 
         ipcMain.on(events.UPDATE_ACCOUNT, (e, account) => {
             const toggleSignIn = (nickname) => {
-                this._accountMenu.submenu.items.forEach(item => {
-                    if(item.id === 'SIGN_IN') {
-                        item.visible = !nickname;
-                    }
-                    else if(item.id === 'SIGN_OUT') {
-                        item.visible = !!nickname;
-                    }
-                    else if(item.id === 'MY_ACCOUNT') {
-                        item.visible = !!nickname;
-                        item.label = nickname;
-                    }
-                });
+                
             };
 
             toggleSignIn(account.nickname);
