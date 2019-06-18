@@ -82,7 +82,7 @@ define([
             })[0];
 
             this.setState({ device }, ()=>{
-                if((['fbb1b', 'fbb1p', 'laser-b1', 'darwin-dev'].includes(device.model))) {
+                if((['fbm1', 'mozu1', 'fbb1b', 'fbb1p', 'laser-b1', 'darwin-dev'].includes(device.model))) {
 
                 } else {
                     this._getDeviceConfig();

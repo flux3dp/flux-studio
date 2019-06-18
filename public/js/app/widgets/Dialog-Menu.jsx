@@ -4,6 +4,7 @@ define([
     'reactDOM',
     'reactPropTypes',
     'reactClassset',
+    'app/stores/global-store',
     'jsx!widgets/List',
     // non-return
     'helpers/object-assign'
@@ -14,6 +15,7 @@ function(
     ReactDOM,
     PropTypes,
     ReactCx,
+    GlobalStore,
     List
 ) {
     return React.createClass({
@@ -23,6 +25,14 @@ function(
             items: PropTypes.array
         },
 
+        componentDidMount: function() {
+            GlobalStore.onResetDialogMenuIndex(() => this.resetCheckedItem());
+        },
+
+        componentWillUnmount: function() {
+            GlobalStore.removeResetDialogMenuIndexListener(() => this.resetCheckedItem());
+        },
+
         getDefaultProps: function() {
             return {
                 arrowDirection: 'LEFT',
@@ -30,12 +40,16 @@ function(
                 items: []
             };
         },
+
         getInitialState: function() {
             return {
                 checkedItem: -1
             };
         },
 
+        resetCheckedItem: function() {
+            this.setState({ checkedItem: -1 });
+        },
 
         toggleSubPopup: function(itemIndex, isChecked) {
             this.setState({
@@ -55,17 +69,25 @@ function(
             return this.props.items
                 .filter(item => !!item.label)
                 .map((item, index) => {
-                    let disablePopup = false;
-                    if(item.disable || !item.content) {
-                        disablePopup = true;
-                    }
+                    const {
+                        content,
+                        disable,
+                        forceKeepOpen,
+                        label,
+                        labelClass,
+                        previewOn
+                    } = item;
+                    const { checkedItem } = this.state;
+                    const disablePopup = (disable || !content);
+                    const checked = (forceKeepOpen || previewOn) || ((checkedItem === index) && !disablePopup);
 
                     let itemLabelClassName = {
                         'dialog-label': true,
-                        'disable': item.disable === true
+                        'disable': disable === true
                     };
-                    itemLabelClassName = Object.assign(itemLabelClassName, item.labelClass || {});
-                    const checked = item.forceKeepOpen || ((this.state.checkedItem === index) && !disablePopup);
+
+                    itemLabelClassName = Object.assign(itemLabelClassName, labelClass || {});
+
                     return {
                         label: (
                             <label className='ui-dialog-menu-item'>
@@ -76,18 +98,18 @@ function(
                                     disabled={disablePopup}
                                     checked={checked}
                                     onClick={e => {
-                                        if (!item.forceKeepOpen) {
+                                        if (!forceKeepOpen) {
                                             this.toggleSubPopup(index, e.target.checked);
                                         }
                                     }}
                                 />
                                 <div className={ReactCx.cx(itemLabelClassName)}>
-                                    {item.label}
+                                    {label}
                                 </div>
                                 <label className='dialog-window'>
                                     <div className={arrowClassName}/>
                                     <div className='dialog-window-content'>
-                                        {item.content}
+                                        {content}
                                     </div>
                                 </label>
                             </label>

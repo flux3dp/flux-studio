@@ -28,7 +28,8 @@ define([
 
     const validPanelsMap = {
         'unknown':  [],
-        'path':     [],
+        'path':     ['position', 'size', 'rotation'],
+        'polygon':     ['position', 'size', 'rotation'],
         'rect':     ['position', 'size', 'rotation', 'rectRoundedCorner'],
         'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
         'line':     ['line', 'rotation'],
@@ -108,7 +109,7 @@ define([
                     return input;
                 }
                 const left = _between(thePoint.left, 0, $(window).width()-240);
-                const top = _between(thePoint.top, 100, $(window).height()-80);
+                const top = _between(thePoint.top, 100, $(window).height()-$('#beamboxObjPanel').height());
                 return {
                     left: left,
                     top: top
@@ -128,7 +129,7 @@ define([
             const positionStyle = this._findPositionStyle();
             const classes = ClassNames('object-panels', {'unselectable': !(this.props.isEditable)});
             return (
-                <div className={classes} style={positionStyle}>
+                <div id="beamboxObjPanel" className={classes} style={positionStyle}>
                     {this._renderPanels()}
                 </div>
             );

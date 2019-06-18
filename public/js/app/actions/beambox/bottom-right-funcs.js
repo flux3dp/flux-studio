@@ -119,7 +119,14 @@ define([
         const { uploadFile, thumbnailBlobURL } = await prepareFileWrappedFromSvgStringAndThumbnail();
         await svgeditorParser.uploadToSvgeditorAPI([uploadFile], {
             model: BeamboxPreference.read('model'),
-            engraveDpi: BeamboxPreference.read('engrave_dpi')
+            engraveDpi: BeamboxPreference.read('engrave_dpi'),
+            onProgressing: (data) => {
+                ProgressActions.open(ProgressConstants.STEPPING, '', data.message, false);
+                ProgressActions.updating(data.message, data.percentage * 100);
+            },
+            onFinished: () => {
+                ProgressActions.updating(lang.message.uploading_fcode, 100);
+            }
         });
         const fcodeBlob = await new Promise((resolve) => {
             const names = []; //don't know what this is for
@@ -127,7 +134,7 @@ define([
                 names,
                 {
                     onProgressing: (data) => {
-                        ProgressActions.open(ProgressConstants.STEPPING);
+                        ProgressActions.open(ProgressConstants.STEPPING, '', data.message, false);
                         ProgressActions.updating(data.message, data.percentage * 100);
                     },
                     onFinished: function (blob, fileName, fileTimeCost) {
@@ -164,8 +171,16 @@ define([
         exportFcode: async function () {
             const { fcodeBlob } = await fetchFcode();
             const defaultFCodeName = svgCanvas.getLatestImportFileName() || 'untitled';
+            const langFile = i18n.lang.topmenu.file;
+            const fileReader = new FileReader();
+
             ProgressActions.close();
-            saveAs(fcodeBlob,  defaultFCodeName + '.fc');
+
+            fileReader.onload = function () {
+                window.electron.ipc.send('save-dialog', langFile.save_fcode, langFile.all_files, langFile.fcode_files, ['fc'], defaultFCodeName, new Uint8Array(this.result));
+            };
+
+            fileReader.readAsArrayBuffer(fcodeBlob);
         },
     };
 });

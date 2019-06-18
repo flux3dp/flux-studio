@@ -1,4 +1,4 @@
-const {app, ipcMain, BrowserWindow} = require('electron');
+const {app, ipcMain, BrowserWindow, dialog} = require('electron');
 app.commandLine.appendSwitch('ignore-gpu-blacklist');
 
 const BackendManager = require('./src/backend-manager.js');
@@ -10,7 +10,6 @@ const TTC2TTF = require('./src/ttc2ttf.js');
 
 const FontManager = require('font-manager');
 const TextToSVG = require('text-to-svg');
-
 const path = require('path');
 const url = require('url');
 const fs = require('fs');
@@ -47,12 +46,16 @@ function createLogFile() {
 var DEBUG = false;
 const logger = process.stderr.isTTY ? process.stderr : createLogFile();
 
-if(process.argv.indexOf('--debug') > 0) {
+if (process.argv.indexOf('--debug') > 0) {
     DEBUG = true;
     console.log('DEBUG Mode');
     // require('electron-reload')(__dirname);
 }
 
+// Solve transparent window issue
+if (process.platform === 'linux') {
+    app.disableHardwareAcceleration();
+}
 
 function onGhostUp(data) {
     global.backend.alive = true;
@@ -182,9 +185,10 @@ ipcMain.on(events.CHECK_BACKEND_STATUS, () => {
         console.error('Recv async-status request but main window not exist');
     }
 });
-
+var fontsListCache = [];
 ipcMain.on(events.GET_AVAILABLE_FONTS , (event, arg) => {
     const fonts = FontManager.getAvailableFontsSync();
+	fontsListCache = fonts;
     event.returnValue = fonts;
 });
 
@@ -200,8 +204,49 @@ ipcMain.on(events.FIND_FONT , (event, arg) => {
     event.returnValue = font;
 });
 
-ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
+ipcMain.on('save-dialog', function (event, title, allFiles, extensionName, extensions, filename, file) {
+    const isMac = (process.platform === 'darwin');
+    const options = {
+        defaultPath: filename,
+        title,
+        filters: [
+            { name: isMac ? `${extensionName} (*.${extensions[0]})` : extensionName ,extensions },
+            { name: allFiles, extensions: ['*'] }
+        ]
+    }
 
+    dialog.showSaveDialog(options, function (filePath) {
+        if (!filePath) {
+            return;
+        }
+
+        switch (typeof(file)) {
+            case 'string':
+                fs.writeFile(filePath, file, function(err) {
+                    if (err) {
+                        dialog.showErrorBox('Error', err);
+
+                        return;
+                    }
+                });
+                break;
+            case 'object':
+                fs.writeFileSync(filePath, file, function(err) {
+                    if(err) {
+                        dialog.showErrorBox('Error', err);
+
+                        return;
+                    }
+                });
+                break;
+            default:
+                dialog.showErrorBox('Error: something wrong, please contact FLUX Support');
+                break;
+        }
+    })
+})
+
+ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily, fontSize, fontStyle, letterSpacing, key}) => {
     const substitutedFamily = (function(){
 
         //if only contain basic character (123abc!@#$...), don't substitute.
@@ -242,13 +287,40 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
         }
     })();
 
-    const font = FontManager.findFontSync({
+    // Font Manager won't return PingFang Semibold if input PingFang Bold
+    if (substitutedFamily && substitutedFamily.indexOf('PingFang') > -1) {
+        switch(fontStyle) {
+            case 'Bold':
+                fontStyle = 'Semibold';
+                break;
+            case 'Italic':
+                fontStyle = 'Regular';
+                break;
+            case 'Bold Italic':
+                fontStyle = 'Semibold';
+                break;
+            default:
+                break;
+        }
+    }
+
+    let font = FontManager.findFontSync({
         family: substitutedFamily,
         style: fontStyle
     });
     let fontPath = font.path;
-
-    if(fontPath.toLowerCase().endsWith('.ttc') || fontPath.toLowerCase().endsWith('.ttcf')) {
+	if (fontFamily.indexOf("華康") >= 0 && (fontPath.toLowerCase().indexOf("arial") > 0 || fontPath.toLowerCase().indexOf("meiryo") > 0)) {
+		// This is a hotfix for 華康系列 fonts, because fontmanager does not support
+		for (var i in fontsListCache) {
+			const fontInfo = fontsListCache[i];
+			if (fontInfo.family == fontFamily) {
+				fontPath = fontInfo.path;
+				font = fontInfo;
+			}
+		}
+	}
+	console.log("New Font path ", fontPath);
+    if (fontPath.toLowerCase().endsWith('.ttc') || fontPath.toLowerCase().endsWith('.ttcf')) {
         fontPath = await TTC2TTF(fontPath, font.postscriptName);
     }
     const pathD = TextToSVG.loadSync(fontPath).getD(text, {

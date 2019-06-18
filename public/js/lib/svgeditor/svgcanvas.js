@@ -87,6 +87,7 @@ define([
             '<feMergeNode in="SourceGraphic"/>' +
             '</feMerge>' +
             '</filter>' +
+            /*'<clipPath id="scene_mask"><rect x="0" y="0" width="2700" height="2000" /></clipPath>' +*/
             '</defs>' +
             '</svg>').documentElement, true);
         container.appendChild(svgroot);
@@ -1299,7 +1300,6 @@ define([
                 //		if (['select', 'resize'].indexOf(current_mode) == -1) {
                 //			setGradient();
                 //		}
-
                 var x = mouse_x / current_zoom,
                     y = mouse_y / current_zoom,
                     mouse_target = getMouseTarget(evt);
@@ -1340,10 +1340,11 @@ define([
                 }
 
                 if (ext_result = runExtensions('checkMouseTarget', { mouseTarget: mouse_target }, true)) {
+                    let extensionEvent = false;
                     $.each(ext_result, function (i, r) {
                         started = started || (r && r.started);
                     });
-                    if (started) {
+                    if (started && current_mode !== 'path') {
                         return;
                     }
                 }
@@ -1351,6 +1352,7 @@ define([
                 startTransform = mouse_target.getAttribute('transform');
                 var i, stroke_w,
                     tlist = svgedit.transformlist.getTransformList(mouse_target);
+
                 switch (current_mode) {
                     case 'select':
                         started = true;
@@ -2575,6 +2577,33 @@ define([
                         //panning is default behavior when pressing middle button
                     }
 
+                    function _zoomProcess() {
+                        // End of animation
+                        const currentZoom = svgCanvas.getZoom();
+                        if ((currentZoom === targetZoom) || (Date.now() - trigger > 500)) {
+                            clearInterval(timer);
+                            timer = undefined;
+                            return;
+                        }
+
+                        // Calculate next animation zoom level
+                        var nextZoom = currentZoom + (targetZoom - currentZoom) / 5;
+
+                        if (Math.abs(targetZoom - currentZoom) < 0.005) {
+                            nextZoom = targetZoom;
+                        }
+
+                        const cursorPosition = {
+                            x: evt.pageX,
+                            y: evt.pageY
+                        };
+
+                        call('zoomed', {
+                            zoomLevel: nextZoom,
+                            staticPoint: cursorPosition
+                        });
+                    }
+
                     function _zoomAsIllustrator() {
                         const delta = (evt.wheelDelta) ? evt.wheelDelta : (evt.detail) ? -evt.detail : 0;
 
@@ -2595,33 +2624,6 @@ define([
                         if (Date.now() - trigger > 20) {
                             _zoomProcess();
                             trigger = Date.now();
-                        }
-
-                        function _zoomProcess() {
-                            // End of animation
-                            const currentZoom = svgCanvas.getZoom();
-                            if ((currentZoom === targetZoom) || (Date.now() - trigger > 500)) {
-                                clearInterval(timer);
-                                timer = undefined;
-                                return;
-                            }
-
-                            // Calculate next animation zoom level
-                            var nextZoom = currentZoom + (targetZoom - currentZoom) / 5;
-
-                            if (Math.abs(targetZoom - currentZoom) < 0.005) {
-                                nextZoom = targetZoom;
-                            }
-
-                            const cursorPosition = {
-                                x: evt.pageX,
-                                y: evt.pageY
-                            };
-
-                            call('zoomed', {
-                                zoomLevel: nextZoom,
-                                staticPoint: cursorPosition
-                            });
                         }
                     }
 
@@ -3228,6 +3230,7 @@ define([
                                 attr: {
                                     d: d_attr,
                                     id: getNextId(),
+                                    'stroke-width' : 1,
                                     opacity: cur_shape.opacity / 2
                                 }
                             });
@@ -3554,7 +3557,6 @@ define([
                     }
                 },
                 mouseUp: function (evt, element, mouse_x, mouse_y) {
-
                     // Create mode
                     if (current_mode === 'path') {
                         newPoint = null;
@@ -4159,6 +4161,8 @@ define([
                     groupSvgElem(this);
                 });
             }
+
+            console.log(output);
 
             return output;
         };
@@ -5135,7 +5139,7 @@ define([
                         const resizeH = rootHeight / rootViewBox.split(' ')[3];
                         transformList.unshift(`scale(${resizeW}, ${resizeH})`);
                     } else {
-                        console.log('resize with 72 dpi');
+                        // console.log('resize with 72 dpi');
 
                         const svgUnitScaling = unit2Pixel('1px');
                         transformList.unshift(`scale(${svgUnitScaling})`);
@@ -5328,22 +5332,21 @@ define([
                 use_el.id = getNextId();
                 setHref(use_el, '#' + symbol.id);
                 //switch currentLayer, and create layer if necessary
-                if((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
+                if ((type === 'layer' && symbol.getAttribute('data-id')) || (type === 'color' && symbol.getAttribute('data-color') || (type === 'image-trace'))) {
 
                     const color = symbol.getAttribute('data-color');
                     const layerName = (type === 'image-trace') ? 'Traced Path' : symbol.getAttribute('data-id') || rgbToHex(color);
 
                     const isLayerExist = svgCanvas.setCurrentLayer(layerName);
-                    if(!isLayerExist) {
+                    if (!isLayerExist) {
                         const layer = svgCanvas.createLayer(layerName);
                         layer.color = color;
                     }
                 }
 
-                // append ~~~~~ ya
                 getCurrentDrawing().getCurrentLayer().appendChild(use_el);
 
-                if(type !== 'color' || type !== 'image-trace') {
+                if (type === 'nolayer') {
                     use_el.setAttribute('data-wireframe', true);
                 }
 
@@ -5421,7 +5424,7 @@ define([
 
                 const unit = val.substr(-2);
                 const num = val.substr(0, val.length-2);
-                if(!unitMap[unit]) {
+                if (!unitMap[unit]) {
                     console.log('unsupported unit', unit, 'for', val, ' use pixel instead');
                 }
 
@@ -8040,15 +8043,15 @@ define([
             let indexMax = -1,
                 indexMin = -1;
 
-            const len = selectedElements.length;
+            const realSelectedElements = selectedElements.filter(e => e);
+            const len = realSelectedElements.length;
+
             if (len < 3) {
                 return;
             }
+
             for (let i = 0; i < len; i=i+1) {
-                if (selectedElements[i] == null) {
-                    break;
-                }
-                const elem = selectedElements[i];
+                const elem = realSelectedElements[i];
 
                 let centerX = this.getCenter(elem).x;
                 centerXs[i] = centerX;
@@ -8075,9 +8078,9 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition((minX + dx*j) - centerXs[i], 0, selectedElements[i]);
+                    this.moveElemPosition((minX + dx*j) - centerXs[i], 0, realSelectedElements[i]);
                 } else {
-                    this.moveElemPosition((minX + dx*j) - centerXs[i-len], 0, selectedElements[i-len]);
+                    this.moveElemPosition((minX + dx*j) - centerXs[i-len], 0, realSelectedElements[i-len]);
                 }
                 j = j+1;
             }
@@ -8091,15 +8094,15 @@ define([
             let indexMax = -1,
                 indexMin = -1;
 
-            const len = selectedElements.length;
+            const realSelectedElements = selectedElements.filter(e => e);
+            const len = realSelectedElements.length;
+
             if (len < 3) {
                 return;
             }
+
             for (let i = 0; i < len; i=i+1) {
-                if (selectedElements[i] == null) {
-                    break;
-                }
-                const elem = selectedElements[i];
+                const elem = realSelectedElements[i];
 
                 let centerY = this.getCenter(elem).y;
                 centerYs[i] = centerY;
@@ -8126,9 +8129,9 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i], selectedElements[i]);
+                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i], realSelectedElements[i]);
                 } else {
-                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i-len], selectedElements[i-len]);
+                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i-len], realSelectedElements[i-len]);
                 }
                 j = j+1;
             }
@@ -8147,17 +8150,19 @@ define([
                 indexMaxX = -1,
                 indexMaxY = -1;
 
-            const len = selectedElements.length;
+            const realSelectedElements = selectedElements.filter(e => e);
+            const len = realSelectedElements.length;
+
             if (len < 3) {
                 return;
             }
 
             for (let i = 0; i < len; i=i+1) {
-                if (selectedElements[i] == null) {
+                if (realSelectedElements[i] == null) {
                     console.error('distributing null');
                     break;
                 }
-                const elem = selectedElements[i];
+                const elem = realSelectedElements[i];
 
                 let center = this.getCenter(elem);
                 centerXs[i] = center.x;
@@ -8207,9 +8212,9 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition((startX + dx*j) - centerXs[i], (startY + dy*j) - centerYs[i], selectedElements[i]);
+                    this.moveElemPosition((startX + dx*j) - centerXs[i], (startY + dy*j) - centerYs[i], realSelectedElements[i]);
                 } else {
-                    this.moveElemPosition((startX + dx*j) - centerXs[i-len], (startY + dy*j) - centerYs[i-len], selectedElements[i-len]);
+                    this.moveElemPosition((startX + dx*j) - centerXs[i-len], (startY + dy*j) - centerYs[i-len], realSelectedElements[i-len]);
                 }
                 j = j+1;
             }
@@ -8559,6 +8564,9 @@ define([
 
 
         this.getSvgRealLocation = function (elem) {
+            if (elem.tagName === 'path' || elem.tagName === 'polygon') {
+                return elem.getBBox();
+            }
             const ts = $(elem).attr('transform') || '';
             const xform = $(elem).attr('data-xform');
             const elemX = parseFloat($(elem).attr('x') || '0');
@@ -8592,6 +8600,9 @@ define([
         };
 
         this.getSvgRealLocation = function (elem) {
+            if (elem.tagName === 'path' || elem.tagName === 'polygon') {
+                return elem.getBBox();
+            }
             const ts = $(elem).attr('transform') || '';
             const xform = $(elem).attr('data-xform');
             const elemX = parseFloat($(elem).attr('x') || '0');
@@ -8813,6 +8824,8 @@ define([
             selectorManager.requestSelector(selected).showGrips(true);
 
             svgedit.recalculate.recalculateDimensions(selected);
+
+            window.updateContextPanel();
         };
 
         this.setRotaryMode = function(val) {

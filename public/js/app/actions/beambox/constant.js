@@ -6,6 +6,7 @@ define([
     BeamboxPreference
 ){
     const workareaMap = new Map();
+    workareaMap.set('fbm1', [3000, 2000]);
     workareaMap.set('fbb1b', [4000, 3750]);
     workareaMap.set('fbb1p', [6000, 3750]);
 
@@ -30,7 +31,7 @@ define([
             scaleRatio_ideal: (585 / 720) * 2, // pixel on studio / pixel on beambox machine; 與焦距成正比
             calibrationPicture: {
                 centerX: 90, //mm
-                centerY: 80, //mm
+                centerY: 90, //mm
                 size: 25 //mm
             }
         }

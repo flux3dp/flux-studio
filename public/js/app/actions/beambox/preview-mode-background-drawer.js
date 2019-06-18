@@ -1,13 +1,13 @@
 define([
     'Rx',
-    'helpers/i18n',
     'app/actions/beambox/constant',
-    'app/actions/beambox'
+    'app/actions/beambox',
+    'helpers/i18n'
 ], function (
     Rx,
-    i18n,
     Constant,
-    BeamboxActions
+    BeamboxActions,
+    i18n
 ) {
     const LANG = i18n.lang.beambox.left_panel;
 
@@ -28,6 +28,7 @@ define([
 
             this.cameraOffset = null;
         }
+
         start(cameraOffset) {
             // { x, y, angle, scaleRatioX, scaleRatioY }
             this.cameraOffset = cameraOffset;
@@ -36,11 +37,12 @@ define([
             this.backgroundDrawerSubject
                 .concatMap(p => Rx.Observable.fromPromise(p))
                 .subscribe(blob => this._drawBlobToBackground(blob));
-
         }
 
         end() {
-            this.backgroundDrawerSubject.onCompleted();
+            if (this.backgroundDrawerSubject) {
+                this.backgroundDrawerSubject.onCompleted();
+            }
         }
 
         async draw(imgUrl, x, y, last = false) {
@@ -53,13 +55,17 @@ define([
         drawBoundary() {
             const canvasBackground = svgedit.utilities.getElem('canvasBackground');
             const previewBoundary = this._getPreviewBoundary();
+
             canvasBackground.appendChild(previewBoundary);
         }
 
         clearBoundary() {
             const canvasBackground = svgedit.utilities.getElem('canvasBackground');
             const previewBoundary = svgedit.utilities.getElem('previewBoundary');
-            canvasBackground.removeChild(previewBoundary);
+
+            if (previewBoundary) {
+                canvasBackground.removeChild(previewBoundary);
+            }
         }
 
         isClean() {
@@ -67,6 +73,10 @@ define([
         }
 
         clear() {
+            if (this.isClean()) {
+                return;
+            }
+
             window.svgCanvas.setBackground('#fff');
 
             // clear canvas
@@ -96,6 +106,7 @@ define([
             if (this.cameraCanvasUrl) {
                 URL.revokeObjectURL(this.cameraCanvasUrl);
             }
+
             this.cameraCanvasUrl = URL.createObjectURL(blob);
             window.svgCanvas.setBackground('#fff', this.cameraCanvasUrl);
         }
@@ -103,6 +114,7 @@ define([
         _prepareCroppedAndRotatedImgBlob(imgUrl, x, y, last = false) {
             const img = new Image();
             img.src = imgUrl;
+
             return new Promise(resolve => {
                 img.onload = () => {
                     // free unused blob memory
@@ -138,7 +150,11 @@ define([
         }
 
         _cropAndRotateImg(imageObj) {
-            const {angle, scaleRatioX, scaleRatioY} = this.cameraOffset;
+            const {
+                angle,
+                scaleRatioX,
+                scaleRatioY
+            } = this.cameraOffset;
 
             const cvs = document.createElement('canvas');
             const ctx = cvs.getContext('2d');
@@ -194,9 +210,10 @@ define([
                 'fill': '#fff',
                 'style': 'pointer-events:none'
             });
-            const textNode = document.createTextNode(LANG.unpreviewable_area);
-            descText.appendChild(textNode);
 
+            const textNode = document.createTextNode(LANG.unpreviewable_area);
+
+            descText.appendChild(textNode);
 
             boundaryGroup.appendChild(borderTop);
             boundaryGroup.appendChild(descText);
@@ -208,5 +225,4 @@ define([
     const instance = new PreviewModeBackgroundDrawer();
 
     return instance;
-
 });

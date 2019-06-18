@@ -8,6 +8,11 @@ define([
     Dispatcher
 ) {
     return {
+        updateLaserPanel: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.UPDATE_LASER_PANEL,
+            });
+        },
         backToPreviewMode: function() {
             Dispatcher.dispatch({
                 actionType: BeamboxConstants.BACK_TO_PREVIEW,
@@ -38,5 +43,15 @@ define([
                 actionType: BeamboxConstants.CLEAR_CAMERA_CANVAS
             });
         },
+        closeInsertObjectSubmenu: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.CLOSE_INSERT_OBJECT_SUBMENU
+            });
+        },
+        resetPreviewButton: function() {
+            Dispatcher.dispatch({
+                actionType: BeamboxConstants.RESET_PREVIEW_BUTTON
+            });
+        }
     };
 });

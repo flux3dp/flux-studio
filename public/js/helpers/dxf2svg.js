@@ -1716,7 +1716,7 @@
         acc += point[0] + ',' + point[1];
         return acc;
       }, '');
-      return '<path fill="#ffffff" stroke="' + hex + '" stroke-width="1px" d="' + d + '"/>';
+      return `<path fill="transparent" stroke="#000" stroke-width="1px" d="${d}"/>`;
     };
 
     /**

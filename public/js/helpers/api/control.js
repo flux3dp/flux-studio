@@ -20,7 +20,7 @@ define([
         opts.onConnect = opts.onConnect || function() {};
 
         let timeout = 12 * 1000,
-            timmer,
+            timer,
             isConnected = false,
             lang = i18n.get(),
             ws,
@@ -40,18 +40,18 @@ define([
             };
 
         const createWs = (wsOptions) => {
-            let url = opts.availableUsbChannel >= 0  && opts.availableUsbChannel !==null ? `usb/${opts.availableUsbChannel}` : uuid;
+            let url = opts.availableUsbChannel >= 0  && opts.availableUsbChannel !==null ? `usb/${opts.availableUsbChannel}` : (uuid.length < 3 ? `usb/${uuid}` : uuid);
             let _ws = new Websocket({
                 method: `control/${url}`,
                 onMessage: (data) => {
                     switch (data.status) {
                     case 'connecting':
                         opts.onConnect(data);
-                        clearTimeout(timmer);
-                        timmer = setTimeout(isTimeout, timeout);
+                        clearTimeout(timer);
+                        timer = setTimeout(isTimeout, timeout);
                         break;
                     case 'connected':
-                        clearTimeout(timmer);
+                        clearTimeout(timer);
                         createDedicatedWs(fileInfoWsId);
                         opts.onConnect(data, wsOptions);
                         break;
@@ -67,11 +67,11 @@ define([
                     }
                 },
                 onError: (response) => {
-                    clearTimeout(timmer);
+                    clearTimeout(timer);
                     events.onError(response);
                 },
                 onFatal: (response) => {
-                    clearTimeout(timmer);
+                    clearTimeout(timer);
                     if(response.error === 'REMOTE_IDENTIFY_ERROR') {
                         setTimeout(() => {
                             createWs();
@@ -96,12 +96,12 @@ define([
                         opts.onFatal(response);
                     }
                     else {
-                        clearTimeout(timmer);
+                        clearTimeout(timer);
                         events.onError(response);
                     }
                 },
                 onClose: (response) => {
-                    clearTimeout(timmer);
+                    clearTimeout(timer);
                     isConnected = false;
                     opts.onFatal(response);
                 },
@@ -140,23 +140,10 @@ define([
 
             events.onMessage = (response) => {
                 if ('continue' === response.status) {
-                    let fileReader, chunk;
-
                     for (let i = 0; i < length; i += CHUNK_PKG_SIZE) {
-                        chunk = data.slice(i, i + CHUNK_PKG_SIZE);
-
-                        if (data instanceof Array) {
-                            chunk = convertToTypedArray(chunk, Uint8Array);
-                        }
-
-                        fileReader = new FileReader();
-
-                        fileReader.onloadend = (e) => {
-                            step++;
-                            ws.send(e.target.result);
-                        };
-
-                        fileReader.readAsArrayBuffer(chunk);
+                        let chunk = data.slice(i, i + CHUNK_PKG_SIZE);
+                        step++;
+                        ws.send(chunk);
                     }
                 }
                 else if (response.status === 'uploading') {

@@ -4,7 +4,9 @@ define([
     'reactDOM',
     'reactPropTypes',
     'app/actions/beambox/beambox-preference',
+    'app/actions/beambox/svgeditor-function-wrapper',
     'app/constants/right-panel-constants',
+    'app/stores/beambox-store',
     'jsx!widgets/Unit-Input-v2',
     'jsx!widgets/Button-Group',
     'jsx!widgets/Dropdown-Control',
@@ -19,7 +21,9 @@ define([
     ReactDOM,
     PropTypes,
     BeamboxPreference,
+    FnWrapper,
     RightPanelConstants,
+    BeamboxStore,
     UnitInput,
     ButtonGroup,
     DropdwonControl,
@@ -77,6 +81,14 @@ define([
             };
         },
 
+        componentDidMount() {
+            BeamboxStore.onUpdateLaserPanel(() => this.updateData());
+        },
+
+        componentWillUnmount() {
+            BeamboxStore.removeUpdateLaserPanelListener(() => this.updateData());
+        },
+
         componentWillReceiveProps: function(nextProps) {
             if (nextProps.configName != '') {
                 if (defaultLaserOptions.indexOf(nextProps.configName) > 0 || LocalStorage.get('customizedLaserConfigs').findIndex((e) => e.name === nextProps.configName) > -1) {
@@ -95,6 +107,16 @@ define([
                 original:       defaultLaserOptions[0],
                 modal:          '',
                 selectedItem:   LocalStorage.get('customizedLaserConfigs')[0] ? LocalStorage.get('customizedLaserConfigs')[0].name : ''
+            });
+        },
+
+        updateData: function() {
+            const layerData = FnWrapper.getCurrentLayerData();
+
+            this.setState({
+                speed:      layerData.speed,
+                strength:   layerData.power,
+                repeat:     layerData.repeat
             });
         },
 
@@ -169,6 +191,7 @@ define([
             if (defaultLaserOptions.indexOf(value) > -1) {
                 const model = BeamboxPreference.read('model');
                 switch(model) {
+                    case 'fbm1':
                     case 'fbb1b':
                         this.setState({
                             original: value,
@@ -435,7 +458,6 @@ define([
                 defaultOptions.concat(customizedOptions).concat(functionalOptions) :
                 defaultOptions.concat(functionalOptions)
             );
-
 
             return (
                 <div>

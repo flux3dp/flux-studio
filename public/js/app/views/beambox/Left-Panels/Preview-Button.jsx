@@ -11,6 +11,10 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/beambox-version-master',
     'app/actions/beambox/beambox-preference',
+    'app/actions/beambox',
+    'app/actions/global-actions',
+    'app/actions/progress-actions',
+    'app/constants/progress-constants',
     'app/stores/beambox-store',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
@@ -29,6 +33,10 @@ define([
     PreviewModeController,
     BeamboxVersionMaster,
     BeamboxPreference,
+    BeamboxActions,
+    GlobalActions,
+    ProgressActions,
+    ProgressConstants,
     BeamboxStore,
     ImageTracePanelController,
     classNames,
@@ -54,6 +62,7 @@ define([
             BeamboxStore.onEndDrawingPreviewBlob(() => this.endDrawing());
             BeamboxStore.onClearCameraCanvas(() => this.hideImageTraceButton());
             BeamboxStore.onEndImageTrace(() => this.endImageTrace());
+            BeamboxStore.onResetPreviewButton(() => this.resetPreviewButton());
         }
 
         componentWillUnmount() {
@@ -61,6 +70,7 @@ define([
             BeamboxStore.removeEndDrawingPreviewBlobListener(() => this.endDrawing());
             BeamboxStore.removeClearCameraCanvasListener(() => this.hideImageTraceButton())
             BeamboxStore.removeEndImageTraceListener(() => this.endImageTrace());
+            BeamboxStore.removeResetPreviewButton(() => this.resetPreviewButton());
         }
 
         endImageTrace() {
@@ -83,6 +93,9 @@ define([
                 console.log(error);
             } finally {
                 FnWrapper.useSelectTool();
+                FnWrapper.clearSelection();
+                BeamboxActions.closeInsertObjectSubmenu();
+                GlobalActions.monitorClosed();
                 this.setState({
                     isPreviewMode: false,
                     isImageTraceMode: true
@@ -190,11 +203,14 @@ define([
                     return;
                 };
 
+                ProgressActions.open(ProgressConstants.NONSTOP, i18n.lang.message.tryingToConenctMachine);
+
                 if (!(await isFirmwareVersionValid(device))) {
                     alertUserToUpdateFirmware();
                     return;
                 }
 
+                ProgressActions.close();
                 startPreviewMode(device);
             };
 
@@ -204,15 +220,13 @@ define([
                 } catch (error) {
                     console.log(error);
                 } finally {
-                    FnWrapper.useSelectTool();
-                    this.setState({
-                        isPreviewMode: false,
-                        isImageTraceMode: false
-                    });
+                    this.resetPreviewButton()
                 }
             };
 
             FnWrapper.clearSelection();
+            BeamboxActions.closeInsertObjectSubmenu();
+            GlobalActions.monitorClosed();
 
             if(!this.state.isPreviewMode) {
                 tryToStartPreviewMode();
@@ -227,6 +241,14 @@ define([
             } else {
                 return null;
             }
+        }
+
+        resetPreviewButton() {
+            FnWrapper.useSelectTool();
+            this.setState({
+                isPreviewMode: false,
+                isImageTraceMode: false
+            });
         }
 
         render() {
@@ -250,7 +272,7 @@ define([
                         className={classNames('option', 'preview-btn', {'preview-mode-on': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        {isPreviewMode || isImageTraceMode ? LANG.end_preview : LANG.preview}
+                        {isPreviewMode ? LANG.end_preview : LANG.preview}
                     </div>
                     <span id='clear-preview-graffiti-button-placeholder' />
                     <span id='printer-selector-placeholder' />

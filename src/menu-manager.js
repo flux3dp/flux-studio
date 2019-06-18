@@ -143,7 +143,7 @@ function getDeviceMenuId(uuid, data) {
 function buildDeviceMenu(callback, uuid, data) {
     let { serial, source } = data;
     let menuLabel = data.source == "lan" ? data.name : `${data.name} (USB)`;
-    const modelType = (['fbb1b', 'fbb1p', 'laser-b1', 'darwin-dev'].includes(data.model))?'beambox-series':'delta-series';
+    const modelType = (['fbm1', 'fbb1b', 'fbb1p', 'laser-b1','darwin-dev'].includes(data.model))?'beambox-series':'delta-series';
     let submenu = [];
     if(modelType === 'beambox-series') {
         submenu = [

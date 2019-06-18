@@ -120,7 +120,7 @@ define([
                     return deferred.promise();
                 };
 
-                const response = DeviceMaster.getDeviceInfo();
+                const response = await DeviceMaster.getDeviceInfo();
                 let tried = 0;
 
                 const bindDevice = async (uuid, token, accessId, signature) => {
@@ -161,6 +161,7 @@ define([
 
                 const getCloudValidationCodeAndBind = async (uuid) => {
                     const r = await DeviceMaster.getCloudValidationCode();
+                    console.log('Got cloud validation code', r);
                     let { token, signature } = r.code,
                         accessId = r.code.access_id;
 
@@ -170,13 +171,11 @@ define([
 
                 if(response.cloud[0] === true) {
                     getCloudValidationCodeAndBind(response.uuid);
-                }
-                else {
+                } else {
                     if(response.cloud[1].join('') === 'DISABLE') {
                         const resp = await DeviceMaster.enableCloud();
                         await processEnableCloudResult(resp);
-                    }
-                    else {
+                    } else {
                         let error = response.cloud[1];
                         error.unshift('CLOUD');
                         this.props.onError(error);

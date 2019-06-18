@@ -62,7 +62,7 @@ define([
             var me = e.currentTarget,
                 lang = this.state.lang,
                 originalIP = Config().read('poke-ip-addr'),
-                ips = me.value.split(','),
+                ips = me.value.split(/[,;] ?/),
                 ipv4Pattern = /^\d{1,3}[\.]\d{1,3}[\.]\d{1,3}[\.]\d{1,3}$/g,
                 isCorrectFormat = true;
 
@@ -117,7 +117,6 @@ define([
                 location.hash = '#';
             }
         },
-
 
         render: function() {
             let { supported_langs } = this.props,
@@ -179,6 +178,19 @@ define([
                     value: 'beambox',
                     label: lang.menu.beambox,
                     selected: Config().read('default-app') === 'beambox'
+                },
+            ];
+
+            const defaultUnitsOptions = [
+                {
+                    value: 'mm',
+                    label: lang.menu.mm,
+                    selected: Config().read('default-units') === 'mm'
+                },
+                {
+                    value: 'inches',
+                    label: lang.menu.inches,
+                    selected: Config().read('default-units') === 'inches'
                 },
             ];
 
@@ -266,6 +278,11 @@ define([
             ];
 
             const defaultBeamboxModelOptions = [
+                {
+                    value: 'fbm1',
+                    label: 'Beamo',
+                    selected: BeamboxPreference.read('model') === 'fbm1'
+                },
                 {
                     value: 'fbb1b',
                     label: 'Beambox',
@@ -385,6 +402,25 @@ define([
                     </Controls>
 
                     <div className='subtitle'>{lang.settings.beambox_series}</div>
+
+                    <Controls label={lang.settings.default_units}>
+                        <SelectView
+                            className='font3'
+                            options={defaultUnitsOptions}
+                            onChange={this._updateOptions.bind(null, 'default-units')}
+                        />
+                    </Controls>
+
+                    <Controls label={lang.settings.loop_compensation}>
+                        <UnitInput
+                            unit='mm'
+                            min={0}
+                            max={20}
+                            defaultValue={Number(localStorage.getItem('loop_compensation') || '0') / 10}
+                            getValue={val => localStorage.setItem('loop_compensation', Number(val) * 10)}
+                            className={{half: true}}
+                        />
+                    </Controls>
 
                     <Controls label={lang.settings.default_beambox_model}>
                         <SelectView

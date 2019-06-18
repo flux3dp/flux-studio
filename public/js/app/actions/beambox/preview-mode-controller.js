@@ -72,6 +72,10 @@ define([
                 this.errorCallback = errCallback;
                 this.isPreviewModeOn = true;
             } catch (error) {
+                if (this.originalSpeed !== 1) {
+                    await DeviceMaster.setLaserSpeed(this.originalSpeed);
+                    this.originalSpeed = 1;
+                }
                 throw error;
             } finally {
                 ProgressActions.close();
@@ -252,6 +256,7 @@ define([
         _getPhotoAfterMove(x, y) {
             const movementX = x / Constant.dpmm - this._getCameraOffset().x;
             const movementY = y / Constant.dpmm - this._getCameraOffset().y;
+
             return this._getPhotoAfterMoveTo(movementX, movementY);
         }
 
@@ -266,7 +271,9 @@ define([
             await DeviceMaster.select(this.storedPrinter);
             await DeviceMaster.maintainMove(movement);
             await this._waitUntilEstimatedMovementTime(movementX, movementY);
+
             const imgUrl = await this._getPhotoFromMachine();
+
             return imgUrl;
         }
 

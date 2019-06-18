@@ -14,6 +14,11 @@ define([
 
     beamboxStore = Object.assign(EventEmitter.prototype, {
 
+        onUpdateLaserPanel: function(callback) {
+            this.on(Constants.UPDATE_LASER_PANEL, callback);
+            return beamboxStore;
+        },
+
         onEndDrawingPreviewBlob: function(callback) {
             this.on(Constants.END_DRAWING_PREVIEW_BLOB, callback);
             return beamboxStore;
@@ -39,6 +44,21 @@ define([
             return beamboxStore;
         },
 
+        onCloseInsertObjectSubmenu: function(callback) {
+            this.on(Constants.CLOSE_INSERT_OBJECT_SUBMENU, callback);
+            return beamboxStore;
+        },
+
+        onResetPreviewButton: function(callback) {
+            this.on(Constants.RESET_PREVIEW_BUTTON, callback);
+            return beamboxStore;
+        },
+
+        removeUpdateLaserPanelListener: function(callback) {
+            this.removeListener(Constants.UPDATE_LASER_PANEL, callback);
+            return beamboxStore;
+        },
+
         removeEndDrawingPreviewBlobListener: function(callback) {
             this.removeListener(Constants.END_DRAWINGk_PREVIEW_BLOB, callback);
             return beamboxStore;
@@ -61,6 +81,16 @@ define([
 
         removeClearCameraCanvasListener: function(callback) {
             this.removeListener(Constants.CLEAR_CAMERA_CANVAS, callback);
+            return beamboxStore;
+        },
+
+        removeCloseInsertObjectSubmenuListener: function(callback) {
+            this.removeListener(Constants.CLOSE_INSERT_OBJECT_SUBMENU, callback);
+            return beamboxStore;
+        },
+
+        removeResetPreviewButton: function(callback) {
+            this.removeListener(Constants.RESET_PREVIEW_BUTTON, callback);
             return beamboxStore;
         },
 

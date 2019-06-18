@@ -35,26 +35,44 @@ define([
             this._handleStartClick = this._handleStartClick.bind(this);
             this._renderPrinterSelectorWindow = this._renderPrinterSelectorWindow.bind(this);
         }
+
         async _handleStartClick() {
             if (PreviewModeController.isPreviewMode()) {
                 await PreviewModeController.end();
             }
-            const isPowerTooHigh = $('#svgcontent > g.layer')
-                .toArray()
-                .map(layer => layer.getAttribute('data-strength'))
-                .some(strength => Number(strength) > 80);
 
-            if (isPowerTooHigh) {
-                if(BeamboxPreference.read('should_remind_power_too_high_countdown') > 0) {
-                    AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
-                    BeamboxPreference.write('should_remind_power_too_high_countdown', BeamboxPreference.read('should_remind_power_too_high_countdown') - 1);
+            const layers = $('#svgcontent > g.layer').toArray();
+            const dpi = BeamboxPreference.read('engrave_dpi');
+
+            const isPowerTooHigh = layers.map(layer => layer.getAttribute('data-strength'))
+                    .some(strength => Number(strength) > 80);
+            const imageElems = document.querySelectorAll('image');
+
+            let isSpeedTooHigh = false;
+
+            for (let i = 1; i < imageElems.length; i++) {
+                if (imageElems[i].getAttribute('data-shading') && (
+                        (dpi === 'medium' && imageElems[i].parentNode.getAttribute('data-speed') > 135) ||
+                        (dpi === 'high' && imageElems[i].parentNode.getAttribute('data-speed') > 90)
+                )) {
+                    isSpeedTooHigh = true;
+                    break;
                 }
+            }
+
+            if (isPowerTooHigh && isSpeedTooHigh) {
+                AlertActions.showPopupWarning('', lang.beambox.popup.both_power_and_speed_too_high);
+            } else if (isPowerTooHigh) {
+                AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
+            } else if (isSpeedTooHigh) {
+                AlertActions.showPopupWarning('', lang.beambox.popup.speed_too_high_lower_the_quality);
             }
 
             this.setState({
                 isPrinterSelectorOpen: true
             });
         }
+
         _renderPrinterSelectorWindow() {
             const onGettingPrinter = async (selected_item) => {
                 //export fcode
@@ -63,6 +81,7 @@ define([
                     this.setState({
                         isPrinterSelectorOpen: false
                     });
+
                     return;
                 }
 
@@ -73,6 +92,7 @@ define([
                     this.setState({
                         isPrinterSelectorOpen: false
                     });
+
                     return;
                 }
 
@@ -82,12 +102,13 @@ define([
                 });
                 BottomRightFuncs.uploadFcode(selected_item);
             };
+
             const onClose = () => {
                 this.setState({
                     isPrinterSelectorOpen: false
                 });
             };
-            
+
             const content = (
                 <PrinterSelector
                     uniqleId="laser"
@@ -98,6 +119,7 @@ define([
                     onGettingPrinter={onGettingPrinter}
                 />
             );
+
             return (
                 <Modal content={content} onClose={onClose} />
             );
@@ -120,9 +142,13 @@ define([
             ];
 
             return (
-                <ButtonGroup buttons={buttons} className="beehive-buttons action-buttons" />
+                <ButtonGroup
+                    buttons={buttons}
+                    className="beehive-buttons action-buttons"
+                />
             );
         }
+
         render() {
             const actionButtons = this._renderActionButtons();
             const printerSelector = this._renderPrinterSelectorWindow();
@@ -135,6 +161,6 @@ define([
             );
         }
     }
-    return BottomRightPanel;
 
+    return BottomRightPanel;
 });

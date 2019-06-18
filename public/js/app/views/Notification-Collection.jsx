@@ -228,8 +228,6 @@ define([
                     // Raven.setUserContext({ extra: { version: window.FLUX.version } });
                 }
 
-                this._checkOsxRequirement();
-
                 DeviceMaster.registerUsbEvent('DASHBOARD', this._monitorUsb);
             },
 
@@ -253,24 +251,6 @@ define([
                 GlobalStore.removeSliceCompleteListener();
             },
 
-            _checkOsxRequirement: function() {
-                if(window.FLUX.isNW && localStorage.getItem('dev') !== '1') {
-                    if(process.env.osType === 'osx') {
-                        let pathArray = process.env.launched.split('/');
-                        if(
-                            pathArray[1] !== 'Applications' &&
-                            !window.FLUX.dev &&
-                            !localStorage.getItem('mislaunch-warned')
-                        ) {
-                            AlertActions.showPopupError(
-                                'LAUNCHING_FROM_INSTALLER_WARNING',
-                                lang.message.launghing_from_installer_warning
-                            );
-                            localStorage.setItem('mislaunch-warned', true);
-                        }
-                    }
-                }
-            },
 
             _monitorUsb: function(usbOn) {
                 if(this.state.showMonitor) {

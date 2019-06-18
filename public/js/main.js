@@ -2,6 +2,7 @@
 requirejs.config({
     urlArgs: 'v=' + (Boolean(localStorage.dev) ? '' : window.FLUX.timestamp),
     baseUrl: 'js/',
+    waitSeconds: 30,
     paths: {
         //jquery: 'lib/jquery-1.11.0.min',
         jquery: 'lib/svgeditor/jquery',

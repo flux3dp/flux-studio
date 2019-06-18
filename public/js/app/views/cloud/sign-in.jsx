@@ -3,15 +3,13 @@ define([
     'helpers/i18n',
     'helpers/sprintf',
     'helpers/api/cloud',
-    'plugins/classnames/index',
-    'helpers/nwjs/menu-factory',
+    'plugins/classnames/index'
 ], function(
     React,
     i18n,
     Sprintf,
     CloudApi,
-    ClassNames,
-    menuFactory
+    ClassNames
 ) {
     const LANG = i18n.lang.settings.flux_cloud;
     return React.createClass({
@@ -82,7 +80,6 @@ define([
             if(response.ok) {
                 const { nickname } = responseBody;
                 const displayName = nickname || email;
-                menuFactory.methods.updateAccountDisplay(displayName);
                 location.hash = '#/studio/cloud/bind-machine';
             } else {
                 if (response.status !== 200) {

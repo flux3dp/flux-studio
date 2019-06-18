@@ -332,11 +332,11 @@ define([
                     offsetY: 100
                 }
 
-                FnWrapper.insertImage(croppedBlobUrl, testingCropData, testingPreCrop, threshold);
-                FnWrapper.insertSvg(imageTrace, testingCropData, testingPreCrop);
+                FnWrapper.insertImage(croppedBlobUrl, testingCropData, testingPreCrop, 1, threshold, true);
+                FnWrapper.insertSvg(imageTrace, 'image-trace', testingCropData, testingPreCrop);
             } else {
-                FnWrapper.insertImage(croppedBlobUrl, cropData, preCrop, threshold);
-                FnWrapper.insertSvg(imageTrace, cropData, preCrop);
+                FnWrapper.insertImage(croppedBlobUrl, cropData, preCrop, 1, threshold, true);
+                FnWrapper.insertSvg(imageTrace, 'image-trace', cropData, preCrop);
             }
 
             URL.revokeObjectURL(grayscaleCroppedImg);

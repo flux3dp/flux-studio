@@ -235,6 +235,14 @@ define([
                     GlobalStore.onCancelPreview(this._handleCancelPreview);
                     GlobalStore.onMonitorClosed(this._handleMonitorClosed);
                     GlobalStore.onSliceComplete(this._handleSliceReport);
+
+                    $('.print-studio').mouseup(() => {
+                        GlobalActions.resetDialogMenuIndex();
+                    });
+
+                    document.addEventListener('mouseup', () => {
+                        GlobalActions.monitorClosed();
+                    });
                 },
 
                 componentWillUnmount: function() {
@@ -246,6 +254,11 @@ define([
                     GlobalStore.removeCancelPreviewListener(this._handleCancelPreview);
                     GlobalStore.removeMonitorClosedListener(this._handleMonitorClosed);
                     GlobalStore.removeSliceCompleteListener(this._handleSliceReport);
+
+                    document.removeEventListener('mouseup', () => {
+                        GlobalActions.monitorClosed();
+                        //GlobalActions.resetDialogMenuIndex();
+                    });
                 },
 
                 _startTutorial: function() {
@@ -427,7 +440,7 @@ define([
                         DeviceMaster.getDeviceBySerial(device.serial, false, callback);
                     }
                     else if(answer === 'print-setting-version') {
-                        advancedSettings.load(DefaultPrintSettings);
+                        advancedSettings.load(DefaultPrintSettings.cura2);
                         Config().write('slicing-config', advancedSettings.toString());
                         Config().write('print-setting-version', GlobalConstants.DEFAULT_PRINT_SETTING_VERSION);
                     }
@@ -880,7 +893,7 @@ define([
 
                 _checkDefaultPrintSettingsVersion: function() {
                     var version = Config().read('print-setting-version');
-                    if(version && version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
+                    if(version !== GlobalConstants.DEFAULT_PRINT_SETTING_VERSION) {
                         AlertActions.showPopupYesNo('print-setting-version', lang.monitor.updatePrintPresetSetting);
                     }
                 },

@@ -6,7 +6,6 @@ define([
     'jsx!views/settings/Setting-Device',
     'plugins/classnames/index',
     'app/app-settings',
-    'helpers/force-reload',
     'helpers/api/config',
 ], function(
     $,
@@ -16,7 +15,6 @@ define([
     DeviceSetting,
     ClassNames,
     settings,
-    forceReload,
     config
 ) {
     'use strict';

@@ -53,6 +53,18 @@ define([
             FnWrapper.update_line_y2(val);
             this.setState({y2: val});            
         },
+        getValueCaption: function() {
+            const x1 = this.state.x1, 
+                y1 = this.state.y1,
+                x2 = this.state.x2, 
+                y2 = this.state.y2,
+                units = localStorage.getItem('default-units', 'mm') ;
+            if (units === 'inches') {
+                return `A (${Number(x1/25.4).toFixed(2)}, ${Number(y1/25.4).toFixed(2)}), B (${Number(x2/25.4).toFixed(2)}, ${Number(y2/25.4).toFixed(2)})`;
+            } else {
+                return `A (${x1}, ${y1}), B (${x2}, ${y2})`;
+            } 
+        },
         render: function() {
             return (
                 <div className="object-panel">
@@ -60,7 +72,7 @@ define([
                     <input type="checkbox" className="accordion-switcher"/>
                     <p className="caption">
                         {LANG.points}
-                        <span className="value">A  ( {this.state.x1}, {this.state.y1} ) mm<br/>B  ( {this.state.x2}, {this.state.y2} ) mm</span>
+                        <span className="value">{this.getValueCaption()}</span>
                     </p>
                     <label className="accordion-body">
                         <div className="control">
@@ -69,7 +81,8 @@ define([
                                 <UnitInput
                                     min={0}
                                     max={Constant.dimension.width/Constant.dpmm}
-                                    unit=""
+                                    unit="mm"
+                                    abbr={true}
                                     defaultValue={this.state.x1}
                                     getValue={this._update_x1_handler}
                                     className={{'input-halfsize': true}}
@@ -77,7 +90,8 @@ define([
                                 <UnitInput
                                     min={0}
                                     max={Constant.dimension.height/Constant.dpmm}
-                                    unit=""
+                                    unit="mm"
+                                    abbr={true}
                                     defaultValue={this.state.y1}
                                     getValue={this._update_y1_handler}
                                     className={{'input-halfsize': true}}
@@ -90,7 +104,8 @@ define([
                                 <UnitInput
                                     min={0}
                                     max={Constant.dimension.width/Constant.dpmm}
-                                    unit=""
+                                    unit="mm"
+                                    abbr={true}
                                     defaultValue={this.state.x2}
                                     getValue={this._update_x2_handler}
                                     className={{'input-halfsize': true}}
@@ -98,7 +113,8 @@ define([
                                 <UnitInput
                                     min={0}
                                     max={Constant.dimension.height/Constant.dpmm}
-                                    unit=""
+                                    unit="mm"
+                                    abbr={true}
                                     defaultValue={this.state.y2}
                                     getValue={this._update_y2_handler}
                                     className={{'input-halfsize': true}}

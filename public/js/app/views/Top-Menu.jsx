@@ -26,7 +26,10 @@ define([
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/constants/global-constants',
-    'app/actions/initialize-machine'
+    'app/actions/initialize-machine',
+    'app/actions/beambox/preview-mode-background-drawer',
+    'app/actions/beambox/preview-mode-controller',
+    'app/actions/beambox/svgeditor-function-wrapper'
 ], function(
     $,
     React,
@@ -55,7 +58,10 @@ define([
     ProgressActions,
     ProgressConstants,
     GlobalConstants,
-    InitializeMachine
+    InitializeMachine,
+    PreviewModeBackgroundDrawer,
+    PreviewModeController,
+    FnWrapper
 ) {
     'use strict';
 
@@ -732,11 +738,16 @@ define([
             },
 
             _handleNavigation: function(address) {
-
                 if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
                     AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
                 }
                 else {
+                    if (location.hash.indexOf('beambox') > 0 && address !== 'beambox') {
+                        FnWrapper.clearSelection();
+                        PreviewModeController.end();
+                        PreviewModeBackgroundDrawer.clear();
+                    }
+
                     location.hash = '#studio/' + address;
                 }
             },
@@ -789,7 +800,7 @@ define([
             },
 
             _handleContextMenu: function(event) {
-                electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY});
+                electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY}, {});
             },
             _renderStudioFunctions: function(groupName = 'delta') {
                 var itemClass = '',

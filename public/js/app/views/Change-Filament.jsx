@@ -161,7 +161,7 @@ define([
                             self._next(steps.UNLOADING);
                             break;
                         case 'DISCONNECTED':
-                            DeviceMaster.KickChangeFilament().always(function () {
+                            DeviceMaster.kickChangeFilament().always(function () {
                                 self._next(steps.DISCONNECTED);
                             });
                             break;

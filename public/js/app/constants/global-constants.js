@@ -9,6 +9,7 @@ define([], function(){
         EXIT_PREVIEW                    : 'EXIT_PREVIEW',
         IMPORT_FCODE                    : 'IMPORT_FCODE',
         IMPORT_SCENE                    : 'IMPORT_SCENE',
+        RESET_DIALOG_MENU_INDEX         : 'RESET_DIALOG_MENU_INDEX',
 
         // Monitor Open source
         PRINT                           : 'PRINT',
@@ -23,6 +24,6 @@ define([], function(){
         CAMERA                          : 'CAMERA',
         FILE_PREVIEW                    : 'FILE_PREVIEW',
 
-        DEFAULT_PRINT_SETTING_VERSION   : '0.73'
+        DEFAULT_PRINT_SETTING_VERSION   : '0.75'
     };
 });

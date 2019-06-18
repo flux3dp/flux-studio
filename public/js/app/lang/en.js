@@ -85,6 +85,10 @@ define(function() {
                 import: 'Import',
                 save_fcode: 'Export FLUX Task',
                 save_scene: 'Save Scene',
+                all_files: 'All Files',
+                bvg_files: 'Beambox Scene',
+                fcode_files: 'FLUX Code',
+                fsc_files: '3D Printing Scene',
                 confirmReset: 'Are you sure you want to reset all settings?'
             },
             edit: {
@@ -305,7 +309,9 @@ define(function() {
             draw: 'DRAW',
             cut: 'CUT',
             beambox: 'BEAMBOX',
-            mill: 'MILL'
+            mill: 'MILL',
+            mm: 'mm',
+            inches: 'Inches'
         },
         settings: {
             on: 'On',
@@ -332,7 +338,9 @@ define(function() {
             confirm_reset: 'Confirm reset FLUX Studio?',
             language: 'Language',
             notifications: 'Notifications',
-            default_app: 'Default app',
+            default_app: 'Default App',
+            default_units: 'Default Units',
+            loop_compensation: 'Loop Compensation',
             delta_series: 'Delta Family',
             beambox_series: 'Beambox Family',
             default_model: 'Default Model<br />(For Print Settings)',
@@ -906,7 +914,7 @@ define(function() {
             estimating: 'Estimating the time...',
             calibrate_fail: 'Calibration Failed',
             calibration_is_running: 'Calibrating for Scanning',
-            calibration_firmware_requirement: 'Please upgrade your firmware to 1.6.25+',
+            calibration_firmware_requirement: 'Please upgrade your firmware to 1.6.9+',
             resolution: [{
                 id: 'best',
                 text: 'Best',
@@ -1010,6 +1018,8 @@ define(function() {
                 nolayer: 'Single Layer',
                 no_support_text: 'FLUX Studio does not support text tag currently. Please transfer text to path before importing.',
                 power_too_high_damage_laser_tube: 'Using lower laser power will extends laser tube\'s lifetime.' ,
+                speed_too_high_lower_the_quality: 'Using too high speed at this resolution may result in the lower quality of shading engraving.',
+                both_power_and_speed_too_high: 'Using lower laser power will extends laser tube\'s lifetime.\nAlso, too high speed at this resolution may result in the lower quality of shading engraving.',
                 should_update_firmware_to_continue: 'Your firmware does not support some improvements of FLUX Studio. For better performance and user experience, please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)'
             },
             left_panel: {
@@ -1030,7 +1040,9 @@ define(function() {
                     ellipse: 'Ellipse',
                     line: 'Line',
                     image: 'Image',
-                    text: 'Text'
+                    text: 'Text',
+                    path: 'Path',
+                    polygon: 'Polygon'
                 },
                 advanced_panel: {
                     engrave_parameters: 'Engraving Parameters',
@@ -1355,6 +1367,7 @@ define(function() {
         message: {
             connecting: 'Connecting...',
             connectingMachine: 'Connecting %s...',
+            tryingToConenctMachine: 'Trying to connect to machine...',
             connected: 'Connected',
             authenticating: 'Authenticating...',
             runningTests: 'Running tests...',
@@ -1496,11 +1509,12 @@ define(function() {
             back: 'BACK',
             finish: 'DONE',
             please_goto_beambox_first: 'Please switch to Engraving Mode ( Beambox ) in order to use this feature.',
-            please_place_paper: 'Please place an A4 white paper at left-top corner of workarea',
+            please_place_paper: 'Please place an A4 or Letter size white paper at left-top corner of workarea',
             please_refocus: 'Please focus the platform properly',
             taking_picture: 'Taking Picture...',
             start_engrave: 'START ENGRAVE',
             analyze_result_fail: 'Fail to analyze captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            no_lines_detected: 'Fail to detect lines from captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             drawing_calibration_image: 'Drawing calibration image...',
             please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             calibrate_done: 'Calibration done. Better camera accurency is given when focus precisely.'

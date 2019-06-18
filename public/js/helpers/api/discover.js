@@ -11,11 +11,11 @@ define([
     'helpers/smart-upnp',
     'helpers/api/cloud'
 ], function(
-    Websocket, 
-    initializeMachine, 
-    Config, 
-    DeviceList, 
-    Logger, 
+    Websocket,
+    initializeMachine,
+    Config,
+    DeviceList,
+    Logger,
     SmartUpnp,
     CloudApi) {
     'use strict';
@@ -42,12 +42,27 @@ define([
         },
         onMessage = function(device) {
             if (device.alive) {
-                // console.log(device);
-                if(device.source === 'h2h') {
+                if (device.source === 'h2h') {
                     device.h2h_uuid = device.uuid;
                     device.uuid = device.addr.toString();
                 }
-                // console.log(device);
+
+                let pokeIPAddr = localStorage.getItem('poke-ip-addr');
+
+                if (pokeIPAddr && pokeIPAddr !== '') {
+                    const pokeIPAddrArr = pokeIPAddr.split(/[,;] ?/);
+
+                    if (pokeIPAddrArr.indexOf(device.ipaddr) === -1) {
+                        if (pokeIPAddrArr.length > 19) {
+                            pokeIPAddr = pokeIPAddrArr.slice(pokeIPAddrArr.length - 19, pokeIPAddrArr.length);
+                        }
+
+                        localStorage.setItem('poke-ip-addr', `${pokeIPAddr}, ${device.ipaddr}`);
+                    }
+                } else {
+                    localStorage.setItem('poke-ip-addr', device.ipaddr);
+                }
+
                 _devices[device.uuid] = device;
 
                 //SmartUpnp.addSolidIP(device.ip);
@@ -75,7 +90,8 @@ define([
             ws.send(JSON.stringify({ 'cmd' : 'poke', 'ipaddr': targetIP }));
         },
         BUFFER = 100,
-        pokeIPs = Config().read('poke-ip-addr').split(';'),
+        pokeIPAddr = localStorage.getItem('poke-ip-addr'),
+        pokeIPs = (pokeIPAddr ? pokeIPAddr.split(/[,;] ?/) : ['']),
         timer;
 
     if ('' === pokeIPs[0]) {

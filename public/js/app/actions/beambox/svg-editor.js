@@ -1238,7 +1238,7 @@ define([
             var clickSelect = editor.clickSelect = function () {
                 if (toolButtonClick('#tool_select')) {
                     svgCanvas.setMode('select');
-                    $('#styleoverrides').text('#svgcanvas svg *{cursor:move;pointer-events:all}, #svgcanvas svg{cursor:default}');
+                    $('#styleoverrides').text('#svgcanvas svg *{cursor:move;pointer-events:all;stroke-width:1px;vector-effect:non-scaling-stroke;}, #svgcanvas svg{cursor:default}');
                 }
             };
 
@@ -1722,11 +1722,16 @@ define([
                             var x, y;
 
                             // Get BBox vals for g, polyline and path
-                            if (['g', 'polyline', 'path'].indexOf(elname) >= 0) {
+                            if (['g', 'polyline', 'path', 'polygon'].indexOf(elname) >= 0) {
                                 var bb = svgCanvas.getStrokedBBox([elem]);
                                 if (bb) {
                                     x = bb.x;
                                     y = bb.y;
+                                    if (elname === 'path' || elname === 'polygon') {
+                                        let bbox = elem.getBBox();
+                                        ObjectPanelsController.setWidth(bbox.width);
+                                        ObjectPanelsController.setHeight(bbox.height);
+                                    }
                                 }
                             } else {
                                 x = elem.getAttribute('x');
@@ -1783,6 +1788,8 @@ define([
                         circle: ['cx', 'cy', 'r'],
                         ellipse: ['cx', 'cy', 'rx', 'ry'],
                         line: ['x1', 'y1', 'x2', 'y2'],
+                        path: [],
+                        polygon: [],
                         text: [],
                         use: []
                     };
@@ -1901,6 +1908,9 @@ define([
                                 ObjectPanelsController.setWidth(location.width);
                                 ObjectPanelsController.setHeight(location.height);
                             }
+                        }
+                        else if (el_name === 'path') {
+                            //$('#container_panel').show();
                         }
                     }
                     menu_items[(el_name === 'g' ? 'en' : 'dis') + 'ableContextMenuItems']('#ungroup');
@@ -4702,7 +4712,8 @@ define([
                 {
                     sel: '#tool_path',
                     fn: clickPath,
-                    evt: 'click',
+                    evt: 'mouseup',
+                    parent: '#tool_path',
                     key: ['P', true]
                 },
                 {
@@ -5033,6 +5044,16 @@ define([
                         Shortcuts.on(['right'], () => {
                             moveSelected(1, 0);
                         });
+                        // -
+                        Shortcuts.on(['plus'], () => {
+                            console.log('on plus');
+                            window.polygonAddSides();
+                        });
+                        // +
+                        Shortcuts.on(['minus'], () => {
+                            console.log('on minus');
+                            window.polygonDecreaseSides();
+                        });
                         Shortcuts.on(['esc'], clickSelect);
 
                         // Setup flyouts
@@ -5343,8 +5364,8 @@ define([
                                         id: svgCanvas.getNextId(),
                                         style: 'pointer-events:inherit',
                                         preserveAspectRatio: 'none',
-                                        'data-threshold': 255,
-                                        'data-shading': true,
+                                        'data-threshold': 128,
+                                        'data-shading': false,
                                         origImage: img.src
                                     }
                                 });
@@ -5355,7 +5376,7 @@ define([
                                         width: width,
                                         grayscale: {
                                             is_rgba: true,
-                                            is_shading: Boolean(newImage.getAttribute('data-shading')),
+                                            is_shading: false,
                                             threshold: parseInt(newImage.getAttribute('data-threshold')),
                                             is_svg: false
                                         },
@@ -5400,11 +5421,94 @@ define([
                         var reader = new FileReader();
                         reader.onloadend = function (e) {
                             let svgString = e.target.result;
+
                             if (blob.path) {
                                 svgString = svgString.replace('xlink:href="../', 'xlink:href="' + getBasename(blob.path) + '/../');
                                 svgString = svgString.replace('xlink:href="./', 'xlink:href="' + getBasename(blob.path) + '/');
                             }
-                            var newElement = svgCanvas.importSvgString(svgString, type);
+
+                            if (svgString.indexOf('<![CDATA[') > -1) {
+                                const indexLeft = svgString.indexOf('<![CDATA[');
+                                const indexRight = svgString.indexOf(']]>');
+
+                                svgString = svgString.substr(0, indexLeft) + svgString.substring(indexLeft+9, indexRight) + svgString.substr(indexRight + 3);
+                            }
+
+
+                            if (svgString.indexOf('<switch>') > -1) {
+                                const indexLeft = svgString.indexOf('<switch>');
+                                const indexRight = svgString.indexOf('</switch>');
+
+                                svgString = svgString.substr(0, indexLeft) + svgString.substring(indexLeft+8, indexRight) + svgString.substr(indexRight+9);
+                            }
+
+                            if (type !== 'color') {
+                                svgString = svgString.replace(/<image(.|\n)+\/image>/g, '');
+                                svgString = svgString.replace(/<image(.|\n)+\/>/g, '');
+                            }
+
+                            // Insert CSS style into the node
+                            if (type === 'layer') {
+                                const indexStyle = svgString.indexOf('<style');
+
+                                if (indexStyle > -1) {
+                                    const styleString = svgString.slice(indexStyle, svgString.indexOf('/style>'));
+                                    let classPrefix = '';
+
+                                    if (styleString.indexOf('.st') > -1) {
+                                        classPrefix = 'st';
+                                    } else if (styleString.indexOf('.cls-') > -1) {
+                                        classPrefix = 'cls-';
+                                    } else {
+                                        console.log('Unknown Class Prefix');
+                                    }
+
+                                    if (classPrefix !== '') {
+                                        let styleStrings = [];
+                                        let index = (classPrefix === 'st' ? 0 : 1);
+
+                                        while(true) {
+                                            const splitStyleString = styleString.split(`.${classPrefix}${index}`);
+                                            let classStyle = 'style="';
+
+                                            if (splitStyleString.length === 1) {
+                                                break;
+                                            }
+
+                                            for (let i = 1; i < splitStyleString.length; i++) {
+                                                const leftBrace = splitStyleString[i].indexOf('{') + 1;
+                                                const rightBrace = splitStyleString[i].indexOf('}');
+                                                const style = `${splitStyleString[i].slice(leftBrace, rightBrace).trim()}`;
+
+                                                classStyle += style;
+                                            }
+
+                                            classStyle += '"';
+                                            styleStrings[index] = classStyle;
+                                            index += 1;
+                                        }
+
+                                        for (let i = (classPrefix === 'st' ? 0 : 1); i < styleStrings.length; i++) {
+                                            const className = `class="${classPrefix}${i}"`;
+                                            const split = svgString.split(className);
+
+                                            if (split.length === 1) {
+                                                continue;
+                                            }
+
+                                            svgString = split[0];
+
+                                            for (let j = 1; j < split.length; j++) {
+                                                svgString += `${styleStrings[i]}${split[j]}`;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            const modifiedSvgString = svgString.replace(/fill(: ?#(fff(fff)?|FFF(FFF)?));/g, 'fill: none;').replace(/fill= ?"#(fff(fff)?|FFF(FFF))"/g, 'fill="none"');
+                            const newElement = svgCanvas.importSvgString(modifiedSvgString, type);
+
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.ungroupSelectedElement();
                             svgCanvas.groupSelectedElements();
@@ -5426,23 +5530,25 @@ define([
                 const importSvg = file => {
                     svgCanvas.setLatestImportFileName(file.name.split('.')[0]);
                     async function importAs(type) {
-                        if (type === 'color') {
-                            await svgWebSocket.uploadPlainSVG(file);
-                            const outputs = await svgWebSocket.divideSVG();
+                        await svgWebSocket.uploadPlainSVG(file);
+                        const outputs = await svgWebSocket.divideSVG();
 
+                        if (type === 'color') {
                             await readSVG(outputs['strokes'], type);
-                            console.log('Loading colors');
 
                             await readSVG(outputs['colors'], type);
-                            console.log('Loading bitmap', outputs['bitmap']);
-
-                            if (outputs['bitmap'].size > 0) {
-                                svgCanvas.createLayer(LANG.right_panel.layer_panel.layer_bitmap);
-                                await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
-                            }
-                            console.log('Load complete');
                         } else {
-                            readSVG(file, type);
+                            await readSVG(file, type);
+                        }
+
+                        if (outputs['bitmap'].size > 0) {
+                            const layerName = LANG.right_panel.layer_panel.layer_bitmap;
+
+                            if (!svgCanvas.setCurrentLayer(layerName)) {
+                                svgCanvas.createLayer(layerName);
+                            }
+
+                            await readImage(outputs['bitmap'], 3.5277777, outputs['bitmap_offset']); // Magic number 72dpi / 25.4 inch per mm
                         }
                     }
 
@@ -5454,15 +5560,12 @@ define([
                         '',
                         [
                             () => {
-                                $('#svg_editor').removeClass('color');
                                 importAs('layer');
                             },
                             () => {
-                                $('#svg_editor').addClass('color');
                                 importAs('color');
                             },
                             () => {
-                                $('#svg_editor').removeClass('color');
                                 importAs('nolayer');
                             }
                         ]
@@ -5545,7 +5648,29 @@ define([
                     const parsedSvg = await new Promise(resolve => {
                         const reader = new FileReader();
                         reader.onloadend = (evt) => {
-                            editor.loadFromString(evt.target.result);
+                            let str = evt.target.result;
+                            editor.loadFromString(str.replace(/STYLE>/g, 'style>'));
+
+                            // loadFromString will lose data-xform and data-wireframe of `use` so set it back here
+                            if (typeof(str) === 'string') {
+                                let tmp = str.substr(str.indexOf('<use')).split('<use');
+
+                                for(let i = 1; i < tmp.length; ++i) {
+                                    let elem, match, id, wireframe, xform;
+
+                                    tmp[i] = tmp[i].substring(0, tmp[i].indexOf('/>'))
+                                    match = tmp[i].match(/id="svg_\d+"/)[0];
+                                    id = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+                                    match = tmp[i].match(/data-xform="[^"]*"/)[0];
+                                    xform = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+                                    match = tmp[i].match(/data-wireframe="[a-z]*"/)[0];
+                                    wireframe = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+
+                                    elem = document.getElementById(id);
+                                    elem.setAttribute('data-xform', xform);
+                                    elem.setAttribute('data-wireframe', wireframe === 'true');
+                                }
+                            }
                         };
                         reader.readAsText(file);
                     });
@@ -5758,7 +5883,19 @@ define([
             });
             $('#workarea')[0].scrollLeft = svgCanvas.defaultScroll.x;
             $('#workarea')[0].scrollTop = svgCanvas.defaultScroll.y;
-        }
+        };
+
+        editor.zoomIn = function() {
+            editor.zoomChanged(window, {
+                zoomLevel: svgCanvas.getZoom() * 1.1
+            });
+        };
+
+        editor.zoomOut = function() {
+            editor.zoomChanged(window, {
+                zoomLevel: svgCanvas.getZoom() / 1.1
+            });
+        };
 
         editor.ready = function (cb) {
             if (!isReady) {

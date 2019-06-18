@@ -23,7 +23,6 @@ define([
     'helpers/shortcuts',
     'helpers/round',
     'helpers/dnd-handler',
-    'helpers/nwjs/menu-factory',
     'helpers/point-cloud',
     'Rx',
     'helpers/duration-formatter',
@@ -58,7 +57,6 @@ define([
     shortcuts,
     round,
     dndHandler,
-    menuFactory,
     PointCloudHelper,
     Rx,
     FormatDuration,
@@ -177,14 +175,6 @@ define([
                     self.setState({
                         stage: ScannedModel.init()
                     });
-
-                    menuFactory.items.undo.enabled = true;
-                    menuFactory.items.undo.onClick = fireUndo;
-                    menuFactory.items.import.enabled = false === self.state.isScanStarted;
-                    menuFactory.items.import.onClick = function() {
-                        ReactDOM.findDOMNode(self.refs.fileUploader.click());
-                    };
-                    menuFactory.methods.refresh();
 
                     Shortcuts.on(['ctrl', 'e'], () => {
                         ScannedModel.getBlobFromScene();
@@ -1543,8 +1533,6 @@ define([
                                 })
                             });
 
-                            menuFactory.items.import.enabled = true;
-                            menuFactory.methods.refresh();
                             self._openBlocker(true, ProgressConstants.NONSTOP);
                         },
                         noDeviceAvailable = function() {

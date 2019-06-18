@@ -57,6 +57,16 @@ define([
                 isRatioPreserve: e.target.checked
             });
         },
+        getValueCaption: function() {
+            const rx = this.state.rx, 
+                ry = this.state.ry,
+                units = localStorage.getItem('default-units', 'mm') ;
+            if (units === 'inches') {
+                return `${Number(rx*2/25.4).toFixed(3)}\", ${Number(ry*2/25.4).toFixed(3)}\"`;
+            } else {
+                return `${rx*2}, ${ry*2} mm`;
+            }
+        },
         render: function() {
             return (
                 <div className="object-panel">
@@ -64,7 +74,7 @@ define([
                         <input type="checkbox" className="accordion-switcher" defaultChecked={true} />
                         <p className="caption">
                             {LANG.ellipse_radius}
-                            <span className="value">{this.state.rx * 2}, {this.state.ry * 2} mm</span>
+                            <span className="value">{this.getValueCaption()}</span>
                         </p>
                         <label className="accordion-body  with-lock">
                             <div>

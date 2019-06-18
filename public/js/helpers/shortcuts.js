@@ -5,7 +5,7 @@ define([
     'jquery',
     'app/constants/keycode-constants',
     'helpers/array-findindex'
-], function($, keyCodeConstants) {
+], function($, KeycodeConstants) {
     'use strict';
 
     var root = window,
@@ -14,21 +14,23 @@ define([
         },
         special_key_map = {
             'CMD'    : -91,
-            'L_CMD'  : keyCodeConstants.KEY_L_CMD,
-            'R_CMD'  : keyCodeConstants.KEY_R_CMD,
-            'SHIFT'  : keyCodeConstants.KEY_SHIFT,
-            'CTRL'   : keyCodeConstants.KEY_CTRL,
-            'ALT'    : keyCodeConstants.KEY_ALT,
-            'DEL'    : keyCodeConstants.KEY_DEL,
-            'BACK'   : keyCodeConstants.KEY_BACK,
-            'RETURN' : keyCodeConstants.KEY_RETURN,
-            'TAB'    : keyCodeConstants.KEY_TAB,
-            'ESC'    : keyCodeConstants.KEY_ESC,
-            'LEFT'   : keyCodeConstants.KEY_LEFT,
-            'UP'     : keyCodeConstants.KEY_UP,
-            'RIGHT'  : keyCodeConstants.KEY_RIGHT,
-            'DOWN'   : keyCodeConstants.KEY_DOWN,
-            'FNKEY'  : (process.platform === 'darwin') ? -91 : keyCodeConstants.KEY_CTRL
+            'L_CMD'  : KeycodeConstants.KEY_L_CMD,
+            'R_CMD'  : KeycodeConstants.KEY_R_CMD,
+            'SHIFT'  : KeycodeConstants.KEY_SHIFT,
+            'CTRL'   : KeycodeConstants.KEY_CTRL,
+            'ALT'    : KeycodeConstants.KEY_ALT,
+            'DEL'    : KeycodeConstants.KEY_DEL,
+            'BACK'   : KeycodeConstants.KEY_BACK,
+            'RETURN' : KeycodeConstants.KEY_RETURN,
+            'TAB'    : KeycodeConstants.KEY_TAB,
+            'ESC'    : KeycodeConstants.KEY_ESC,
+            'LEFT'   : KeycodeConstants.KEY_LEFT,
+            'UP'     : KeycodeConstants.KEY_UP,
+            'RIGHT'  : KeycodeConstants.KEY_RIGHT,
+            'DOWN'   : KeycodeConstants.KEY_DOWN,
+            'PLUS'   : KeycodeConstants.KEY_PLUS,
+            'MINUS'  : KeycodeConstants.KEY_MINUS,
+            'FNKEY'  : (process.platform === 'darwin') ? -91 : KeycodeConstants.KEY_CTRL
         },
         events = [],
         keyCodeStatus = [],

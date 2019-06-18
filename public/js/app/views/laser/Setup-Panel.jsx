@@ -364,7 +364,6 @@ define([
                 true === this.state.openAdvancedPanel ?
                 <Modal
                     className={{ hasShadow: true }}
-                    disabledEscapeOnBackground={true}
                     content={content}
                     onClose={this._togglePanel('advanced', false)}
                 /> :

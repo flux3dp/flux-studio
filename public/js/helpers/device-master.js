@@ -3,6 +3,7 @@ define([
     'helpers/i18n',
     'helpers/sprintf',
     'app/actions/alert-actions',
+    'app/actions/beambox',
     'app/actions/progress-actions',
     'app/constants/progress-constants',
     'app/actions/input-lightbox-actions',
@@ -26,6 +27,7 @@ define([
     i18n,
     sprintf,
     AlertActions,
+    BeamboxActions,
     ProgressActions,
     ProgressConstants,
     InputLightboxActions,
@@ -55,10 +57,9 @@ define([
         _stopChangingFilamentCallback,
         _selectedDevice = {},
         _deviceNameMap = {},
-        _actionMap = {},
+        _controllerMap = {},
         _device,
         _wasKilled = false,
-        nwConsole,
         usbDeviceReport = {},
         _devices = [],
         _availableDevices = [],
@@ -67,7 +68,7 @@ define([
         usbEventListeners = {},
         self = this;
 
-        // Better select device
+    // Better select device
     function select(device, opts) {
         let d = $.Deferred();
         selectDevice(device).then((result) => {
@@ -76,9 +77,9 @@ define([
             } else {
                 d.reject(lang.message.connectionTimeout);
             }
-        },
-        (errmsg) => { console.log('Device Master Select Error. Should handle errMsg here', errmsg); }
-        );
+        }, (error) => {
+            console.error('Selection error in DeviceMaster. Should handle error here', error);
+        });
 
         return d.promise();
     }
@@ -119,7 +120,7 @@ define([
 
             InputLightboxActions.open('auth', callback);
         };
-        const createDeviceActions = (uuid, availableUsbChannel = -1, success) => {
+        const createDeviceController = (uuid, availableUsbChannel = -1, success) => {
             return DeviceController(device.uuid, {
                 availableUsbChannel: availableUsbChannel,
                 onConnect: function (response, options) {
@@ -137,7 +138,7 @@ define([
                     }
                 },
                 onError: function (response) {
-                    console.log('createDeviceActions onError', response);
+                    console.log('createDeviceController onError', response);
                     ProgressActions.close();
                     // TODO: shouldn't do replace
                     response.error = response.error.replace(/^.*\:\s+(\w+)$/g, '$1');
@@ -202,7 +203,7 @@ define([
                     }
                 },
                 onFatal: function (response) {
-                    console.log('createDeviceActions onFatal', response);
+                    console.log('createDeviceController onFatal', response);
                     // process fatal
                     if (!_wasKilled) {
                         _selectedDevice = {};
@@ -220,12 +221,16 @@ define([
                     };
 
                     removeTimedOutConnection(availableUsbChannel);
+
+                    if (response.reason === 'error [\'KICKED\']') {
+                        BeamboxActions.resetPreviewButton();
+                    }
                 }
             });
         };
         const initSocketMaster = () => {
-            if (typeof _actionMap[device.uuid] !== 'undefined') {
-                _device.actions = _actionMap[device.uuid];
+            if (device && typeof _controllerMap[device.uuid] !== 'undefined') {
+                _device.controller = _controllerMap[device.uuid];
                 return;
             }
 
@@ -251,19 +256,19 @@ define([
                     typeof self.availableUsbChannel !== 'undefined' &&
                     device.source === 'h2h'
             ) {
-                _device.actions = createDeviceActions(null, this.availableUsbChannel, (success) => {
-                    console.log('_device.actions', _device.actions);
+                _device.controller = createDeviceController(null, this.availableUsbChannel, (success) => {
+                    console.log('_device.controller', _device.controller);
                     console.log('success', success);
                     if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
                     else {
-                        // createDeviceActions will auto reject with errors
+                        // createDeviceController will auto reject with errors
                     }
                 });
             }
             else {
-                _device.actions = createDeviceActions(device.uuid, null, (success) => {
+                _device.controller = createDeviceController(device.uuid, null, (success) => {
                     if (success) {
                         d.resolve(DeviceConstants.CONNECTED);
                     }
@@ -290,33 +295,37 @@ define([
                 });
             }
 
-            _actionMap[device.uuid] = _device.actions;
-            SocketMaster.setWebSocket(_device.actions);
+            _controllerMap[device.uuid] = _device.controller;
+            SocketMaster.setWebSocket(_device.controller);
         };
 
-            // match the device from the newest received device list
-        let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
-            self = this;
-
-        Object.assign(_selectedDevice, latestDevice[0]);
         let d = deferred || $.Deferred();
 
-        if (_existConnection(device.uuid, device.source)) {
-            _device = _switchDevice(device.uuid);
-            SocketMaster.setWebSocket(_actionMap[device.uuid]);
-            d.resolve(DeviceConstants.CONNECTED);
-        }
-        else {
-            ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
-            _device = {};
-            _device.uuid = device.uuid;
-            _device.source = device.source;
-            _device.name = device.name;
-            _device.serial = device.serial;
-            delete _actionMap[device.uuid];
-        }
+        if (device) {
+        // Match the device from the newest received device list
+            let latestDevice = _availableDevices.filter(d => d.serial === device.serial && d.source === device.source),
+                self = this;
 
-        initSocketMaster();
+            Object.assign(_selectedDevice, latestDevice[0]);
+
+            if (_existConnection(device.uuid, device.source)) {
+                _device = _switchDevice(device.uuid);
+                SocketMaster.setWebSocket(_controllerMap[device.uuid]);
+                d.resolve(DeviceConstants.CONNECTED);
+            }
+            else {
+                ProgressActions.open(ProgressConstants.NONSTOP, sprintf(lang.message.connectingMachine, device.name));
+                _device = {
+                    uuid: device.uuid,
+                    source: device.source,
+                    name: device.name,
+                    serial: device.serial
+                };
+                delete _controllerMap[device.uuid];
+            }
+
+            initSocketMaster();
+        }
 
         return d.promise();
     }
@@ -347,7 +356,7 @@ define([
 
     function reconnectWs() {
         let d = $.Deferred();
-        _device.actions = DeviceController(_selectedDevice.uuid, {
+        _device.controller = DeviceController(_selectedDevice.uuid, {
             availableUsbChannel: _selectedDevice.source === 'h2h' ? _selectedDevice.addr : -1,
             onConnect: function (response) {
                 d.notify(response);
@@ -400,13 +409,13 @@ define([
             },
             onFatal: function (response) {
                 // if channel is not available, (opcode -1),
-                // default in createDeviceActions will catch first
+                // default in createDeviceController will catch first
             }
         });
 
         SocketMaster = new Sm();
         SocketMaster.onTimeout(handleSMTimeout);
-        SocketMaster.setWebSocket(_device.actions);
+        SocketMaster.setWebSocket(_device.controller);
         return d.promise();
     }
 
@@ -555,23 +564,23 @@ define([
     }
 
     function resume() {
-        return _do(DeviceConstants.RESUME);
+        return SocketMaster.addTask('resume')
     }
 
     function pause() {
-        return _do(DeviceConstants.PAUSE);
+        return SocketMaster.addTask('pause');
     }
 
     function stop() {
         let d = $.Deferred();
-        _do(DeviceConstants.STOP).then(r => {
+        SocketMaster.addTask('abort').then(r => {
             d.resolve(r);
         });
         return d.promise();
     }
 
     function quit() {
-        return _do(DeviceConstants.QUIT);
+        return SocketMaster.addTask('quit');
     }
 
     function quitTask(mode) {
@@ -583,13 +592,13 @@ define([
     }
 
     function kick() {
-        return _do(DeviceConstants.KICK);
+        return SocketMaster.addTask('kick');
     }
 
     function killSelf() {
         _wasKilled = true;
         let d = $.Deferred();
-        _device.actions.killSelf().then(response => {
+        _device.controller.killSelf().then(response => {
             d.resolve(response);
         }).always(() => {
             reconnectWs();
@@ -602,7 +611,7 @@ define([
     }
 
     function downloadLog(log) {
-        return _device.actions.downloadLog(log);
+        return _device.controller.downloadLog(log);
     }
 
     function fileInfo(path, fileName) {
@@ -792,12 +801,16 @@ define([
 
     function maintainMove(args) {
         let d = $.Deferred();
+
         SocketMaster.addTask('maintainMove', args)
             .then((result) => {
                 if (result.status === 'ok') {
-                    return d.resolve();
+                    d.resolve();
                 }
+            }).fail(() => {
+                d.reject();
             });
+
         return d.promise();
     }
 
@@ -844,7 +857,7 @@ define([
         return d.promise();
     }
 
-    function KickChangeFilament() {
+    function kickChangeFilament() {
         let d = $.Deferred();
         //return result is success always even the USB disconnected on device side.
         //need to be figure it out.
@@ -857,9 +870,29 @@ define([
     }
 
     // get functions
-
     function getReport() {
-        return _do(DeviceConstants.REPORT);
+        // Jim Kang's code below
+        let d = $.Deferred();
+        let timeout;
+
+        SocketMaster.addTask('report').then((result) => {
+            // Set timeout
+            timeout = setTimeout(() => {
+                d.reject({ status: 'fatal', error: ['TIMEOUT'] });
+            }, 10 * 1000);
+
+            // Force update st_label for a backend inconsistancy
+            let s = result.device_status;
+            if (s.st_id === DeviceConstants.status.ABORTED) {
+                s.st_label = 'ABORTED';
+            }
+            d.resolve(s);
+        }).fail((error) => {
+            d.reject(error);
+        }).always(() => {
+            clearTimeout(timeout);
+        });
+        return d.promise();;
     }
 
     function getSelectedDevice() {
@@ -898,7 +931,7 @@ define([
     }
 
     function closeConnection() {
-        _device.actions.connection.close();
+        _device.controller.connection.close();
         _removeConnection(_device.uuid);
     }
 
@@ -911,61 +944,6 @@ define([
     }
 
     // Private Functions
-
-    function _do(command) {
-        let actions = {
-            'RESUME': () => SocketMaster.addTask('resume'),
-            'PAUSE': () => SocketMaster.addTask('pause'),
-            'STOP': () => SocketMaster.addTask('abort'),
-            'QUIT': () => SocketMaster.addTask('quit'),
-            'KICK': () => SocketMaster.addTask('kick'),
-            'QUIT_TASK': () => SocketMaster.addTask('quitTask'),
-
-            'REPORT': () => {
-                let d = $.Deferred(),
-                    timeout;
-
-                SocketMaster.addTask('report').then((result) => {
-                    // set timeout
-                    timeout = setTimeout(() => {
-                        d.reject({ status: 'fata', error: ['TIMEOUT'] });
-                    }, 10 * 1000);
-
-                    // force update st_label for a backend inconsistancy
-                    let s = result.device_status;
-                    if (s.st_id === DeviceConstants.status.ABORTED) {
-                        s.st_label = 'ABORTED';
-                    }
-                    d.resolve(s);
-                }).fail((error) => {
-                    d.reject(error);
-                }).always(() => {
-                    clearTimeout(timeout);
-                });
-                return d.promise();
-            }
-        };
-
-        return actions[command]();
-    }
-
-    function updateNWProgress(deviceStatus) {
-        if (FLUX.isNW) {
-            if (!nwConsole) {
-                nwConsole = nw.Window.get();
-            }
-            let stId = deviceStatus.st_id;
-            if (stId !== 0 && stId !== 64 && stId !== 128) {
-                if (deviceStatus.st_prog) {
-                    nwConsole.setProgressBar(-1);
-                    nwConsole.setProgressBar(deviceStatus.st_prog);
-                }
-            }
-            else if (stId === 64 || stId === 128) {
-                nwConsole.setProgressBar(-1);
-            }
-        }
-    }
 
     function _existConnection(uuid, source) {
         return _devices.some(function (d) {
@@ -1008,7 +986,7 @@ define([
     }
 
     function disconnectCamera() {
-        if (!_device.camera) {
+        if (!_device || !_device.camera) {
             return;
         }
         _device.camera.closeWs();
@@ -1313,8 +1291,6 @@ define([
                             defaultPrinterWarningShowed = false;
                         }
                     }
-
-                    updateNWProgress(device);
                 }
             }
         });
@@ -1396,7 +1372,7 @@ define([
     }
 
     function downloadErrorLog() {
-        return _device.actions.downloadErrorLog();
+        return _device.controller.downloadErrorLog();
     }
 
     function setHeadTemperature(temperature) {
@@ -1581,80 +1557,80 @@ define([
 
     DeviceSingleton.prototype = {
         init: function () {
-            this.KickChangeFilament = KickChangeFilament;
-            this.select = select;
-            this.selectDevice = selectDevice;
-            this.uploadToDirectory = uploadToDirectory;
-            this.go = go;
-            this.goFromFile = goFromFile;
-            this.resume = resume;
-            this.pause = pause;
-            this.stop = stop;
-            this.quit = quit;
-            this.quitTask = quitTask;
-            this.kick = kick;
-            this.getReport = getReport;
-            this.getSelectedDevice = getSelectedDevice;
-            this.readyCamera = readyCamera;
-            this.ls = ls;
-            this.fileInfo = fileInfo;
-            this.deleteFile = deleteFile;
-            this.downloadFile = downloadFile;
-            this.getPreviewInfo = getPreviewInfo;
+            this.calibrate = calibrate;
             this.changeFilament = changeFilament;
-            this.reconnect = reconnect;
-            this.getDeviceByName = getDeviceByName;
-            this.getFirstDevice = getFirstDevice;
-            this.updateFirmware = updateFirmware;
-            this.updateToolhead = updateToolhead;
-            this.headInfo = headInfo;
+            this.changeFilamentDuringPause = changeFilamentDuringPause;
+            this.cleanCalibration = cleanCalibration;
             this.closeConnection = closeConnection;
             this.connectCamera = connectCamera;
-            this.streamCamera = streamCamera;
-            this.takeOnePicture = takeOnePicture;
-            this.disconnectCamera = disconnectCamera;
-            this.calibrate = calibrate;
-            this.showOutline = showOutline;
-            this.zprobe = zprobe;
-            this.home = home;
-            this.cleanCalibration = cleanCalibration;
+            this.deleteFile = deleteFile;
             this.detectHead = detectHead;
-            this.enterMaintainMode = enterMaintainMode;
+            this.disconnectCamera = disconnectCamera;
+            this.downloadErrorLog = downloadErrorLog;
+            this.downloadFile = downloadFile;
+            this.downloadLog = downloadLog;
+            this.enableCloud = enableCloud;
+            this.endLoadingDuringPause = endLoadingDuringPause;
             this.endMaintainMode = endMaintainMode;
+            this.endToolheadOperation = endToolheadOperation;
+            this.enterMaintainMode = enterMaintainMode;
+            this.existDevice = existDevice;
+            this.fileInfo = fileInfo;
+            this.getAvailableDevices = getAvailableDevices;
+            this.getAvailableUsbChannel = getAvailableUsbChannel;
+            this.getCloudValidationCode = getCloudValidationCode;
+            this.getDeviceByName = getDeviceByName;
+            this.getDeviceBySerial = getDeviceBySerial;
+            this.getDeviceInfo = getDeviceInfo;
+            this.getDeviceList = getDeviceList;
+            this.getDeviceSetting = getDeviceSetting;
+            this.getDeviceSettings = getDeviceSettings;
+            this.getFirstDevice = getFirstDevice;
+            this.getHeadStatus = getHeadStatus;
             this.getLaserPower = getLaserPower;
             this.getLaserSpeed = getLaserSpeed;
+            this.getPreviewInfo = getPreviewInfo;
+            this.getReport = getReport;
+            this.getSelectedDevice = getSelectedDevice;
+            this.go = go;
+            this.goFromFile = goFromFile;
+            this.headInfo = headInfo;
+            this.home = home;
+            this.kick = kick;
+            this.kickChangeFilament = kickChangeFilament;
+            this.killSelf = killSelf;
+            this.ls = ls;
+            this.maintainCloseFan = maintainCloseFan;
+            this.maintainMove = maintainMove;
+            this.pause = pause;
+            this.quit = quit;
+            this.quitTask = quitTask;
+            this.readyCamera = readyCamera;
+            this.reconnect = reconnect;
+            this.registerUsbEvent = registerUsbEvent;
+            this.resume = resume;
+            this.runBeamboxCameraTest = runBeamboxCameraTest;
+            this.runMovementTests = runMovementTests;
+            this.select = select;
+            this.selectDevice = selectDevice;
+            this.setDeviceSetting = setDeviceSetting;
+            this.setHeadTemperature = setHeadTemperature;
+            this.setHeadTemperatureDuringPause = setHeadTemperatureDuringPause;
             this.setLaserPower = setLaserPower;
             this.setLaserSpeed = setLaserSpeed;
-            this.getDeviceList = getDeviceList;
-            this.getDeviceSettings = getDeviceSettings;
-            this.getDeviceSetting = getDeviceSetting;
-            this.setDeviceSetting = setDeviceSetting;
-            this.getCloudValidationCode = getCloudValidationCode;
-            this.enableCloud = enableCloud;
-            this.getDeviceInfo = getDeviceInfo;
-            this.downloadLog = downloadLog;
-            this.downloadErrorLog = downloadErrorLog;
-            this.killSelf = killSelf;
-            this.setHeadTemperature = setHeadTemperature;
-            this.getHeadStatus = getHeadStatus;
+            this.showOutline = showOutline;
             this.startMonitoringUsb = startMonitoringUsb;
-            this.getAvailableUsbChannel = getAvailableUsbChannel;
-            this.registerUsbEvent = registerUsbEvent;
-            this.unregisterUsbEvent = unregisterUsbEvent;
-            this.changeFilamentDuringPause = changeFilamentDuringPause;
             this.startToolheadOperation = startToolheadOperation;
-            this.endToolheadOperation = endToolheadOperation;
-            this.endLoadingDuringPause = endLoadingDuringPause;
-            this.setHeadTemperatureDuringPause = setHeadTemperatureDuringPause;
-            this.runMovementTests = runMovementTests;
-            this.runBeamboxCameraTest = runBeamboxCameraTest;
-            this.getDeviceBySerial = getDeviceBySerial;
-            this.getAvailableDevices = getAvailableDevices;
-            this.usbDefaultDeviceCheck = usbDefaultDeviceCheck;
+            this.stop = stop;
             this.stopChangingFilament = stopChangingFilament;
-            this.existDevice = existDevice;
-            this.maintainMove = maintainMove;
-            this.maintainCloseFan = maintainCloseFan;
+            this.streamCamera = streamCamera;
+            this.takeOnePicture = takeOnePicture;
+            this.unregisterUsbEvent = unregisterUsbEvent;
+            this.updateFirmware = updateFirmware;
+            this.updateToolhead = updateToolhead;
+            this.uploadToDirectory = uploadToDirectory;
+            this.usbDefaultDeviceCheck = usbDefaultDeviceCheck;
+            this.zprobe = zprobe;
 
             Discover(
                 'device-master',

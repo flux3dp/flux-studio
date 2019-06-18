@@ -85,6 +85,10 @@ define(function() {
                 import: '匯入',
                 save_fcode: '匯出工作',
                 save_scene: '匯出場景',
+                all_files: '所有檔案',
+                bvg_files: 'Beambox 雷雕場景',
+                fcode_files: 'FLUX Code',
+                fsc_files: 'Delta 列印場景',
                 confirmReset: '是否確定要重置所有設定?'
             },
             edit: {
@@ -305,7 +309,9 @@ define(function() {
             draw: '繪圖',
             cut: '切割',
             beambox: 'BEAMBOX',
-            mill: 'MILL'
+            mill: 'MILL',
+            mm: '毫米',
+            inches: '英吋'
         },
         settings: {
             on: '開',
@@ -333,6 +339,8 @@ define(function() {
             language: '語言',
             notifications: '通知',
             default_app: '預設功能',
+            default_units: '預設單位',
+            loop_compensation: '封閉路徑補償',
             delta_series: 'Delta 系列',
             beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',
@@ -904,7 +912,7 @@ define(function() {
             estimating: '估計中...',
             calibrate_fail: '校正失敗',
             calibration_is_running: '掃描校正中',
-            calibration_firmware_requirement: '請更新至韌體以使用此功能 (1.6.25+)',
+            calibration_firmware_requirement: '請更新至韌體以使用此功能 (1.6.9+)',
             resolution: [{
                 id: 'best',
                 text: '最佳',
@@ -1007,7 +1015,9 @@ define(function() {
                 layer_by_color: '依顏色分層',
                 nolayer: '不分層',
                 no_support_text: 'FLUX Studio 目前不支援由外部匯入文字標籤，請由向量繪圖軟體將文字轉成路徑後再匯入。',
-                power_too_high_damage_laser_tube: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命',
+                power_too_high_damage_laser_tube: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命。',
+                speed_too_high_lower_the_quality: '在此雕刻解析度使用過快的速度，可能導致漸層雕刻的品質較差。',
+                both_power_and_speed_too_high: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命。\n並且在此雕刻解析度使用過快的速度可能導致漸層雕刻的品質較差。',
                 should_update_firmware_to_continue: '您的韌體版本不支援最新的軟體改善。為了更良好的使用經驗與雕刻品質，請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)'
             },
             left_panel: {
@@ -1028,7 +1038,9 @@ define(function() {
                     ellipse: '橢圓形',
                     line: '線段',
                     image: '圖片',
-                    text: '文字'
+                    text: '文字',
+                    path: '路徑',
+                    polygon: '多邊形'
                 },
                 advanced_panel: {
                     engrave_parameters: '雕刻參數',
@@ -1354,6 +1366,7 @@ define(function() {
         message: {
             connecting: '連線中...',
             connectingMachine: '連接 %s 中...',
+            tryingToConenctMachine: '嘗試連接機器中...',
             connected: '已連線',
             authenticating: '密碼驗證中...',
             runningTests: '運動測試中...',
@@ -1499,6 +1512,7 @@ define(function() {
             taking_picture: '擷取圖片中...',
             start_engrave: '開始繪製校正圖片',
             analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
+            no_lines_detected: '無法從校正圖片上偵測到線段<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             drawing_calibration_image: '繪製校正圖片中...',
             please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦。',
             calibrate_done: '校正相機完成<br/>使用時請正確對焦以取得良好的預覽效果。'

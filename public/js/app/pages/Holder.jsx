@@ -6,7 +6,7 @@ define([
     'reactPropTypes',
     'app/actions/laser',
     'app/actions/alert-actions',
-    'app/actions/global-interaction',
+    'app/actions/delta/holder-global-interactions',
     'app/actions/progress-actions',
     'jsx!views/laser/Setup-Panel',
     'jsx!views/holder/Setup-Panel',
@@ -26,7 +26,7 @@ define([
     PropTypes,
     laserEvents,
     AlertActions,
-    GlobalInteraction,
+    HolderGlobalInteraction,
     ProgressActions,
     LaserSetupPanel,
     HolderSetupPanel,
@@ -44,41 +44,8 @@ define([
     let Config = ConfigHelper(),
         lang = i18n.lang;
 
-    class HolderGlobalInteraction extends GlobalInteraction {
-        constructor() {
-            super();
-            this._instance = undefined;
-            this._actions = {
-                "IMPORT": () => {
-                    if(electron) {
-                        electron.trigger_file_input_click("file-upload-widget")
-                    }
-                },
-                "EXPORT_FLUX_TASK": () => this._instance._handleExportClick("-f"),
-                "CLEAR_SCENE": () => this._instance.state.laserEvents.clearScene(),
-            }
-        }
-        attach(instance) {
-            this._instance = instance
-            this._hasImage = false;
-            super.attach(["IMPORT"]);
-        }
-        onImageChanged(hasImage) {
-            if(this._hasImage !== hasImage) {
-                this._hasImage = hasImage;
-                if(hasImage) {
-                    this.enableMenuItems(["EXPORT_FLUX_TASK", "CLEAR_SCENE"]);
-                } else {
-                    this.disableMenuItems(["EXPORT_FLUX_TASK", "CLEAR_SCENE"]);
-                }
-            }
-        }
-    }
-
     return function(args) {
         args = args || {};
-
-        let globalInteraction = new HolderGlobalInteraction();
 
         let view = React.createClass({
                 PropTypes: {
@@ -110,17 +77,11 @@ define([
                 componentDidMount: function() {
                     var self = this;
 
-                    globalInteraction.attach(this);
+                    HolderGlobalInteraction.attach(this);
 
                     DnDHandler.plug(document, self._handleDragAndDrop);
 
-
                     self.state.laserEvents.setPlatform(ReactDOM.findDOMNode(self.refs.laserObject));
-
-                    self.state.laserEvents.menuFactory.items.execute.enabled = false;
-                    self.state.laserEvents.menuFactory.items.execute.onClick = function() {
-                        self._handleStartClick();
-                    };
 
                     var laser_custom_bg = Config.read('laser-custom-bg') && this.props.page === 'laser';
                     if (laser_custom_bg) {
@@ -146,7 +107,7 @@ define([
                 },
 
                 componentWillUnmount: function () {
-                    globalInteraction.detach()
+                    HolderGlobalInteraction.detach();
                     this.state.laserEvents.destroySocket();
                     this.state.laserEvents.destroy();
                     DnDHandler.unplug(document);
@@ -349,7 +310,7 @@ define([
                 },
 
                 _renderActionButtons: function() {
-                    globalInteraction.onImageChanged(this.state.hasImage);
+                    HolderGlobalInteraction.onImageChanged(this.state.hasImage);
 
                     var buttons = [{
                             label: lang.monitor.start,
