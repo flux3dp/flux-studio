@@ -29,6 +29,7 @@ define([
         switch (model) {
             case 'fbb1b':
             case 'fbb1p':
+            case 'darwin-dev':
             case 'laser-b1':
                 return 'beambox';
                 break;

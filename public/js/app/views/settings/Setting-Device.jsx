@@ -82,7 +82,7 @@ define([
             })[0];
 
             this.setState({ device }, ()=>{
-                if((['fbb1b', 'fbb1p', 'laser-b1'].includes(device.model))) {
+                if((['fbb1b', 'fbb1p', 'laser-b1', 'darwin-dev'].includes(device.model))) {
 
                 } else {
                     this._getDeviceConfig();
@@ -556,7 +556,7 @@ define([
         },
 
         render : function() {
-            const isBeamoxSeries = this.state.device && ['fbb1b', 'fbb1p', 'laser-b1'].includes(this.state.device.model);
+            const isBeamoxSeries = this.state.device && ['fbb1b', 'fbb1p', 'laser-b1', 'darwin-dev'].includes(this.state.device.model);
             let deviceList      = this._getDeviceList(),
                 correction      = this._renderCorrectionSetting(),
                 detectFilament  = this._renderDetectFilamentSetting(),
