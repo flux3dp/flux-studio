@@ -5,6 +5,9 @@
     position: fixed;
     width: 100%;
     z-index: 1;
+    background: #333;
+    height: 105px;
+    -webkit-app-region: drag;
 
     .brand-logo {
         cursor: default;

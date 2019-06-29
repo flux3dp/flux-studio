@@ -3,7 +3,8 @@
 
 <head>
     <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'>
+    <meta name='viewport'
+        content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'>
     <title>Beam Studio</title>
 </head>
 
@@ -14,7 +15,6 @@
 
     <div class='wrapper'>
         <section class='top-menu'></section>
-        <section class='tour-overlay'></section>
         <section class='content'>
             <div class='spinner-roller absolute-center'></div>
         </section>
@@ -29,7 +29,7 @@
             head = document.querySelector('head'),
             body = document.querySelector('body'),
             dev = localStorage['dev'] === 'true',
-            getStarted = function(ghostPort) {
+            getStarted = function (ghostPort) {
                 script.setAttribute('src', 'js/require.js');
                 script.dataset.main = 'js/main.js?v=' + (dev ? '' : window.FLUX.timestamp);
                 body.appendChild(script);
@@ -44,11 +44,12 @@
             onLine: navigator.onLine,
             os: ('undefined' === typeof nw ? undefined : os),
             ghostPort: 8000,
-            allowTracking: false, //localStorage['allow-tracking'] === 'true',
+            allowTracking: false,
             dev: dev
         };
 
-        if(window["electron"]) {
+        // Add electron listener 
+        if (window["electron"]) {
             let ipc = electron.ipc,
                 events = electron.events;
 
@@ -62,7 +63,7 @@
             ipc.on(events.BACKEND_DOWN, () => {});
 
             ipc.on(events.NOTIFY_BACKEND_STATUS, (sender, status) => {
-                if(status.backend.alive) {
+                if (status.backend.alive) {
                     window.FLUX.ghostPort = status.backend.port;
                     window.FLUX.logfile = status.backend.logfile;
                     getStarted(status.backend.port);
@@ -83,11 +84,12 @@
         head.appendChild(cssLink);
         head.appendChild(cssLink);
 
-        if(localStorage.getItem('poke-ip-addr') == 'undefined') {
+        if (localStorage.getItem('poke-ip-addr') == 'undefined') {
             localStorage.setItem('poke-ip-addr', '192.168.1.1')
         }
     }
     launch();
+
 </script>
 
 </html>

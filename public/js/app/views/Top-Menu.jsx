@@ -3,7 +3,6 @@ define([
     'react',
     'helpers/i18n',
     'app/app-settings',
-    'helpers/detect-webgl',
     'helpers/api/discover',
     'helpers/device-master',
     'helpers/check-device-status',
@@ -16,8 +15,6 @@ define([
     'plugins/classnames/index',
     'app/constants/device-constants',
     'jsx!views/toolbox/Toolbox',
-    'jsx!views/print/Monitor',
-    'jsx!widgets/Modal',
     'app/actions/alert-actions',
     'app/stores/alert-store',
     'app/actions/global-actions',
@@ -30,7 +27,7 @@ define([
     'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/svgeditor-function-wrapper'
-], function(
+], function (
     $,
     React,
     i18n,
@@ -42,14 +39,11 @@ define([
     checkFirmware,
     firmwareUpdater,
     FirmwareVersionChecker,
-    ScanControl,
     CloudApi,
     OutputError,
     ClassNames,
     DeviceConstants,
     Toolbox,
-    Monitor,
-    Modal,
     AlertActions,
     AlertStore,
     GlobalActions,
@@ -73,65 +67,12 @@ define([
         var events = {};
     }
 
-    return function(args) {
+    return function (args) {
         args = args || {};
         var _id = 'TopMenu',
             lang = args.state.lang,
-            genericClassName = {
-                'item': true
-            },
-            options = [
-                {
-                    name: 'print',
-                    displayName: 'PRINT',
-                    className: genericClassName,
-                    label: lang.menu.print,
-                    imgSrc: 'img/menu/icon_print.svg',
-                    group: 'delta'
-                },
-                {
-                    name: 'laser',
-                    displayName: 'ENGRAVE',
-                    className: genericClassName,
-                    label: lang.menu.laser,
-                    imgSrc: 'img/menu/icon_laser.svg',
-                    group: 'delta'
-                },
-                {
-                    name: 'scan',
-                    displayName: 'SCAN',
-                    className: genericClassName,
-                    label: lang.menu.scan,
-                    imgSrc: 'img/menu/icon_scan.svg',
-                    group: 'delta'
-                },
-                {
-                    name: 'draw',
-                    displayName: 'DRAW',
-                    className: genericClassName,
-                    label: lang.menu.draw,
-                    imgSrc: 'img/menu/icon-draw.svg',
-                    group: 'delta'
-                },
-                {
-                    name: 'cut',
-                    displayName: 'CUT',
-                    className: genericClassName,
-                    label: lang.menu.cut,
-                    imgSrc: 'img/menu/icon-cut.svg',
-                    group: 'delta'
-                },
-                {
-                    name: 'beambox',
-                    displayName: 'ENGRAVE',
-                    className: genericClassName,
-                    label: lang.menu.laser,
-                    imgSrc: 'img/menu/icon_laser.svg',
-                    group: 'beambox'
-                },
-            ],
-
-            getLog = async function(printer, log) {
+            
+            getLog = async function (printer, log) {
                 await DeviceMaster.select(printer);
                 ProgressActions.open(ProgressConstants.WAITING, '');
                 let downloader = DeviceMaster.downloadLog(log);
@@ -143,27 +84,27 @@ define([
                     ProgressActions.open(ProgressConstants.STEPPING);
                     ProgressActions.updating(
                         'downloading',
-                        progress.completed/progress.size * 100,
-                        function() { downloader.reject('canceled'); }
+                        progress.completed / progress.size * 100,
+                        function () { downloader.reject('canceled'); }
                     );
 
                 }).fail((data) => {
-                  let msg = data === 'canceled' ?
+                    let msg = data === 'canceled' ?
                         lang.device.download_log_canceled : lang.device.download_log_error;
-                  AlertActions.showPopupInfo('', msg);
+                    AlertActions.showPopupInfo('', msg);
                 });
             },
 
-            executeFirmwareUpdate = function(printer, type) {
+            executeFirmwareUpdate = function (printer, type) {
                 //var currentPrinter = discoverMethods.getLatestPrinter(printer),
                 var currentPrinter = printer,
-                    checkToolheadFirmware = function() {
+                    checkToolheadFirmware = function () {
                         var $deferred = $.Deferred();
 
                         ProgressActions.open(ProgressConstants.NONSTOP, lang.update.checkingHeadinfo);
 
                         if ('toolhead' === type) {
-                            DeviceMaster.headInfo().done(function(response) {
+                            DeviceMaster.headInfo().done(function (response) {
                                 currentPrinter.toolhead_version = response.version || '';
 
                                 if ('undefined' === typeof response.version) {
@@ -182,8 +123,8 @@ define([
 
                         return $deferred;
                     },
-                    updateFirmware = function() {
-                        checkFirmware(currentPrinter, type).done(function(response) {
+                    updateFirmware = function () {
+                        checkFirmware(currentPrinter, type).done(function (response) {
                             var latestVersion = currentPrinter.version,
                                 caption = lang.update.firmware.latest_firmware.caption,
                                 message = lang.update.firmware.latest_firmware.message;
@@ -197,12 +138,12 @@ define([
                             if (!response.needUpdate) {
                                 let forceUpdate = {
                                     custom: () => {
-                                      firmwareUpdater(response, currentPrinter, type, true);
+                                        firmwareUpdater(response, currentPrinter, type, true);
                                     },
                                     no: () => {
-                                      if ('toolhead' === type) {
-                                          DeviceMaster.quitTask();
-                                      }
+                                        if ('toolhead' === type) {
+                                            DeviceMaster.quitTask();
+                                        }
                                     }
                                 };
                                 AlertActions.showPopupCustomCancel(
@@ -213,36 +154,36 @@ define([
                                     forceUpdate
                                 );
                             } else {
-                              firmwareUpdater(response, currentPrinter, type);
+                                firmwareUpdater(response, currentPrinter, type);
                             }
 
                         })
-                        .fail(function(response) {
-                            firmwareUpdater(response, currentPrinter, type);
-                            AlertActions.showPopupInfo(
-                                'latest-firmware',
-                                lang.monitor.cant_get_toolhead_version
-                            );
-                        });
+                            .fail(function (response) {
+                                firmwareUpdater(response, currentPrinter, type);
+                                AlertActions.showPopupInfo(
+                                    'latest-firmware',
+                                    lang.monitor.cant_get_toolhead_version
+                                );
+                            });
                     },
-                    checkStatus = function() {
+                    checkStatus = function () {
                         const processUpdate = () => {
-                            checkToolheadFirmware().always(function() {
+                            checkToolheadFirmware().always(function () {
                                 ProgressActions.close();
                                 updateFirmware();
-                            }).fail(function() {
+                            }).fail(function () {
                                 AlertActions.showPopupError('toolhead-offline', lang.monitor.cant_get_toolhead_version);
                             });
                         };
 
                         const handleYes = (id) => {
-                            if(id === 'head-missing') {
+                            if (id === 'head-missing') {
                                 processUpdate();
                             }
                         };
 
                         const handleCancel = (id) => {
-                            if(id === 'head-missing') {
+                            if (id === 'head-missing') {
                                 AlertStore.removeYesListener(handleYes);
                                 AlertStore.removeCancelListener(handleCancel);
                                 DeviceMaster.endMaintainMode();
@@ -253,7 +194,7 @@ define([
                         AlertStore.onCancel(handleCancel);
 
                         ProgressActions.open(ProgressConstants.NONSTOP, lang.update.preparing);
-                        if(type === 'toolhead') {
+                        if (type === 'toolhead') {
                             DeviceMaster.enterMaintainMode().then(() => {
                                 setTimeout(() => {
                                     ProgressActions.close();
@@ -267,24 +208,12 @@ define([
                     };
 
 
-                DeviceMaster.select(printer).then(function(status) {
+                DeviceMaster.select(printer).then(function (status) {
                     checkStatus();
                 }).fail((resp) => {
                     AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
                 });
             };
-        //============ end var================================================
-
-        // Special Feature
-        if (window.FLUX && window.FLUX.dev) {
-            options.push({
-                name: 'mill',
-                displayName: 'Mill',
-                className: genericClassName,
-                label: lang.menu.mill,
-                imgSrc: 'img/menu/icon-draw.svg'
-            });
-        }
 
         const registerAllDeviceMenuClickEvents = () => {
 
@@ -295,42 +224,42 @@ define([
                 const allowPause = await FirmwareVersionChecker.check(currentPrinter, 'OPERATE_DURING_PAUSE');
                 const status = await checkDeviceStatus(currentPrinter, allowPause);
                 switch (status) {
-                case 'ok':
-                    if(type === 'SET_TEMPERATURE') {
-                        AlertActions.showHeadTemperature(currentPrinter);
-                    }
-                    else {
-                        AlertActions.showChangeFilament(currentPrinter);
-                    }
-                    break;
-                case 'auth':
-                    let callback = {
-                        onSuccess: function() {
-                            AlertActions.showChangeFilament(currentPrinter);
-                        },
-                        onError: function() {
-                            InputLightboxActions.open('auth-device', {
-                                type         : InputLightboxConstants.TYPE_PASSWORD,
-                                caption      : lang.select_printer.notification,
-                                inputHeader  : lang.select_printer.please_enter_password,
-                                confirmText  : lang.select_printer.submit,
-                                onSubmit     : function(password) {
-                                    _auth(printer.uuid, password, {
-                                        onError: function(response) {
-                                            var message = (
-                                                false === response.reachable ?
-                                                lang.select_printer.unable_to_connect :
-                                                lang.select_printer.auth_failure
-                                            );
-                                            AlertActions.showPopupError('device-auth-fail', message);
-                                        }
-                                    });
-                                }
-                            });
+                    case 'ok':
+                        if (type === 'SET_TEMPERATURE') {
+                            AlertActions.showHeadTemperature(currentPrinter);
                         }
-                    };
-                    _auth(currentPrinter.uuid, '', callback);
-                    break;
+                        else {
+                            AlertActions.showChangeFilament(currentPrinter);
+                        }
+                        break;
+                    case 'auth':
+                        let callback = {
+                            onSuccess: function () {
+                                AlertActions.showChangeFilament(currentPrinter);
+                            },
+                            onError: function () {
+                                InputLightboxActions.open('auth-device', {
+                                    type: InputLightboxConstants.TYPE_PASSWORD,
+                                    caption: lang.select_printer.notification,
+                                    inputHeader: lang.select_printer.please_enter_password,
+                                    confirmText: lang.select_printer.submit,
+                                    onSubmit: function (password) {
+                                        _auth(printer.uuid, password, {
+                                            onError: function (response) {
+                                                var message = (
+                                                    false === response.reachable ?
+                                                        lang.select_printer.unable_to_connect :
+                                                        lang.select_printer.auth_failure
+                                                );
+                                                AlertActions.showPopupError('device-auth-fail', message);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        };
+                        _auth(currentPrinter.uuid, '', callback);
+                        break;
                 }
             };
 
@@ -354,46 +283,6 @@ define([
                     AlertActions.showPopupInfo('', info);
                 };
 
-                _action['TOOLHEAD_INFO'] = async (device) => {
-                    const status = await DeviceMaster.selectDevice(device);
-                    if (status === DeviceConstants.TIMEOUT) {
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                        return;
-                    }
-                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
-                    await checkDeviceStatus(device);
-                    await DeviceMaster.enterMaintainMode();
-                    const info = await DeviceMaster.headInfo();
-                    ProgressActions.close();
-                    DeviceMaster.endMaintainMode();
-
-                    const headModule = info.head_module;
-
-                    if (headModule === null) {
-                        AlertActions.showPopupInfo('', lang.head_info.cannot_get_info);
-                        return;
-                    }
-
-                    let fields = ['ID', 'VERSION', 'HEAD_MODULE', 'USED'];
-                    if (headModule === 'LASER') {
-                        fields.push('FOCAL_LENGTH');
-                    }
-
-                    let displayInfo = fields.map(field => {
-                        let k = info[field];
-                        if(field.toUpperCase() === 'HEAD_MODULE') {
-                            k = lang.head_info[info[field.toLowerCase()]];
-                        }
-                        else if(field === 'USED') {
-                            k = `${parseInt(info[field] / 60)} ${lang.head_info.hours}`;
-                        }
-                        return `${lang.head_info[field]}:  ${k}`;
-                    });
-
-
-                    AlertActions.showPopupInfo('', displayInfo.join('\n'));
-                };
-
                 _action['CALIBRATE_BEAMBOX_CAMERA'] = (device) => {
                     if (location.hash !== '#studio/beambox') {
                         AlertActions.showPopupInfo('', lang.camera_calibration.please_goto_beambox_first);
@@ -411,181 +300,16 @@ define([
                         });
                 };
 
-                _action['CHANGE_FILAMENT'] = (device) => {
-                    DeviceMaster.selectDevice(device).then(function(status) {
-                        DeviceMaster.getReport().then(report => {
-                            if(report.st_id === 16 || report.st_id === 2) {
-                                AlertActions.showPopupError('OCCUPIED', lang.message.device_in_use);
-                            }
-                            else if (status === DeviceConstants.CONNECTED) {
-                                showPopup(device, 'CHANGE_FILAMENT');
-                            }
-                            else if (status === DeviceConstants.TIMEOUT) {
-                                AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                            }
-                        });
-                    });
-                };
-
-                _action['AUTO_LEVELING'] = (device) => {
-                    DeviceMaster.selectDevice(device).then((status) => {
-                        if (status === DeviceConstants.CONNECTED) {
-                            const handleStopCalibrate = () => {
-                                DeviceMaster.killSelf();
-                            };
-                            const emptyFunction = (object) => ( object || {} );
-                            checkDeviceStatus(device).then(() => {
-                                ProgressActions.open(
-                                    ProgressConstants.WAITING,
-                                    lang.device.calibrating,
-                                    lang.device.pleaseWait,
-                                    true,
-                                    emptyFunction,
-                                    emptyFunction,
-                                    handleStopCalibrate
-                                );
-                                DeviceMaster.calibrate().done((debug_message) => {
-                                    setTimeout(() => {
-                                        AlertActions.showPopupInfo('calibrated', JSON.stringify(debug_message), lang.calibration.calibrated);
-                                    }, 100);
-                                }).fail((resp) => {
-                                    if (resp.error[0] === 'EDGE_CASE') { return; }
-                                    if (resp.module === 'LASER') {
-                                        AlertActions.showPopupError('calibrate-fail', lang.calibration.extruderOnly);
-                                    }
-                                    else {
-                                        DeviceErrorHandler.processDeviceMasterResponse(resp);
-                                        AlertActions.showPopupError('calibrate-fail', DeviceErrorHandler.translate(resp.error));
-                                    }
-                                }).always(() => {
-                                    ProgressActions.close();
-                                });
-                            });
-                        }
-                        else if (status === DeviceConstants.TIMEOUT) {
-                            AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                        }
-                    });
-                };
-
-                _action['CALIBRATE_ORIGIN'] = (device) => {
-                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
-                    DeviceMaster.select(device).then(() => {
-                        checkDeviceStatus(device).then(() => {
-                            ProgressActions.open(ProgressConstants.NONSTOP);
-                            DeviceMaster.home().done(() => {
-                                ProgressActions.close();
-                                setTimeout(() => {
-                                    console.log('lang is', lang);
-                                    AlertActions.showPopupInfo('set-to-origined', lang.topmenu.device.set_to_origin_complete);
-                                }, 100);
-                            }).always(() => {
-                                ProgressActions.close();
-                            });
-                        });
-                    }).fail(() => {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                    });
-                };
-
-                _action['MOVEMENT_TEST'] = (device) => {
-                    ProgressActions.open(ProgressConstants.NONSTOP, lang.message.connecting);
-                    DeviceMaster.select(device).then(() => {
-                        ProgressActions.open(ProgressConstants.NONSTOP, lang.tutorial.runningMovementTests);
-                        checkDeviceStatus(device).then(() => {
-                            DeviceMaster.runMovementTests().then(() => {
-                                console.log('ran movemnt test');
-                                ProgressActions.close();
-                                AlertActions.showPopupInfo('movement-tests', lang.topmenu.device.movement_tests_complete);
-                            }).fail((resp) => {
-                                console.log('ran movemnt test failed', resp);
-                                ProgressActions.close();
-                                AlertActions.showPopupInfo('movement-tests', lang.topmenu.device.movement_tests_failed);
-                            });
-                        });
-                    }).fail(() => {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                    });
-                };
-
-                _action['TURN_ON_LASER'] = (device) => {
-                    ProgressActions.open(ProgressConstants.WAITING, lang.message.connecting);
-                    DeviceMaster.select(device).then(() => {
-                        ProgressActions.open(ProgressConstants.WAITING);
-                        checkDeviceStatus(device).then(() => {
-                            ProgressActions.open(ProgressConstants.WAITING, lang.topmenu.device.calibrating, lang.device.pleaseWait, false);
-                            var scanControl,
-                                opts = {
-                                    onError: (data) => {
-                                        scanControl.takeControl(function(response) {
-                                            ProgressActions.close();
-                                        });
-                                    },
-                                    onReady: () => {
-                                        ProgressActions.close();
-                                        scanControl.turnLaser(true).then(() => {
-                                            AlertActions.showPopupCustom('scan-laser-turned-on', lang.topmenu.device.scan_laser_complete, lang.topmenu.device.finish, '');
-                                            var _handleFinish = (dialog_name) => {
-                                                scanControl.turnLaser(false).then(() => {
-                                                    scanControl.quit(true).then(() => {
-                                                        opts.onReady = function() {};
-                                                    }).fail(() => {
-                                                        ProgressActions.close();
-                                                    });
-                                                });
-                                                AlertStore.removeCustomListener(_handleFinish);
-                                            };
-                                            AlertStore.onCustom(_handleFinish);
-                                        });
-                                    }
-                                };
-                            scanControl = ScanControl(device.uuid, opts);
-                        });
-                    }).fail(() => {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                    });
-                };
-
-                _action['AUTO_LEVELING_CLEAN'] = (device) => {
-                    ProgressActions.open(ProgressConstants.WAITING, lang.message.connecting);
-                    DeviceMaster.select(device).then(() => {
-                        checkDeviceStatus(device).then(() => {
-                            ProgressActions.open(ProgressConstants.WAITING, lang.topmenu.device.calibrating, lang.topmenu.device.pleaseWait, false);
-                            DeviceMaster.cleanCalibration().done(() => {
-                                setTimeout(() => {
-                                    AlertActions.showPopupInfo('calibrated', lang.calibration.calibrated);
-                                }, 100);
-                            }).always(() => {
-                                ProgressActions.close();
-                            });
-                        });
-                    }).fail(() => {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                    });
-                };
-
-                _action['SET_TOOLHEAD_TEMPERATURE'] = (device) => {
-                    DeviceMaster.select(device).then(() => {
-                        showPopup(device, 'SET_TEMPERATURE');
-                    }).fail(() => {
-                        AlertActions.showPopupError('menu-item', lang.message.connectionTimeout);
-                    });
-                };
-
                 _action['UPDATE_FIRMWARE'] = (device) => {
                     checkDeviceStatus(device).then(() => {
-                      executeFirmwareUpdate(device, 'firmware');
-                    })
+                        executeFirmwareUpdate(device, 'firmware');
+                    });
                 };
 
                 _action['UPDATE_TOOLHEAD'] = (device) => {
                     checkDeviceStatus(device).then(() => {
-                      executeFirmwareUpdate(device, 'toolhead');
-                    })
+                        executeFirmwareUpdate(device, 'toolhead');
+                    });
                 };
 
                 _action['LOG_NETWORK'] = (device) => {
@@ -644,12 +368,12 @@ define([
                     location.hash = '#studio/cloud/bind-machine';
                 };
 
-                if(typeof _action[menuItem.id] === 'function') {
-                    if(
+                if (typeof _action[menuItem.id] === 'function') {
+                    if (
                         menuItem.id === 'SIGN_IN' ||
-                        menuItem.id === 'SIGN_OUT' ||
-                        menuItem.id === 'MY_ACCOUNT' ||
-                        menuItem.id === 'BUG_REPORT'
+                            menuItem.id === 'SIGN_OUT' ||
+                            menuItem.id === 'MY_ACCOUNT' ||
+                            menuItem.id === 'BUG_REPORT'
                     ) {
                         _action[menuItem.id]();
                     }
@@ -657,7 +381,7 @@ define([
                         let callback = {
                             timeout: 20000,
                             onSuccess: (device) => { _action[menuItem.id](device); },
-                            onTimeout: () => { console.log('select device timeout');}
+                            onTimeout: () => { console.log('select device timeout'); }
                         };
 
                         DeviceMaster.getDeviceBySerial(menuItem.serial, menuItem.source === 'h2h', callback);
@@ -672,32 +396,32 @@ define([
             ipc.removeAllListeners(events.MENU_CLICK);
         };
 
-        if(!window.menuEventRegistered) {
+        if (!window.menuEventRegistered) {
             registerAllDeviceMenuClickEvents();
         }
         // registerMenuItemClickEvents();
 
         return React.createClass({
 
-            getDefaultProps: function() {
+            getDefaultProps: function () {
                 return {
                     show: true
                 };
             },
 
-            getInitialState: function() {
+            getInitialState: function () {
                 return {
-                    sourceId        : '',
-                    deviceList      : [],
-                    refresh         : '',
-                    showDeviceList  : false,
-                    customText      : '',
-                    fcode           : {},
-                    previewUrl      : ''
+                    sourceId: '',
+                    deviceList: [],
+                    refresh: '',
+                    showDeviceList: false,
+                    customText: '',
+                    fcode: {},
+                    previewUrl: ''
                 };
             },
 
-            componentDidMount: function() {
+            componentDidMount: function () {
                 this._toggleDeviceListBind = this._toggleDeviceList.bind(null, false);
 
                 AlertStore.onCancel(this._toggleDeviceListBind);
@@ -706,20 +430,20 @@ define([
 
             },
 
-            componentWillUnmount: function() {
+            componentWillUnmount: function () {
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 AlertStore.removeRetryListener(this._waitForPrinters);
                 GlobalStore.removeMonitorClosedListener(this._toggleDeviceListBind);
                 // unregisterEvents();
             },
 
-            _waitForPrinters: function() {
+            _waitForPrinters: function () {
                 setTimeout(this._openAlertWithnoPrinters, 5000);
             },
 
-            _openAlertWithnoPrinters: function() {
+            _openAlertWithnoPrinters: function () {
                 if (0 === this.state.deviceList.length && true === this.state.showDeviceList) {
-                    if(location.hash === '#studio/beambox') {
+                    if (location.hash === '#studio/beambox') {
                         AlertActions.showPopupRetry('no-printer', lang.device_selection.no_beambox);
                     } else {
                         AlertActions.showPopupRetry('no-printer', lang.device_selection.no_printers);
@@ -727,17 +451,17 @@ define([
                 }
             },
 
-            _toggleDeviceList: function(open) {
+            _toggleDeviceList: function (open) {
                 this.setState({
                     showDeviceList: open
                 });
 
-                if (true === open) {
+                if (open) {
                     this._waitForPrinters();
                 }
             },
 
-            _handleNavigation: function(address) {
+            _handleNavigation: function (address) {
                 if (-1 < appSettings.needWebGL.indexOf(address) && false === detectWebgl()) {
                     AlertActions.showPopupError('no-webgl-support', lang.support.no_webgl);
                 }
@@ -752,9 +476,9 @@ define([
                 }
             },
 
-            _handleShowDeviceList: function() {
+            _handleShowDeviceList: function () {
                 var self = this,
-                    refreshOption = function(devices) {
+                    refreshOption = function (devices) {
                         self.setState({
                             deviceList: devices
                         });
@@ -762,7 +486,7 @@ define([
 
                 Discover(
                     'top-menu',
-                    function(printers) {
+                    function (printers) {
                         printers = DeviceList(printers);
                         refreshOption(printers);
                     }
@@ -771,11 +495,11 @@ define([
                 this._toggleDeviceList(!this.state.showDeviceList);
             },
 
-            _handleSelectDevice: function(device, e) {
+            _handleSelectDevice: function (device, e) {
                 e.preventDefault();
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
-                DeviceMaster.selectDevice(device).then(function(status) {
+                DeviceMaster.selectDevice(device).then(function (status) {
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
                         GlobalActions.showMonitor(device);
@@ -785,66 +509,36 @@ define([
                         AlertActions.showPopupError(_id, lang.message.connectionTimeout);
                     }
                 })
-                .fail(function(status) {
-                    ProgressActions.close();
-                    AlertActions.showPopupError('fatal-occurred', status);
-                });
+                    .fail(function (status) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('fatal-occurred', status);
+                    });
 
                 this._toggleDeviceList(false);
             },
 
-            _handleMonitorClose: function() {
+            _handleMonitorClose: function () {
                 this.setState({
                     showMonitor: false
                 });
             },
 
-            _handleContextMenu: function(event) {
-                electron && electron.ipc.send("POPUP_MENU_ITEM", {x: event.screenX, y:event.screenY}, {});
-            },
-            _renderStudioFunctions: function(groupName = 'delta') {
-                var itemClass = '',
-                    label = '',
-                    isActiveItem,
-                    menuItems;
-
-                menuItems = options.filter((v) => { return v.group == groupName }).map(function(opt, i) {
-                    isActiveItem = -1 < location.hash.indexOf(opt.name);
-                    itemClass = '';
-                    label = '';
-
-                    if ('' !== opt.label) {
-                        label = (<p>{opt.label}</p>);
-                    }
-
-                    opt.className.active = isActiveItem;
-                    itemClass = ClassNames(opt.className);
-
-                    return (
-                        <li className={itemClass} key={'menu' + i}
-                            data-display-name={opt.displayName}
-                            onClick={this._handleNavigation.bind(null, opt.name)}>
-                            <img src={opt.imgSrc} draggable="false"/>
-                            {label}
-                        </li>
-                    );
-                }, this);
-
-                return menuItems;
+            _handleContextMenu: function (event) {
+                electron && electron.ipc.send("POPUP_MENU_ITEM", { x: event.screenX, y: event.screenY }, {});
             },
 
-            _renderDeviceList: function() {
+            _renderDeviceList: function () {
                 var status = lang.machine_status,
                     headModule = lang.head_module,
                     statusText,
                     headText,
                     progress,
                     deviceList = this.state.deviceList,
-                    options = deviceList.map(function(device) {
+                    options = deviceList.map(function (device) {
                         statusText = status[device.st_id] || status.UNKNOWN;
                         headText = headModule[device.head_module] || headModule.UNKNOWN;
 
-                        if(device.st_prog === 0) {
+                        if (device.st_prog === 0) {
                             progress = '';
                         }
                         else if (16 === device.st_id && 'number' === typeof device.st_prog) {
@@ -854,7 +548,7 @@ define([
                             progress = '';
                         }
 
-                        let img = `img/icon_${device.source === 'h2h' ? 'usb' : 'wifi' }.svg`;
+                        let img = `img/icon_${device.source === 'h2h' ? 'usb' : 'wifi'}.svg`;
 
                         return (
                             <li
@@ -878,8 +572,8 @@ define([
 
                 list = (
                     0 < options.length
-                    ? options :
-                    [<div key="spinner-roller" className="spinner-roller spinner-roller-reverse"/>]
+                        ? options :
+                        [<div key="spinner-roller" className="spinner-roller spinner-roller-reverse" />]
                 );
 
                 return (
@@ -887,17 +581,10 @@ define([
                 );
             },
 
-            render : function() {
-                var deltaMenuItems  = this._renderStudioFunctions('delta'),
-                    beamboxMenuItems  = this._renderStudioFunctions('beambox'),
-                    deviceList = this._renderDeviceList(),
-                    currentWorkingFunction,
+            render: function () {
+                let deviceList = this._renderDeviceList(),
                     menuClass,
                     topClass;
-
-                currentWorkingFunction = options.filter(function(el) {
-                    return -1 < location.hash.search(el.name);
-                })[0] || {};
 
                 menuClass = ClassNames('menu', { show: this.state.showDeviceList });
                 topClass = {
@@ -906,33 +593,15 @@ define([
 
                 return (
                     <div className={ClassNames(topClass)}>
-                        <div className="brand-logo" onContextMenu={this._handleContextMenu}>
-                            <img className="logo-icon" src="img/menu/main_logo.svg" draggable="false"/>
-                            <span className="func-name">{currentWorkingFunction.displayName}</span>
-                            <div className="menu">
-                                <div className="arrow arrow-left arrow-top-left-flat"/>
-                                <div className="product-group-title">
-                                    Delta Family
-                                </div>
-                                <ul className="inner-menu delta">
-                                    {deltaMenuItems}
-                                </ul>
-                                <div className="product-group-title">
-                                    Beambox Family
-                                </div>
-                                <ul className="inner-menu beambox">
-                                    {beamboxMenuItems}
-                                </ul>
-                            </div>
-                        </div>
+
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
                             <p className="device-icon">
-                                <img src="img/btn-device.svg" draggable="false"/>
+                                <img src="img/btn-device.svg" draggable="false" />
                                 <span>{lang.menu.device}</span>
                             </p>
                             <div className={menuClass}>
-                                <div className="arrow arrow-right"/>
+                                <div className="arrow arrow-right" />
                                 <div className="device-list">
                                     {deviceList}
                                 </div>

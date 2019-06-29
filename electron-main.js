@@ -127,7 +127,9 @@ backendManager.start();
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1024, height: 768,
+        width: 1024,
+        height: 768,
+        titleBarStyle: 'hidden',
         title: `Beam Studio - ${app.getVersion()}`,
         webPreferences: {
             preload: path.join(__dirname, 'src', 'main-window-entry.js')
