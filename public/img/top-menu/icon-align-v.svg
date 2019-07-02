@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="27px" viewBox="0 0 28 27" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4 (15575) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-align-v</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Desktop-HD" sketch:type="MSArtboardGroup" transform="translate(-445.000000, -18.000000)" stroke="#333333" fill="#FFFFFF">
+            <g id="Align-Controls" sketch:type="MSLayerGroup" transform="translate(371.000000, 18.000000)">
+                <g id="icon-align-v" transform="translate(88.000000, 13.500000) rotate(-270.000000) translate(-88.000000, -13.500000) translate(75.500000, 0.500000)" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-10" transform="translate(12.000000, 13.000000) rotate(-270.000000) translate(-12.000000, -13.000000) " x="-1" y="12" width="26" height="2" rx="1"></rect>
+                    <rect id="Rectangle-10" x="-3.55271368e-15" y="7" width="25" height="4" rx="1"></rect>
+                    <path d="M4,15.0093689 C4,14.4519098 4.44463086,14 5.00087166,14 L18.9991283,14 C19.5518945,14 20,14.4433532 20,15.0093689 L20,16.9906311 C20,17.5480902 19.5598772,18 18.9977532,18 L9.26103947,18 C8.7080512,18 7.80999977,18 7.25594765,18 L4.99853159,18 C4.44705782,18 4,17.5566468 4,16.9906311 L4,15.0093689 Z" id="Rectangle-10"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

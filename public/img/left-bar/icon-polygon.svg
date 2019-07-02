@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="29px" viewBox="0 0 30 29" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4 (15575) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-polygon</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Desktop-HD" sketch:type="MSArtboardGroup" transform="translate(-9.000000, -318.000000)" stroke-width="2" stroke="#333333">
+            <g id="Left-Toolbar" sketch:type="MSLayerGroup" transform="translate(0.000000, 87.000000)">
+                <polygon id="icon-polygon" sketch:type="MSShapeGroup" points="24 233 37.3147912 242.673762 32.2289935 258.326238 15.7710065 258.326238 10.6852088 242.673762 "></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

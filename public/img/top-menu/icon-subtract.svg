@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="28px" viewBox="0 0 29 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4 (15575) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-subtract</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Desktop-HD" sketch:type="MSArtboardGroup" transform="translate(-749.000000, -19.000000)">
+            <g id="Clip-Controls" sketch:type="MSLayerGroup" transform="translate(700.500000, 19.000000)">
+                <g id="icon-subtract" transform="translate(49.000000, 0.000000)" sketch:type="MSShapeGroup">
+                    <path d="M11,11 L0.999960201,11 C0.454708934,11 0,11.4476974 0,11.9999602 L0,27.0000398 C0,27.5452911 0.447697432,28 0.999960201,28 L16.0000398,28 C16.5452911,28 17,27.5523026 17,27.0000398 L17,17 L11.9999602,17 C11.4476974,17 11,16.5452911 11,16.0000398 L11,11 Z" id="Rectangle-10" fill="#FFFFFF"></path>
+                    <rect id="Rectangle-10" fill-opacity="0.2" fill="#FFFFFF" x="11" y="0" width="17" height="17" rx="1"></rect>
+                    <path d="M11,11 L16.0000398,11 C16.5523026,11 17,11.4547089 17,11.9999602 L17,17 L11.9999602,17 C11.4476974,17 11,16.5452911 11,16.0000398 L11,11 Z" id="Rectangle-10" fill="#424242"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

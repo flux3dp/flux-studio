@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="28px" viewBox="0 0 29 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4 (15575) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-intersect</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Desktop-HD" sketch:type="MSArtboardGroup" transform="translate(-798.000000, -19.000000)" fill="#FFFFFF">
+            <g id="Clip-Controls" sketch:type="MSLayerGroup" transform="translate(700.500000, 19.000000)">
+                <g id="icon-intersect" transform="translate(98.000000, 0.000000)" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-10" fill-opacity="0.2" x="0" y="11" width="17" height="17" rx="1"></rect>
+                    <rect id="Rectangle-10" fill-opacity="0.2" x="11" y="0" width="17" height="17" rx="1"></rect>
+                    <g id="Rectangle-10-+-Rectangle-10" transform="translate(11.000000, 11.000000)">
+                        <path d="M6.66133815e-16,0 L5.0000398,0 C5.55230257,0 6,0.454708934 6,0.999960201 L6,6 L0.999960201,6 C0.447697432,6 1.77635684e-15,5.54529107 1.77635684e-15,5.0000398 L1.77635684e-15,6.66133815e-16 Z" id="Rectangle-10"></path>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

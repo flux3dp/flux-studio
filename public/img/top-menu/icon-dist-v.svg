@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="28px" height="22px" viewBox="0 0 28 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4 (15575) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-dist-v</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Desktop-HD" sketch:type="MSArtboardGroup" transform="translate(-576.000000, -20.000000)" stroke="#333333" fill="#FFFFFF">
+            <g id="Align-Controls" sketch:type="MSLayerGroup" transform="translate(371.000000, 18.000000)">
+                <g id="icon-dist-v" transform="translate(206.000000, 3.000000)" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-10" x="3" y="8" width="20" height="4" rx="1"></rect>
+                    <rect id="Rectangle-10" transform="translate(13.000000, 19.000000) rotate(-180.000000) translate(-13.000000, -19.000000) " x="0" y="18" width="26" height="2" rx="1"></rect>
+                    <rect id="Rectangle-10" transform="translate(13.000000, 1.000000) rotate(-180.000000) translate(-13.000000, -1.000000) " x="0" y="0" width="26" height="2" rx="1"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

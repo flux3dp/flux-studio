@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="28px" viewBox="0 0 29 28" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.4 (15575) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-union</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="Desktop-HD" sketch:type="MSArtboardGroup" transform="translate(-700.000000, -19.000000)" fill="#FFFFFF">
+            <g id="Clip-Controls" sketch:type="MSLayerGroup" transform="translate(700.500000, 19.000000)">
+                <g id="icon-union" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-10" x="0" y="11" width="17" height="17" rx="1"></rect>
+                    <rect id="Rectangle-10" x="11" y="0" width="17" height="17" rx="1"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
