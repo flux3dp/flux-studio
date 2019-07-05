@@ -9,7 +9,6 @@ define([
     'helpers/check-firmware',
     'helpers/firmware-updater',
     'helpers/firmware-version-checker',
-    'helpers/api/3d-scan-control',
     'helpers/api/cloud',
     'helpers/output-error',
     'plugins/classnames/index',
@@ -32,7 +31,6 @@ define([
     React,
     i18n,
     appSettings,
-    detectWebgl,
     Discover,
     DeviceMaster,
     checkDeviceStatus,
@@ -483,7 +481,7 @@ define([
                             deviceList: devices
                         });
                     };
-
+                console.log("Discover", Discover);
                 Discover(
                     'top-menu',
                     function (printers) {
@@ -581,6 +579,17 @@ define([
                 );
             },
 
+            _renderTopBtn: function(iconName, label) {
+                return (
+                    <div className="top-btn">
+                        <img src={`img/top-menu/icon-${iconName}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
+                        <div className="btn-label">
+                            {label}
+                        </div>
+                    </div>
+                );
+            },
+
             render: function () {
                 let deviceList = this._renderDeviceList(),
                     menuClass,
@@ -593,7 +602,32 @@ define([
 
                 return (
                     <div className={ClassNames(topClass)}>
+                        <div className="top-btns">
+                            <div className="top-controls zoom-controls">
+                                {this._renderTopBtn('zoom', 'Zoom')}
+                            </div>
+                            <div className="top-controls group-controls">
+                                {this._renderTopBtn('group', 'Group')}
+                                {this._renderTopBtn('ungroup', 'Ungroup')}
+                            </div>
+                            <div className="top-controls align-controls">
+                                {this._renderTopBtn('align-h', 'H-Align')}
+                                {this._renderTopBtn('align-v', 'V-Align')}
+                                {this._renderTopBtn('dist-h', 'H-Dist')}
+                                {this._renderTopBtn('dist-v', 'V-Dist')}
+                            </div>
+                            <div className="top-controls clip-controls">
+                                {this._renderTopBtn('union', 'Union')}
+                                {this._renderTopBtn('subtract', 'Subtract')}
+                                {this._renderTopBtn('intersect', 'Intersect')}
+                                {this._renderTopBtn('difference', 'Difference')}
+                            </div>
 
+                            <div className="top-controls flip-controls">
+                                {this._renderTopBtn('h-flip', 'H-Flip')}
+                                {this._renderTopBtn('v-flip', 'V-Flip')}
+                            </div>
+                        </div>
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
                             <p className="device-icon">

@@ -1,6 +1,7 @@
 define([
     'jquery',
     'react',
+    'reactClassset',
     'reactDOM',
     'reactPropTypes',
     'app/actions/beambox/beambox-preference',
@@ -15,9 +16,15 @@ define([
     'helpers/local-storage',
     'helpers/i18n',
     'plugins/classnames/index',
+    'app/actions/beambox/bottom-right-funcs',
+    'app/actions/beambox/preview-mode-controller',
+    'jsx!views/Printer-Selector',
+    'app/actions/alert-actions',
+    'app/actions/beambox/beambox-version-master'
 ], function(
     $,
     React,
+    ReactCx,
     ReactDOM,
     PropTypes,
     BeamboxPreference,
@@ -31,11 +38,17 @@ define([
     Modal,
     LocalStorage,
     i18n,
-    ClassNames
+    ClassNames,
+    BottomRightFuncs,
+    PreviewModeController,
+    PrinterSelector,
+    AlertActions,
+    BeamboxVersionMaster
 ) {
     'use strict';
 
     const LANG = i18n.lang.beambox.right_panel.laser_panel;
+    const LANG2 = i18n.lang;
     const defaultLaserOptions = [
         'parameters',
         'wood_3mm_cutting',
@@ -71,12 +84,16 @@ define([
         },
 
         getInitialState: function() {
+            this._handleStartClick = this._handleStartClick.bind(this);
+            this._renderPrinterSelectorWindow = this._renderPrinterSelectorWindow.bind(this);
+
             return {
                 speed:          this.props.speed,
                 strength:       this.props.strength,
                 repeat:         this.props.repeat,
                 original:       defaultLaserOptions[0],
                 modal:          '',
+                isPrinterSelectorOpen: false,
                 selectedItem:   LocalStorage.get('customizedLaserConfigs')[0] ? LocalStorage.get('customizedLaserConfigs')[0].name : ''
             };
         },
@@ -424,6 +441,109 @@ define([
             }
         },
 
+        _handleStartClick: async function() {
+            if (PreviewModeController.isPreviewMode()) {
+                await PreviewModeController.end();
+            }
+
+            const layers = $('#svgcontent > g.layer').toArray();
+            const dpi = BeamboxPreference.read('engrave_dpi');
+
+            const isPowerTooHigh = layers.map(layer => layer.getAttribute('data-strength'))
+                    .some(strength => Number(strength) > 80);
+            const imageElems = document.querySelectorAll('image');
+
+            let isSpeedTooHigh = false;
+
+            for (let i = 1; i < imageElems.length; i++) {
+                if (imageElems[i].getAttribute('data-shading') && (
+                        (dpi === 'medium' && imageElems[i].parentNode.getAttribute('data-speed') > 135) ||
+                        (dpi === 'high' && imageElems[i].parentNode.getAttribute('data-speed') > 90)
+                )) {
+                    isSpeedTooHigh = true;
+                    break;
+                }
+            }
+
+            if (isPowerTooHigh && isSpeedTooHigh) {
+                AlertActions.showPopupWarning('', LANG2.beambox.popup.both_power_and_speed_too_high);
+            } else if (isPowerTooHigh) {
+                AlertActions.showPopupWarning('', LANG2.beambox.popup.power_too_high_damage_laser_tube);
+            } else if (isSpeedTooHigh) {
+                AlertActions.showPopupWarning('', LANG2.beambox.popup.speed_too_high_lower_the_quality);
+            }
+
+            this.setState({
+                isPrinterSelectorOpen: true
+            });
+        },
+
+        _renderPrinterSelectorWindow: function() {
+            const onGettingPrinter = async (selected_item) => {
+                //export fcode
+                if (selected_item === 'export_fcode') {
+                    BottomRightFuncs.exportFcode();
+                    this.setState({
+                        isPrinterSelectorOpen: false
+                    });
+
+                    return;
+                }
+
+                //check firmware
+                if (await BeamboxVersionMaster.isUnusableVersion(selected_item)) {
+                    console.error('Not a valid firmware version');
+                    AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
+                    this.setState({
+                        isPrinterSelectorOpen: false
+                    });
+
+                    return;
+                }
+
+                // start task
+                this.setState({
+                    isPrinterSelectorOpen: false,
+                });
+                BottomRightFuncs.uploadFcode(selected_item);
+            };
+
+            const onClose = () => {
+                this.setState({
+                    isPrinterSelectorOpen: false
+                });
+            };
+
+            const content = (
+                <PrinterSelector
+                    uniqleId="laser"
+                    className="laser-device-selection-popup"
+                    modelFilter={PrinterSelector.BEAMBOX_FILTER}
+                    showExport={true}
+                    onClose={onClose}
+                    onGettingPrinter={onGettingPrinter}
+                />
+            );
+
+            return (
+                <Modal content={content} onClose={onClose} />
+            );
+        },
+
+        _renderActionButtons: function() {
+            let className = ReactCx.cx({
+                'btn-default': true, 
+                'btn-go': true
+            });
+            let label = LANG2.monitor.start;
+            
+            return (
+                <button className={className} type="button" data-ga-event="laser-goto-monitor" data-test-key={label} onClick={this._handleStartClick}>
+                    {label}
+                </button>
+            );
+        },
+
         render: function() {
             const speedPanel = this._renderSpeed();
             const strengthPanel = this._renderStrength();
@@ -435,14 +555,14 @@ define([
                     value : item,
                     key: item,
                     label: (LANG.dropdown[item] ? LANG.dropdown[item] : item)
-                }
+                };
             });
             const functionalOptions = functionalLaserOptions.map((item) => {
                 return {
                     value : item,
                     key: item,
                     label: LANG.dropdown[item]
-                }
+                };
             });
             const customizedConfigs = LocalStorage.get('customizedLaserConfigs');
             const customizedOptions = (customizedConfigs || customizedConfigs.length > 0) ? customizedConfigs.map((e) => {
@@ -455,16 +575,19 @@ define([
 
             const dropdownOptions = (
                 customizedOptions ?
-                defaultOptions.concat(customizedOptions).concat(functionalOptions) :
-                defaultOptions.concat(functionalOptions)
+                    defaultOptions.concat(customizedOptions).concat(functionalOptions) :
+                    defaultOptions.concat(functionalOptions)
             );
+
+            const actionButtons = this._renderActionButtons();
+            const printerSelector = this._renderPrinterSelectorWindow();
 
             return (
                 <div>
                     <div className="layername">
                         {this.props.layerName}
                     </div>
-                    <div>
+                    <div className="layerparams">
                         <DropdwonControl
                             id='laser-config-dropdown'
                             default={defaultLaserOptions[0]}
@@ -475,6 +598,8 @@ define([
                         {speedPanel}
                         {repeatPanel}
                         {modalDialog}
+                        {actionButtons}
+                        {this.state.isPrinterSelectorOpen ? printerSelector : ''}
                     </div>
                 </div>
             );

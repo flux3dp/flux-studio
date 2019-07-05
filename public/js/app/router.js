@@ -143,7 +143,7 @@ function(React, ReactDOM, i18n, $, Backbone, config, appSettings, detectWebgl) {
                 func = map[page];
             }
 
-            // this.appendSideBar();
+            this.appendSideBar();
 
             if (false === detectWebgl() && -1 < needWebGL.indexOf(page)) {
                 location.hash = '#studio/laser';

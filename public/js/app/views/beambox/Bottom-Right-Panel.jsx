@@ -28,6 +28,7 @@ define([
     class BottomRightPanel extends React.Component {
         constructor() {
             super();
+            console.error("BottomRigtPanel is deprecated.")
             this.state = {
                 isPrinterSelectorOpen: false
             };
@@ -38,7 +39,7 @@ define([
 
         async _handleStartClick() {
             if (PreviewModeController.isPreviewMode()) {
-                await PreviewModeController.end();
+                await PreviewModeController.end(); 
             }
 
             const layers = $('#svgcontent > g.layer').toArray();

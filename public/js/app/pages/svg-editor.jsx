@@ -305,12 +305,6 @@ define([
                                 </select>
                             </div>
                             <div id="layer-laser-panel-placeholder" />
-                            <div
-                                id="sidepanel_handle"
-                                title="Drag left/right to resize side panel [X]"
-                            >
-                                L a y e r s
-                            </div>
                         </div>
                         <div id="main_button">
                             <div id="main_icon" className="tool_button" title="Main Menu">

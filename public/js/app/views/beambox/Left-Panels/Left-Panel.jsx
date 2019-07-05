@@ -144,16 +144,34 @@ _
             );
         }
 
-        render() {
+        _renderToolButton(iconName, label, onClick, active) {
+            let cx = 'tool-btn';
+            if (active) {
+                cx += ' active';
+            }
             return (
-                <div className="left-panel">
-                    {this._renderInsertObject()}
-                    <PreviewButton />
-                    {this._renderAdvanced()}
+                <div className={cx} onClick={onClick}>
+                    <img src={`img/left-bar/icon-${iconName}.svg`} />
                 </div>
             );
         }
-    }
+
+        render() {
+            return (
+                <div className="left-toolbar">
+                    {this._renderToolButton('cursor','Cursor', ()=>{} , true)}
+                    {this._renderToolButton('photo','Photo', FnWrapper.importImage)}
+                    {this._renderToolButton('text','Text', FnWrapper.insertText)}
+                    {this._renderToolButton('rect','Rectangle', FnWrapper.insertRectangle)}
+                    {this._renderToolButton('oval','Ellipse', FnWrapper.insertEllipse)}
+                    {this._renderToolButton('polygon','polygon', FnWrapper.insertPolygon)}
+                    {this._renderToolButton('draw','Pen', FnWrapper.insertPath)}
+                    {this._renderToolButton('grid','Grid', ()=>{ alert('Coming soon'); })}
+                    {this._renderToolButton('camera','Camera Preview', ()=>{ } )}
+                </div>
+            );
+        }
+    } 
 
     return LeftPanel;
 });

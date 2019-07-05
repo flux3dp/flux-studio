@@ -4,7 +4,6 @@ define([
     'app/actions/beambox/beambox-global-interaction',
     'app/actions/beambox/beambox-preference',
     'jsx!views/beambox/Left-Panels/Left-Panel',
-    'jsx!views/beambox/Bottom-Right-Panel',
     'jsx!pages/svg-editor',
 ], function (
     React,
@@ -12,7 +11,6 @@ define([
     BeamboxGlobalInteraction,
     BeamboxPreference,
     LeftPanel,
-    BottomRightPanel,
     SvgEditor
 ) {
     BeamboxInit.init();
@@ -35,7 +33,6 @@ define([
                 <div className="studio-container beambox-studio">
                     <LeftPanel />
                     <SvgEditor />
-                    <BottomRightPanel />
                     <div id='object-panels-placeholder' />
                     <div id='image-trace-panel-placeholder' />
                 </div>

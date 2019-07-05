@@ -122,7 +122,6 @@ define([
             },
             defaultExtensions = [
                 'ext-rotary_mode.js',
-                'ext-overview_window.js',
                 'ext-markers.js',
                 'ext-connector.js',
                 'ext-shapes.js',
@@ -1044,7 +1043,7 @@ define([
                     var layerVis = $('<td class="layervis">').toggleClass('layerinvis', !drawing.getLayerVisibility(name));
                     var layerColor = $('<td class="layercolor"><div style="background:' + drawing.getLayerColor(name) + '"></div></td>');
                     var layerName = $('<td class="layername">' + name + '</td>');
-                    layerlist.append(layerTr.append(layerVis, layerColor, layerName));
+                    layerlist.append(layerTr.append(layerColor, layerName, layerVis));
                     selLayerNames.append('<option value="' + name + '">' + name + '</option>');
                     layer--;
                 }
