@@ -32,8 +32,12 @@ html, body, div{
 
 #svg_editor {
 	font-size: 10pt;
-	/* font-family: Verdana, Helvetica, Arial; */
 	color: #000000;
+	position: absolute;
+	left: 60px;
+	top: 0px;
+	width: calc(100vw - 213px);
+	height: 100vh;
 }
 
 a {
@@ -77,6 +81,12 @@ select {
 
 /* Rulers
 ——————————————————————————————————————*/
+
+#rulers {
+	position: absolute;
+	width: calc(100vw - 213px);
+	height: 100vh;
+}
 
 #rulers > div {
 	position: absolute;
@@ -180,7 +190,7 @@ select {
 	position:absolute;
 	top: 40px;
 	bottom: 40px;
-	right: 0;
+	right: -153px;
 	width: 2px;
 	padding: 10px;
 	border-color: #808080;
@@ -290,7 +300,7 @@ select {
 	overflow-x: hidden;
 	overflow-y: scroll;
 	background: white;
-	height: calc(100vh - 530px);
+	height: calc(100vh - 435px);
 }
 #layerlist_container::-webkit-scrollbar {
 	-webkit-appearance: none;

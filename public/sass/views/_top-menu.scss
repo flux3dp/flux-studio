@@ -6,82 +6,34 @@
     width: 100%;
     z-index: 1;
     background: #333;
-    height: 105px;
+    height: 85px;
     -webkit-app-region: drag;
 
-    .brand-logo {
-        cursor: default;
-        left: 24px;
-        position: absolute;
-        top: 24px;
-
-        .logo-icon,
-        .menu {
-            float: left;
-        }
-
-        .logo-icon {
-            transition: all .25s;
-            width: 49px;
-        }
-
-        .func-name {
-            color: $primaryColor;
-            font-size: 40px;
-            font-weight: lighter;
-            line-height: 55px;
-            padding: 0 0 0 21px;
-        }
-
-        .menu {
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            background: #fff;
-            display: none;
-            left: 5.05rem;
-            padding: 1.8rem .65rem 1.5rem .65rem;
-            position: relative;
-            top: 27px;
-            border-radius: 2px;
-            border-top-left-radius: 0;
-            z-index: 1;
-
-            .arrow-top-left-flat {
-                box-shadow: -1px -1px 5px rgba(0,0,0,0.1);
-                left: 0;
-                position: absolute;
-                top: 0;
-                transform: translateX(-98%);
+    .top-controls {
+        display: inline-block;
+        margin: 0px 20px 0 20px;
+    }
+    .top-btns {
+        width: calc(100% - 40px);
+        .top-btn {
+            opacity: 0.8;
+            padding-top: 30px;
+            display: inline-block;
+            height: 84px;
+            width: 60px;
+            text-align: center;
+            img {
+                max-width: 28px;
+                max-height: 28px;
             }
-
-            .inner-menu {
-                @include flexbox();
-                list-style: none;
-                margin: 0;
-                padding: 0;
-                flex-wrap: wrap;
-                align-content: space-between;
-                width: 450px;
-                height: 65px;
+            .btn-label {
+                letter-spacing: 0.5px;
+                margin-top: 3px;
+                color: #F8F8F8;
+                font-size: 11px;
             }
-
-            .product-group-title {
-                font-size: 12px;
-                color: #999;
-                margin: 5px 0 8px 20px;
-            }
-        }
-
-        &:hover {
-            .menu {
-                display: block;
-            }
-
-            .logo-icon {
-                transform: rotate(90deg);
-            }
-
-            .func-name {
-                display: none;
+            &:hover {
+                opacity: 1.0;
             }
         }
     }

@@ -7,11 +7,34 @@
     }
     user-select: none;
     padding: 5px;
+    .left-toolbar {
+        background: #F8F8F8;
+        border: 1px solid #E0E0E0;
+        position: absolute;
+        top: 85px;
+        left: 0px;
+        height: 100vh;
+        .tool-btn {
+            text-align: center;
+            line-height: 26px;
+            img {
+                height: 26px;
+            }
+            margin: 15px 7px;
+            height: 40px;
+            width: 40px;
+            opacity: 0.5;
+            &.active {
+                opacity: 1.0;
+            }
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+    }
     .left-panel {
-        margin: 0 0 0 30px;
-        z-index: 1;
         position: relative;
-        margin-top: calc(50vh - 125px);
+        z-index: 1;
         display: inline-flex;
         flex-direction: column;
         .option {
@@ -270,12 +293,12 @@
             border: none;
             position: absolute;
             width: 153px;
-            padding-left: 10px;
-            padding-right: 10px;
-            opacity: 0.8;
+            padding: 0px;
+            opacity: 1.0;
             z-index: 2;
-            top: 110px;
-            right: 9px;
+            top: 85px;
+            height: calc(100vh - 85px);
+            right: -153px;
             transition: opacity 0.3s;
             &:hover {
                 opacity: 1;
@@ -285,9 +308,9 @@
                 background-color: $backgroundColor;
                 display: block;
                 overflow: initial;
-                border: 1px #444 solid;
+                border: 1px #CCC solid;
+                border-top: 0;
                 border-radius: 2px;
-                // box-shadow: 4px 5px 14px #444;
 
                 #layerbuttons {
                     padding: 0;
@@ -307,17 +330,19 @@
                     .layercolor div{
                         position: relative;
                         top: 2px;
-                        border: 1px solid black;
+                        border: 2px solid white;
+                        border-radius: 2px;
                         background: black;
                         width: 14px;
                         height: 14px;
-                        margin-left: 5px;
+                        margin-left: 10px;
                         display: inline-block;
                     }
                     .layervis {
                         text-align: center;
                     }
                     tr.layer {
+                        height: 40px;
                         .layername {
                             padding: 3px 0px;
                         }
@@ -352,6 +377,17 @@
             #sidepanel_handle {
                 @include force-hide();
             }
+            .btn-go {
+                background: #4D4D4D;
+                font-size: 23px;
+                width: 153px;
+                height: 100px;
+                border: 1px solid #333;
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                color: white;
+            } 
         }
         .selLayerBlock {
             margin-top: 18px;
@@ -366,15 +402,17 @@
         }
         #layer-laser-panel-placeholder {
             background-color: $backgroundColor;
-            min-height: 200px;
-            margin-top: 20px;
-            border: 1px #444 solid;
+            min-height: 220px;
+            margin-top: -1px;
+            border: 1px #CCC solid;
             border-radius: 2px;
             .layername {
-                margin-bottom: 10px;
-                border-bottom: 1px #444 solid;
-                padding: 2px;
+                padding: 10px 0;
+                border-bottom: 1px #CCC solid;
                 text-align: center;
+            }
+            .layerparams {
+                padding: 10px 0;
             }
             .panel {
                 padding-left: 10px;
