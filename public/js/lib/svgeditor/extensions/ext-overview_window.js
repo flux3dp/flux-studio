@@ -31,7 +31,7 @@ svgEditor.addExtension("overview_window", function(S) {
 	// Define dynamic animation of the view box.
 	const elWorkarea = document.getElementById('workarea');
 	const elCanvas = document.getElementById('svgcanvas');
-	const elMiniview = document.getElementById('overviewMiniView');
+	// const elMiniview = document.getElementById('overviewMiniView');
 	const elOverviewBox = document.getElementById('overview_window_view_box')
 	var updateViewBox = function(){
 		var portHeight=elWorkarea.clientHeight;
@@ -40,8 +40,8 @@ svgEditor.addExtension("overview_window", function(S) {
 		var portY=elWorkarea.scrollTop;
 		var windowWidth= elCanvas.clientWidth
 		var windowHeight= elCanvas.clientHeight;
-		var overviewWidth=elMiniview.clientWidth;
-		var overviewHeight=elMiniview.clientHeight;
+	//	var overviewWidth=elMiniview.clientWidth;
+	//	var overviewHeight=elMiniview.clientHeight;
 		
 		var viewBoxX=portX/windowWidth*overviewWidth;
 		var viewBoxY=portY/windowHeight*overviewHeight;
