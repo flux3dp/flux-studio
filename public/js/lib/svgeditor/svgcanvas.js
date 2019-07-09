@@ -7769,6 +7769,51 @@ define([
             }
         };
 
+        this.gridArraySelectedElement = (gridDistanceXY, arrayNumberXY) => {
+            const originElements = selectedElements;
+            if (originElements.length == 0) {
+                return;
+            }
+            let pastedElements = [];
+            let dx = [];
+            let dy = [];
+            let batchCmd = new svgedit.history.BatchCommand('Grid elements');
+            var drawing = getCurrentDrawing();
+            let elementCount = 0;
+            for (let i = 0; i < originElements.length; ++i) {
+                const elem = originElements[i];
+                if (!elem) {
+                    continue;
+                }
+                for (let j = 0; j < arrayNumberXY.column; ++j) {
+                    for (let k = 0; k < arrayNumberXY.row; ++k) {
+
+                        dx[elementCount] = j * gridDistanceXY.dx;
+                        dy[elementCount] = k * gridDistanceXY.dy;
+                        elementCount += 1;
+
+                        if (j == 0 && k == 0) continue;
+                        const copy = drawing.copyElem(elem);
+                        if (!svgedit.utilities.getElem(elem.id)) {
+                            copy.id = elem.id;
+                        }
+                        const layerName = $(elem.parentNode).find('title').text();
+                        const layer =drawing.getLayerByName(layerName);
+                        layer.appendChild(copy);
+                        batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(copy));
+                        restoreRefElems(copy);
+                        pastedElements.push(copy);
+                    }
+                }
+            }
+            addToSelection(pastedElements);
+            const cmd = canvas.moveSelectedElements(dx, dy, false);
+            batchCmd.addSubCommand(cmd);
+            addCommandToHistory(batchCmd);
+            if (pastedElements.length > 0) {
+                call('changed', pastedElements);
+            }
+        }
 
         // Function: ungroupSelectedElement
         // Unwraps all the elements in a selected group (g) element. This requires

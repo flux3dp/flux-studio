@@ -256,6 +256,9 @@ define([
             }
             $('#workarea').css('cursor', 'text');
         },
+        gridArraySelected: function() {
+            $('#tool_grid').mouseup();
+        },
         saveFile: function() {
             const output = svgCanvas.getSvgString();
             const defaultFileName = svgCanvas.getLatestImportFileName() || 'untitled';

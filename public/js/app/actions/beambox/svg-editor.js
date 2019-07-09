@@ -25,6 +25,7 @@ TODOS
 define([
     'react',
     'jsx!app/actions/beambox/Object-Panels-Controller',
+    'jsx!app/actions/beambox/Tool-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
     'app/actions/beambox/preview-mode-controller',
     'jsx!app/actions/announcement',
@@ -41,6 +42,7 @@ define([
 ], function (
     React,
     ObjectPanelsController,
+    ToolPanelsController,
     LaserPanelController,
     PreviewModeController,
     Announcement,
@@ -3666,6 +3668,18 @@ define([
                 }
             };
 
+            var clickGrid = function () {
+                if (toolButtonClick('#tool_grid')) {
+                    if (selectedElement != null) {
+                        ToolPanelsController.setType('gridArray');
+                        ToolPanelsController.setVisibility(true);
+                        ToolPanelsController.render();
+                        ObjectPanelsController.setVisibility(false);
+                        ObjectPanelsController.render();
+                    }
+                }
+            }
+
                 // Delete is a contextual tool that only appears in the ribbon if
                 // an element has been selected
             var deleteSelected = function () {
@@ -4720,6 +4734,11 @@ define([
                     fn: clickText,
                     evt: 'click',
                     key: ['T', true]
+                },
+                {
+                    sel: '#tool_grid',
+                    fn: clickGrid,
+                    evt: 'mouseup'
                 },
                 {
                     sel: '#tool_image',
