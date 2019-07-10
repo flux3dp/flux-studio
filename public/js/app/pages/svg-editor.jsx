@@ -1000,6 +1000,7 @@ define([
                                 <div id="tool_ellipse" title="Ellipse" />
                                 <div id="tool_path" title="Path" />
                                 <div id="tool_polygon" title="Polygon" />
+                                <div id="tool_grid" title="Grid Array" />
                                 <div id="tool_circle" title="Circle" />
                                 <div id="tool_fhellipse" title="Free-Hand Ellipse" />
                             </div>

@@ -16,9 +16,11 @@
 // 4) math.js
 // 5) svgutils.js
 define([
-	'jsx!app/actions/beambox/Object-Panels-Controller'
+	'jsx!app/actions/beambox/Object-Panels-Controller',
+	'jsx!app/actions/beambox/Tool-Panels-Controller'
 ], function(
-	ObjectPanelsController
+	ObjectPanelsController,
+	ToolPanelsController
 ){
 'use strict';
 
@@ -154,7 +156,7 @@ svgedit.select.Selector.prototype.showGrips = function(show) {
 		this.selectorGroup.appendChild(selectorManager_.selectorGripsGroup);
 		this.updateGripCursors(svgedit.utilities.getRotationAngle(elem));
 	}
-
+	ToolPanelsController.unmount();
 	ObjectPanelsController.setVisibility(show);
 	ObjectPanelsController.render();
 };
@@ -501,6 +503,7 @@ svgedit.select.SelectorManager.prototype.releaseSelector = function(elem) {
 	}
 	
 	ObjectPanelsController.unmount();
+	ToolPanelsController.unmount();
 };
 
 // Function: svgedit.select.SelectorManager.getRubberBandBox

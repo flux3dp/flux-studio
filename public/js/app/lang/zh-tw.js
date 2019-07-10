@@ -1149,6 +1149,17 @@ define(function() {
                 threshold: '曝光閾值',
                 lock_desc: '縮放時固定比例 (SHIFT)'
             },
+            tool_panels:{
+                cancel: '取消',
+                confirm: '確認',
+                grid_array: '生成陣列',
+                array_dimension: '陣列維度',
+                rows: '列',
+                columns: '行',
+                array_interval: '陣列間隔',
+                dx: '寬',
+                dy: '高',
+            },
             svg_editor: {
                 unnsupported_file_type: 'Beam Studio 不直接支援此檔案格式。請先輸出成圖片檔或 SVG 格式',
                 unnsupport_ai_file_directly: '請先將您的 AI 檔輸出成 SVG 或 圖片檔，再匯入至 Beam Studio'

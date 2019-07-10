@@ -1074,6 +1074,17 @@ define(function() {
                 threshold: '曝光阈值',
                 lock_desc: '缩放时固定比例 (SHIFT)'
             },
+            tool_panels:{
+                cancel: '取消',
+                confirm: '确认',
+                grid_array: '生成阵列',
+                array_dimension: '阵列维度',
+                rows: '列',
+                columns: '行',
+                array_interval: '阵列间隔',
+                dx: '宽',
+                dy: '高',
+            },
             svg_editor: {
                 unnsupported_file_type: 'Mozu Studio 不直接支持此文件格式。请先输出成图片档或 SVG 格式',
                 unnsupport_ai_file_directly: '请先将您的 AI 档输出成 SVG 或 图片档，再导入至 Mozu Studio'

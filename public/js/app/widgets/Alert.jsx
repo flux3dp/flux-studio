@@ -38,13 +38,13 @@ define(['react', 'jsx!widgets/Button-Group', 'helpers/i18n'], function(React, Bu
             var self = this;
             if (this.props.displayImages) {
                 if (this.state.imgIndex < this.props.images.length - 1) {
-                    return <ButtonGroup buttons={[{
+                    return (<ButtonGroup buttons={[{
                         label: lang.next,
                         right: true,
                         onClick: () => {
                             self.setState({imgIndex: this.state.imgIndex + 1});
                         }
-                    }]}/>
+                    }]}/>)
                 } else {
                     return <ButtonGroup buttons={[{
                         label: lang.next,

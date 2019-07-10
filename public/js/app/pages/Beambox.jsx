@@ -34,6 +34,7 @@ define([
                     <LeftPanel />
                     <SvgEditor />
                     <div id='object-panels-placeholder' />
+                    <div id='tool-panels-placeholder' />
                     <div id='image-trace-panel-placeholder' />
                 </div>
             );

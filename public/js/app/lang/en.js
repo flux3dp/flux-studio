@@ -1151,6 +1151,18 @@ define(function() {
                 threshold: 'Threshold',
                 lock_desc: 'Preserve the ratio of width and height (SHIFT)'
             },
+            tool_panels:{
+                cancel: 'Cancel',
+                confirm: 'Confirm',
+                grid_array: 'Create Grid Array',
+                array_dimension: 'Array Dimension',
+                rows: 'Rows',
+                columns: 'Cols.',
+                array_interval: 'Array Interval',
+                dx: 'X',
+                dy: 'Y',
+
+            },
             svg_editor: {
                 unnsupported_file_type: 'The file type is not directly supported. Please convert the file into SVG or bitmap',
                 unnsupport_ai_file_directly: 'Please convert your AI file into SVG or Bitmap first.'

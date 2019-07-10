@@ -146,7 +146,9 @@
             }
         }
     }
-    .object-panels {
+
+    .object-panels,
+    .tool-panels {
         display: absolute;
         box-shadow: 0px 3px 5px rgba(0,0,0,0.15);
         border-radius: 2px;
@@ -156,7 +158,8 @@
             user-select: none;
             pointer-events: none;
         }
-        .object-panel {
+        .object-panel,
+        .tool-panel {
             @include flexbox();
             font-size: 20px;
             transition: all .1s ease;
@@ -273,6 +276,31 @@
                             cursor: pointer;
                         }
                     }
+                }
+            }
+        }
+    }
+    .tool-block {
+        font-size: 20px;
+        transition: all .1s ease;
+        z-index: 1;
+        color: #999;
+        background: #FFFFFF;
+        display: block;
+        margin: 0;
+        padding: 0 20px;
+        width: 240px;
+        border: 1px #ddd solid;
+        .btn-h-group {
+            width: 100%;
+            .btn {
+                font-size: 1.3rem;
+                height: 2.8rem;
+                line-height: calc(2.8rem - 4px);    // borders are 2px
+                margin: 0 .6rem 0 0;
+                max-width: 13rem;
+                &:last-child {
+                    margin: 0;
                 }
             }
         }
@@ -782,7 +810,7 @@
 
     #svg_source_editor,
     #docprops,
-    #svg_prefs,
+    #svg_prefs
     //#cmenu_canvas
     {
         @include force-hide();

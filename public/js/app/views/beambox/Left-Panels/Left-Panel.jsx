@@ -166,7 +166,7 @@ _
                     {this._renderToolButton('oval','Ellipse', FnWrapper.insertEllipse)}
                     {this._renderToolButton('polygon','polygon', FnWrapper.insertPolygon)}
                     {this._renderToolButton('draw','Pen', FnWrapper.insertPath)}
-                    {this._renderToolButton('grid','Grid', ()=>{ alert('Coming soon'); })}
+                    {this._renderToolButton('grid','Grid', FnWrapper.gridArraySelected)}
                     {this._renderToolButton('camera','Camera Preview', ()=>{ } )}
                 </div>
             );
