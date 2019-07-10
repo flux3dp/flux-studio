@@ -7161,7 +7161,7 @@ define([
             }
             elems = elems || selectedElements;
             var i = elems.length;
-            var no_xy_elems = ['g', 'polyline', 'path'];
+            var no_xy_elems = ['g', 'polyline', 'path', 'polygon'];
             var good_g_attrs = ['transform', 'opacity', 'filter'];
 
             while (i--) {
@@ -7783,7 +7783,7 @@ define([
             for (let i = 0; i < originElements.length; ++i) {
                 const elem = originElements[i];
                 if (!elem) {
-                    continue;
+                    break;
                 }
                 for (let j = 0; j < arrayNumberXY.column; ++j) {
                     for (let k = 0; k < arrayNumberXY.row; ++k) {
