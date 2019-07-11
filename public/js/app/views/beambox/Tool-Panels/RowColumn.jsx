@@ -63,16 +63,6 @@ define([
                         </p>
                         <label className="accordion-body">
                             <div className="control">
-                                <span className="text-center header">{LANG.rows}</span>
-                                <UnitInput
-                                    min={1}
-                                    unit=""
-                                    decimal={0}
-                                    defaultValue={this.state.row || 1}
-                                    getValue={this._update_row_handler}
-                                />
-                            </div>
-                            <div className="control">
                                 <span className="text-center header">{LANG.columns}</span>
                                 <UnitInput
                                     min={1}
@@ -80,6 +70,16 @@ define([
                                     decimal={0}
                                     defaultValue={this.state.column || 1}
                                     getValue={this._update_column_handler}
+                                />
+                            </div>
+                            <div className="control">
+                                <span className="text-center header">{LANG.rows}</span>
+                                <UnitInput
+                                    min={1}
+                                    unit=""
+                                    decimal={0}
+                                    defaultValue={this.state.row || 1}
+                                    getValue={this._update_row_handler}
                                 />
                             </div>
                         </label>
