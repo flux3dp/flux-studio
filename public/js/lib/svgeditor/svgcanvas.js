@@ -8054,6 +8054,7 @@ define([
         };
 
         this.getCenter = function(elem) {
+            //TODO: no polygon, path,... maybe use bbox to find X Y?
             let centerX,centerY ;
             switch(elem.tagName) {
                 case 'image':
@@ -8314,8 +8315,7 @@ define([
         // "selected", "largest", "smallest", "page"
         this.alignSelectedElements = function (type, relative_to) {
             var i, elem;
-            var bboxes = [],
-                angles = [];
+            var bboxes = [];
             var minx = Number.MAX_VALUE,
                 maxx = Number.MIN_VALUE,
                 miny = Number.MAX_VALUE,

@@ -37,6 +37,38 @@
             }
         }
     }
+    
+    
+    .top-dropdown-control {
+        .arrow-up {
+            width: 0; 
+            height: 0;
+            margin-top: 10px;
+            margin-left: 10px;
+            position: absolute;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-bottom: 16px solid #333;
+            z-index: 1;
+        }
+        .top-btn {
+            padding-top: 15px;
+            height: 69px;
+        }
+        .dropdown-block {
+            padding-top: 26px;
+            position: absolute;
+            background: #333;
+            background-clip: content-box;
+            z-index: 1;
+        }
+        .dropdown-content {
+            display: none;
+        }
+        &:hover .dropdown-content {
+            display: block;
+        }
+    }
 
     .item {
         color: $primaryColor;

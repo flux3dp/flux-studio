@@ -38,6 +38,13 @@ define([
         $(image).attr('xlink:href', flipCanvas.toDataURL());
     };
 
+    let _align = function(types) {
+        const selectedElements = window.svgCanvas.getSelectedElems();
+        const len = selectedElements.filter(e => e).length;
+        const mode = len > 1 ? 'selected' : 'page';
+        svgCanvas.alignSelectedElements(types, mode);
+    };
+
     const funcs =  {
         clearSelection: function() {
             svgCanvas.clearSelection();
@@ -190,31 +197,41 @@ define([
             }
         },
 
+        //top menu
+
+        groupSelected: function() {
+            svgCanvas.groupSelectedElements();
+        },
+
+        ungroupSelected: function() {
+            svgCanvas.ungroupSelectedElement();
+        },
+
         //align toolbox
         alignLeft: function() {
-            svgCanvas.alignSelectedElements('l', 'page');
+            _align('l');
         },
         alignCenter: function(){
-            svgCanvas.alignSelectedElements('c', 'page');
+            _align('c');
         },
         alignRight: function() {
-            svgCanvas.alignSelectedElements('r', 'page');
+            _align('r');
         },
         alignTop: function() {
-            svgCanvas.alignSelectedElements('t', 'page');
+            _align('t');
         },
         alignMiddle: function() {
-            svgCanvas.alignSelectedElements('m', 'page');
+            _align('m');
         },
         alignBottom: function() {
-            svgCanvas.alignSelectedElements('b', 'page');
+            _align('b');
         },
         // distribute toolbox
         distHori: function() {
             svgCanvas.distHori();
         },
         distVert: function() {
-            svgCanvas.distHori();
+            svgCanvas.distVert();
         },
         distEven: function() {
             svgCanvas.distEven();

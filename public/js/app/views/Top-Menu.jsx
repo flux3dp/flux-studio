@@ -579,9 +579,45 @@ define([
                 );
             },
 
-            _renderTopBtn: function(iconName, label) {
+            _renderTopDropDown: function(iconName, label) {
+                const labelFunctionMap = {
+                    'H-Align': [
+                        {iconName: 'align-h', label: 'Left', f: ()=>{FnWrapper.alignLeft();}},
+                        {iconName: 'align-h', label: 'Center', f: ()=>{FnWrapper.alignCenter();}},
+                        {iconName: 'align-h', label: 'Right', f: ()=>{FnWrapper.alignRight();}}
+                    ],
+                    'V-Align': [
+                        {iconName: 'align-v', label: 'Top', f: ()=>{FnWrapper.alignTop();}},
+                        {iconName: 'align-v', label: 'Middle', f: ()=>{FnWrapper.alignMiddle();}},
+                        {iconName: 'align-v', label: 'Bottom', f: ()=>{FnWrapper.alignBottom();}}
+                    ],
+                };
+                let fns = labelFunctionMap[label];
+                let items = [];
+                for (let i = 0; i < fns.length; ++i) {
+                    items.push(this._renderTopBtn(fns[i].iconName, fns[i].label, fns[i].f))
+                }
+
                 return (
-                    <div className="top-btn">
+                    <div className="top-btn top-dropdown-control">
+                        <img src={`img/top-menu/icon-${iconName}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
+                        <div className="btn-label">
+                            {label}
+                        </div>
+                        <div className="dropdown-content">
+                            <div className="arrow-up "></div>
+                            <div className="dropdown-block">
+                                {items}
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            },
+
+            _renderTopBtn: function(iconName, label, onClick) {
+                return (
+                    <div className="top-btn" onClick={onClick}>
                         <img src={`img/top-menu/icon-${iconName}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
                         <div className="btn-label">
                             {label}
@@ -599,7 +635,7 @@ define([
                 topClass = {
                     'hide': !this.props.show
                 };
-
+                console.log('render top menu');
                 return (
                     <div className={ClassNames(topClass)}>
                         <div className="top-btns">
@@ -607,14 +643,14 @@ define([
                                 {this._renderTopBtn('zoom', 'Zoom')}
                             </div>
                             <div className="top-controls group-controls">
-                                {this._renderTopBtn('group', 'Group')}
-                                {this._renderTopBtn('ungroup', 'Ungroup')}
+                                {this._renderTopBtn('group', 'Group', ()=>{FnWrapper.groupSelected();})}
+                                {this._renderTopBtn('ungroup', 'Ungroup', ()=>{FnWrapper.ungroupSelected();})}
                             </div>
                             <div className="top-controls align-controls">
-                                {this._renderTopBtn('align-h', 'H-Align')}
-                                {this._renderTopBtn('align-v', 'V-Align')}
-                                {this._renderTopBtn('dist-h', 'H-Dist')}
-                                {this._renderTopBtn('dist-v', 'V-Dist')}
+                                {this._renderTopDropDown('align-h', 'H-Align')}
+                                {this._renderTopDropDown('align-v', 'V-Align')}
+                                {this._renderTopBtn('dist-h', 'H-Dist', ()=>{FnWrapper.distHori();})}
+                                {this._renderTopBtn('dist-v', 'V-Dist', ()=>{FnWrapper.distVert();})}
                             </div>
                             <div className="top-controls clip-controls">
                                 {this._renderTopBtn('union', 'Union')}
