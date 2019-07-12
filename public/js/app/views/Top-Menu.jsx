@@ -582,14 +582,14 @@ define([
             _renderTopDropDown: function(iconName, label) {
                 const labelFunctionMap = {
                     'H-Align': [
-                        {iconName: 'align-h', label: 'Left', f: ()=>{FnWrapper.alignLeft();}},
-                        {iconName: 'align-h', label: 'Center', f: ()=>{FnWrapper.alignCenter();}},
-                        {iconName: 'align-h', label: 'Right', f: ()=>{FnWrapper.alignRight();}}
+                        {iconName: 'align-h', label: 'Left', f: () => {FnWrapper.alignLeft();}},
+                        {iconName: 'align-h', label: 'Center', f: () => {FnWrapper.alignCenter();}},
+                        {iconName: 'align-h', label: 'Right', f: () => {FnWrapper.alignRight();}}
                     ],
                     'V-Align': [
-                        {iconName: 'align-v', label: 'Top', f: ()=>{FnWrapper.alignTop();}},
-                        {iconName: 'align-v', label: 'Middle', f: ()=>{FnWrapper.alignMiddle();}},
-                        {iconName: 'align-v', label: 'Bottom', f: ()=>{FnWrapper.alignBottom();}}
+                        {iconName: 'align-v', label: 'Top', f: () => {FnWrapper.alignTop();}},
+                        {iconName: 'align-v', label: 'Middle', f: () => {FnWrapper.alignMiddle();}},
+                        {iconName: 'align-v', label: 'Bottom', f: () => {FnWrapper.alignBottom();}}
                     ],
                 };
                 let fns = labelFunctionMap[label];
@@ -643,17 +643,17 @@ define([
                                 {this._renderTopBtn('zoom', 'Zoom')}
                             </div>
                             <div className="top-controls group-controls">
-                                {this._renderTopBtn('group', 'Group', ()=>{FnWrapper.groupSelected();})}
-                                {this._renderTopBtn('ungroup', 'Ungroup', ()=>{FnWrapper.ungroupSelected();})}
+                                {this._renderTopBtn('group', 'Group', () => {FnWrapper.groupSelected();})}
+                                {this._renderTopBtn('ungroup', 'Ungroup', () => {FnWrapper.ungroupSelected();})}
                             </div>
                             <div className="top-controls align-controls">
                                 {this._renderTopDropDown('align-h', 'H-Align')}
                                 {this._renderTopDropDown('align-v', 'V-Align')}
-                                {this._renderTopBtn('dist-h', 'H-Dist', ()=>{FnWrapper.distHori();})}
-                                {this._renderTopBtn('dist-v', 'V-Dist', ()=>{FnWrapper.distVert();})}
+                                {this._renderTopBtn('dist-h', 'H-Dist', () => {FnWrapper.distHori();})}
+                                {this._renderTopBtn('dist-v', 'V-Dist', () => {FnWrapper.distVert();})}
                             </div>
                             <div className="top-controls clip-controls">
-                                {this._renderTopBtn('union', 'Union')}
+                                {this._renderTopBtn('union', 'Union', () => {FnWrapper.booleanUnion();})}
                                 {this._renderTopBtn('subtract', 'Subtract')}
                                 {this._renderTopBtn('intersect', 'Intersect')}
                                 {this._renderTopBtn('difference', 'Difference')}

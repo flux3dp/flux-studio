@@ -3670,9 +3670,9 @@ define([
 
             var clickGrid = function () {
                 if (toolButtonClick('#tool_grid')) {
-                    if (selectedElement != null) {
+                    if (selectedElement != null || multiselected) {
+                        ToolPanelsController.setVisibility(ToolPanelsController.type != 'gridArray' || !ToolPanelsController.isVisible);
                         ToolPanelsController.setType('gridArray');
-                        ToolPanelsController.setVisibility(true);
                         ToolPanelsController.render();
                         ObjectPanelsController.setVisibility(false);
                         ObjectPanelsController.render();
