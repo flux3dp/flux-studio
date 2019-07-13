@@ -28,7 +28,7 @@ define([
     class BottomRightPanel extends React.Component {
         constructor() {
             super();
-            console.error("BottomRigtPanel is deprecated.")
+            console.error("BottomRightPanel is deprecated.")
             this.state = {
                 isPrinterSelectorOpen: false
             };

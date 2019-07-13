@@ -595,7 +595,9 @@ define([
                             options={dropdownOptions}
                         />
                         {strengthPanel}
+                        <div className="rainbow-sidebar" />
                         {speedPanel}
+                        <div className="rainbow-sidebar" />
                         {repeatPanel}
                         {modalDialog}
                         {this.state.isPrinterSelectorOpen ? printerSelector : ''}

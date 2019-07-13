@@ -21,7 +21,8 @@ define(function() {
             intersect: 'Intersect',
             difference: 'Difference',
             hflip: 'HFlip',
-            vflip: 'VFlip'
+            vflip: 'VFlip',
+            export: 'Export'
         },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',

@@ -833,3 +833,14 @@
     }
 
 }
+
+.rainbow-sidebar {
+    background: linear-gradient(to right, #89d307 0%,#9ede05 73%,#fff600 80%,#c50101 100%);
+    width: 100px;
+    height: 5px;
+    border: 1px solid #E0E0E0;
+    border-radius: 5px;
+    clean: both;
+    margin: 10px 10px 10px 10px;
+    width: calc(188px - 20px);
+}

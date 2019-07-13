@@ -21,7 +21,8 @@ define(function() {
             intersect: '交集',
             difference: '異集',
             hflip: '水平翻轉',
-            vflip: '垂直翻轉'
+            vflip: '垂直翻轉',
+            export: '匯出'
         },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 Beam Studio',

@@ -25,7 +25,9 @@ define([
     'app/actions/initialize-machine',
     'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
-    'app/actions/beambox/svgeditor-function-wrapper'
+    'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/beambox/bottom-right-funcs',
+    'app/actions/beambox/beambox-version-master'
 ], function (
     $,
     React,
@@ -53,7 +55,9 @@ define([
     InitializeMachine,
     PreviewModeBackgroundDrawer,
     PreviewModeController,
-    FnWrapper
+    FnWrapper,
+    BottomRightFuncs,
+    BeamboxVersionMaster
 ) {
     'use strict';
 
@@ -474,14 +478,44 @@ define([
                 }
             },
 
-            _handleShowDeviceList: function () {
-                var self = this,
-                    refreshOption = function (devices) {
-                        self.setState({
-                            deviceList: devices
-                        });
-                    };
-                console.log("Discover", Discover);
+            _handleExportClick: async function() {
+                const self = this;
+                const refreshOption = function (devices) {
+                    self.setState({
+                        deviceList: devices
+                    });
+                };
+
+                if (PreviewModeController.isPreviewMode()) {
+                    await PreviewModeController.end(); 
+                }
+
+                const layers = $('#svgcontent > g.layer').toArray();
+                const dpi = BeamboxPreference.read('engrave_dpi');
+
+                const isPowerTooHigh = layers.map(layer => layer.getAttribute('data-strength')).some(strength => Number(strength) > 80);
+                const imageElems = document.querySelectorAll('image');
+
+                let isSpeedTooHigh = false;
+
+                for (let i = 1; i < imageElems.length; i++) {
+                    if (imageElems[i].getAttribute('data-shading') && (
+                            (dpi === 'medium' && imageElems[i].parentNode.getAttribute('data-speed') > 135) ||
+                            (dpi === 'high' && imageElems[i].parentNode.getAttribute('data-speed') > 90)
+                    )) {
+                        isSpeedTooHigh = true;
+                        break;
+                    }
+                }
+
+                if (isPowerTooHigh && isSpeedTooHigh) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.both_power_and_speed_too_high);
+                } else if (isPowerTooHigh) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
+                } else if (isSpeedTooHigh) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.speed_too_high_lower_the_quality);
+                }
+
                 Discover(
                     'top-menu',
                     function (printers) {
@@ -494,13 +528,32 @@ define([
             },
 
             _handleSelectDevice: function (device, e) {
+                //export fcode
+                if (selected_item === 'export_fcode') {
+                    BottomRightFuncs.exportFcode();
+                    this.setState({ showDeviceList: false});
+                    return;
+                }
+                // Regular machine
                 e.preventDefault();
+                // Check firmware
+                if (await BeamboxVersionMaster.isUnusableVersion(device)) {
+                    console.error('Not a valid firmware version');
+                    AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
+                    this.setState({ showDeviceList: false });
+                    return;
+                } else {
+                    // Successfully selected device
+                    this.setState({ showDeviceList: false });
+                    BottomRightFuncs.uploadFcode(device);   
+                }
+
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(device).then(function (status) {
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
-                        GlobalActions.showMonitor(device);
+                        GlobalActions.showMonitor(device);                     
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         ProgressActions.close();
@@ -669,10 +722,10 @@ define([
                             </div>
                         </div>
 
-                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
+                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleExportClick}>
                             <p className="device-icon">
-                                <img src="img/btn-device.svg" draggable="false" />
-                                <span>{lang.menu.device}</span>
+                                <img src="img/top-menu/icon-export.svg" draggable="false" />
+                                <div>{lang.topbar.export}</div>
                             </p>
                             <div className={menuClass}>
                                 <div className="arrow arrow-right" />
