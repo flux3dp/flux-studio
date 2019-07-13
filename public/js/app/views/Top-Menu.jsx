@@ -27,7 +27,8 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox/svgeditor-function-wrapper',
     'app/actions/beambox/bottom-right-funcs',
-    'app/actions/beambox/beambox-version-master'
+    'app/actions/beambox/beambox-version-master',
+    'app/actions/beambox/beambox-preference',
 ], function (
     $,
     React,
@@ -57,7 +58,8 @@ define([
     PreviewModeController,
     FnWrapper,
     BottomRightFuncs,
-    BeamboxVersionMaster
+    BeamboxVersionMaster,
+    BeamboxPreference
 ) {
     'use strict';
 
@@ -527,7 +529,7 @@ define([
                 this._toggleDeviceList(!this.state.showDeviceList);
             },
 
-            _handleSelectDevice: function (device, e) {
+            _handleSelectDevice: async function (device, e) {
                 //export fcode
                 if (selected_item === 'export_fcode') {
                     BottomRightFuncs.exportFcode();
