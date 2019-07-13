@@ -320,13 +320,13 @@
         #sidepanels {
             border: none;
             position: absolute;
-            width: 153px;
+            width: $sidePanelWidth;
             padding: 0px;
             opacity: 1.0;
             z-index: 2;
             top: 85px;
             height: calc(100vh - 85px);
-            right: -153px;
+            right: -$sidePanelWidth;
             transition: opacity 0.3s;
             &:hover {
                 opacity: 1;
@@ -336,7 +336,7 @@
                 background-color: $backgroundColor;
                 display: block;
                 overflow: initial;
-                border: 1px #CCC solid;
+                border: 1px $panelBorderColor solid;
                 border-top: 0;
                 border-radius: 2px;
 
@@ -408,7 +408,7 @@
             .btn-go {
                 background: #4D4D4D;
                 font-size: 23px;
-                width: 153px;
+                width: $sidePanelWidth;
                 height: 100px;
                 border: 1px solid #333;
                 position: absolute;
@@ -429,21 +429,32 @@
             }
         }
         #layer-laser-panel-placeholder {
-            background-color: $backgroundColor;
-            min-height: 220px;
+            background-color: #F8F8F8;
+            height: 100%;
             margin-top: -1px;
-            border: 1px #CCC solid;
+            border: 1px $panelBorderColor solid;
             border-radius: 2px;
             .layername {
-                padding: 10px 0;
-                border-bottom: 1px #CCC solid;
-                text-align: center;
+                padding: 10px 10px;
+                background: #F2F2F2;
+                border-bottom: 1px $panelBorderColor solid;
+                text-align: left;
+                color: #333;
+                font-weight: bold;
             }
             .layerparams {
                 padding: 10px 0;
             }
             .panel {
+                margin-top: 20px;
                 padding-left: 10px;
+                clear: both;
+
+                .ui.ui-control-unit-input-v2 {
+                    margin-bottom: 7px;
+                    width: 50%;
+                    float: right;
+                }
             }
             .ui.ui-control-unit-input-v2 {
                 margin-bottom: 7px;
@@ -453,7 +464,8 @@
                 }
                 input {
                     outline: none;
-                    border: 1px #333 solid;
+                    border: 1px #E0E0E0 solid;
+                    border-radius: 2px;
                     width: 90%;
                     padding: 3px 0px 3px 12px;
                 }
@@ -464,6 +476,7 @@
 
                 .control {
                     line-height: 0;
+                    width: 100%;
                 }
                 .label {
                     font-size: 10pt;
@@ -472,9 +485,8 @@
                     padding-left: 10px;
                 }
                 .dropdown-container {
-                    position: relative;
-                    top: 0;
-                    left: 0;
+                    position: static;
+                    width: 100%;
 
                     :focus {
                         outline: none;
@@ -485,7 +497,7 @@
                         height: 24px;
                         font-size: 9pt;
                         color: #000;
-                        width: 110px;
+                        width: calc(100% - 20px);
                         padding-left: 5px;
                         margin-left: 10px;
                         margin-top: 0;

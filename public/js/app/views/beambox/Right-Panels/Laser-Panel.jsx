@@ -579,7 +579,7 @@ define([
                     defaultOptions.concat(functionalOptions)
             );
 
-            const actionButtons = this._renderActionButtons();
+            // const actionButtons = this._renderActionButtons();
             const printerSelector = this._renderPrinterSelectorWindow();
 
             return (
@@ -598,7 +598,6 @@ define([
                         {speedPanel}
                         {repeatPanel}
                         {modalDialog}
-                        {actionButtons}
                         {this.state.isPrinterSelectorOpen ? printerSelector : ''}
                     </div>
                 </div>

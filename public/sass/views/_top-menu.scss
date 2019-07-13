@@ -14,10 +14,17 @@
         margin: 0px 20px 0 20px;
     }
     .top-btns {
-        width: calc(100% - 40px);
+        width: calc(100% - 100px);
+        overflow-x: scroll;
+        &::-webkit-scrollbar { 
+            width: 0 !important 
+        }
+        .top-btn-container {
+            width: 1000px;
+        }
         .top-btn {
             opacity: 0.8;
-            padding-top: 30px;
+            padding-top: 25px;
             display: inline-block;
             height: 84px;
             width: 60px;

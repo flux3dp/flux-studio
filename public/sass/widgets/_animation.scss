@@ -3,7 +3,7 @@
  */
 
 .spinner-flip {
-    background-color: #333;
+    background-color: #F0F0F0;
     height: 40px;
     margin: auto;
     -webkit-animation: sk-rotateplane 1s infinite ease-in-out;
@@ -65,7 +65,7 @@
     }
 
     &:after {
-        background: #E0E0E0;
+        background: #F0F0F0;
         width: 80%;
         height: 80%;
         border-radius: 50%;
@@ -81,7 +81,7 @@
 
 .invert {
     &:before {
-        background: #E2E1E0 !important;
+        background: #F0F0F0 !important;
     }
     &:after {
         background: #FFFFFF !important;
@@ -89,7 +89,7 @@
 }
 
 .spinner-roller-reverse {
-    background: linear-gradient(to right, #E2E1E0 10%, rgba(255, 255, 255, 0) 42%);
+    background: linear-gradient(to right, #F0F0F0 10%, rgba(255, 255, 255, 0) 42%);
 
     &::before {
         left: -1px;

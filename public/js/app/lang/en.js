@@ -8,6 +8,21 @@ define(function() {
         buttons: {
             next: 'NEXT'
         },
+        topbar: {
+            zoom: 'Zoom',
+            group: 'Group',
+            ungroup: 'Ungroup',
+            halign: 'HAlign',
+            valign: 'VAlign',
+            hdist: 'HDist',
+            vdist: 'VDist',
+            union: 'Union',
+            subtract: 'Subtract',
+            intersect: 'Intersect',
+            difference: 'Difference',
+            hflip: 'HFlip',
+            vflip: 'VFlip'
+        },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
             no_vcredist: 'Please install Visual C++ Redistributable 2015<br/>That can be downloaded on flux3dp.com',

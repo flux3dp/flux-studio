@@ -151,12 +151,11 @@ define([
         }
 
         render() {
-            const actionButtons = this._renderActionButtons();
+            //const actionButtons = this._renderActionButtons();
             const printerSelector = this._renderPrinterSelectorWindow();
 
             return (
                 <div>
-                    {actionButtons}
                     {this.state.isPrinterSelectorOpen?printerSelector:''}
                 </div>
             );
