@@ -1398,16 +1398,9 @@ TODOS
 				}
 
 				if (center) {
-					// Go to top-left for larger documents
-					if (svgCanvas.contentW > w_area.width()) {
-						// Top-left
-						workarea[0].scrollLeft = offset.x - 10;
-						workarea[0].scrollTop = offset.y - 10;
-					} else {
-						// Center
-						w_area[0].scrollLeft = scroll_x;
-						w_area[0].scrollTop = scroll_y;
-					}
+					// Center
+					w_area[0].scrollLeft = scroll_x;
+					w_area[0].scrollTop = scroll_y;
 				} else {
 					w_area[0].scrollLeft = new_ctr.x - w_orig/2;
 					w_area[0].scrollTop = new_ctr.y - h_orig/2;

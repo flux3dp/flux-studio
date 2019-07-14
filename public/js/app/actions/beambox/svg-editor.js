@@ -1524,11 +1524,15 @@ define([
                 const zoomRatio = new_canvas_width / old_canvas_width;
 
                 function _scrollToMakeItCenter(workarea, svgcanvas) {
-                    workarea.scrollLeft(svgcanvas.width() / 2 - workarea.width() / 2);
-                    workarea.scrollTop(svgcanvas.height() / 2 - workarea.height() / 2);
+                    console.warn("Scroll to make it center");
+                    console.trace();
+                    workarea.scrollLeft(svgcanvas.width() / 2 - workarea.width() / 2 - 124);
+                    workarea.scrollTop(svgcanvas.height() / 2 - workarea.height() / 2 - 85);
                 }
 
                 function _scrollToMakePointStatic(workarea, staticPoint, zoomRatio, old_scroll) {
+                    console.warn("Scroll to make point", staticPoint, zoomRatio);
+                    console.trace();
                     const left_cvs = old_scroll.left + staticPoint.x; //related to canvas
                     const newScrollLeft = left_cvs * zoomRatio - staticPoint.x;
                     workarea.scrollLeft(newScrollLeft);
@@ -2110,8 +2114,8 @@ define([
                     zoomLevel: undefined,
                     factor: 1,
                     staticPoint: {
-                        x: $(window).width() / 2,
-                        y: $(window).height() / 2
+                        x: (($(window).width() - 268) / 2),
+                        y: (($(window).height() - 135) / 2)
                     },
                     autoCenter: false
                 };
@@ -5865,8 +5869,10 @@ define([
             //initialize the view
             // zoomImage(0.2);
             //$('#fit_to_canvas').mouseup();
+            let windowScale = Math.min((($(window).width() - 268) / 1000), (($(window).height() - 105) / 600));
+            let workspaceScale = 1 / Math.max(svgEditor.dimensions[0] / 4000, svgEditor.dimensions[1] / 3750);
             zoomChanged(window, {
-                zoomLevel: 0.16
+                zoomLevel: 0.16 * windowScale * workspaceScale
             });
             svgCanvas.defaultScroll = {
                 x: workarea[0].scrollLeft,
@@ -5898,8 +5904,10 @@ define([
         };
 
         editor.resetView = function() {
+            let windowScale = Math.min((($(window).width() - 268) / 1000), (($(window).height() - 105) / 600));
+            let workspaceScale = 1 / Math.max(svgEditor.dimensions[0] / 4000, svgEditor.dimensions[1] / 3750);
             editor.zoomChanged(window, {
-                zoomLevel: 0.16
+                zoomLevel: 0.16 * windowScale * workspaceScale
             });
             $('#workarea')[0].scrollLeft = svgCanvas.defaultScroll.x;
             $('#workarea')[0].scrollTop = svgCanvas.defaultScroll.y;
