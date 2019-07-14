@@ -995,8 +995,10 @@ define([
                 })();
 
                 if (isHide) {
+                    $('#sidepanels').removeClass('layerblock-activated');
                     block.hide();
                 } else {
+                    $('#sidepanels').addClass('layerblock-activated');
                     block.show();
                 }
             };
