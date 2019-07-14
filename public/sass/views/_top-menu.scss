@@ -2,11 +2,12 @@
  * top menu
  */
 .top-menu {
-    position: fixed;
+    position: absolute;
     width: 100%;
     z-index: 1;
     background: #333;
     height: 85px;
+    overflow: hidden;
     -webkit-app-region: drag;
 
     .top-controls {
@@ -120,6 +121,11 @@
             text-align: center;
             top: 0;
             width: 28px;
+            opacity: 0.8;
+
+            &:hover {
+                opacity: 1.0;
+            }
 
             img {
                 height: 28px;
@@ -127,10 +133,6 @@
                 transform-origin: 50% 50%;
                 transition: all .25s;
                 width: 2em;
-            }
-
-            &:hover img {
-                transform: rotate(240deg);
             }
         }
 
@@ -146,8 +148,8 @@
             background: #fff;
             display: none;
             position: relative;
-            right: 80px;
             top: 11px;
+            right: 80px;
             border-radius: 2px;
 
             .arrow {

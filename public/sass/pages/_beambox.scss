@@ -343,9 +343,12 @@
                 #layerbuttons {
                     padding: 0;
                     width: 100%;
+                    height: 20px;
                     border: none;
+                    border-bottom: 1px solid #E0E0E0;
                     .layer_button {
-                        padding: 3px 0;
+                        font-size: 12px;
+                        padding: 2px 0;
                         &:hover {
                             background-color: #808080;
                             color: white;
@@ -400,7 +403,11 @@
                         }
                     }
                 }
-
+            }
+            &.layerblock-activated {
+                #layerlist_container {
+                    height: calc(100vh - 505px);
+                }
             }
             #sidepanel_handle {
                 @include force-hide();
@@ -418,14 +425,26 @@
             } 
         }
         .selLayerBlock {
-            margin-top: 18px;
-            margin-bottom: 15px;
+            background: #F8F8F8;
+            padding: 15px;
+            margin-top: -1px;
+            border: 1px solid #E0E0E0;
             #selLayerNames {
+                background-color: #FFFFFF;
+                height: 30px;
                 width: 100%;
-                background-color: #444;
-                color: #ddd;
-                padding: 3px 3px 3px 13px;
+                padding: 0 0 0 10px;
+                background-position: calc(100% - 4px);
                 cursor: pointer;
+            }
+            #selLayerLabel {
+                margin: -15px -15px 15px -15px;
+                display: block;
+                padding: 10px 15px;
+                background: #F2F2F2;
+                border-bottom: 1px #E0E0E0 solid;
+                color: #333;
+                font-weight: bold;
             }
         }
         #layer-laser-panel-placeholder {
@@ -435,7 +454,7 @@
             border: 1px $panelBorderColor solid;
             border-radius: 2px;
             .layername {
-                padding: 10px 10px;
+                padding: 10px 15px;
                 background: #F2F2F2;
                 border-bottom: 1px $panelBorderColor solid;
                 text-align: left;
@@ -447,11 +466,11 @@
             }
             .panel {
                 margin-top: 20px;
-                padding-left: 10px;
+                padding-left: 15px;
+                padding-right: 5px;
                 clear: both;
 
                 .ui.ui-control-unit-input-v2 {
-                    margin-bottom: 7px;
                     width: 50%;
                     float: right;
                 }
@@ -494,15 +513,12 @@
 
                     select {
                         background-color: #fff;
-                        height: 24px;
-                        font-size: 9pt;
+                        font-size: 10pt;
                         color: #000;
-                        width: calc(100% - 20px);
-                        padding-left: 5px;
-                        margin-left: 10px;
-                        margin-top: 0;
+                        width: calc(100% - 29px);
+                        margin-left: 15px;
+                        margin-top: 5px;
                         margin-bottom: 7px;
-                        border: 1px #333 solid;
                     }
                 }
 
@@ -835,12 +851,36 @@
 }
 
 .rainbow-sidebar {
-    background: linear-gradient(to right, #89d307 0%,#9ede05 73%,#fff600 80%,#c50101 100%);
+    position: relative;
+    background: linear-gradient(to right, #89d307 0%,#9ede05 65%,#fff600 75%,#c50101 100%);
     width: 100px;
-    height: 5px;
-    border: 1px solid #E0E0E0;
+    height: 6px;
+    border: 1px solid #EDEDED;
     border-radius: 5px;
-    clean: both;
-    margin: 10px 10px 10px 10px;
-    width: calc(188px - 20px);
+    clear: both;
+    margin: 20px 15px 20px 15px;
+    width: calc(188px - 30px);
+    .rainbow-drag {
+        width: 14px;
+        height: 14px;
+        border-radius: 8px;
+        background: white;
+        border: 1px solid #E2E2E2;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        z-index: 2;
+    }
+    &::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: " ";
+        background: linear-gradient(to bottom, rgba(255,255,255,0.5) 20%, rgba(0,0,0,0.1) 90%);
+        width: 100%;
+        height: 100%;
+        border-radius:5px;
+        display: block;
+    }
 }
