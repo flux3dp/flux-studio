@@ -348,7 +348,7 @@
                     border-bottom: 1px solid #E0E0E0;
                     .layer_button {
                         font-size: 12px;
-                        padding: 2px 0;
+                        padding: 3px 0;
                         &:hover {
                             background-color: #808080;
                             color: white;
@@ -471,7 +471,7 @@
                 clear: both;
 
                 .ui.ui-control-unit-input-v2 {
-                    width: 50%;
+                    width: 60%;
                     float: right;
                 }
             }
@@ -868,8 +868,10 @@
         border: 1px solid #E2E2E2;
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
         position: absolute;
-        top: -5px;
-        left: -5px;
+        margin-left: -5px;
+        margin-top: -5px;
+        top: 0;
+        left: 60%;
         z-index: 2;
     }
     &::after {
