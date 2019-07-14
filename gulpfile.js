@@ -10,8 +10,54 @@ var gulp = require('gulp'),
     cleanCSS = require('gulp-clean-css'),
     mocha = require('gulp-mocha');
 
+// Polyfill gulp@3.0 API if gulp version >=4
+if (gulp.parallel) {
+    let gulpV4Task = gulp.task.bind(gulp);
+    let gulpV4Watch = gulp.watch.bind(gulp);
+    gulp.task = (a, b, c) => {
+        if (!c) {
+            gulpV4Task(a, b);
+        } else {
+            gulpV4Task(a, gulp.parallel(b, c));
+        }
+    };
+    gulp.watch = (a, b) => {
+        for (var i = 0; i < b.length; i++) {
+            gulpV4Watch(a, gulp.series(b[i]));
+        }
+    };
+}
+
+gulp.task('cleancss', function () {
+    return gulp.src('public/css/**/*.css')
+        .pipe(cleanCSS())
+        .pipe(gulp.dest('public/css/'));
+});
+
+gulp.task('babel', function () {
+    return gulp.src(['public/js/**/*.js*', '!public/js/require.js', '!public/js/main.js', '!public/js/plugins/**/*.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js', '!**/*.json'])
+        .pipe(babel({
+            presets: ['es2015', 'react']
+        }))
+        .pipe(gulp.dest('public/js'));
+});
+
+gulp.task('sass', function () {
+    return gulp.src('./public/sass/**/*.scss')
+        .pipe(sass({
+            indentWidth: 4
+        }).on('error', sass.logError))
+        .pipe(gulp.dest('./public/css/'));
+});
+
+gulp.task('jsx', function () {
+    return gulp.src('./public/js/**/*.jsx')
+        .pipe(react())
+        .pipe(gulp.dest('./public/js/jsx/'));
+});
+
 gulp.task('deployment', ['babel', 'cleancss'], function (cb) {
-    pump([
+    return pump([
         gulp.src(['public/js/**/*.js', '!public/js/require.js', '!public/js/main.js']),
         sourcemaps.init(),
         uglify(),
@@ -22,48 +68,20 @@ gulp.task('deployment', ['babel', 'cleancss'], function (cb) {
     );
 });
 
-gulp.task('cleancss', function () {
-    return gulp.src('public/css/**/*.css')
-        .pipe(cleanCSS())
-        .pipe(gulp.dest('public/css/'));
-});
-
-gulp.task('babel', function () {
-    return gulp.src(['public/js/**/*.js*', '!public/js/require.js', '!public/js/main.js', '!public/js/plugins/**/*.js', '!public/js/lib/**/*.js', '!public/js/helpers/CircularGridHelper.js'])
-        .pipe(babel({
-            presets: ['es2015', 'react']
-        }))
-        .pipe(gulp.dest('public/js'));
-});
-
-gulp.task('sass', function () {
-    gulp.src('./public/sass/**/*.scss')
-        .pipe(sass({
-            indentWidth: 4
-        }).on('error', sass.logError))
-        .pipe(gulp.dest('./public/css/'));
-});
-
-gulp.task('jsx', function () {
-    gulp.src('./public/js/**/*.jsx')
-        .pipe(react())
-        .pipe(gulp.dest('./public/js/jsx/'));
-});
-
 gulp.task('sass:watch', function () {
-    gulp.watch('./public/sass/**/*.scss', ['sass']);
+    return gulp.watch('./public/sass/**/*.scss', ['sass']);
 });
 
 gulp.task('jsx:watch', function () {
-    gulp.watch('./public/js/**/*.jsx', ['jsx']);
+    return gulp.watch('./public/js/**/*.jsx', ['jsx']);
 });
 
 gulp.task('electron', function () {
-    gulp.watch('./src/*', ['jsx']);
+    return gulp.watch('./src/*', ['jsx']);
 });
 
 gulp.task('webserver', ['sass:watch'], function () {
-    gulp.src('public')
+    return gulp.src('public')
         .pipe(webserver({
             livereload: true,
             open: false,
@@ -72,7 +90,9 @@ gulp.task('webserver', ['sass:watch'], function () {
         }));
 });
 
-gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'sass', 'electron', 'webserver']);
+gulp.task('dev', ['sass:watch', 'jsx:watch', 'jsx', 'sass', 'electron', 'webserver'], () => {
+    return new Promise(() => {});
+});
 
 gulp.task('unit-test', function () {
     return gulp.
