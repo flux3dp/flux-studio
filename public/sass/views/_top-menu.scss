@@ -10,6 +10,14 @@
     overflow: hidden;
     -webkit-app-region: drag;
 
+    .title {
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 45px;
+    }
+
     .top-controls {
         display: inline-block;
         margin: 0px 20px 0 20px;
@@ -147,8 +155,9 @@
         .menu {
             background: #fff;
             display: none;
-            position: relative;
-            top: 11px;
+            position: fixed;
+            z-index: 99;
+            top: 25px;
             right: 80px;
             border-radius: 2px;
 

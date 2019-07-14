@@ -106,12 +106,17 @@ function(React, ReactDOM, i18n, $, Backbone, config, appSettings, detectWebgl) {
             });
         },
 
-        appendSideBar: function(show) {
-            show = ('boolean' === typeof show ? show : true);
+        appendSideBar: function(show, page) {
+            if (show) {
+                $('.top-menu').show();
+            } else {
+                $('.top-menu').hide();
+            }
             requirejs(['jsx!views/Top-Menu'], function(view) {
                 _display(view, {
                     props: {
-                        show: show
+                        show: show ? true : false,
+                        page: page
                     }
                 }, $('.top-menu')[0]);
             });
@@ -142,8 +147,8 @@ function(React, ReactDOM, i18n, $, Backbone, config, appSettings, detectWebgl) {
             if (true === map.hasOwnProperty(page)) {
                 func = map[page];
             }
-
-            this.appendSideBar();
+            
+            this.appendSideBar(page !== 'settings', page);
 
             if (false === detectWebgl() && -1 < needWebGL.indexOf(page)) {
                 location.hash = '#studio/laser';

@@ -409,7 +409,8 @@ define([
 
             getDefaultProps: function () {
                 return {
-                    show: true
+                    show: true,
+                    page: ''
                 };
             },
 
@@ -687,14 +688,19 @@ define([
                     topClass;
 
                 let lang = i18n.get();
+                console.log("Props...", this.props);
+                let barTitle = lang.topbar.titles[this.props.page] || this.props.page;
 
                 menuClass = ClassNames('menu', { show: this.state.showDeviceList });
-                topClass = {
-                    'hide': !this.props.show
-                };
-                console.log('render top menu', lang.topbar);
+                if (!this.props.show) {
+                    return (
+                        <div className="title">
+                            {barTitle}
+                        </div>
+                    );
+                }
                 return (
-                    <div className={ClassNames(topClass)}>
+                    <div>
                         <div className="top-btns">
                             <div className="top-btn-container">
                                 <div className="top-controls zoom-controls">

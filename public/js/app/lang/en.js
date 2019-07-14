@@ -9,6 +9,9 @@ define(function() {
             next: 'NEXT'
         },
         topbar: {
+            titles: {
+                settings: 'Preferences'
+            },
             zoom: 'Zoom',
             group: 'Group',
             ungroup: 'Ungroup',
@@ -339,11 +342,6 @@ define(function() {
             },
             ip: 'Machine IP Address',
             wrong_ip_format: 'Wrong IP Formats',
-            projection: 'View Projection',
-            projection_perspective: 'Perspective',
-            projection_orthographic: 'Orthographic',
-            antialiasing: 'Anti-aliasing',
-            auto_slice: 'Auto Slice',
             lock_selection: 'Lock Selection',
             default_machine: 'Default Machine',
             default_machine_button: 'Empty',
@@ -363,12 +361,16 @@ define(function() {
             default_beambox_model: 'Default Model',
             guides_origin: 'Guides Origin',
             guides: 'Guides',
-            fd1: 'FLUX Delta',
-            fd1p: 'FLUX Delta+',
             none: 'None',
             close: 'Close',
             cancel: 'CANCEL',
             done: 'DONE',
+            groups: {
+                general: '一般',
+                connection: '連線',
+                editor: '編輯器',
+                path: '路徑'
+            },
             connect_printer: {
                 title: 'Connect with your printer'
             },
