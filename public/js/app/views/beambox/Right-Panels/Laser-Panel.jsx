@@ -596,11 +596,11 @@ define([
                         />
                         {strengthPanel}
                         <div className="rainbow-sidebar">
-                            <div className="rainbow-drag" />
+                            <div className="rainbow-drag" style={{left: `${this.state.strength}%`}} />
                         </div>
                         {speedPanel}
                         <div className="rainbow-sidebar">
-                            <div className="rainbow-drag" />
+                            <div className="rainbow-drag" style={{left: `${this.state.speed/3}%`}} /> 
                         </div>
                         {repeatPanel}
                         {modalDialog}
