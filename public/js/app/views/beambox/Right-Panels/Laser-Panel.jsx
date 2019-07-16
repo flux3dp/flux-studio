@@ -579,7 +579,7 @@ define([
                     defaultOptions.concat(functionalOptions)
             );
 
-            const actionButtons = this._renderActionButtons();
+            // const actionButtons = this._renderActionButtons();
             const printerSelector = this._renderPrinterSelectorWindow();
 
             return (
@@ -595,10 +595,15 @@ define([
                             options={dropdownOptions}
                         />
                         {strengthPanel}
+                        <div className="rainbow-sidebar">
+                            <div className="rainbow-drag" style={{left: `${this.state.strength}%`}} />
+                        </div>
                         {speedPanel}
+                        <div className="rainbow-sidebar">
+                            <div className="rainbow-drag" style={{left: `${this.state.speed/3}%`}} /> 
+                        </div>
                         {repeatPanel}
                         {modalDialog}
-                        {actionButtons}
                         {this.state.isPrinterSelectorOpen ? printerSelector : ''}
                     </div>
                 </div>

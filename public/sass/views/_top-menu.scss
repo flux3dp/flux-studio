@@ -2,22 +2,38 @@
  * top menu
  */
 .top-menu {
-    position: fixed;
+    position: absolute;
     width: 100%;
     z-index: 1;
     background: #333;
     height: 85px;
+    overflow: hidden;
     -webkit-app-region: drag;
+
+    .title {
+        color: white;
+        font-size: 15px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 45px;
+    }
 
     .top-controls {
         display: inline-block;
         margin: 0px 20px 0 20px;
     }
     .top-btns {
-        width: calc(100% - 40px);
+        width: calc(100% - 100px);
+        overflow-x: scroll;
+        &::-webkit-scrollbar { 
+            width: 0 !important 
+        }
+        .top-btn-container {
+            width: 1000px;
+        }
         .top-btn {
             opacity: 0.8;
-            padding-top: 30px;
+            padding-top: 25px;
             display: inline-block;
             height: 84px;
             width: 60px;
@@ -99,7 +115,7 @@
 
     .device {
         cursor: pointer;
-        font-size: 1rem;
+        font-size: 11px;
         line-height: 2rem;
         position: absolute;
         right: 24px;
@@ -112,25 +128,25 @@
             right: 0;
             text-align: center;
             top: 0;
-            width: 3.6rem;
+            width: 28px;
+            opacity: 0.8;
 
-            img {
-                height: 3.6rem;
-                margin: 0 0 7px 0;
-                transform: rotate(60deg);
-                transform-origin: 50% 50%;
-                transition: all .25s;
-                width: 3.6rem;
+            &:hover {
+                opacity: 1.0;
             }
 
-            &:hover img {
-                transform: rotate(240deg);
+            img {
+                height: 28px;
+                margin: 0 0 7px 0;
+                transform-origin: 50% 50%;
+                transition: all .25s;
+                width: 2em;
             }
         }
 
         p {
-            color: #999;
-            font-size: 12px;
+            color: #FFF;
+            font-size: 11px;
             font-weight: 500;
             line-height: 12px;
             margin: 0;
@@ -139,9 +155,10 @@
         .menu {
             background: #fff;
             display: none;
-            position: relative;
+            position: fixed;
+            z-index: 99;
+            top: 25px;
             right: 80px;
-            top: 11px;
             border-radius: 2px;
 
             .arrow {

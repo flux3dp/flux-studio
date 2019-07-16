@@ -5607,6 +5607,15 @@ define([
             getCurrentDrawing().identifyLayers();
         };
 
+        let randomColors = ['#333333','#3F51B5','#F44336','#FFC107','#8BC34A','#2196F3','#009688','#FF9800','#CDDC39','#00BCD4','#FFEB3B','#E91E63','#673AB7','#03A9F4','#9C27B0','#607D8B','#9E9E9E'];
+
+        var getRandomLayerColor = canvas.getRandomLayerColor = function () {
+            if (randomColors.length === 0) {
+                return '#333';
+            }
+            return randomColors.shift();
+        };
+
         // Function: createLayer
         // Creates a new top-level layer in the drawing with the given name, sets the current layer
         // to it, and then clears the selection. This function then calls the 'changed' handler.
@@ -5615,7 +5624,11 @@ define([
         // Parameters:
         // name - The given name
         this.createLayer = function (name, hrService) {
-            var new_layer = getCurrentDrawing().createLayer(name, historyRecordingService(hrService));
+            let drawing = getCurrentDrawing();
+            let new_layer = drawing.createLayer(name, historyRecordingService(hrService));
+            if (drawing.layer_map[name]) {
+                drawing.layer_map[name].setColor(getRandomLayerColor());
+            }
             clearSelection();
             call('changed', [new_layer]);
             return new_layer;

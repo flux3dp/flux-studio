@@ -100,7 +100,7 @@ define([
         _showPreview: function() {
             let divStyle = {
                 borderRadius: '2px',
-                backgroundColor: '#E2E1E0',
+                backgroundColor: '#F0F0F0',
                 backgroundImage: this._getPreviewUrl(),
                 backgroundSize: '100% auto',
                 backgroundPosition: '50% 50%',

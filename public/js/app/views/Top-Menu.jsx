@@ -25,7 +25,10 @@ define([
     'app/actions/initialize-machine',
     'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
-    'app/actions/beambox/svgeditor-function-wrapper'
+    'app/actions/beambox/svgeditor-function-wrapper',
+    'app/actions/beambox/bottom-right-funcs',
+    'app/actions/beambox/beambox-version-master',
+    'app/actions/beambox/beambox-preference',
 ], function (
     $,
     React,
@@ -53,7 +56,10 @@ define([
     InitializeMachine,
     PreviewModeBackgroundDrawer,
     PreviewModeController,
-    FnWrapper
+    FnWrapper,
+    BottomRightFuncs,
+    BeamboxVersionMaster,
+    BeamboxPreference
 ) {
     'use strict';
 
@@ -403,7 +409,8 @@ define([
 
             getDefaultProps: function () {
                 return {
-                    show: true
+                    show: true,
+                    page: ''
                 };
             },
 
@@ -474,14 +481,44 @@ define([
                 }
             },
 
-            _handleShowDeviceList: function () {
-                var self = this,
-                    refreshOption = function (devices) {
-                        self.setState({
-                            deviceList: devices
-                        });
-                    };
-                console.log("Discover", Discover);
+            _handleExportClick: async function() {
+                const self = this;
+                const refreshOption = function (devices) {
+                    self.setState({
+                        deviceList: devices
+                    });
+                };
+
+                if (PreviewModeController.isPreviewMode()) {
+                    await PreviewModeController.end(); 
+                }
+
+                const layers = $('#svgcontent > g.layer').toArray();
+                const dpi = BeamboxPreference.read('engrave_dpi');
+
+                const isPowerTooHigh = layers.map(layer => layer.getAttribute('data-strength')).some(strength => Number(strength) > 80);
+                const imageElems = document.querySelectorAll('image');
+
+                let isSpeedTooHigh = false;
+
+                for (let i = 1; i < imageElems.length; i++) {
+                    if (imageElems[i].getAttribute('data-shading') && (
+                            (dpi === 'medium' && imageElems[i].parentNode.getAttribute('data-speed') > 135) ||
+                            (dpi === 'high' && imageElems[i].parentNode.getAttribute('data-speed') > 90)
+                    )) {
+                        isSpeedTooHigh = true;
+                        break;
+                    }
+                }
+
+                if (isPowerTooHigh && isSpeedTooHigh) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.both_power_and_speed_too_high);
+                } else if (isPowerTooHigh) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.power_too_high_damage_laser_tube);
+                } else if (isSpeedTooHigh) {
+                    AlertActions.showPopupWarning('', lang.beambox.popup.speed_too_high_lower_the_quality);
+                }
+
                 Discover(
                     'top-menu',
                     function (printers) {
@@ -493,14 +530,33 @@ define([
                 this._toggleDeviceList(!this.state.showDeviceList);
             },
 
-            _handleSelectDevice: function (device, e) {
+            _handleSelectDevice: async function (device, e) {
+                //export fcode
+                if (selected_item === 'export_fcode') {
+                    BottomRightFuncs.exportFcode();
+                    this.setState({ showDeviceList: false});
+                    return;
+                }
+                // Regular machine
                 e.preventDefault();
+                // Check firmware
+                if (await BeamboxVersionMaster.isUnusableVersion(device)) {
+                    console.error('Not a valid firmware version');
+                    AlertActions.showPopupError('', lang.beambox.popup.should_update_firmware_to_continue);
+                    this.setState({ showDeviceList: false });
+                    return;
+                } else {
+                    // Successfully selected device
+                    this.setState({ showDeviceList: false });
+                    BottomRightFuncs.uploadFcode(device);   
+                }
+
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(device).then(function (status) {
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
-                        GlobalActions.showMonitor(device);
+                        GlobalActions.showMonitor(device);                     
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         ProgressActions.close();
@@ -579,28 +635,28 @@ define([
                 );
             },
 
-            _renderTopDropDown: function(iconName, label) {
+            _renderTopDropDown: function(id, label) {
                 const labelFunctionMap = {
-                    'H-Align': [
-                        {iconName: 'align-h', label: 'Left', f: () => {FnWrapper.alignLeft();}},
-                        {iconName: 'align-h', label: 'Center', f: () => {FnWrapper.alignCenter();}},
-                        {iconName: 'align-h', label: 'Right', f: () => {FnWrapper.alignRight();}}
+                    'align-h': [
+                        {id: 'align-h', label: 'Left', f: () => {FnWrapper.alignLeft();}},
+                        {id: 'align-h', label: 'Center', f: () => {FnWrapper.alignCenter();}},
+                        {id: 'align-h', label: 'Right', f: () => {FnWrapper.alignRight();}}
                     ],
-                    'V-Align': [
-                        {iconName: 'align-v', label: 'Top', f: () => {FnWrapper.alignTop();}},
-                        {iconName: 'align-v', label: 'Middle', f: () => {FnWrapper.alignMiddle();}},
-                        {iconName: 'align-v', label: 'Bottom', f: () => {FnWrapper.alignBottom();}}
+                    'align-v': [
+                        {id: 'align-v', label: 'Top', f: () => {FnWrapper.alignTop();}},
+                        {id: 'align-v', label: 'Middle', f: () => {FnWrapper.alignMiddle();}},
+                        {id: 'align-v', label: 'Bottom', f: () => {FnWrapper.alignBottom();}}
                     ],
                 };
-                let fns = labelFunctionMap[label];
+                let fns = labelFunctionMap[id];
                 let items = [];
                 for (let i = 0; i < fns.length; ++i) {
-                    items.push(this._renderTopBtn(fns[i].iconName, fns[i].label, fns[i].f))
+                    items.push(this._renderTopBtn(fns[i].id, fns[i].label, fns[i].f));
                 }
 
                 return (
                     <div className="top-btn top-dropdown-control">
-                        <img src={`img/top-menu/icon-${iconName}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
+                        <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
                         <div className="btn-label">
                             {label}
                         </div>
@@ -615,10 +671,10 @@ define([
 
             },
 
-            _renderTopBtn: function(iconName, label, onClick) {
+            _renderTopBtn: function(id, label, onClick) {
                 return (
                     <div className="top-btn" onClick={onClick}>
-                        <img src={`img/top-menu/icon-${iconName}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
+                        <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
                         <div className="btn-label">
                             {label}
                         </div>
@@ -631,44 +687,53 @@ define([
                     menuClass,
                     topClass;
 
-                menuClass = ClassNames('menu', { show: this.state.showDeviceList });
-                topClass = {
-                    'hide': !this.props.show
-                };
-                console.log('render top menu');
-                return (
-                    <div className={ClassNames(topClass)}>
-                        <div className="top-btns">
-                            <div className="top-controls zoom-controls">
-                                {this._renderTopBtn('zoom', 'Zoom')}
-                            </div>
-                            <div className="top-controls group-controls">
-                                {this._renderTopBtn('group', 'Group', () => {FnWrapper.groupSelected();})}
-                                {this._renderTopBtn('ungroup', 'Ungroup', () => {FnWrapper.ungroupSelected();})}
-                            </div>
-                            <div className="top-controls align-controls">
-                                {this._renderTopDropDown('align-h', 'H-Align')}
-                                {this._renderTopDropDown('align-v', 'V-Align')}
-                                {this._renderTopBtn('dist-h', 'H-Dist', () => {FnWrapper.distHori();})}
-                                {this._renderTopBtn('dist-v', 'V-Dist', () => {FnWrapper.distVert();})}
-                            </div>
-                            <div className="top-controls clip-controls">
-                                {this._renderTopBtn('union', 'Union', () => {FnWrapper.booleanUnion();})}
-                                {this._renderTopBtn('subtract', 'Subtract')}
-                                {this._renderTopBtn('intersect', 'Intersect', () => {FnWrapper.booleanIntersect();})}
-                                {this._renderTopBtn('difference', 'Difference')}
-                            </div>
+                let lang = i18n.get();
+                console.log("Props...", this.props);
+                let barTitle = lang.topbar.titles[this.props.page] || this.props.page;
 
-                            <div className="top-controls flip-controls">
-                                {this._renderTopBtn('h-flip', 'H-Flip')}
-                                {this._renderTopBtn('v-flip', 'V-Flip')}
+                menuClass = ClassNames('menu', { show: this.state.showDeviceList });
+                if (!this.props.show) {
+                    return (
+                        <div className="title">
+                            {barTitle}
+                        </div>
+                    );
+                }
+                return (
+                    <div>
+                        <div className="top-btns">
+                            <div className="top-btn-container">
+                                <div className="top-controls zoom-controls">
+                                    {this._renderTopBtn('zoom', lang.topbar.zoom)}
+                                </div>
+                                <div className="top-controls group-controls">
+                                    {this._renderTopBtn('group', lang.topbar.group, () => {FnWrapper.groupSelected();})}
+                                    {this._renderTopBtn('ungroup', lang.topbar.ungroup, () => {FnWrapper.ungroupSelected();})}
+                                </div>
+                                <div className="top-controls align-controls">
+                                    {this._renderTopDropDown('align-h', lang.topbar.halign)}
+                                    {this._renderTopDropDown('align-v', lang.topbar.valign)}
+                                    {this._renderTopBtn('dist-h', lang.topbar.hdist, () => {FnWrapper.distHori();})}
+                                    {this._renderTopBtn('dist-v', lang.topbar.vdist, () => {FnWrapper.distVert();})}
+                                </div>
+                                <div className="top-controls clip-controls">
+                                    {this._renderTopBtn('union', lang.topbar.union, () => {FnWrapper.booleanUnion();})}
+                                    {this._renderTopBtn('subtract', lang.topbar.subtract)}
+                                    {this._renderTopBtn('intersect', lang.topbar.intersect)}
+                                    {this._renderTopBtn('difference', lang.topbar.difference)}
+                                </div>
+
+                                <div className="top-controls flip-controls">
+                                    {this._renderTopBtn('h-flip', lang.topbar.hflip)}
+                                    {this._renderTopBtn('v-flip', lang.topbar.vflip)}
+                                </div>
                             </div>
                         </div>
 
-                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleShowDeviceList}>
+                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleExportClick}>
                             <p className="device-icon">
-                                <img src="img/btn-device.svg" draggable="false" />
-                                <span>{lang.menu.device}</span>
+                                <img src="img/top-menu/icon-export.svg" draggable="false" />
+                                <div>{lang.topbar.export}</div>
                             </p>
                             <div className={menuClass}>
                                 <div className="arrow arrow-right" />

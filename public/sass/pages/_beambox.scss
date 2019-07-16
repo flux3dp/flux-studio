@@ -320,13 +320,13 @@
         #sidepanels {
             border: none;
             position: absolute;
-            width: 153px;
+            width: $sidePanelWidth;
             padding: 0px;
             opacity: 1.0;
             z-index: 2;
             top: 85px;
             height: calc(100vh - 85px);
-            right: -153px;
+            right: -$sidePanelWidth;
             transition: opacity 0.3s;
             &:hover {
                 opacity: 1;
@@ -336,15 +336,18 @@
                 background-color: $backgroundColor;
                 display: block;
                 overflow: initial;
-                border: 1px #CCC solid;
+                border: 1px $panelBorderColor solid;
                 border-top: 0;
                 border-radius: 2px;
 
                 #layerbuttons {
                     padding: 0;
                     width: 100%;
+                    height: 20px;
                     border: none;
+                    border-bottom: 1px solid #E0E0E0;
                     .layer_button {
+                        font-size: 12px;
                         padding: 3px 0;
                         &:hover {
                             background-color: #808080;
@@ -400,7 +403,11 @@
                         }
                     }
                 }
-
+            }
+            &.layerblock-activated {
+                #layerlist_container {
+                    height: calc(100vh - 505px);
+                }
             }
             #sidepanel_handle {
                 @include force-hide();
@@ -408,7 +415,7 @@
             .btn-go {
                 background: #4D4D4D;
                 font-size: 23px;
-                width: 153px;
+                width: $sidePanelWidth;
                 height: 100px;
                 border: 1px solid #333;
                 position: absolute;
@@ -418,32 +425,55 @@
             } 
         }
         .selLayerBlock {
-            margin-top: 18px;
-            margin-bottom: 15px;
+            background: #F8F8F8;
+            padding: 15px;
+            margin-top: -1px;
+            border: 1px solid #E0E0E0;
             #selLayerNames {
+                background-color: #FFFFFF;
+                height: 30px;
                 width: 100%;
-                background-color: #444;
-                color: #ddd;
-                padding: 3px 3px 3px 13px;
+                padding: 0 0 0 10px;
+                background-position: calc(100% - 4px);
                 cursor: pointer;
+            }
+            #selLayerLabel {
+                margin: -15px -15px 15px -15px;
+                display: block;
+                padding: 10px 15px;
+                background: #F2F2F2;
+                border-bottom: 1px #E0E0E0 solid;
+                color: #333;
+                font-weight: bold;
             }
         }
         #layer-laser-panel-placeholder {
-            background-color: $backgroundColor;
-            min-height: 220px;
+            background-color: #F8F8F8;
+            height: 100%;
             margin-top: -1px;
-            border: 1px #CCC solid;
+            border: 1px $panelBorderColor solid;
             border-radius: 2px;
             .layername {
-                padding: 10px 0;
-                border-bottom: 1px #CCC solid;
-                text-align: center;
+                padding: 10px 15px;
+                background: #F2F2F2;
+                border-bottom: 1px $panelBorderColor solid;
+                text-align: left;
+                color: #333;
+                font-weight: bold;
             }
             .layerparams {
                 padding: 10px 0;
             }
             .panel {
-                padding-left: 10px;
+                margin-top: 20px;
+                padding-left: 15px;
+                padding-right: 5px;
+                clear: both;
+
+                .ui.ui-control-unit-input-v2 {
+                    width: 60%;
+                    float: right;
+                }
             }
             .ui.ui-control-unit-input-v2 {
                 margin-bottom: 7px;
@@ -453,7 +483,8 @@
                 }
                 input {
                     outline: none;
-                    border: 1px #333 solid;
+                    border: 1px #E0E0E0 solid;
+                    border-radius: 2px;
                     width: 90%;
                     padding: 3px 0px 3px 12px;
                 }
@@ -464,6 +495,7 @@
 
                 .control {
                     line-height: 0;
+                    width: 100%;
                 }
                 .label {
                     font-size: 10pt;
@@ -472,9 +504,8 @@
                     padding-left: 10px;
                 }
                 .dropdown-container {
-                    position: relative;
-                    top: 0;
-                    left: 0;
+                    position: static;
+                    width: 100%;
 
                     :focus {
                         outline: none;
@@ -482,15 +513,12 @@
 
                     select {
                         background-color: #fff;
-                        height: 24px;
-                        font-size: 9pt;
+                        font-size: 10pt;
                         color: #000;
-                        width: 110px;
-                        padding-left: 5px;
-                        margin-left: 10px;
-                        margin-top: 0;
+                        width: calc(100% - 29px);
+                        margin-left: 15px;
+                        margin-top: 5px;
                         margin-bottom: 7px;
-                        border: 1px #333 solid;
                     }
                 }
 
@@ -820,4 +848,41 @@
         z-index: 91;
     }
 
+}
+
+.rainbow-sidebar {
+    position: relative;
+    background: linear-gradient(to right, #89d307 0%,#9ede05 65%,#fff600 75%,#c50101 100%);
+    width: 100px;
+    height: 6px;
+    border: 1px solid #EDEDED;
+    border-radius: 5px;
+    clear: both;
+    margin: 20px 15px 20px 15px;
+    width: calc(188px - 30px);
+    .rainbow-drag {
+        width: 14px;
+        height: 14px;
+        border-radius: 8px;
+        background: white;
+        border: 1px solid #E2E2E2;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        position: absolute;
+        margin-left: -5px;
+        margin-top: -5px;
+        top: 0;
+        left: 60%;
+        z-index: 2;
+    }
+    &::after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: " ";
+        background: linear-gradient(to bottom, rgba(255,255,255,0.5) 20%, rgba(0,0,0,0.1) 90%);
+        width: 100%;
+        height: 100%;
+        border-radius:5px;
+        display: block;
+    }
 }

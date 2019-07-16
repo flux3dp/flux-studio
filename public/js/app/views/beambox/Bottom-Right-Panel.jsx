@@ -28,7 +28,7 @@ define([
     class BottomRightPanel extends React.Component {
         constructor() {
             super();
-            console.error("BottomRigtPanel is deprecated.")
+            console.error("BottomRightPanel is deprecated.")
             this.state = {
                 isPrinterSelectorOpen: false
             };
@@ -151,12 +151,11 @@ define([
         }
 
         render() {
-            const actionButtons = this._renderActionButtons();
+            //const actionButtons = this._renderActionButtons();
             const printerSelector = this._renderPrinterSelectorWindow();
 
             return (
                 <div>
-                    {actionButtons}
                     {this.state.isPrinterSelectorOpen?printerSelector:''}
                 </div>
             );

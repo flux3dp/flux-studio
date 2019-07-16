@@ -8,6 +8,25 @@ define(function() {
         buttons: {
             next: 'NEXT'
         },
+        topbar: {
+            titles: {
+                settings: 'Preferences'
+            },
+            zoom: 'Zoom',
+            group: 'Group',
+            ungroup: 'Ungroup',
+            halign: 'HAlign',
+            valign: 'VAlign',
+            hdist: 'HDist',
+            vdist: 'VDist',
+            union: 'Union',
+            subtract: 'Subtract',
+            intersect: 'Intersect',
+            difference: 'Difference',
+            hflip: 'HFlip',
+            vflip: 'VFlip',
+            export: 'Export'
+        },
         support: {
             no_webgl: 'WebGL is not supported. Please use other devices.',
             no_vcredist: 'Please install Visual C++ Redistributable 2015<br/>That can be downloaded on flux3dp.com',
@@ -323,11 +342,6 @@ define(function() {
             },
             ip: 'Machine IP Address',
             wrong_ip_format: 'Wrong IP Formats',
-            projection: 'View Projection',
-            projection_perspective: 'Perspective',
-            projection_orthographic: 'Orthographic',
-            antialiasing: 'Anti-aliasing',
-            auto_slice: 'Auto Slice',
             lock_selection: 'Lock Selection',
             default_machine: 'Default Machine',
             default_machine_button: 'Empty',
@@ -347,12 +361,16 @@ define(function() {
             default_beambox_model: 'Default Model',
             guides_origin: 'Guides Origin',
             guides: 'Guides',
-            fd1: 'FLUX Delta',
-            fd1p: 'FLUX Delta+',
             none: 'None',
             close: 'Close',
             cancel: 'CANCEL',
             done: 'DONE',
+            groups: {
+                general: '一般',
+                connection: '連線',
+                editor: '編輯器',
+                path: '路徑'
+            },
             connect_printer: {
                 title: 'Connect with your printer'
             },

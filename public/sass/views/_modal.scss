@@ -127,7 +127,7 @@
 
         .spinner-roller-reverse {
 
-            background: linear-gradient(to right, #DEDEDC 10%, rgba(248, 248, 248, 0) 42%);
+            background: linear-gradient(to right, #F0F0F0 10%, rgba(248, 248, 248, 0) 42%);
 
             &::before {
                 background-color: #F8F8F8;
@@ -200,7 +200,7 @@
     }
 
     .spinner-roller {
-        background: linear-gradient(to right, #DEDEDC 10%, rgba(255, 255, 255, 0) 42%);
+        background: linear-gradient(to right, #F0F0F0 10%, rgba(255, 255, 255, 0) 42%);
         height: 5rem;
         margin: 0 auto 1.6rem auto;
         width: 5rem;

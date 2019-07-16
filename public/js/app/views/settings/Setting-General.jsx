@@ -118,6 +118,11 @@ define([
             }
         },
 
+        _handleDone: function() {
+            location.hash = 'studio/beambox';
+            location.reload();
+        },
+
         render: function() {
             let { supported_langs } = this.props,
                 printer = initializeMachine.defaultPrinter.get(),
@@ -194,58 +199,6 @@ define([
                 },
             ];
 
-            const projectionOptions = [
-                {
-                    value: 'Perspective',
-                    label: lang.settings.projection_perspective,
-                    selected: Config().read('camera-projection') === 'Perspective'
-                },
-                {
-                    value: 'Orthographic',
-                    label: lang.settings.projection_orthographic,
-                    selected: Config().read('camera-projection') === 'Orthographic'
-                }
-            ];
-
-            const antialiasingOptions = [
-                {
-                    value: 0,
-                    label: lang.settings.off,
-                    selected: Config().read('antialiasing') === '0'
-                },
-                {
-                    value: 1,
-                    label: lang.settings.on,
-                    selected: Config().read('antialiasing') === '1'
-                }
-            ];
-
-            const autoSlicingOptions = [
-                {
-                    value: 'true',
-                    label: lang.settings.on,
-                    selected: Config().read('auto-slicing') !== 'false'
-                },
-                {
-                    value: 'false',
-                    label: lang.settings.off,
-                    selected: Config().read('auto-slicing') === 'false'
-                }
-            ];
-
-            const lockSelectionOptions = [
-                {
-                    value: 'true',
-                    label: lang.settings.on,
-                    selected: Config().read('lock-selection') !== 'false'
-                },
-                {
-                    value: 'false',
-                    label: lang.settings.off,
-                    selected: Config().read('lock-selection') === 'false'
-                }
-            ];
-
             const guideSelectionOptions = [
                 {
                     value: 'false',
@@ -308,6 +261,7 @@ define([
 
             return (
                 <div className='form general'>
+                    <div className='subtitle'>{lang.settings.groups.general}</div>
 
                     <Controls label={lang.settings.language}>
                         <SelectView
@@ -326,11 +280,14 @@ define([
                         />
                     </Controls>
 
-                    <Controls label={lang.settings.default_app}>
-                        <SelectView
-                            className='font3'
-                            options={defaultAppOptions}
-                            onChange={this._updateOptions.bind(null, 'default-app')}
+                    <div className='subtitle'>{lang.settings.groups.connection}</div>
+
+                    <Controls label={lang.settings.ip}>
+                        <input
+                            type='text'
+                            autoComplete='false'
+                            defaultValue={pokeIP}
+                            onBlur={this._checkIPFormat}
                         />
                     </Controls>
 
@@ -345,80 +302,13 @@ define([
                         </table>
                     </Controls>
 
-                    <Controls label={lang.settings.ip}>
-                        <input
-                            type='text'
-                            autoComplete='false'
-                            defaultValue={pokeIP}
-                            onBlur={this._checkIPFormat}
-                        />
-                    </Controls>
-
-                    <div className='subtitle'>{lang.settings.delta_series}</div>
-
-                    <Controls label={lang.settings.projection}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={projectionOptions}
-                            onChange={this._updateOptions.bind(null, 'camera-projection')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.antialiasing}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={antialiasingOptions}
-                            onChange={this._updateOptions.bind(null, 'antialiasing')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.auto_slice}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={autoSlicingOptions}
-                            onChange={this._updateOptions.bind(null, 'auto-slicing')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.lock_selection}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={lockSelectionOptions}
-                            onChange={this._updateOptions.bind(null, 'lock-selected')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.default_model}>
-                        <SelectView
-                            id='select-lang'
-                            className='font3'
-                            options={defaultModelOptions}
-                            onChange={this._updateOptions.bind(null, 'default-model')}
-                        />
-                    </Controls>
-
-                    <div className='subtitle'>{lang.settings.beambox_series}</div>
+                    <div className='subtitle'>{lang.settings.groups.editor}</div>
 
                     <Controls label={lang.settings.default_units}>
                         <SelectView
                             className='font3'
                             options={defaultUnitsOptions}
                             onChange={this._updateOptions.bind(null, 'default-units')}
-                        />
-                    </Controls>
-
-                    <Controls label={lang.settings.loop_compensation}>
-                        <UnitInput
-                            unit='mm'
-                            min={0}
-                            max={20}
-                            defaultValue={Number(localStorage.getItem('loop_compensation') || '0') / 10}
-                            getValue={val => localStorage.setItem('loop_compensation', Number(val) * 10)}
-                            className={{half: true}}
                         />
                     </Controls>
 
@@ -459,12 +349,24 @@ define([
                         />
                     </Controls>
 
-                    <Controls label=''>
-                        <a className='font3'
-                            onClick={this._resetFS}
-                        ><b>{lang.settings.reset_now}</b></a>
+                    <div className='subtitle'>{lang.settings.groups.path}</div>
+
+                    <Controls label={lang.settings.loop_compensation}>
+                        <UnitInput
+                            unit='mm'
+                            min={0}
+                            max={20}
+                            defaultValue={Number(localStorage.getItem('loop_compensation') || '0') / 10}
+                            getValue={val => localStorage.setItem('loop_compensation', Number(val) * 10)}
+                            className={{half: true}}
+                        />
                     </Controls>
 
+                    <a className='font5' onClick={this._resetFS}>
+                        <b>{lang.settings.reset_now}</b>
+                    </a>
+                    <div className="clearfix" />
+                    <a className="btn btn-done" onClick={this._handleDone}>{lang.settings.done}</a>
                 </div>
             );
         }

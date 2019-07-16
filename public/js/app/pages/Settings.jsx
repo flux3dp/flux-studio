@@ -3,7 +3,6 @@ define([
     'react',
     'helpers/i18n',
     'jsx!views/settings/Setting-General',
-    'jsx!views/settings/Setting-Device',
     'plugins/classnames/index',
     'app/app-settings',
     'helpers/api/config',
@@ -12,7 +11,6 @@ define([
     React,
     i18n,
     GeneralSetting,
-    DeviceSetting,
     ClassNames,
     settings,
     config
@@ -32,7 +30,7 @@ define([
             },
 
             _handleDone: function() {
-                location.hash = 'studio/' + (config().read('default-app')||'print');
+                location.hash = 'studio/' + (config().read('default-app')||'beambox');
                 location.reload();
             },
 
@@ -71,19 +69,6 @@ define([
                     tabs,
                     footer;
 
-                tabs = (
-                    <header>
-                        <ul className="nav clearfix">
-                            <li className={generalClass}>
-                                <a href="#studio/settings/general">{lang.settings.tabs.general}</a>
-                            </li>
-                            <li className={deviceClass}>
-                                <a href="#studio/settings/device">{lang.settings.tabs.device}</a>
-                            </li>
-                        </ul>
-                    </header>
-                );
-
                 footer = (
                     <footer className="sticky-bottom">
                         <div className="actions">
@@ -94,13 +79,8 @@ define([
 
                 return (
                     <div className="studio-container settings-studio">
-                        <div className="settings">
-                            {tabs}
-                            <div className="tab-container">
-                                {this._renderContent()}
-                            </div>
-                            {footer}
-                        </div>
+                        <div className="settings-gradient-overlay"/>
+                        {this._renderContent()}
                     </div>
                 );
             }

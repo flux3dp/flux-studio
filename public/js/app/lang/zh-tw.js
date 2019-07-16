@@ -8,6 +8,25 @@ define(function() {
         buttons: {
             next: '下一步'
         },
+        topbar: {
+            titles: {
+                settings: '偏好設定'
+            },
+            zoom: '縮放',
+            group: '群組',
+            ungroup: '解散群組',
+            halign: '水平對齊',
+            valign: '垂直對齊',
+            hdist: '水平均分',
+            vdist: '垂直均分',
+            union: '相加',
+            subtract: '相減',
+            intersect: '相交',
+            difference: '相異',
+            hflip: '水平翻轉',
+            vflip: '垂直翻轉',
+            export: '匯出'
+        },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 Beam Studio',
             no_vcredist: '請安裝 Visual C++ Redistributable 2015<br/>可以在flux3dp.com找到',
@@ -323,11 +342,6 @@ define(function() {
             },
             ip: '機器 IP 位址',
             wrong_ip_format: 'IP格式錯誤',
-            projection: '視角投影',
-            projection_perspective: '透視投影',
-            projection_orthographic: '正投影',
-            antialiasing: '反鋸齒',
-            auto_slice: '自動切片',
             lock_selection: '鎖定選取目標',
             reset: '重置所有設定',
             default_machine: '預設機器',
@@ -341,16 +355,19 @@ define(function() {
             default_app: '預設功能',
             default_units: '預設單位',
             loop_compensation: '封閉路徑補償',
-            delta_series: 'Delta 系列',
             beambox_series: 'Beambox 系列',
             default_model: '預設型號（列印參數）',
             default_beambox_model: '預設型號',
             guides_origin: '參考線座標',
             guides: '參考線',
-            fd1: 'FLUX Delta',
-            fd1p: 'FLUX Delta+',
             none: '無',
             close: '關閉',
+            groups: {
+                general: '一般',
+                connection: '連線',
+                editor: '編輯器',
+                path: '路徑'
+            },
             printer: {
                 new_printer: '新增成型機',
                 name: '成型機名稱',
@@ -1589,18 +1606,6 @@ define(function() {
             FOCAL_LENGTH        : '焦距調整',
             hours               : '小時',
             cannot_get_info     : '無法讀取工具頭資訊'
-        },
-        topbar: {
-            align_toolbox: {
-                ALIGN_LEFT: '向左靠齊',
-                ALIGN_RIGHT: '向右靠齊',
-                ALIGN_CENTER : '水平置中',
-                ALIGN_TOP : '向上靠齊',
-                ALIGN_MIDDLE : '垂直置中',
-                ALIGN_BOTTOM : '向下靠齊',
-                ARRANGE_HORIZON: '水平平均分配',
-                ARRANGE_VERTICAL: '垂直平均分配'
-            }
         }
     };
 });

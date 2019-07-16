@@ -39,9 +39,10 @@ var NS = svgedit.NS;
  * @param {SVGGElement=} svgElem - The SVG DOM element. If defined, use this to add
  * 		a new layer to the document.
  */
-var Layer = svgedit.draw.Layer = function(name, group, svgElem) {
+var Layer = svgedit.draw.Layer = function(name, group, svgElem, color) {
 	this.name_ = name;
 	this.group_ = svgElem ? null : group;
+	this.color_ = '#333333';
 
 	if (svgElem) {
 		// Create a group element with title and add it to the DOM.
@@ -57,8 +58,12 @@ var Layer = svgedit.draw.Layer = function(name, group, svgElem) {
 		}
 	}
 
+	let groupColor = this.group_.getAttribute('data-color');
+	if (groupColor) color = groupColor;
+
 	addLayerClass(this.group_);
 	svgedit.utilities.walkTree(this.group_, function(e){e.setAttribute("style", "pointer-events:inherit");});
+	this.setColor(color ? color : '#333333');
 	// this.group_.setAttribute('clip-path', 'url(#scene_mask)')
 	// this.group_.setAttribute("style", svgElem ? "pointer-events:all" : "pointer-events:none");
 };
@@ -145,6 +150,24 @@ Layer.prototype.setOpacity = function(opacity) {
 	if (typeof opacity === 'number' && opacity >= 0.0 && opacity <= 1.0) {
 		this.group_.setAttribute('opacity', opacity);
 	}
+};
+
+/**
+ * Get layer opacity.
+ * @returns {hex} color value.
+ */
+Layer.prototype.getColor = function() {
+	return this.group_.getAttribute('data-color');
+};
+
+/**
+ * Sets the Color of this layer. If Color is not a value between 0.0 and 1.0,
+ * nothing happens.
+ * @param {hex} color
+ */
+Layer.prototype.setColor = function(color) {
+	this.color_ = color;
+	this.group_.setAttribute('data-color', color);
 };
 
 /**

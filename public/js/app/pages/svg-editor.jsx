@@ -296,7 +296,7 @@ define([
                                 </div>
 
                             </div>
-                            <div className='selLayerBlock'>
+                            <div className='selLayerBlock controls'>
                                 <span id="selLayerLabel">Move elements to:</span>
                                 <select
                                     value={LANG.right_panel.layer_panel.layer1}

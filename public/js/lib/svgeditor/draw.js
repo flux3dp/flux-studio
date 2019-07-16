@@ -459,6 +459,16 @@
     }
 
     /**
+     * Find the layer name in a group element.
+     * @param group The group element to search in.
+     * @returns {string} The layer name or empty string.
+     */
+    function findLayerColorInGroup(group) {
+        var color = group.getAttribute('data-color');
+        return color;
+    }
+
+    /**
      * Given a set of names, return a new unique name.
      * @param {Array.<string>} existingLayerNames - Existing layer names.
      * @returns {string} - The new name.
@@ -485,13 +495,16 @@
         for (var i = 0; i < numchildren; ++i) {
             var child = this.svgElem_.childNodes.item(i);
             // for each g, find its layer name
-            if (child && child.nodeType == 1) {
-                if (child.tagName == 'g') {
+            if (child && child.nodeType === 1) {
+                console.log("Checking child", child);
+                if (child.tagName === 'g') {
                     childgroups = true;
                     var name = findLayerNameInGroup(child);
+                    var color = findLayerColorInGroup(child);
+                    console.log("Group ", name); 
                     if (name) {
                         layernames.push(name);
-                        layer = new svgedit.draw.Layer(name, child);
+                        layer = new svgedit.draw.Layer(name, child, null, color);
                         this.all_layers.push(layer);
                         this.layer_map[name] = layer;
                     } else {
@@ -597,17 +610,20 @@
     };
 
     /**
-     * Returns whether the layer is visible.  If the layer name is not valid,
+     * Returns whether the layer color.  If the layer name is not valid,
      * then this function returns false.
      * @param {string} layername - The name of the layer which you want to query.
      * @returns {boolean} The visibility state of the layer, or false if the layer name was invalid.
     */
-    svgedit.draw.Drawing.prototype.getLayerColor = function (layername) {
-        var layer = this.layer_map[layername];
-        if (layer && !layer.color) {
-            layer.color = (layername == 'Traced Path') ? '#ff00ff' : layername;
+    svgedit.draw.Drawing.prototype.getLayerColor = function (layerName) {
+        var layer = this.layer_map[layerName];
+        if (layer) {
+            layer.color_ = layer.getColor();
         }
-        return layer ? layer.color : false;
+        if (layer && !layer.color_) {
+            layer.setColor((layerName === 'Traced Path') ? '#ff00ff' : layerName);
+        }
+        return layer ? layer.color_ : false;
     };
 
     /**
