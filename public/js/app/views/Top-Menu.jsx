@@ -655,7 +655,7 @@ define([
                             <div className="top-controls clip-controls">
                                 {this._renderTopBtn('union', 'Union', () => {FnWrapper.booleanUnion();})}
                                 {this._renderTopBtn('subtract', 'Subtract')}
-                                {this._renderTopBtn('intersect', 'Intersect')}
+                                {this._renderTopBtn('intersect', 'Intersect', () => {FnWrapper.booleanIntersect();})}
                                 {this._renderTopBtn('difference', 'Difference')}
                             </div>
 
