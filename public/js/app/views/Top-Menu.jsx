@@ -656,12 +656,12 @@ define([
 
                 return (
                     <div className="top-btn top-dropdown-control">
-                        <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
+                        <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${id}.png`}} />
                         <div className="btn-label">
                             {label}
                         </div>
                         <div className="dropdown-content">
-                            <div className="arrow-up "></div>
+                            <div className="arrowup "></div>
                             <div className="dropdown-block">
                                 {items}
                             </div>
@@ -718,9 +718,9 @@ define([
                                 </div>
                                 <div className="top-controls clip-controls">
                                     {this._renderTopBtn('union', lang.topbar.union, () => {FnWrapper.booleanUnion();})}
-                                    {this._renderTopBtn('subtract', lang.topbar.subtract)}
-                                    {this._renderTopBtn('intersect', lang.topbar.intersect)}
-                                    {this._renderTopBtn('difference', lang.topbar.difference)}
+                                    {this._renderTopBtn('subtract', lang.topbar.subtract, () => {FnWrapper.booleanDifference();})}
+                                    {this._renderTopBtn('intersect', lang.topbar.intersect, () => {FnWrapper.booleanIntersect();})}
+                                    {this._renderTopBtn('difference', lang.topbar.difference, () => {FnWrapper.booleanXor();})}
                                 </div>
 
                                 <div className="top-controls flip-controls">
