@@ -8285,8 +8285,7 @@ define([
             }
         };
 
-        this.booleanInterSectUnionSelectedElements = function(mode) {
-            console.log('svgcanvas, TODO: union');
+        this.booleanOperationSelectedElements = function(mode) {
             let len = selectedElements.length;
             for (let i = 0; i < selectedElements.length; ++i) {
                 if (!selectedElements[i]) {
@@ -8297,9 +8296,12 @@ define([
             if (len < 2) {
                 return;
             }
+            if (len > 2 && mode === 'diff') {
+                alert('Do not support for more than 2 objects');
+            }
             let batchCmd = new svgedit.history.BatchCommand(`${mode} Elements`);
+            console.log(selectedElements);
             // clipper needs integer input so scale up path with a big const.
-
             const scale = 100;
             let solution_paths = [];
             const modemap = {'intersect': 0, 'union': 1, 'diff': 2, 'xor': 3};
@@ -8307,23 +8309,19 @@ define([
             const subject_fillType = 1;
             const clip_fillType = 1;
             let succeeded = true;
-            for (let i = 0; i < len; ++i) {
+            for (let i = len - 1; i >= 0; --i) {
                 let clipper = new svgedit.ClipperLib.Clipper();
                 const ele =selectedElements[i];
                 const dpath = svgedit.utilities.getPathDFromElement(ele);
-                console.log(dpath);
                 const bbox = svgedit.utilities.getBBox(ele);
                 let rotation = {
                     angle: svgedit.utilities.getRotationAngle(ele),
-                    cx: (bbox.x + bbox.width / 2) * scale,
-                    cy: (bbox.y + bbox.height / 2) * scale
+                    cx: bbox.x + bbox.width / 2,
+                    cy: bbox.y + bbox.height / 2
                 };
-                //console.log('d', dpath);
                 const paths = svgedit.ClipperLib.dPathtoPointPathsAndScale(dpath, rotation, scale);
-                //console.log('pp', JSON.stringify(paths));
-                if (i === 0) {
+                if (i === len - 1) {
                     solution_paths = paths;
-                    //clipper.AddPaths(paths, svgedit.ClipperLib.PolyType.ptSubject, true);
                 } else {
                     clipper.AddPaths(solution_paths, svgedit.ClipperLib.PolyType.ptSubject, true);
                     clipper.AddPaths(paths, svgedit.ClipperLib.PolyType.ptClip, true);
@@ -8363,7 +8361,7 @@ define([
             canvas.undoMgr.undoStack.pop();
             addCommandToHistory(batchCmd);
             this.selectOnly([element]);
-            console.log(canvas.undoMgr);
+            //console.log(canvas.undoMgr);
         }
 
         // Function: cloneSelectedElements

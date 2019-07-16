@@ -205,10 +205,16 @@ define([
             svgCanvas.ungroupSelectedElement();
         },
         booleanUnion: function() {
-            svgCanvas.booleanInterSectUnionSelectedElements('union');
+            svgCanvas.booleanOperationSelectedElements('union');
+        },
+        booleanDifference: function() {
+            svgCanvas.booleanOperationSelectedElements('diff');
         },
         booleanIntersect: function() {
-            svgCanvas.booleanInterSectUnionSelectedElements('intersect');
+            svgCanvas.booleanOperationSelectedElements('intersect');
+        },
+        booleanXor: function() {
+            svgCanvas.booleanOperationSelectedElements('xor');
         },
 
         //align toolbox

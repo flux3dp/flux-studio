@@ -7626,42 +7626,26 @@
 	};
 //----------------------Customized functions
 	ClipperLib.dPathtoPointPathsAndScale = function (dPath, rotation, scale) {
-		//TODO add C
-		//console.log('dpath', dPath);
-		let c  = ClipperLib.dPathSpliter(dPath);
-		console.log(c);
-		dPath = dPath.replace(/z/ig, 'Z ');
-		dPath = dPath.split(' ');
-		//console.log('dpath', dPath);
-		let resultPaths = []
-		let currentPath = []
-		for (let i = 0; i < dPath.length; ++i) {
-			if (dPath[i][0] === 'Z') {
+		const commands  = ClipperLib.dPathSpliter(dPath);
+		console.log(commands);
+		let resultPaths = [];
+		let currentPath = [];
+		for (let i = 0; i < commands.length; ++i) {
+			let points = commands[i].points;
+			if (commands[i].command === 'Z') {
 				resultPaths.push(currentPath);
+				currentPath = [];
 				continue;
 			}
-			if (!dPath[i]) {
-				continue;
-			}
-
-			let point = dPath[i].substring(1).split(',').map(s => parseFloat(s) * scale);
 			if (rotation.angle !== 0) {
-				ClipperLib.rotationPoint(rotation, point);
+				ClipperLib.rotationPoints(rotation, points);
 			}
-			if (dPath[i][0] === 'M') {
-				currentPath = [{X: point[0],Y: point[1]}];
-			} else if (dPath[i][0] === 'L') {
-				currentPath.push({X: point[0],Y: point[1]});
-			} else if (dPath[i][0] === 'C') {
-				const p2 = dPath[i+1].split(',').map(s => parseFloat(s) * scale);
-				const p3 = dPath[i+2].split(',').map(s => parseFloat(s) * scale);
-				if (rotation.angle !== 0) {
-					ClipperLib.rotationPoint(rotation, p2);
-					ClipperLib.rotationPoint(rotation, p3);
-				}
+			points = points.map(p => ({X: p.X * scale, Y: p.Y * scale}));
+			if (commands[i].command === 'M' || commands[i].command === 'L') {
+				currentPath.push(...points);
+			} else if (commands[i].command === 'C') {
 				const startPoint = currentPath[currentPath.length - 1];
-				const controlPoints = [point, p2, p3];
-				i += 2;
+				const controlPoints = points;
 				const cPath = ClipperLib.generatePointPathFromC(startPoint, controlPoints);
 				currentPath.push(...cPath); 
 			}
@@ -7670,23 +7654,18 @@
 	}
 	ClipperLib.dPathSpliter = function (dPath) {
 		let commands = [];
-		let points = [];
-		let lastCommand = -1;
-		for (let i = 0; i < dPath.length; ++i) {
+		let lastCommand = dPath.match(/[a-df-z]/i).index;
+		commands.push({command: dPath[lastCommand].toUpperCase(), points: []})
+		for (let i = lastCommand + 1; i < dPath.length; ++i) {
 			if (dPath[i].match(/[a-df-z]/i)) {
-				if (commands.length > 0) {
-					const pointsString = dPath.substring(lastCommand+1, i);
-					const point = ClipperLib.pointStringHandler(pointsString);
-					points.push(point);
-				}
-				commands.push(dPath[i].toUpperCase());
+				const pointsString = dPath.substring(lastCommand+1, i);
+				const point = ClipperLib.pointStringHandler(pointsString);
+				commands[commands.length-1].points = point;
 				lastCommand = i;
+				commands.push({command: dPath[lastCommand].toUpperCase(), points: []})
 			}
 		}
-		const pointsString = dPath.substring(lastCommand+1);
-		const point = ClipperLib.pointStringHandler(pointsString);
-		points.push(point);
-		return {commands, points}
+		return commands
 	}
 	ClipperLib.pointStringHandler = function (pString) {
 		const p = pString.split(/[, ]/).filter(s => s).map(s => parseFloat(s));
@@ -7696,28 +7675,42 @@
 		}
 		return point
 	}
-
-
-	ClipperLib.rotationPoint = function (rotation, point) {
-		const x = point[0] - rotation.cx;
-		const y = point[1] - rotation.cy;
+	ClipperLib.rotationPoints = function (rotation, points) {
+		for (let i = 0; i < points.length; ++i) {
+		const x = points[i].X - rotation.cx;
+		const y = points[i].Y - rotation.cy;
 		const rad = rotation.angle * Math.PI / 180;
 		const new_x = x * Math.cos(rad) - y * Math.sin(rad) + rotation.cx;
 		const new_y = x * Math.sin(rad) + y * Math.cos(rad) + rotation.cy;
 
-		point[0] = new_x;
-		point[1] = new_y;
+		points[i].X = new_x;
+		points[i].Y = new_y;
+		}
 	}
 	ClipperLib.generatePointPathFromC = function (startPoint, controlPoints) {
-		const maxDistance = 100;
+		const maxDistance = 1000;
+		const defaultStep = 10;
 		let cPath = [];
 		let bzc = new svgedit.ClipperLib.BezierCurve(startPoint, controlPoints);
 		if (bzc.isLine) {
-			cPath.push({X: controlPoints[2][0], Y: controlPoints[2][1]});
+			cPath.push(controlPoints[2]);
 		} else {
-			for (let i = 1; i <= 10; ++i) {
-				const p = bzc.point(i/10);
-				cPath.push(p);
+			let lastPoint = {...startPoint, t: 0};
+			let stack = [];
+			for (let i = 1; i <= defaultStep; ++i) {
+				stack.push({...bzc.point(i / defaultStep), t: i / defaultStep});
+				
+				while (stack.length > 0) {
+					const p = stack[stack.length - 1];
+					if (Math.sqrt((p.X - lastPoint.X) ** 2 + (p.Y - lastPoint.Y) ** 2) > maxDistance) {
+						const mid_t = (lastPoint.t + p.t) / 2;
+						stack.push({...bzc.point(mid_t), t: mid_t});
+					} else {
+						stack.pop();
+						cPath.push({X: p.X, Y: p.Y});
+						lastPoint = p;
+					}
+				}
 			}
 		}
 		return cPath;
@@ -7725,12 +7718,12 @@
 	ClipperLib.BezierCurve = function(startPoint, controlPoints) {
 		this.x0 = startPoint.X;
 		this.y0 = startPoint.Y;
-		this.x1 = controlPoints[0][0];
-		this.y1 = controlPoints[0][1];
-		this.x2 = controlPoints[1][0];
-		this.y2 = controlPoints[1][1];
-		this.x3 = controlPoints[2][0];
-		this.y3 = controlPoints[2][1];
+		this.x1 = controlPoints[0].X;
+		this.y1 = controlPoints[0].Y;
+		this.x2 = controlPoints[1].X;
+		this.y2 = controlPoints[1].Y;
+		this.x3 = controlPoints[2].X;
+		this.y3 = controlPoints[2].Y;
 		this.isLine = false;
 		if (this.x0 == this.x1 && this.y0 == this.y1 && this.x2 == this.x3 && this.y2 == this.y3) {
 			this.isLine = true;
