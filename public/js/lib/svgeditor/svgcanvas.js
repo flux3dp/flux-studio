@@ -8297,7 +8297,8 @@ define([
                 return;
             }
             if (len > 2 && mode === 'diff') {
-                alert('Do not support for more than 2 objects');
+                AlertActions.showPopupError('Error', 'Too Many Objects.');
+                return;
             }
             let batchCmd = new svgedit.history.BatchCommand(`${mode} Elements`);
             console.log(selectedElements);
@@ -8311,11 +8312,15 @@ define([
             let succeeded = true;
             for (let i = len - 1; i >= 0; --i) {
                 let clipper = new svgedit.ClipperLib.Clipper();
-                const ele =selectedElements[i];
-                const dpath = svgedit.utilities.getPathDFromElement(ele);
-                const bbox = svgedit.utilities.getBBox(ele);
+                const elem =selectedElements[i];
+                if (!(elem.tagName === 'rect' || elem.tagName === 'path' || elem.tagName === 'polygon' || elem.tagName === 'ellipse')) {
+                    AlertActions.showPopupError('Error', `Not Support Object Type: ${elem.tagName}`);
+                    return;
+                }
+                const dpath = svgedit.utilities.getPathDFromElement(elem);
+                const bbox = svgedit.utilities.getBBox(elem);
                 let rotation = {
-                    angle: svgedit.utilities.getRotationAngle(ele),
+                    angle: svgedit.utilities.getRotationAngle(elem),
                     cx: bbox.x + bbox.width / 2,
                     cy: bbox.y + bbox.height / 2
                 };
