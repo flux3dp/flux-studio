@@ -531,8 +531,31 @@ define([
             },
 
             _handleSelectDevice: async function (device, e) {
+                const self = this;
+                AlertStore.removeCancelListener(this._toggleDeviceListBind);
+                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
+                DeviceMaster.selectDevice(device).then(function (status) {
+                    if (status === DeviceConstants.CONNECTED) {
+                        ProgressActions.close();
+                        self.test();
+                        self._onSuccessConnected(device, e);                 
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(_id, lang.message.connectionTimeout);
+                    }
+                })
+                    .fail(function (status) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('fatal-occurred', status);
+                    });
+                this._toggleDeviceList(false);
+
+            },
+
+            _onSuccessConnected: async function(device, e) {
                 //export fcode
-                if (selected_item === 'export_fcode') {
+                if (device === 'export_fcode') {
                     BottomRightFuncs.exportFcode();
                     this.setState({ showDeviceList: false});
                     return;
@@ -546,29 +569,9 @@ define([
                     this.setState({ showDeviceList: false });
                     return;
                 } else {
-                    // Successfully selected device
                     this.setState({ showDeviceList: false });
                     BottomRightFuncs.uploadFcode(device);   
                 }
-
-                AlertStore.removeCancelListener(this._toggleDeviceListBind);
-                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
-                DeviceMaster.selectDevice(device).then(function (status) {
-                    if (status === DeviceConstants.CONNECTED) {
-                        ProgressActions.close();
-                        GlobalActions.showMonitor(device);                     
-                    }
-                    else if (status === DeviceConstants.TIMEOUT) {
-                        ProgressActions.close();
-                        AlertActions.showPopupError(_id, lang.message.connectionTimeout);
-                    }
-                })
-                    .fail(function (status) {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('fatal-occurred', status);
-                    });
-
-                this._toggleDeviceList(false);
             },
 
             _handleMonitorClose: function () {
