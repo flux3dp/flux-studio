@@ -31,6 +31,61 @@
                 opacity: 0.8;
             }
         }
+        .preview {
+            #clear-preview-graffiti-button-placeholder {
+                background: #999;
+                color: white;
+                position: absolute;
+                width: 120px;
+                height: 36px;
+                left: 90px;
+                top: 30px;
+                z-index: 2;
+                &.active {
+                    background: #0099cc;
+                }
+                .text {
+                    position: absolute;
+                    top: 0px;
+                    left: 30px;
+                    width: 90px;
+                    height: 36px;
+                    line-height: 36px;
+                }
+                img {
+                    margin-top: 5px;
+                    margin-bottom: 5px;
+                    height: 26px;
+                }
+            }
+
+            #image-trace-button {
+                background: #999;
+                color: white;
+                position: absolute;
+                width: 120px;
+                height: 36px;
+                left: 230px;
+                top: 30px;
+                z-index: 2;
+                &.active {
+                    background: #0099cc;
+                }
+                .text {
+                    position: absolute;
+                    top: 0px;
+                    left: 30px;
+                    width: 90px;
+                    height: 36px;
+                    line-height: 36px;
+                }
+                img {
+                    margin-top: 5px;
+                    margin-bottom: 5px;
+                    height: 26px;
+                }
+            }
+        }
     }
     .left-panel {
         position: relative;

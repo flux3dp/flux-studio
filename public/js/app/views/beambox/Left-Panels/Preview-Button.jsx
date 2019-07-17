@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'react',
     'reactDOM',
     'jsx!widgets/Modal',
@@ -21,6 +22,7 @@ define([
     'helpers/api/config',
     'helpers/i18n',
 ], function(
+    $,
     React,
     ReactDOM,
     Modal,
@@ -104,12 +106,12 @@ define([
         }
 
         endDrawing() {
-            ClearPreviewGraffitiButton.show();
+            ClearPreviewGraffitiButton.activate();
             this.setState({ isDrawing: false, isDrawn: true });
         }
 
         startDrawing() {
-            ClearPreviewGraffitiButton.hide();
+            ClearPreviewGraffitiButton.deactivate();
             this.setState({ isDrawing: true, isDrawn: false });
         }
 
@@ -141,6 +143,8 @@ define([
                 const getDeviceToUse = async () => {
                     const d = $.Deferred();
                     const root = document.getElementById('printer-selector-placeholder');
+                    const button = $('.preview-btn');
+                    const top = button.position().top - button.height() / 2;
                     const printerSelector = (
                         <Modal onClose={d.reject}>
                             <PrinterSelector
@@ -150,8 +154,8 @@ define([
                                 onClose={d.reject}
                                 onGettingPrinter={device => d.resolve(device)}
                                 WindowStyle={{
-                                    top: 'calc(50% - 180px)',
-                                    left: '173px'
+                                    top: `${top}px`,
+                                    left: '80px'
                                 }}
                                 arrowDirection='left'
                             />
@@ -258,24 +262,25 @@ define([
                 isDrawing,
                 isDrawn
             } = this.state;
-            const ImageTrace = (
-                PreviewModeBackgroundDrawer.isClean() || isDrawing ?
-                null :
-                <ImageTraceButton
-                    onClick={() => this.handleImageTraceClick()}
-                />
-            );
-
+            const active = !(PreviewModeBackgroundDrawer.isClean() || isDrawing);
+            console.log(active);
+            const ImageTrace = (<ImageTraceButton
+                onClick={active ? () => this.handleImageTraceClick() : () => {}}
+                active={active}
+                />)
             return (
-                <div>
+                <div className='preview'>
                     <div
-                        className={classNames('option', 'preview-btn', {'preview-mode-on': isPreviewMode})}
+                        className={classNames('tool-btn', 'preview-btn', {'active': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        {isPreviewMode ? LANG.end_preview : LANG.preview}
+                        <img src={'img/left-bar/icon-camera.svg'} />
                     </div>
-                    <span id='clear-preview-graffiti-button-placeholder' />
                     <span id='printer-selector-placeholder' />
+                    <div id='clear-preview-graffiti-button-placeholder'>
+                        <img src={'img/left-bar/icon-camera.svg'}/>
+                        <div className={'text'}>{LANG.preview} X</div>
+                    </div>
                     {ImageTrace}
                 </div>
             );

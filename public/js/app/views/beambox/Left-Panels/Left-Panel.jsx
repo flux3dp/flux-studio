@@ -167,7 +167,7 @@ _
                     {this._renderToolButton('polygon','polygon', FnWrapper.insertPolygon)}
                     {this._renderToolButton('draw','Pen', FnWrapper.insertPath)}
                     {this._renderToolButton('grid','Grid', FnWrapper.gridArraySelected)}
-                    {this._renderToolButton('camera','Camera Preview', ()=>{ } )}
+                    <PreviewButton />
                 </div>
             );
         }

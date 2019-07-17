@@ -22,27 +22,25 @@ define([
             this.onClick = onClick;
         }
 
-        show() {
-            const root = document.getElementById(rootId);
-            const button = (<i
-                className='fa fa-times clear-preview'
-                title="Clear all"
-                onClick={() => {
-                    if(!PreviewModeBackgroundDrawer.isClean()) {
-                        PreviewModeBackgroundDrawer.resetCoordinates();
-                        this.onClick();
-                        this.hide();
-                        BeamboxActions.clearCameraCanvas();
-                    }
-                }}
-            />);
-            ReactDOM.render(button, root);
+        activate() {
+            $(`#${rootId}`).addClass('active');
+            const onClick= () => {
+                if(!PreviewModeBackgroundDrawer.isClean()) {
+                    PreviewModeBackgroundDrawer.resetCoordinates();
+                    this.onClick();
+                    this.deactivate();
+                    BeamboxActions.clearCameraCanvas();
+                }
+            }
+            $(`#${rootId}`).bind('click', onClick);
         }
 
-        hide() {
-            const root = document.getElementById(rootId);
-            ReactDOM.unmountComponentAtNode(root);
+        deactivate() {
+            $(`#${rootId}`).removeClass('active');
+            const onClick= () => {}
+            $(`#${rootId}`).bind('click', onClick);
         }
+        
     };
     return new ClearPreviewGraffitiButton();
 });

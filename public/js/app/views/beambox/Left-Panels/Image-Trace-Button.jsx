@@ -47,11 +47,16 @@ define([
         }
 
         render() {
-            const button = PreviewModeBackgroundDrawer.isClean() ? null : this._renderButton();
-
+            const active = this.props.active && !(PreviewModeBackgroundDrawer.isClean());
+            //const button = PreviewModeBackgroundDrawer.isClean() ? null : this._renderButton();
+            console.log(active)
             return (
-                <div>
-                    {button}
+                <div
+                    id='image-trace-button'
+                    className={active ? 'active' : ''}
+                    onClick={() => this._handleClick()}
+                >
+                    <div className={'text'}>{LANG.image_trace}</div>
                 </div>
             );
         }
