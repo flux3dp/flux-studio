@@ -366,10 +366,10 @@ define(function() {
             cancel: 'CANCEL',
             done: 'DONE',
             groups: {
-                general: '一般',
-                connection: '連線',
-                editor: '編輯器',
-                path: '路徑'
+                general: 'General',
+                connection: 'Connection',
+                editor: 'Editor',
+                path: 'Path'
             },
             connect_printer: {
                 title: 'Connect with your printer'
@@ -1075,7 +1075,7 @@ define(function() {
             },
             right_panel: {
                 layer_panel: {
-                    layer1: 'Default',
+                    layer1: 'Layer 1',
                     layer_bitmap: 'Bitmap'
                 },
                 laser_panel: {
@@ -1539,14 +1539,20 @@ define(function() {
             back: 'BACK',
             finish: 'DONE',
             please_goto_beambox_first: 'Please switch to Engraving Mode ( Beambox ) in order to use this feature.',
-            please_place_paper: 'Please place an A4 or Letter size white paper at left-top corner of workarea',
-            please_refocus: 'Please focus the platform properly',
+            please_place_paper: {
+                beambox: 'Please place an A4 or Letter size white paper at left-top corner of workarea',
+                beamo: 'Please place an A4 or Letter size white paper at left-top corner of workarea',
+            },
+            please_refocus: {
+                beambox: 'Kindly adjust the platform to the focal point (the height of turned down acrylic)',
+                beamo: 'Kindly adjust the laser head to focus on the engraving object (the height of turned down acrylic)'
+            },
             taking_picture: 'Taking Picture...',
             start_engrave: 'START ENGRAVE',
             analyze_result_fail: 'Fail to analyze captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             no_lines_detected: 'Fail to detect lines from captured image.<br/>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             drawing_calibration_image: 'Drawing calibration image...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
+            please_confirm_image: '<div><div class="img-center" style="background:url(%s)"></div></div>Please make sure:<br/>1. Captured picture fully coverd with white paper.<br/>2. The platform is focus properly.',
             calibrate_done: 'Calibration done. Better camera accurency is given when focus precisely.'
         },
         input_machine_password: {
