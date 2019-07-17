@@ -288,7 +288,7 @@ define([
                         className={classNames('tool-btn', 'preview-btn', {'active': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        <img src={'img/left-bar/icon-camera.svg'} />
+                        <img src={'img/left-bar/icon-camera.svg'} draggable="false"/>
                     </div>
                     <span id='printer-selector-placeholder' />
                     <div

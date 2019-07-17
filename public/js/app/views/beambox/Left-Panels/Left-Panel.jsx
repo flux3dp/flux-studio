@@ -164,7 +164,7 @@ _
 
             return (
                 <div className={cx} onClick={endPreviewAndOnClick}>
-                    <img src={`img/left-bar/icon-${iconName}.svg`} />
+                    <img src={`img/left-bar/icon-${iconName}.svg`} draggable="false"/>
                 </div>
             );
         }
