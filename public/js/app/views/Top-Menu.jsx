@@ -537,7 +537,7 @@ define([
                 DeviceMaster.selectDevice(device).then(function (status) {
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
-                        self.test();
+                        //self.test();
                         self._onSuccessConnected(device, e);                 
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
