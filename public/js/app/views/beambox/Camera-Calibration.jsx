@@ -364,31 +364,31 @@ define([
                 </div>
                 <div className="controls">
                     <div className="control">
-                        <label>X</label>
+                        <label>水平位移</label>
                         <UnitInput
                             min={-50}
                             max={50}
                             unit="mm"
-                            defaultValue={currentOffset.X}
-                            getValue={(val) => handleValueChange('X', val)}
+                            defaultValue={currentOffset.X - 15}
+                            getValue={(val) => handleValueChange('X', val + 15)}
                             decimal={3}
                         />
                     </div>
 
                     <div className="control">
-                        <label>Y</label>
+                        <label>垂直位移</label>
                         <UnitInput
                             min={-50}
                             max={50}
                             unit="mm"
-                            defaultValue={currentOffset.Y}
-                            getValue={(val) => handleValueChange('Y', val)}
+                            defaultValue={currentOffset.Y - 30}
+                            getValue={(val) => handleValueChange('Y', val + 35)}
                             decimal={3}
                         />
                     </div>
 
                     <div className="control">
-                        <label>旋轉</label>
+                        <label>旋轉角度</label>
                         <UnitInput
                             min={-3.14}
                             max={3.14}
@@ -400,26 +400,26 @@ define([
                     </div>
 
                     <div className="control">
-                        <label>X 比例</label>
+                        <label>水平比例</label>
                         <UnitInput
-                            min={0.5}
-                            max={2}
-                            unit="X"
-                            defaultValue={currentOffset.SX / 1.625}
-                            getValue={(val) => handleValueChange('SX', val * 1.625)}
-                            decimal={3}
+                            min={30}
+                            max={250}
+                            unit="%"
+                            defaultValue={100 * currentOffset.SX / 1.625}
+                            getValue={(val) => handleValueChange('SX', val * 1.625 / 100)}
+                            decimal={2}
                         />
                     </div>
 
                     <div className="control">
-                        <label>Y 比例</label>
+                        <label>垂直比例</label>
                         <UnitInput
-                            min={0.5}
-                            max={2}
-                            unit="X"
-                            defaultValue={currentOffset.SY / 1.625}
-                            getValue={(val) => handleValueChange('SY', val * 1.625)}
-                            decimal={3}
+                            min={30}
+                            max={250}
+                            unit="%"
+                            defaultValue={100 * currentOffset.SY / 1.625}
+                            getValue={(val) => handleValueChange('SY', val * 1.625 / 100)}
+                            decimal={2}
                         />
                     </div>
                 </div>
