@@ -42,7 +42,7 @@ var NS = svgedit.NS;
 var Layer = svgedit.draw.Layer = function(name, group, svgElem, color) {
 	this.name_ = name;
 	this.group_ = svgElem ? null : group;
-	this.color_ = '#333333';
+	this.color_ = name;
 
 	if (svgElem) {
 		// Create a group element with title and add it to the DOM.
@@ -63,7 +63,7 @@ var Layer = svgedit.draw.Layer = function(name, group, svgElem, color) {
 
 	addLayerClass(this.group_);
 	svgedit.utilities.walkTree(this.group_, function(e){e.setAttribute("style", "pointer-events:inherit");});
-	this.setColor(color ? color : '#333333');
+	this.setColor(color ? color : name);
 	// this.group_.setAttribute('clip-path', 'url(#scene_mask)')
 	// this.group_.setAttribute("style", svgElem ? "pointer-events:all" : "pointer-events:none");
 };
