@@ -36,26 +36,29 @@
                 background: #999;
                 color: white;
                 position: absolute;
-                width: 120px;
-                height: 36px;
                 left: 90px;
                 top: 30px;
+                width: 120px;
+                height: 25px;
                 z-index: 2;
+                border-radius: 20px;
                 &.active {
                     background: #0099cc;
                 }
                 .text {
                     position: absolute;
                     top: 0px;
-                    left: 30px;
+                    left: 31px;
                     width: 90px;
                     height: 36px;
-                    line-height: 36px;
+                    line-height: 25px;
+                    font-size: 9pt;
                     text-align: center;
                 }
                 img {
-                    margin: 5px 0px 5px 4px;
-                    height: 26px;
+                    margin: 4px 0px 0px 15px;
+                    height: 16px;
+                    filter: brightness(0) invert(100%);
                 }
             }
 
@@ -63,26 +66,29 @@
                 background: #999;
                 color: white;
                 position: absolute;
-                width: 120px;
-                height: 36px;
                 left: 230px;
                 top: 30px;
+                width: 120px;
+                height: 25px;
                 z-index: 2;
+                border-radius: 20px;
                 &.active {
                     background: #0099cc;
                 }
                 .text {
                     position: absolute;
                     top: 0px;
-                    left: 30px;
+                    left: 31px;
                     width: 90px;
                     height: 36px;
-                    line-height: 36px;
+                    line-height: 25px;
+                    font-size: 9pt;
                     text-align: center;
                 }
                 img {
-                    margin: 5px 0px 5px 4px;
-                    height: 26px;
+                    margin: 4px 0px 0px 15px;
+                    height: 16px;
+                    filter: brightness(0) invert(100%);
                 }
             }
         }

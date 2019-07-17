@@ -22,23 +22,27 @@ define([
             this.onClick = onClick;
         }
 
-        activate() {
+        activate(endPreviewMode) {
             $(`#${rootId}`).addClass('active');
+            $(`#${rootId}`).removeClass('hide');
             const onClick= () => {
                 if(!PreviewModeBackgroundDrawer.isClean()) {
                     PreviewModeBackgroundDrawer.resetCoordinates();
                     this.onClick();
-                    this.deactivate();
                     BeamboxActions.clearCameraCanvas();
                 }
+                endPreviewMode();
+                this.hide();
             }
             $(`#${rootId}`).bind('click', onClick);
         }
 
         deactivate() {
             $(`#${rootId}`).removeClass('active');
-            const onClick= () => {}
-            $(`#${rootId}`).bind('click', onClick);
+        }
+
+        hide() {
+            $(`#${rootId}`).addClass('hide');
         }
         
     };

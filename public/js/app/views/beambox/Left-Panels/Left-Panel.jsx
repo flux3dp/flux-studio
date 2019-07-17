@@ -32,6 +32,7 @@ define([
                 isAdvancedPanelOpen: false
                 // preview button is managed by itself
             };
+            this._setEndPreview = this._setEndPreview.bind(this);
         }
 
         componentDidMount() {
@@ -144,13 +145,25 @@ _
             );
         }
 
+        _setEndPreview(endPreviewFunction) {
+            this.setState({endPreview: endPreviewFunction});
+        }
+
         _renderToolButton(iconName, label, onClick, active) {
             let cx = 'tool-btn';
             if (active) {
                 cx += ' active';
             }
+
+            const endPreviewAndOnClick = () => {
+                if (this.state.endPreview) {
+                    this.state.endPreview();
+                }
+                onClick();
+            }
+
             return (
-                <div className={cx} onClick={onClick}>
+                <div className={cx} onClick={endPreviewAndOnClick}>
                     <img src={`img/left-bar/icon-${iconName}.svg`} />
                 </div>
             );
@@ -159,7 +172,7 @@ _
         render() {
             return (
                 <div className="left-toolbar">
-                    {this._renderToolButton('cursor','Cursor', ()=>{} , true)}
+                    {this._renderToolButton('cursor','Cursor', FnWrapper.useSelectTool, true)}
                     {this._renderToolButton('photo','Photo', FnWrapper.importImage)}
                     {this._renderToolButton('text','Text', FnWrapper.insertText)}
                     {this._renderToolButton('rect','Rectangle', FnWrapper.insertRectangle)}
@@ -167,7 +180,9 @@ _
                     {this._renderToolButton('polygon','polygon', FnWrapper.insertPolygon)}
                     {this._renderToolButton('draw','Pen', FnWrapper.insertPath)}
                     {this._renderToolButton('grid','Grid', FnWrapper.gridArraySelected)}
-                    <PreviewButton />
+                    <PreviewButton 
+                        passEndPreview={this._setEndPreview}
+                    />
                 </div>
             );
         }
