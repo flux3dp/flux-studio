@@ -3269,6 +3269,7 @@ define([
                             // if we clicked on an existing point, then we are done this path, commit it
                             // (i, i+1) are the x,y that were clicked on
                             if (clickOnPoint) {
+                                console.log('hi');
                                 // if clicked on any other point but the first OR
                                 // the first point was clicked on and there are less than 3 points
                                 // then leave the path open
@@ -3367,6 +3368,7 @@ define([
 
                                 // set stretchy line to latest point
                                 stretchy.setAttribute('d', ['M', x, y, x, y].join(' '));
+                                console.log(stretchy);
                                 index = num;
                                 if (subpath) {
                                     index += svgedit.path.path.segs.length;
@@ -7356,6 +7358,8 @@ define([
             }
             call('changed', selectedCopy);
             clearSelection();
+
+            return batchCmd;
         };
 
         // Function: cutSelectedElements
@@ -7822,6 +7826,8 @@ define([
             addToSelection(pastedElements);
             const cmd = canvas.moveSelectedElements(dx, dy, false);
             batchCmd.addSubCommand(cmd);
+            canvas.undoMgr.undoStackPointer -= 1;
+            canvas.undoMgr.undoStack.pop();
             addCommandToHistory(batchCmd);
             if (pastedElements.length > 0) {
                 call('changed', pastedElements);
@@ -8278,6 +8284,90 @@ define([
                 j = j+1;
             }
         };
+
+        this.booleanOperationSelectedElements = function(mode) {
+            let len = selectedElements.length;
+            for (let i = 0; i < selectedElements.length; ++i) {
+                if (!selectedElements[i]) {
+                    len = i;
+                    break;
+                }
+            }
+            if (len < 2) {
+                return;
+            }
+            if (len > 2 && mode === 'diff') {
+                AlertActions.showPopupError('Error', 'Too Many Objects.');
+                return;
+            }
+            let batchCmd = new svgedit.history.BatchCommand(`${mode} Elements`);
+            console.log(selectedElements);
+            // clipper needs integer input so scale up path with a big const.
+            const scale = 100;
+            let solution_paths = [];
+            const modemap = {'intersect': 0, 'union': 1, 'diff': 2, 'xor': 3};
+            const clipType = modemap[mode];
+            const subject_fillType = 1;
+            const clip_fillType = 1;
+            let succeeded = true;
+            for (let i = len - 1; i >= 0; --i) {
+                let clipper = new svgedit.ClipperLib.Clipper();
+                const elem =selectedElements[i];
+                if (!(elem.tagName === 'rect' || elem.tagName === 'path' || elem.tagName === 'polygon' || elem.tagName === 'ellipse')) {
+                    AlertActions.showPopupError('Error', `Not Support Object Type: ${elem.tagName}`);
+                    return;
+                }
+                const dpath = svgedit.utilities.getPathDFromElement(elem);
+                const bbox = svgedit.utilities.getBBox(elem);
+                let rotation = {
+                    angle: svgedit.utilities.getRotationAngle(elem),
+                    cx: bbox.x + bbox.width / 2,
+                    cy: bbox.y + bbox.height / 2
+                };
+                const paths = svgedit.ClipperLib.dPathtoPointPathsAndScale(dpath, rotation, scale);
+                if (i === len - 1) {
+                    solution_paths = paths;
+                } else {
+                    clipper.AddPaths(solution_paths, svgedit.ClipperLib.PolyType.ptSubject, true);
+                    clipper.AddPaths(paths, svgedit.ClipperLib.PolyType.ptClip, true);
+                    succeeded = clipper.Execute(clipType, solution_paths, subject_fillType, clip_fillType);
+                }
+                if (!succeeded) {
+                    break;
+                }
+            }
+
+            if (succeeded) {
+                let d = '';
+                for (let i = 0; i < solution_paths.length; ++i) {
+                    d += 'M';
+                    d += solution_paths[i].map(x => `${x.X / scale},${x.Y / scale}`).join(' L');
+                    d += ' Z'
+                }
+                element = addSvgElementFromJson({
+                    element: 'path',
+                    curStyles: false,
+                    attr: {
+                        id: getNextId(),
+                        d: d,
+                        stroke: '#000',
+                        'fill-opacity': 0,
+                        opacity: cur_shape.opacity
+                    }
+                });
+            } else {
+                console.log('Clipper not succeeded');
+                return;
+            }
+            batchCmd.addSubCommand(new svgedit.history.InsertElementCommand(element));
+            let cmd = this.deleteSelectedElements();
+            batchCmd.addSubCommand(cmd);
+            canvas.undoMgr.undoStackPointer -= 1;
+            canvas.undoMgr.undoStack.pop();
+            addCommandToHistory(batchCmd);
+            this.selectOnly([element]);
+            //console.log(canvas.undoMgr);
+        }
 
         // Function: cloneSelectedElements
         // Create deep DOM copies (clones) of all selected elements and move them slightly

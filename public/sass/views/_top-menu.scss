@@ -7,7 +7,7 @@
     z-index: 1;
     background: #333;
     height: 85px;
-    overflow: hidden;
+    // overflow: hidden;
     -webkit-app-region: drag;
 
     .title {
@@ -26,7 +26,7 @@
         width: calc(100% - 100px);
         overflow-x: scroll;
         &::-webkit-scrollbar { 
-            width: 0 !important 
+            display: none;
         }
         .top-btn-container {
             width: 1000px;
@@ -56,7 +56,7 @@
     
     
     .top-dropdown-control {
-        .arrow-up {
+        .arrowup {
             width: 0; 
             height: 0;
             margin-top: 10px;

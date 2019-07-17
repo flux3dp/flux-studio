@@ -31,6 +31,7 @@ requirejs.config({
         svgcanvas: 'lib/svgeditor/svgcanvas',
         locale: 'lib/svgeditor/locale/locale',
         contextmenu: 'lib/svgeditor/contextmenu',
+        clipper_unminified: 'lib/svgeditor/clipper_unminified',
 
         jqueryUi: 'lib/svgeditor/jquery-ui/jquery-ui-1.8.17.custom.min',
         jpicker: 'lib/svgeditor/jgraduate/jpicker',
@@ -123,8 +124,11 @@ requirejs.config({
         contextmenu: {
             deps: ['locale']
         },
-        jqueryUi: {
+        clipper_unminified: {
             deps: ['contextmenu']
+        },
+        jqueryUi: {
+            deps: ['clipper_unminified']
         },
         jpicker: {
             deps: ['jqueryUi']
@@ -165,6 +169,7 @@ define([
     'svgEditor',
     'locale',
     'contextmenu',
+    'clipper_unminified',
 
     'jqueryUi',
     'jpicker',

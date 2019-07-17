@@ -198,13 +198,23 @@ define([
         },
 
         //top menu
-
         groupSelected: function() {
             svgCanvas.groupSelectedElements();
         },
-
         ungroupSelected: function() {
             svgCanvas.ungroupSelectedElement();
+        },
+        booleanUnion: function() {
+            svgCanvas.booleanOperationSelectedElements('union');
+        },
+        booleanDifference: function() {
+            svgCanvas.booleanOperationSelectedElements('diff');
+        },
+        booleanIntersect: function() {
+            svgCanvas.booleanOperationSelectedElements('intersect');
+        },
+        booleanXor: function() {
+            svgCanvas.booleanOperationSelectedElements('xor');
         },
 
         //align toolbox

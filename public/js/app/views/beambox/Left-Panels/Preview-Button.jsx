@@ -1,4 +1,5 @@
 define([
+    'jquery',
     'react',
     'reactDOM',
     'jsx!widgets/Modal',
@@ -18,9 +19,11 @@ define([
     'app/stores/beambox-store',
     'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
     'plugins/classnames/index',
+    'helpers/shortcuts',
     'helpers/api/config',
     'helpers/i18n',
 ], function(
+    $,
     React,
     ReactDOM,
     Modal,
@@ -40,6 +43,7 @@ define([
     BeamboxStore,
     ImageTracePanelController,
     classNames,
+    shortcuts,
     ConfigHelper,
     i18n
 ) {
@@ -47,8 +51,8 @@ define([
     const LANG = i18n.lang.beambox.left_panel;
 
     return class PreviewButton extends React.Component {
-        constructor() {
-            super();
+        constructor(props) {
+            super(props);
             this.state = {
                 isPreviewMode: false,
                 isImageTraceMode: false,
@@ -104,12 +108,10 @@ define([
         }
 
         endDrawing() {
-            ClearPreviewGraffitiButton.show();
             this.setState({ isDrawing: false, isDrawn: true });
         }
 
         startDrawing() {
-            ClearPreviewGraffitiButton.hide();
             this.setState({ isDrawing: true, isDrawn: false });
         }
 
@@ -141,6 +143,8 @@ define([
                 const getDeviceToUse = async () => {
                     const d = $.Deferred();
                     const root = document.getElementById('printer-selector-placeholder');
+                    const button = $('.preview-btn');
+                    const top = button.position().top - button.height() / 2;
                     const printerSelector = (
                         <Modal onClose={d.reject}>
                             <PrinterSelector
@@ -150,8 +154,8 @@ define([
                                 onClose={d.reject}
                                 onGettingPrinter={device => d.resolve(device)}
                                 WindowStyle={{
-                                    top: 'calc(50% - 180px)',
-                                    left: '173px'
+                                    top: `${top}px`,
+                                    left: '80px'
                                 }}
                                 arrowDirection='left'
                             />
@@ -193,6 +197,7 @@ define([
 
                 // MAIN PROCESS HERE
 
+                FnWrapper.useSelectTool();
                 if (!isAlreadyRemindUserToCalibrateCamera()) {
                     remindCalibrateCamera();
                     return;
@@ -211,18 +216,12 @@ define([
                 }
 
                 ProgressActions.close();
-                startPreviewMode(device);
+                await startPreviewMode(device);
+                this.props.passEndPreview(this.endPreviewMode.bind(this));
+                shortcuts.on(['esc'], this.endPreviewMode.bind(this));
+                ClearPreviewGraffitiButton.activate(this.endPreviewMode.bind(this));
             };
 
-            const endPreviewMode = () => {
-                try {
-                    PreviewModeController.end();
-                } catch (error) {
-                    console.log(error);
-                } finally {
-                    this.resetPreviewButton()
-                }
-            };
 
             FnWrapper.clearSelection();
             BeamboxActions.closeInsertObjectSubmenu();
@@ -231,7 +230,7 @@ define([
             if(!this.state.isPreviewMode) {
                 tryToStartPreviewMode();
             } else {
-                endPreviewMode();
+                this.endPreviewMode();
             }
         }
 
@@ -251,6 +250,24 @@ define([
             });
         }
 
+        endPreviewMode() {
+            try {
+                if (PreviewModeController.isPreviewMode()) {
+                    PreviewModeController.end();
+                }
+            } catch (error) {
+                console.log(error);
+            } finally {
+                ClearPreviewGraffitiButton.deactivate();
+                if (PreviewModeBackgroundDrawer.isClean()) {
+                    ClearPreviewGraffitiButton.hide();
+                }
+                this.resetPreviewButton();
+                this.props.passEndPreview(()=>{});
+                shortcuts.off(['esc']);
+            }
+        }
+
         render() {
             const {
                 isPreviewMode,
@@ -258,24 +275,30 @@ define([
                 isDrawing,
                 isDrawn
             } = this.state;
-            const ImageTrace = (
-                PreviewModeBackgroundDrawer.isClean() || isDrawing ?
-                null :
-                <ImageTraceButton
-                    onClick={() => this.handleImageTraceClick()}
-                />
-            );
-
+            const imageTraceActive = !(PreviewModeBackgroundDrawer.isClean() || isDrawing);
+            const imageTraceShow = (isPreviewMode || !PreviewModeBackgroundDrawer.isClean())
+            const ImageTrace = (<ImageTraceButton
+                onClick={imageTraceActive ? () => this.handleImageTraceClick() : () => {}}
+                active={imageTraceActive}
+                show={imageTraceShow}
+                />)
             return (
-                <div>
+                <div className='preview'>
                     <div
-                        className={classNames('option', 'preview-btn', {'preview-mode-on': isPreviewMode})}
+                        className={classNames('tool-btn', 'preview-btn', {'active': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
                     >
-                        {isPreviewMode ? LANG.end_preview : LANG.preview}
+                        <img src={'img/left-bar/icon-camera.svg'} draggable="false"/>
                     </div>
-                    <span id='clear-preview-graffiti-button-placeholder' />
                     <span id='printer-selector-placeholder' />
+                    <div
+                        id='clear-preview-graffiti-button-placeholder'
+                        className={'hide'}
+                        onClick={this.endPreviewMode.bind(this)}
+                    >
+                        <img src={'img/left-bar/icon-camera.svg'}/>
+                        <div className={'text'}>{LANG.preview} X</div>
+                    </div>
                     {ImageTrace}
                 </div>
             );

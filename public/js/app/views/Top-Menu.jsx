@@ -531,8 +531,31 @@ define([
             },
 
             _handleSelectDevice: async function (device, e) {
+                const self = this;
+                AlertStore.removeCancelListener(this._toggleDeviceListBind);
+                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
+                DeviceMaster.selectDevice(device).then(function (status) {
+                    if (status === DeviceConstants.CONNECTED) {
+                        ProgressActions.close();
+                        self.test();
+                        self._onSuccessConnected(device, e);                 
+                    }
+                    else if (status === DeviceConstants.TIMEOUT) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError(_id, lang.message.connectionTimeout);
+                    }
+                })
+                    .fail(function (status) {
+                        ProgressActions.close();
+                        AlertActions.showPopupError('fatal-occurred', status);
+                    });
+                this._toggleDeviceList(false);
+
+            },
+
+            _onSuccessConnected: async function(device, e) {
                 //export fcode
-                if (selected_item === 'export_fcode') {
+                if (device === 'export_fcode') {
                     BottomRightFuncs.exportFcode();
                     this.setState({ showDeviceList: false});
                     return;
@@ -546,29 +569,9 @@ define([
                     this.setState({ showDeviceList: false });
                     return;
                 } else {
-                    // Successfully selected device
                     this.setState({ showDeviceList: false });
                     BottomRightFuncs.uploadFcode(device);   
                 }
-
-                AlertStore.removeCancelListener(this._toggleDeviceListBind);
-                ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
-                DeviceMaster.selectDevice(device).then(function (status) {
-                    if (status === DeviceConstants.CONNECTED) {
-                        ProgressActions.close();
-                        GlobalActions.showMonitor(device);                     
-                    }
-                    else if (status === DeviceConstants.TIMEOUT) {
-                        ProgressActions.close();
-                        AlertActions.showPopupError(_id, lang.message.connectionTimeout);
-                    }
-                })
-                    .fail(function (status) {
-                        ProgressActions.close();
-                        AlertActions.showPopupError('fatal-occurred', status);
-                    });
-
-                this._toggleDeviceList(false);
             },
 
             _handleMonitorClose: function () {
@@ -656,12 +659,12 @@ define([
 
                 return (
                     <div className="top-btn top-dropdown-control">
-                        <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
+                        <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${id}.png`}} />
                         <div className="btn-label">
                             {label}
                         </div>
                         <div className="dropdown-content">
-                            <div className="arrow-up "></div>
+                            <div className="arrowup "></div>
                             <div className="dropdown-block">
                                 {items}
                             </div>
@@ -718,9 +721,9 @@ define([
                                 </div>
                                 <div className="top-controls clip-controls">
                                     {this._renderTopBtn('union', lang.topbar.union, () => {FnWrapper.booleanUnion();})}
-                                    {this._renderTopBtn('subtract', lang.topbar.subtract)}
-                                    {this._renderTopBtn('intersect', lang.topbar.intersect)}
-                                    {this._renderTopBtn('difference', lang.topbar.difference)}
+                                    {this._renderTopBtn('subtract', lang.topbar.subtract, () => {FnWrapper.booleanDifference();})}
+                                    {this._renderTopBtn('intersect', lang.topbar.intersect, () => {FnWrapper.booleanIntersect();})}
+                                    {this._renderTopBtn('difference', lang.topbar.difference, () => {FnWrapper.booleanXor();})}
                                 </div>
 
                                 <div className="top-controls flip-controls">

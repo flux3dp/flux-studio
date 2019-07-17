@@ -10,6 +10,7 @@ define([
     'app/actions/beambox/preview-mode-background-drawer',
     'app/actions/beambox/preview-mode-controller',
     'app/stores/beambox-store',
+    'plugins/classnames/index',
     'helpers/api/image-tracer',
 ], function(
     $,
@@ -21,6 +22,7 @@ define([
     PreviewModeBackgroundDrawer,
     PreviewModeController,
     BeamboxStore,
+    classNames,
     ImageTracerApi
 ) {
     const LANG = i18n.lang.beambox.left_panel;
@@ -47,11 +49,14 @@ define([
         }
 
         render() {
-            const button = PreviewModeBackgroundDrawer.isClean() ? null : this._renderButton();
-
+            const active = this.props.active && !(PreviewModeBackgroundDrawer.isClean());
             return (
-                <div>
-                    {button}
+                <div
+                    id='image-trace-button'
+                    className={classNames({'active': active}, {'hide': !this.props.show})}
+                    onClick={() => this._handleClick()}
+                >
+                    <div className={'text'}>{LANG.image_trace}</div>
                 </div>
             );
         }

@@ -593,7 +593,7 @@ svgedit.utilities.getPathDFromElement = function(elem) {
 			d = 'M' + elem.getAttribute('points');
 			break;
 		case 'polygon':
-			d = 'M' + elem.getAttribute('points') + ' Z';
+			d = 'M' + elem.getAttribute('points').replace(/ /g, ' L') + ' Z';
 			break;
 		case 'rect':
 			var r = $(elem).attr(['rx', 'ry']);
