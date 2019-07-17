@@ -48,8 +48,6 @@ define([
 
         render() {
             const active = this.props.active && !(PreviewModeBackgroundDrawer.isClean());
-            //const button = PreviewModeBackgroundDrawer.isClean() ? null : this._renderButton();
-            console.log(active)
             return (
                 <div
                     id='image-trace-button'

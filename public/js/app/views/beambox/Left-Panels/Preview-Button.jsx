@@ -49,8 +49,8 @@ define([
     const LANG = i18n.lang.beambox.left_panel;
 
     return class PreviewButton extends React.Component {
-        constructor() {
-            super();
+        constructor(props) {
+            super(props);
             this.state = {
                 isPreviewMode: false,
                 isImageTraceMode: false,
@@ -263,7 +263,6 @@ define([
                 isDrawn
             } = this.state;
             const active = !(PreviewModeBackgroundDrawer.isClean() || isDrawing);
-            console.log(active);
             const ImageTrace = (<ImageTraceButton
                 onClick={active ? () => this.handleImageTraceClick() : () => {}}
                 active={active}
