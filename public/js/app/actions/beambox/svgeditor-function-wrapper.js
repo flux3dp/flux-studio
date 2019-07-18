@@ -286,6 +286,9 @@ define([
         gridArraySelected: function() {
             $('#tool_grid').mouseup();
         },
+        enterPreviewMode: function() {
+            svgCanvas.setMode('preview');
+        },
         saveFile: function() {
             const output = svgCanvas.getSvgString();
             const defaultFileName = svgCanvas.getLatestImportFileName() || 'untitled';
