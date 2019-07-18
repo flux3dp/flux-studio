@@ -8384,13 +8384,18 @@ define([
             let batchCmd = new svgedit.history.BatchCommand('Flip Elements');
             for (let i = 0; i < len; ++i) {
                 elem = selectedElements[i];
-                const bbox = elem.getBBox();
+                let bbox;
+                if (elem.tagName !== 'use') {
+                    bbox = elem.getBBox();
+                } else {
+                    bbox = this.getSvgRealLocation(elem);
+                }
                 const cx = bbox.x + bbox.width / 2;
                 const cy = bbox.y + bbox.height / 2;
                 let sx = horizon;
                 let sy = vertical;
                 startTransform = elem.getAttribute('transform'); //???maybe non need
-                
+
                 const angle = svgedit.utilities.getRotationAngle(elem);
                 canvas.undoMgr.beginUndoableChange('transform', [elem]);
                 canvas.setRotationAngle(-angle, true, elem);
@@ -8398,7 +8403,6 @@ define([
                 batchCmd.addSubCommand(cmd);
 
                 const tlist = svgedit.transformlist.getTransformList(elem);
-
                 let translateOrigin = svgroot.createSVGTransform();
                 let scale = svgroot.createSVGTransform();
                 let translateBack = svgroot.createSVGTransform();
@@ -8406,7 +8410,6 @@ define([
                 translateOrigin.setTranslate(-cx, -cy);
                 scale.setScale(sx, sy);
                 translateBack.setTranslate(cx, cy);
-
                 const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
                 if (hasMatrix) {
                     const pos = angle ? 1 : 0;
@@ -8418,7 +8421,6 @@ define([
                     tlist.appendItem(scale);
                     tlist.appendItem(translateOrigin);
                 }
-    
                 selectorManager.requestSelector(elem).resize();
                 selectorManager.requestSelector(elem).showGrips(true);
                 cmd = svgedit.recalculate.recalculateDimensions(elem);
@@ -8426,7 +8428,6 @@ define([
                 window.updateContextPanel();
             }
             addCommandToHistory(batchCmd);
-            console.log(canvas.undoMgr)
         }
 
         // Function: cloneSelectedElements
@@ -8792,48 +8793,21 @@ define([
 
             const matr = matrix ? matrix[0].substring(7, matrix[0].length - 1) : '1,0,0,1,0,0';
             [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
+            console.log(obj, matr);
+            let x = a * obj.x + c * obj.y + e + a * elemX;
+            let y = b * obj.x + d * obj.y + f + d * elemY;
 
-            const x = a * obj.x + c * obj.y + e + a * elemX;
-            const y = b * obj.x + d * obj.y + f + d * elemY;
-
-            const width = obj.width * a;
-            const height = obj.height * d;
-
-            return {
-                x: x,
-                y: y,
-                width: width,
-                height: height
-            };
-        };
-
-        this.getSvgRealLocation = function (elem) {
-            if (elem.tagName === 'path' || elem.tagName === 'polygon') {
-                return elem.getBBox();
+            let width = obj.width * a;
+            let height = obj.height * d;
+            
+            if (width < 0) {
+                x += width;
+                width *= -1;
             }
-            const ts = $(elem).attr('transform') || '';
-            const xform = $(elem).attr('data-xform');
-            const elemX = parseFloat($(elem).attr('x') || '0');
-            const elemY = parseFloat($(elem).attr('y') || '0');
-
-            const obj = {};
-            xform.split(' ').forEach((pair) => {
-                [key, value] = pair.split('=');
-                if (value === undefined) {
-                    return;
-                };
-                obj[key] = parseFloat(value);
-            });
-            const matrix = ts.match(/matrix\(.*?\)/g);
-
-            const matr = matrix ? matrix[0].substring(7, matrix[0].length - 1) : '1,0,0,1,0,0';
-            [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
-
-            const x = a * obj.x + c * obj.y + e + a * elemX;
-            const y = b * obj.x + d * obj.y + f + d * elemY;
-
-            const width = obj.width * a;
-            const height = obj.height * d;
+            if (height < 0) {
+                y += height;
+                height *= -1;
+            }
 
             return {
                 x: x,
