@@ -407,7 +407,7 @@ define([
                     hasStop = self.state.progress.hasStop;
                 }
                 else {
-                    hasStop = ('boolean' === typeof payload.hasStop ? payload.hasStop : true);
+                    hasStop = ('boolean' === typeof payload.hasStop ? payload.hasStop : false);
                 }
                 this.setState({
                     progress: {
@@ -623,6 +623,7 @@ define([
             _renderCameraCalibration: function() {
                 return (
                     <CameraCalibration
+                        model="beambox"
                         device={this.state.cameraCalibration.device}
                         onClose={()=>{
                             this.setState({

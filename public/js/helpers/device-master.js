@@ -548,12 +548,26 @@ define([
                     d.reject('UPLOAD_FAILED'); // Error while uploading task
                 })
                 .then(() => {
-                    ProgressActions.open(ProgressConstants.NONSTOP, lang.camera_calibration.drawing_calibration_image);
+                    ProgressActions.open(ProgressConstants.STEPPING, lang.camera_calibration.drawing_calibration_image, false);
+                    let taskTotalSecs = 30;
+                    let elapsedSecs = 0;
+                    let progressUpdateTimer = setInterval(() => {
+                        elapsedSecs += 0.1;
+                        if (elapsedSecs > taskTotalSecs) {
+                            clearInterval(progressUpdateTimer);
+                            return;
+                        }
+                        ProgressActions.updating(lang.camera_calibration.drawing_calibration_image, (elapsedSecs / taskTotalSecs) * 100);
+                    }, 100);
                     waitTillCompleted()
                         .fail((err) => {
+                            clearInterval(progressUpdateTimer);
+                            ProgressActions.close();
                             d.reject(err); // Error while running test
                         })
                         .then(() => {
+                            clearInterval(progressUpdateTimer);
+                            ProgressActions.close();
                             d.resolve();
                         });
 

@@ -44,7 +44,7 @@ define([
 
         getInitialState: function() {
             return {
-                displayValue:   this.getTransformedValue(Number(this.props.defaultValue)),
+                displayValue:   this.getTransformedValue(this._validateValue(this.props.defaultValue)),
                 savedValue:     Number(this.props.defaultValue).toFixed(this.props.decimal)
             };
         },

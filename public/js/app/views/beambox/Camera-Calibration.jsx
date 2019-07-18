@@ -7,6 +7,7 @@ define([
     'app/actions/beambox/beambox-preference',
     'jsx!widgets/Modal',
     'jsx!widgets/Alert',
+    'jsx!widgets/Unit-Input-v2',
     'helpers/device-master',
     'helpers/version-checker',
     'app/constants/device-constants',
@@ -18,6 +19,7 @@ define([
     'helpers/api/camera-calibration',
     'helpers/sprintf',
     'app/actions/beambox/constant',
+    'helpers/device-error-handler'
 ], function(
     $,
     React,
@@ -26,6 +28,7 @@ define([
     BeamboxPreference,
     Modal,
     Alert,
+    UnitInput,
     DeviceMaster,
     VersionChecker,
     DeviceConstants,
@@ -36,7 +39,8 @@ define([
     PreviewModeController,
     CameraCalibration,
     sprintf,
-    Constant
+    Constant,
+    DeviceErrorHandler
 ) {
     const LANG = i18n.lang.camera_calibration;
 
@@ -56,6 +60,7 @@ define([
 
             this.state = {
                 currentStep: STEP_REFOCUS,
+                currentOffset: {},
                 imgBlobUrl: ''
             };
 
@@ -81,12 +86,17 @@ define([
             });
         }
 
+        updateOffsetData(data) {
+            this.setState(data);
+        }
+
         render() {
             const stepsMap = {
                 [STEP_REFOCUS]:
                     <StepRefocus
                         gotoNextStep={this.updateCurrentStep}
                         onClose={this.onClose}
+                        model={this.props.model}
                     />,
                 [STEP_BEFORE_CUT]:
                     <StepBeforeCut
@@ -94,9 +104,12 @@ define([
                         onClose={this.onClose}
                         device={this.props.device}
                         updateImgBlobUrl={this.updateImgBlobUrl}
+                        model={this.props.model}
+                        updateOffsetData={this.updateOffsetData.bind(this)}
                     />,
                 [STEP_BEFORE_ANALYZE_PICTURE]:
                     <StepBeforeAnalyzePicture
+                        currentOffset={this.state.currentOffset}
                         gotoNextStep={this.updateCurrentStep}
                         onClose={this.onClose}
                         imgBlobUrl={this.state.imgBlobUrl}
@@ -117,10 +130,10 @@ define([
         }
     };
 
-    const StepRefocus = ({gotoNextStep, onClose}) => (
+    const StepRefocus = ({gotoNextStep, onClose, model}) => (
         <Alert
             caption={LANG.camera_calibration}
-            message={LANG.please_refocus}
+            message={LANG.please_refocus[model]}
             buttons={
                 [{
                     label: LANG.next,
@@ -136,12 +149,13 @@ define([
         />
     );
 
-    const StepBeforeCut = ({device, updateImgBlobUrl, gotoNextStep, onClose}) => {
-        const cutThenCapture = async () => {
+    const StepBeforeCut = ({device, updateImgBlobUrl, gotoNextStep, onClose, model, updateOffsetData}) => {
+        const cutThenCapture = async function(updateOffsetData) {
             await _doCuttingTask();
-            await _doCaptureTask();
+            let blobUrl = await _doCaptureTask();
+            await _doGetOffsetFromPicture(blobUrl, updateOffsetData);
         };
-        const _doCuttingTask = async () => {
+        const _doCuttingTask = async function() {
             await DeviceMaster.select(device);
             const laserPower = Number((await DeviceMaster.getLaserPower()).value);
 
@@ -157,6 +171,7 @@ define([
             }
         };
         const _doCaptureTask = async () => {
+            let blobUrl;
             try {
                 await PreviewModeController.start(device, ()=>{console.log('camera fail. stop preview mode');});
 
@@ -164,7 +179,7 @@ define([
 
                 const movementX = Constant.camera.calibrationPicture.centerX - Constant.camera.offsetX_ideal;
                 const movementY = Constant.camera.calibrationPicture.centerY - Constant.camera.offsetY_ideal;
-                const blobUrl = await PreviewModeController.takePictureAfterMoveTo(movementX, movementY);
+                blobUrl = await PreviewModeController.takePictureAfterMoveTo(movementX, movementY);
                 cameraOffset = PreviewModeController.getCameraOffset();
                 updateImgBlobUrl(blobUrl);
             } catch (error) {
@@ -173,24 +188,25 @@ define([
                 ProgressActions.close();
                 PreviewModeController.end();
             }
+            return blobUrl;
         };
-
         return (
             <Alert
                 caption={LANG.camera_calibration}
-                message={LANG.please_place_paper}
+                message={LANG.please_place_paper[model]}
                 buttons={
                     [{
                         label: LANG.start_engrave,
                         className: 'btn-default btn-alone-right',
                         onClick: async ()=>{
                             try {
-                                await cutThenCapture();
+                                console.log("Getting all", updateOffsetData);
+                                await cutThenCapture(updateOffsetData);
                                 gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
                             } catch (error) {
                                 console.log(error);
                                 ProgressActions.close();
-                                AlertActions.showPopupRetry('menu-item', error.message || 'Fail to cut and capture');
+                                AlertActions.showPopupRetry('menu-item', error.message || DeviceErrorHandler.translate(error) || 'Fail to cut and capture');
                             }
                         }
                     },
@@ -204,121 +220,223 @@ define([
         );
     };
 
-    const StepBeforeAnalyzePicture = ({imgBlobUrl, gotoNextStep, onClose}) => {
-        const sendPictureThenSetConfig = async () => {
-            const resp = await _doSendPictureTask();
+    const sendPictureThenSetConfig = async (imgBlobUrl) => {
+        const result = await _doSendPictureTask(imgBlobUrl);
+        if (result) {
+            await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
+        } else {
+            throw new Error(LANG.analyze_result_fail);
+        }
+    };
 
-            switch (resp.status) {
-                case 'ok':
-                    const result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.width, resp.height);
-
-                    if (result) {
-                        await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
-                    } else {
-                        throw new Error(LANG.analyze_result_fail);
-                    }
-
-                    break;
-                case 'fail':
-                    throw new Error(LANG.analyze_result_fail);
-                    break;
-                case 'none':
-                    throw new Error(LANG.no_lines_detected);
-                default:
-                    break;
-            }
-        };
-
-        const _doSendPictureTask = async () => {
-            const d = $.Deferred();
-            fetch(imgBlobUrl)
-                .then(res => res.blob())
-                .then((blob) => {
-                    var fileReader = new FileReader();
-                    fileReader.onloadend = (e) => {
-                        cameraCalibrationWebSocket.upload(e.target.result)
-                            .done((resp)=>{
-                                d.resolve(resp);
-                            })
-                            .fail((resp)=>{
-                                d.reject(resp.toString());
-                            });
-                    };
-                    fileReader.readAsArrayBuffer(blob);
-                })
-                .catch((err) => {
-                    d.reject(err);
-                });
-            return await d.promise();
-        };
-
-        const _doAnalyzeResult = async (x, y, angle, squareWidth, squareHeight) => {
-            const blobImgSize = await new Promise(resolve => {
-                const img = new Image();
-                img.src = imgBlobUrl;
-                img.onload = () => {
-                    resolve({
-                        width:img.width,
-                        height: img.height
-                    });
+    const _doSendPictureTask = async (url) => {
+        const d = $.Deferred();
+        if (url) { imgBlobUrl = url; }
+        fetch(imgBlobUrl)
+            .then(res => res.blob())
+            .then((blob) => {
+                var fileReader = new FileReader();
+                fileReader.onloadend = (e) => {
+                    cameraCalibrationWebSocket.upload(e.target.result)
+                        .done((resp)=>{
+                            d.resolve(resp);
+                        })
+                        .fail((resp)=>{
+                            d.reject(resp.toString());
+                        });
                 };
+                fileReader.readAsArrayBuffer(blob);
+            })
+            .catch((err) => {
+                d.reject(err);
             });
 
-            const offsetX_ideal = Constant.camera.offsetX_ideal; // mm
-            const offsetY_ideal = Constant.camera.offsetY_ideal; // mm
-            const scaleRatio_ideal = Constant.camera.scaleRatio_ideal;
-            const square_size = Constant.camera.calibrationPicture.size; // mm
+        let resp = await d.promise();
 
-            const scaleRatioX = (square_size * Constant.dpmm) / squareWidth;
-            const scaleRatioY = (square_size * Constant.dpmm) / squareHeight;
-            const deviationX = x - blobImgSize.width/2; // pixel
-            const deviationY = y - blobImgSize.height/2; // pixel
+        let result = null;;
+        switch (resp.status) {
+            case 'ok':
+                result = await _doAnalyzeResult(resp.x, resp.y, resp.angle, resp.width, resp.height);
+                break;
+            case 'fail':
+            case 'none':
+            default:
+                break;
+        }
+        return result;
+    };
 
-            const offsetX = -deviationX * scaleRatioX / Constant.dpmm + offsetX_ideal;
-            const offsetY = -deviationY * scaleRatioY / Constant.dpmm + offsetY_ideal;
-
-            if ((0.8 > scaleRatioX/scaleRatio_ideal) || (scaleRatioX/scaleRatio_ideal > 1.2)) {
-                return false;
-            }
-            if ((0.8 > scaleRatioY/scaleRatio_ideal) || (scaleRatioY/scaleRatio_ideal > 1.2)) {
-                return false;
-            }
-            if ((Math.abs(deviationX) > 400) || (Math.abs(deviationY) > 400)) {
-                return false;
-            }
-            if (Math.abs(angle) > 10*Math.PI/180) {
-                return false;
-            }
-            return {
-                X: offsetX,
-                Y: offsetY,
-                R: -angle,
-                SX: scaleRatioX,
-                SY: scaleRatioY
+    const _doAnalyzeResult = async (x, y, angle, squareWidth, squareHeight) => {
+        const blobImgSize = await new Promise(resolve => {
+            const img = new Image();
+            img.src = imgBlobUrl;
+            img.onload = () => {
+                console.log("Blob size", img.width, img.height);
+                resolve({
+                    width:img.width,
+                    height: img.height
+                });
             };
+        });
+
+        const offsetX_ideal = Constant.camera.offsetX_ideal; // mm
+        const offsetY_ideal = Constant.camera.offsetY_ideal; // mm
+        const scaleRatio_ideal = Constant.camera.scaleRatio_ideal;
+        const square_size = Constant.camera.calibrationPicture.size; // mm
+
+        const scaleRatioX = (square_size * Constant.dpmm) / squareWidth;
+        const scaleRatioY = (square_size * Constant.dpmm) / squareHeight;
+        const deviationX = x - blobImgSize.width/2; // pixel
+        const deviationY = y - blobImgSize.height/2; // pixel
+
+        const offsetX = -deviationX * scaleRatioX / Constant.dpmm + offsetX_ideal; //mm
+        const offsetY = -deviationY * scaleRatioY / Constant.dpmm + offsetY_ideal; //mm
+
+        if ((0.8 > scaleRatioX/scaleRatio_ideal) || (scaleRatioX/scaleRatio_ideal > 1.2)) {
+            return false;
+        }
+        if ((0.8 > scaleRatioY/scaleRatio_ideal) || (scaleRatioY/scaleRatio_ideal > 1.2)) {
+            return false;
+        }
+        if ((Math.abs(deviationX) > 400) || (Math.abs(deviationY) > 400)) {
+            return false;
+        }
+        if (Math.abs(angle) > 10*Math.PI/180) {
+            return false;
+        }
+        return {
+            X: offsetX,
+            Y: offsetY,
+            R: -angle,
+            SX: scaleRatioX,
+            SY: scaleRatioY
+        };
+    };
+
+    const _doGetOffsetFromPicture = async function(imgBlobUrl, updateOffset) {
+        let sdata = await _doSendPictureTask(imgBlobUrl);
+        if (sdata == null) {
+            sdata = {
+                X: 20,
+                Y: 30,
+                R: 0,
+                SX: 1.625,
+                SY: 1.625
+            };
+        }
+        updateOffset({currentOffset: sdata});
+    };
+
+    const _doSetConfigTask = async (X, Y, R, SX, SY) => {
+        const deviceInfo = await DeviceMaster.getDeviceInfo();
+        const vc = VersionChecker(deviceInfo.version);
+        if(vc.meetRequirement('BEAMBOX_CAMERA_CALIBRATION_XY_RATIO')) {
+            await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${(SX+SY)/2} SX:${SX} SY:${SY}`);
+        } else {
+            await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${(SX+SY)/2}`);
+        }
+    };
+
+    const StepBeforeAnalyzePicture = ({currentOffset, imgBlobUrl, gotoNextStep, onClose}) => {
+        const imageScale = 200 / 280;
+        const mmToImage = 10 * imageScale;
+        let imgBackground = {
+            background: `url(${imgBlobUrl})`
+        };
+        let squareStyle = {
+            width: 25 * mmToImage / currentOffset.SX, //px
+            height: 25 * mmToImage / currentOffset.SY //px
         };
 
-        const _doSetConfigTask = async (X, Y, R, SX, SY) => {
-            const deviceInfo = await DeviceMaster.getDeviceInfo();
-            const vc = VersionChecker(deviceInfo.version);
-            if(vc.meetRequirement('BEAMBOX_CAMERA_CALIBRATION_XY_RATIO')) {
-                await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${(SX+SY)/2} SX:${SX} SY:${SY}`);
-            } else {
-                await DeviceMaster.setDeviceSetting('camera_offset', `Y:${Y} X:${X} R:${R} S:${(SX+SY)/2}`);
-            }
+        squareStyle.left = 100 - squareStyle.width / 2 - (currentOffset.X - Constant.camera.offsetX_ideal) * mmToImage / currentOffset.SX;
+        squareStyle.top = 100 - squareStyle.height / 2 - (currentOffset.Y - Constant.camera.offsetY_ideal) * mmToImage / currentOffset.SY;
+        squareStyle.transform = `rotate(${-currentOffset.R * 180 / Math.PI}deg)`;
+        console.log('SquareStyle', squareStyle);
+
+        let handleValueChange = function (key, val) {
+            console.log('Key', key , '=', val);
+            currentOffset[key] = val;
         };
+        let manual_calibration = (
+            <div>
+                <div className="img-center" style={imgBackground}>
+                    <div className="virtual-square" style={squareStyle} />
+                </div>
+                <div className="controls">
+                    <div className="control">
+                        <label>水平位移</label>
+                        <UnitInput
+                            min={-50}
+                            max={50}
+                            unit="mm"
+                            defaultValue={currentOffset.X - 15}
+                            getValue={(val) => handleValueChange('X', val + 15)}
+                            decimal={3}
+                        />
+                    </div>
+
+                    <div className="control">
+                        <label>垂直位移</label>
+                        <UnitInput
+                            min={-50}
+                            max={50}
+                            unit="mm"
+                            defaultValue={currentOffset.Y - 30}
+                            getValue={(val) => handleValueChange('Y', val + 35)}
+                            decimal={3}
+                        />
+                    </div>
+
+                    <div className="control">
+                        <label>旋轉角度</label>
+                        <UnitInput
+                            min={-3.14}
+                            max={3.14}
+                            unit="deg"
+                            defaultValue={currentOffset.R * 180 / Math.PI}
+                            getValue={(val) => handleValueChange('R', val * Math.PI / 180)}
+                            decimal={3}
+                        />
+                    </div>
+
+                    <div className="control">
+                        <label>水平比例</label>
+                        <UnitInput
+                            min={30}
+                            max={250}
+                            unit="%"
+                            defaultValue={100 * currentOffset.SX / 1.625}
+                            getValue={(val) => handleValueChange('SX', val * 1.625 / 100)}
+                            decimal={2}
+                        />
+                    </div>
+
+                    <div className="control">
+                        <label>垂直比例</label>
+                        <UnitInput
+                            min={30}
+                            max={250}
+                            unit="%"
+                            defaultValue={100 * currentOffset.SY / 1.625}
+                            getValue={(val) => handleValueChange('SY', val * 1.625 / 100)}
+                            decimal={2}
+                        />
+                    </div>
+                </div>
+            </div>
+        );
 
         return (
             <Alert
                 caption={LANG.camera_calibration}
-                message={sprintf(LANG.please_confirm_image, imgBlobUrl)}
+                message={manual_calibration}
                 buttons={
                     [{
                         label: LANG.next,
                         className: 'btn-default btn-alone-right-1',
                         onClick: async () => {
                             try {
-                                await sendPictureThenSetConfig();
+                                await sendPictureThenSetConfig(imgBlobUrl);
                                 gotoNextStep(STEP_FINISH);
                             } catch (error) {
                                 console.log(error);

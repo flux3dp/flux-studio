@@ -5627,7 +5627,11 @@ define([
             let drawing = getCurrentDrawing();
             let new_layer = drawing.createLayer(name, historyRecordingService(hrService));
             if (drawing.layer_map[name]) {
-                drawing.layer_map[name].setColor(getRandomLayerColor());
+                if (name && name.indexOf('#') === 0) {
+                    drawing.layer_map[name].setColor(name);
+                } else {
+                    drawing.layer_map[name].setColor(getRandomLayerColor());
+                }
             }
             clearSelection();
             call('changed', [new_layer]);

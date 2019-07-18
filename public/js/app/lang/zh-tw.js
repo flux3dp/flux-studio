@@ -25,7 +25,7 @@ define(function() {
             difference: '相異',
             hflip: '水平翻轉',
             vflip: '垂直翻轉',
-            export: '匯出'
+            export: 'GO'
         },
         support: {
             no_webgl: '您的系統不支援 WebGL，建議您使用其他電腦開啟 Beam Studio',
@@ -1535,14 +1535,26 @@ define(function() {
             back: '上一步',
             finish: '完成',
             please_goto_beambox_first: '請先選擇 Beambox 功能，再進行校正',
-            please_place_paper: '請將乾淨 A4 白紙放在工作區域的左上角',
-            please_refocus: '請旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
+            please_place_paper: {
+                beambox: '請將乾淨 A4 白紙放在工作區域的左上角',
+                beamo: '請將乾淨 A4 白紙放在工作區域的左上角',
+                borderless: {
+                    beamo: '請將乾淨 A4 白紙放在工作區域的左上角',
+                }
+            },
+            please_refocus: {
+                beambox: '請旋轉升降平台旋鈕，直到輕觸焦距螺絲或焦距尺，完成對焦',
+                beamo: '請轉開焦距固定環，調整雷射頭至平台輕觸焦距尺，完成對焦',
+                borderless: {
+                    beamo: '請轉開焦距固定環，調整雷射頭至雕刻平面輕觸焦距尺，完成對焦',
+                },
+            },
             taking_picture: '擷取圖片中...',
             start_engrave: '開始繪製校正圖片',
             analyze_result_fail: '校正失敗<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             no_lines_detected: '無法從校正圖片上偵測到線段<br/>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦',
             drawing_calibration_image: '繪製校正圖片中...',
-            please_confirm_image: '<div><img class="img-center" src=%s /></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦。',
+            please_confirm_image: '<div><div class="img-center" style="background:url(%s)"></div>請確認:<br/>1. 校正圖片完整畫在 A4 紙上<br/>2. 已旋轉升降平台旋鈕，直到輕觸焦距螺絲，完成對焦。',
             calibrate_done: '校正相機完成<br/>使用時請正確對焦以取得良好的預覽效果。'
         },
         input_machine_password: {
