@@ -870,10 +870,10 @@ define([
         // Parameters:
         // val - The new rotation angle in degrees
         // preventUndo - Boolean indicating whether the action should be undoable or not
-        this.setRotationAngle = function (val, preventUndo) {
+        this.setRotationAngle = function (val, preventUndo, elem) {
             // ensure val is the proper type
             val = parseFloat(val);
-            var elem = selectedElements[0];
+            elem = elem || selectedElements[0];
             var oldTransform = elem.getAttribute('transform');
             var bbox = svgedit.utilities.getBBox(elem);
             var cx = bbox.x + bbox.width / 2,
@@ -906,8 +906,8 @@ define([
                 // TODO: figure out how to make changes to transform list undo-able cross-browser?
                 var newTransform = elem.getAttribute('transform');
                 elem.setAttribute('transform', oldTransform);
-                changeSelectedAttribute('transform', newTransform, selectedElements);
-                call('changed', selectedElements);
+                changeSelectedAttribute('transform', newTransform, [elem]);
+                call('changed', [elem]);
             }
             var pointGripContainer = svgedit.utilities.getElem('pathpointgrip_container');
             //		if (elem.nodeName === 'path' && pointGripContainer) {
@@ -8297,11 +8297,11 @@ define([
                 return;
             }
             if (len > 2 && mode === 'diff') {
+                //TODO: lang
                 AlertActions.showPopupError('Error', 'Too Many Objects.');
                 return;
             }
             let batchCmd = new svgedit.history.BatchCommand(`${mode} Elements`);
-            console.log(selectedElements);
             // clipper needs integer input so scale up path with a big const.
             const scale = 100;
             let solution_paths = [];
@@ -8367,6 +8367,62 @@ define([
             addCommandToHistory(batchCmd);
             this.selectOnly([element]);
             //console.log(canvas.undoMgr);
+        }
+
+        this.flipSelectedElements = function (horizon=1, vertical=1) {
+            let len = selectedElements.length;
+            for (let i = 0; i < selectedElements.length; ++i) {
+                if (!selectedElements[i]) {
+                    len = i;
+                    break;
+                }
+            }
+            let batchCmd = new svgedit.history.BatchCommand('Flip Elements');
+            for (let i = 0; i < len; ++i) {
+                elem = selectedElements[i];
+                const bbox = elem.getBBox();
+                const cx = bbox.x + bbox.width / 2;
+                const cy = bbox.y + bbox.height / 2;
+                let sx = horizon;
+                let sy = vertical;
+                startTransform = elem.getAttribute('transform'); //???maybe non need
+                
+                const angle = svgedit.utilities.getRotationAngle(elem);
+                canvas.undoMgr.beginUndoableChange('transform', [elem]);
+                canvas.setRotationAngle(-angle, true, elem);
+                let cmd = canvas.undoMgr.finishUndoableChange();
+                batchCmd.addSubCommand(cmd);
+
+                const tlist = svgedit.transformlist.getTransformList(elem);
+
+                let translateOrigin = svgroot.createSVGTransform();
+                let scale = svgroot.createSVGTransform();
+                let translateBack = svgroot.createSVGTransform();
+
+                translateOrigin.setTranslate(-cx, -cy);
+                scale.setScale(sx, sy);
+                translateBack.setTranslate(cx, cy);
+
+                const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
+                if (hasMatrix) {
+                    const pos = angle ? 1 : 0;
+                    tlist.insertItemBefore(translateOrigin, pos);
+                    tlist.insertItemBefore(scale, pos);
+                    tlist.insertItemBefore(translateBack, pos);
+                } else {
+                    tlist.appendItem(translateBack);
+                    tlist.appendItem(scale);
+                    tlist.appendItem(translateOrigin);
+                }
+    
+                selectorManager.requestSelector(elem).resize();
+                selectorManager.requestSelector(elem).showGrips(true);
+                cmd = svgedit.recalculate.recalculateDimensions(elem);
+                batchCmd.addSubCommand(cmd)
+                window.updateContextPanel();
+            }
+            addCommandToHistory(batchCmd);
+            console.log(canvas.undoMgr)
         }
 
         // Function: cloneSelectedElements

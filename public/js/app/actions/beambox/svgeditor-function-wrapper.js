@@ -247,10 +247,10 @@ define([
             svgCanvas.distEven();
         },
         flipHorizontal: function() {
-            _flipImage(-1, 1);
+            svgCanvas.flipSelectedElements(-1, 1);
         },
         flipVertical: function() {
-            _flipImage(1, -1);
+            svgCanvas.flipSelectedElements(1, -1);
         },
         //left panel
         useSelectTool: function() {
