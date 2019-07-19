@@ -20,7 +20,7 @@
     "socket.io-client": "^1.4.6",
     "squirejs": "^0.2.1",
     "text-to-svg": "jeffontheground/text-to-svg#e4fb3dc1ac9c8e5a2440373e7e018f07653ad574",
-    "websocket": "~1.0.24"
+    "ws": "^7.1.0"
   },
   "devDependencies": {
     "ajv": "^5.5.2",
@@ -33,10 +33,10 @@
     "babel-preset-stage-0": "^6.3.13",
     "babel-preset-stage-2": "^6.3.13",
     "chai": "3.5.0",
-    "electron": "^2.0.16",
-    "electron-builder": "19.52.1",
-    "electron-publisher-s3": "19.53.1",
-    "electron-rebuild": "^1.8.1",
+    "electron": "5.0.6",
+    "electron-builder": "^21.0.15",
+    "electron-publisher-s3": "^19.53.1",
+    "electron-rebuild": "^1.8.5",
     "electron-reload": "~1.1.0",
     "eslint": "^4.9.0",
     "eslint-plugin-react": "^7.4.0",
