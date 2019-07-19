@@ -297,7 +297,7 @@ define([
                         onClick={this.endPreviewMode.bind(this)}
                     >
                         <img src={'img/left-bar/icon-camera.svg'}/>
-                        <div className={'text'}>{LANG.preview} X</div>
+                        <div className={'text'}>{LANG.preview}&nbsp;&nbsp;×</div>
                     </div>
                     {ImageTrace}
                 </div>
