@@ -96,7 +96,7 @@ define([
             } catch (error) {
                 console.log(error);
             } finally {
-                FnWrapper.useSelectTool();
+                FnWrapper.enterPreviewMode();
                 FnWrapper.clearSelection();
                 BeamboxActions.closeInsertObjectSubmenu();
                 GlobalActions.monitorClosed();

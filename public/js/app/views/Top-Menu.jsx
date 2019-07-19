@@ -537,7 +537,6 @@ define([
                 DeviceMaster.selectDevice(device).then(function (status) {
                     if (status === DeviceConstants.CONNECTED) {
                         ProgressActions.close();
-                        //self.test();
                         self._onSuccessConnected(device, e);                 
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
@@ -727,8 +726,8 @@ define([
                                 </div>
 
                                 <div className="top-controls flip-controls">
-                                    {this._renderTopBtn('h-flip', lang.topbar.hflip)}
-                                    {this._renderTopBtn('v-flip', lang.topbar.vflip)}
+                                    {this._renderTopBtn('h-flip', lang.topbar.hflip, () => {FnWrapper.flipHorizontal();})}
+                                    {this._renderTopBtn('v-flip', lang.topbar.vflip, () => {FnWrapper.flipVertical();})}
                                 </div>
                             </div>
                         </div>
