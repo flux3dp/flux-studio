@@ -28,6 +28,11 @@ function _buildFileMenu(fnKey, callback) {
     let menuItems = [
         { 'id': 'IMPORT', label: r.import || 'Import', click: callback, 'accelerator': `${fnKey}+I` },
         { type: 'separator' },
+        { 'id': 'SAMPLES', label: r.samples || 'Samples', submenu: [
+            { 'id': 'IMPORT_EXAMPLE', label: r.import_beamo_sample || 'Example of beamo', click: callback },
+            { 'id': 'IMPORT_MATERIAL_TESTING', label: r.import_material_testing || 'Material Testing Suite', click: callback },
+        ]},
+        { type: 'separator' },
         { 'id': 'EXPORT_FLUX_TASK', label: r.export_flux_task || 'Export', click: callback, 'accelerator': `${fnKey}+E` },
         { 'id': 'SAVE_SCENE', label: r.save_scene || 'Save Scene', click: callback, 'accelerator': `${fnKey}+S` }
     ];
@@ -99,7 +104,6 @@ function buildMenu(callback) {
             { id: 'HELP_CENTER', label: r.help_center || 'Help Center', click() { shell.openExternal(r.link.help_center); } },
             { id: 'CONTACT_US', label: r.contact || 'Contact Us', click() { shell.openExternal(r.link.contact_us); } },
             { type: 'separator' },
-            { id: 'TUTORIAL', label: r.tutorial || 'Tutorial', click: callback },
             { id: 'FORUM', label: r.forum || 'Forum', click() { shell.openExternal(r.link.forum); } },
             { type: 'separator' },
             { id: 'SOFTWARE_UPDATE', label: r.software_update || 'Software Update', click() { shell.openExternal(r.link.downloads); } },
@@ -126,6 +130,18 @@ function buildDeviceMenu(callback, uuid, data) {
             { id: 'MACHINE_INFO', uuid, serial, source, label: r.machine_info, click: callback },
             { type: 'separator' },
             { id: 'CALIBRATE_BEAMBOX_CAMERA', uuid, serial, source, label: r.calibrate_beambox_camera, click: callback },
+        ];
+        if (modelType === 'fbm1' || true) {
+            submenu.push({
+                id: 'CALIBRATE_BEAMBOX_CAMERA_BORDERLESS', 
+                uuid, 
+                serial, 
+                source, 
+                label: r.calibrate_beambox_camera_borderless, 
+                click: callback
+            });
+        }
+        submenu = submenu.concat([
             { type: 'separator' },
             { id: 'UPDATE_FIRMWARE', uuid, serial, source, label: r.update_firmware, click: callback},
             { id: 'DOWNLOAD_LOG', uuid, serial, source, label: r.download_log, submenu: [
@@ -139,7 +155,7 @@ function buildDeviceMenu(callback, uuid, data) {
                 { id: 'LOG_ROBOT', label: r.log.robot, uuid, serial, source, click: callback }
             ]},
             { id: 'SET_AS_DEFAULT', label: r.set_as_default, uuid, serial, source, click: callback, type:'checkbox'}
-        ];
+        ]);
     } else {
         submenu = [
             { id: 'DASHBOARD', uuid, serial, source, label: r.dashboard, click: callback },
@@ -258,7 +274,6 @@ class MenuManager extends EventEmitter {
                 this._accountMenu = this._appmenu.items[i];
             }
         }
-
         for(let devMenuId in this._device_list) {
             let data = this._device_list[devMenuId];
             let instance = buildDeviceMenu(this._on_menu_click.bind(this), data.uuid, data);

@@ -7,7 +7,7 @@
 const app = require('electron').app;
 const path = require('path');
 const EventEmitter = require('events');
-const WebSocketClient = require('websocket').client;
+const WebSocket = require('ws');
 const spawn = require('child_process').spawn;
 const appHtmlPath = path.join(app.getAppPath(), 'public').replace('app.asar', 'app.asar.unpacked');
 
@@ -97,35 +97,36 @@ class BackendManager extends EventEmitter {
     }
 
     _prepare_discover() {
-        this._ws = new WebSocketClient();
-        this._ws.on('connect', (conn) => {
+        this._ws = new WebSocket(`ws://127.0.0.1:${this._port}/ws/discover`);
+        console.log("Backend start connect!?");
+        this._ws.on('open', (conn) => {
+            console.log("Backend connection!");
             this._wsconn = conn;
             this._ws_tm = new Date();
-            conn.on('message', (message) => {
+            this._ws.on('message', (message) => {
 
                 // prevent timeout disconnect
                 let now = new Date();
                 if (now - this._ws_tm > 30000) {
-                    conn.send('ping');
+                    this._ws.send('ping');
                     this._ws_tm = now;
                 }
 
-                if (message.type === 'utf8' ) {
-                    let devInfo;
 
-                    try {
-                        devInfo = uglyJsonParser(message.utf8Data);
-                        if (devInfo.status === 'pong') {
-                            return
-                        }
+                let devInfo;
 
-                    } catch(err) {
-                        console.error('Can not parse backend stout: %s', err);
+                try {
+                    devInfo = uglyJsonParser(message);
+                    if (devInfo.status === 'pong') {
+                        return
                     }
-                    this.emit('device_updated', devInfo);
+
+                } catch(err) {
+                    console.error('Can not parse backend stout: %s', err);
                 }
+                this.emit('device_updated', devInfo);
             });
-            conn.on('close', () => {
+            this._ws.on('close', () => {
                 this._wsconn = undefined;
                 this._ws = undefined;
                 if(this._running) {
@@ -133,7 +134,7 @@ class BackendManager extends EventEmitter {
                     this._setRecover();
                 }
             });
-            conn.on('error', (error) => {
+            this._ws.on('error', (error) => {
                 console.error('Discover WebSocket error: %s', error);
             });
         });
@@ -144,7 +145,6 @@ class BackendManager extends EventEmitter {
                 this._setRecover();
             }
         });
-        this._ws.connect(`ws://127.0.0.1:${this._port}/ws/discover`);
     }
 
     _spawn() {

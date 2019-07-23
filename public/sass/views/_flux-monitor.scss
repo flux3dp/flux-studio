@@ -318,6 +318,9 @@
                     float: right;
                     text-align: right;
                 }
+                &:last-child {
+                    margin-top:3px;
+                }
             }
             .temperature {
                 float: left;

@@ -1524,15 +1524,11 @@ define([
                 const zoomRatio = new_canvas_width / old_canvas_width;
 
                 function _scrollToMakeItCenter(workarea, svgcanvas) {
-                    console.warn("Scroll to make it center");
-                    console.trace();
                     workarea.scrollLeft(svgcanvas.width() / 2 - workarea.width() / 2 - 124);
                     workarea.scrollTop(svgcanvas.height() / 2 - workarea.height() / 2 - 85);
                 }
 
                 function _scrollToMakePointStatic(workarea, staticPoint, zoomRatio, old_scroll) {
-                    console.warn("Scroll to make point", staticPoint, zoomRatio);
-                    console.trace();
                     const left_cvs = old_scroll.left + staticPoint.x; //related to canvas
                     const newScrollLeft = left_cvs * zoomRatio - staticPoint.x;
                     workarea.scrollLeft(newScrollLeft);
