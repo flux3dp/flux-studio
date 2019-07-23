@@ -8079,10 +8079,12 @@ define([
         };
 
         this.moveElements = function (dx, dy, undoable, elems) {
+            console.log(dx, dy)
             if (dx.constructor != Array) {
                 dx /= current_zoom;
                 dy /= current_zoom;
             }
+            console.log(dx, dy)
             undoable = (undoable == null) ? true : undoable;
             var batchCmd = new svgedit.history.BatchCommand('position');
             var i = elems.length;
@@ -8121,7 +8123,6 @@ define([
         };
 
         this.getCenter = function(elem) {
-            //TODO: no polygon, path,... maybe use bbox to find X Y?
             let centerX,centerY ;
             switch(elem.tagName) {
                 case 'image':
@@ -8137,6 +8138,8 @@ define([
                     centerX = elem.cx.baseVal.value;
                     centerY = elem.cy.baseVal.value;
                     break;
+                case 'polygon':
+                case 'path':
                 case 'use':
                     let realLocation = this.getSvgRealLocation(elem);
                     centerX = realLocation.x + realLocation.width/2 ;
@@ -8167,6 +8170,7 @@ define([
                 const elem = realSelectedElements[i];
 
                 let centerX = this.getCenter(elem).x;
+                console.log(centerX);
                 centerXs[i] = centerX;
                 if (centerX < minX) {
                     minX = centerX;
@@ -8478,7 +8482,6 @@ define([
                 window.updateContextPanel();
             }
             addCommandToHistory(batchCmd);
-            console.log(canvas.undoMgr);
         }
 
         this.flipElementWithRespectToCenter = function(elem, center, flipPara) {
@@ -8528,7 +8531,7 @@ define([
             if (!cmd.isEmpty()) {
                 batchCmd.addSubCommand(cmd);
             }
-            cmd = this.moveElements(dx / Constant.dpmm, dy / Constant.dpmm, false, [elem]);
+            cmd = this.moveElements([dx], [dy], false, [elem]);
             batchCmd.addSubCommand(cmd);
             return batchCmd;
         }
