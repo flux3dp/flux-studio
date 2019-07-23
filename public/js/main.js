@@ -100,24 +100,18 @@ requirejs([
     'backbone',
     'app/router',
     'jsx!app/actions/announcement',
-    'app/actions/global'
-], function($, Backbone, Router, Announcement, globalEvents) {
+    'app/actions/global',
+    'helpers/menubar'
+], function($, Backbone, Router, Announcement, globalEvents, menuBar) {
 
     console.log(`Flux-Studio: ${window.FLUX.version}`);
 
     if(window.FLUX.allowTracking) {
         // google analytics
         $.getScript('/js/helpers/analytics.js');
-
-        // sentry
-        // Raven.config('http://6113878f548846998899855e8e83c477@sentry.io/124829', {
-        //     ignoreUrls: [/cloudserv1\.flux3dp\.com:3000/]
-        // });
-        // Raven.debug = false;
-        // try { window.Raven.setRelease(window.FLUX.version); } catch (e) { }
-        // Raven.install();
-        // window.Raven = Raven;
     }
+
+    menuBar();
 
     globalEvents(function() {
         let router = new Router();
