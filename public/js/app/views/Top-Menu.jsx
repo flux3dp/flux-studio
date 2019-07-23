@@ -744,7 +744,6 @@ define([
                                 </div>
                             </div>
                         </div>
-                        <Toolbox />
                     </div>
                 );
             }
