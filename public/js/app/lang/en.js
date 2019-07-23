@@ -218,6 +218,14 @@ define(function() {
                 tutorial_url: 'https://flux3dp.com/beambox-tutorial/'
             },
 
+            connect_beamo: {
+                set_beamo_connection: 'Set Beamo Connection',
+                please_goto_touchpad: 'Please go to Beamo touchpad',
+                tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".',
+                please_see_tutorial_video: 'Tutorial Video',
+                tutorial_url: 'https://tw.flux3dp.com/beamo-tutorial/'
+            },
+
             set_machine_generic: {
                 printer_name: 'Name*',
                 printer_name_placeholder: 'Give your machine an unique name',

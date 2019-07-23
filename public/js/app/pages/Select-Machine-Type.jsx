@@ -27,9 +27,9 @@ define([
                             </button>
                             <button
                                 className="btn btn-action btn-large"
-                                onClick={() => location.hash = '#initialize/wifi/connect-machine' }
+                                onClick={() => location.hash = '#initialize/wifi/connect-beamo'}
                             >
-                                <p className="subtitle">FLUX Delta</p>
+                                <p className="subtitle">Beamo</p>
                             </button>
                         </div>
                     </div>

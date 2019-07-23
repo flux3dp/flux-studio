@@ -218,6 +218,14 @@ define(function() {
                 tutorial_url: 'https://tw.flux3dp.com/beambox-tutorial/'
             },
 
+            connect_beamo: {
+                set_beamo_connection: '設定 Beamo 連線',
+                please_goto_touchpad: '請使用 Beamo 觸控面板進行 WiFi 連線綁定',
+                tutorial: '1. 點選觸控面板 "設定" > "網際網路" > "設定"\n2. 選取欲綁定的 WiFi 名稱並輸入密碼\n3. 稍待10秒，若於 "設定" > "網際網路" 成功顯示無線網路 IP，即代表綁定成功',
+                please_see_tutorial_video: '觀看教學影片',
+                tutorial_url: 'https://tw.flux3dp.com/beamo-tutorial/'
+            },
+
             set_machine_generic: {
                 printer_name: '機器名稱*',
                 printer_name_placeholder: '例如：霹靂五號',
