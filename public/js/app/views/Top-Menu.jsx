@@ -645,14 +645,14 @@ define([
             _renderTopDropDown: function(id, label) {
                 const labelFunctionMap = {
                     'align-h': [
-                        {id: 'align-h', label: 'Left', f: () => {FnWrapper.alignLeft();}},
-                        {id: 'align-h', label: 'Center', f: () => {FnWrapper.alignCenter();}},
-                        {id: 'align-h', label: 'Right', f: () => {FnWrapper.alignRight();}}
+                        {id: 'align-h', label: lang.topbar.left_align, f: () => {FnWrapper.alignLeft();}},
+                        {id: 'align-h', label: lang.topbar.center_align, f: () => {FnWrapper.alignCenter();}},
+                        {id: 'align-h', label: lang.topbar.right_align, f: () => {FnWrapper.alignRight();}}
                     ],
                     'align-v': [
-                        {id: 'align-v', label: 'Top', f: () => {FnWrapper.alignTop();}},
-                        {id: 'align-v', label: 'Middle', f: () => {FnWrapper.alignMiddle();}},
-                        {id: 'align-v', label: 'Bottom', f: () => {FnWrapper.alignBottom();}}
+                        {id: 'align-v', label: lang.topbar.top_align, f: () => {FnWrapper.alignTop();}},
+                        {id: 'align-v', label: lang.topbar.middle_align, f: () => {FnWrapper.alignMiddle();}},
+                        {id: 'align-v', label: lang.topbar.bottom_align, f: () => {FnWrapper.alignBottom();}}
                     ],
                 };
                 let fns = labelFunctionMap[id];
