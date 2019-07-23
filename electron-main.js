@@ -129,7 +129,8 @@ function createWindow () {
     mainWindow = new BrowserWindow({
         width: 1080,
         height: 610,
-        titleBarStyle: 'hidden',
+        titleBarStyle: process.platform === 'darwin' ? 'hidden' : null,
+        frame: process.platform === 'win32' ? false : null,
         title: `Beam Studio - ${app.getVersion()}`,
         webPreferences: {
             preload: path.join(__dirname, 'src', 'main-window-entry.js'),
