@@ -532,12 +532,17 @@ define([
 
             _handleSelectDevice: async function (device, e) {
                 const self = this;
+                device = DeviceMaster.usbDefaultDeviceCheck(device);
                 AlertStore.removeCancelListener(this._toggleDeviceListBind);
                 ProgressActions.open(ProgressConstants.NONSTOP_WITH_MESSAGE, lang.initialize.connecting);
                 DeviceMaster.selectDevice(device).then(function (status) {
                     if (status === DeviceConstants.CONNECTED) {
-                        ProgressActions.close();
-                        self._onSuccessConnected(device, e);                 
+                        const next = () => {
+                            ProgressActions.close();
+                            self._onSuccessConnected(device, e);
+                        } 
+                        ProgressActions.open(ProgressConstants.NONSTOP);
+                        checkDeviceStatus(device).then(next);
                     }
                     else if (status === DeviceConstants.TIMEOUT) {
                         ProgressActions.close();
