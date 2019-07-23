@@ -5868,7 +5868,7 @@ define([
             let windowScale = Math.min((($(window).width() - 268) / 1000), (($(window).height() - 105) / 600));
             let workspaceScale = 1 / Math.max(svgEditor.dimensions[0] / 4000, svgEditor.dimensions[1] / 3750);
             zoomChanged(window, {
-                zoomLevel: 0.16 * windowScale * workspaceScale
+                zoomLevel: 0.2 * windowScale * workspaceScale
             });
             svgCanvas.defaultScroll = {
                 x: workarea[0].scrollLeft,
@@ -5903,7 +5903,7 @@ define([
             let windowScale = Math.min((($(window).width() - 268) / 1000), (($(window).height() - 105) / 600));
             let workspaceScale = 1 / Math.max(svgEditor.dimensions[0] / 4000, svgEditor.dimensions[1] / 3750);
             editor.zoomChanged(window, {
-                zoomLevel: 0.16 * windowScale * workspaceScale
+                zoomLevel: 0.2 * windowScale * workspaceScale
             });
             $('#workarea')[0].scrollLeft = svgCanvas.defaultScroll.x;
             $('#workarea')[0].scrollTop = svgCanvas.defaultScroll.y;
