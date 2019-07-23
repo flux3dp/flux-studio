@@ -8078,13 +8078,11 @@ define([
             }
         };
 
-        this.moveElements = function (dx, dy, undoable, elems) {
-            console.log(dx, dy)
+        this.moveElements = function (dx, dy, elems, undoable) {
             if (dx.constructor != Array) {
                 dx /= current_zoom;
                 dy /= current_zoom;
             }
-            console.log(dx, dy)
             undoable = (undoable == null) ? true : undoable;
             var batchCmd = new svgedit.history.BatchCommand('position');
             var i = elems.length;
@@ -8142,6 +8140,7 @@ define([
                 case 'path':
                 case 'use':
                     let realLocation = this.getSvgRealLocation(elem);
+                    console.log(realLocation);
                     centerX = realLocation.x + realLocation.width/2 ;
                     centerY = realLocation.y + realLocation.height/2 ;
                     break;
@@ -8195,9 +8194,11 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition((minX + dx*j) - centerXs[i], 0, realSelectedElements[i]);
+                    this.moveElements([(minX + dx*j) - centerXs[i]], [0], [realSelectedElements[i]]);
+                    selectorManager.requestSelector(realSelectedElements[i]).resize();
                 } else {
-                    this.moveElemPosition((minX + dx*j) - centerXs[i-len], 0, realSelectedElements[i-len]);
+                    this.moveElements([(minX + dx*j) - centerXs[i-len]], [0], [realSelectedElements[i-len]]);
+                    selectorManager.requestSelector(realSelectedElements[i-len]).resize();
                 }
                 j = j+1;
             }
@@ -8246,9 +8247,11 @@ define([
                     continue;
                 }
                 if (i < len) {
-                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i], realSelectedElements[i]);
+                    this.moveElements([0], [(minY + dy*j) - centerYs[i]], [realSelectedElements[i]]);
+                    selectorManager.requestSelector(realSelectedElements[i]).resize();
                 } else {
-                    this.moveElemPosition(0, (minY + dy*j) - centerYs[i-len], realSelectedElements[i-len]);
+                    this.moveElements([0], [(minY + dy*j) - centerYs[i-len]], [realSelectedElements[i-len]]);
+                    selectorManager.requestSelector(realSelectedElements[i-len]).resize();
                 }
                 j = j+1;
             }
@@ -8531,7 +8534,7 @@ define([
             if (!cmd.isEmpty()) {
                 batchCmd.addSubCommand(cmd);
             }
-            cmd = this.moveElements([dx], [dy], false, [elem]);
+            cmd = this.moveElements([dx], [dy], [elem], false);
             batchCmd.addSubCommand(cmd);
             return batchCmd;
         }
