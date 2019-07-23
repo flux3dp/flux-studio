@@ -105,7 +105,7 @@ define([
                         device={this.props.device}
                         updateImgBlobUrl={this.updateImgBlobUrl}
                         model={this.props.model}
-                        updateOffsetData={this.updateOffsetData.bind(this)}
+                        updateOffsetDataCb={this.updateOffsetData.bind(this)}
                     />,
                 [STEP_BEFORE_ANALYZE_PICTURE]:
                     <StepBeforeAnalyzePicture
@@ -113,6 +113,7 @@ define([
                         gotoNextStep={this.updateCurrentStep}
                         onClose={this.onClose}
                         imgBlobUrl={this.state.imgBlobUrl}
+                        updateOffsetDataCb={this.updateOffsetData.bind(this)}
                     />,
                 [STEP_FINISH]:
                     <StepFinish
@@ -149,11 +150,11 @@ define([
         />
     );
 
-    const StepBeforeCut = ({device, updateImgBlobUrl, gotoNextStep, onClose, model, updateOffsetData}) => {
-        const cutThenCapture = async function(updateOffsetData) {
-            await _doCuttingTask();
+    const StepBeforeCut = ({device, updateImgBlobUrl, gotoNextStep, onClose, model, updateOffsetDataCb}) => {
+        const cutThenCapture = async function(updateOffsetDataCb) {
+            // await _doCuttingTask();
             let blobUrl = await _doCaptureTask();
-            await _doGetOffsetFromPicture(blobUrl, updateOffsetData);
+            await _doGetOffsetFromPicture(blobUrl, updateOffsetDataCb);
         };
         const _doCuttingTask = async function() {
             await DeviceMaster.select(device);
@@ -200,8 +201,7 @@ define([
                         className: 'btn-default btn-alone-right',
                         onClick: async ()=>{
                             try {
-                                console.log("Getting all", updateOffsetData);
-                                await cutThenCapture(updateOffsetData);
+                                await cutThenCapture(updateOffsetDataCb);
                                 gotoNextStep(STEP_BEFORE_ANALYZE_PICTURE);
                             } catch (error) {
                                 console.log(error);
@@ -220,8 +220,8 @@ define([
         );
     };
 
-    const sendPictureThenSetConfig = async (imgBlobUrl) => {
-        const result = await _doSendPictureTask(imgBlobUrl);
+    const sendPictureThenSetConfig = async (result, imgBlobUrl) => {
+        console.log("Setting camera_offset", result);
         if (result) {
             await _doSetConfigTask(result.X, result.Y, result.R, result.SX, result.SY);
         } else {
@@ -313,7 +313,7 @@ define([
         };
     };
 
-    const _doGetOffsetFromPicture = async function(imgBlobUrl, updateOffset) {
+    const _doGetOffsetFromPicture = async function(imgBlobUrl, updateOffsetCb) {
         let sdata = await _doSendPictureTask(imgBlobUrl);
         if (sdata == null) {
             sdata = {
@@ -324,7 +324,7 @@ define([
                 SY: 1.625
             };
         }
-        updateOffset({currentOffset: sdata});
+        updateOffsetCb({currentOffset: sdata});
     };
 
     const _doSetConfigTask = async (X, Y, R, SX, SY) => {
@@ -337,7 +337,7 @@ define([
         }
     };
 
-    const StepBeforeAnalyzePicture = ({currentOffset, imgBlobUrl, gotoNextStep, onClose}) => {
+    const StepBeforeAnalyzePicture = ({currentOffset, updateOffsetDataCb, imgBlobUrl, gotoNextStep, onClose}) => {
         const imageScale = 200 / 280;
         const mmToImage = 10 * imageScale;
         let imgBackground = {
@@ -356,6 +356,7 @@ define([
         let handleValueChange = function (key, val) {
             console.log('Key', key , '=', val);
             currentOffset[key] = val;
+            updateOffsetDataCb(currentOffset);
         };
         let manual_calibration = (
             <div>
@@ -382,7 +383,7 @@ define([
                             max={50}
                             unit="mm"
                             defaultValue={currentOffset.Y - 30}
-                            getValue={(val) => handleValueChange('Y', val + 35)}
+                            getValue={(val) => handleValueChange('Y', val + 30)}
                             decimal={3}
                         />
                     </div>
@@ -390,8 +391,8 @@ define([
                     <div className="control">
                         <label>旋轉角度</label>
                         <UnitInput
-                            min={-3.14}
-                            max={3.14}
+                            min={-180}
+                            max={180}
                             unit="deg"
                             defaultValue={currentOffset.R * 180 / Math.PI}
                             getValue={(val) => handleValueChange('R', val * Math.PI / 180)}
@@ -436,7 +437,7 @@ define([
                         className: 'btn-default btn-alone-right-1',
                         onClick: async () => {
                             try {
-                                await sendPictureThenSetConfig(imgBlobUrl);
+                                await sendPictureThenSetConfig(currentOffset, imgBlobUrl);
                                 gotoNextStep(STEP_FINISH);
                             } catch (error) {
                                 console.log(error);
