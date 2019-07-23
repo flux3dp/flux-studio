@@ -23,8 +23,8 @@ define(function () {
         promoteVerArr = padArrayWithZero(promoteVerArr, len);
 
         for (let i = 0; i < len; i++) {
-            let proVal = parseNumber(promoteVerArr[i]),
-                curVal = parseNumber(currVerArr[i]);
+            let proVal = parseFloat(promoteVerArr[i]),
+                curVal = parseFloat(currVerArr[i]);
             if (proVal < curVal) {
                 return false;
             } else if (proVal > curVal) {
