@@ -657,17 +657,23 @@ define([
                 };
                 let fns = labelFunctionMap[id];
                 let items = [];
+                const _setTopDropDownPosition = function() {
+                    $('.top-dropdown-control').hover(function() {
+                        const l = $(this).position().left;
+                        $(this).children('.top-dropdown-content').css({left: `${l}px`});
+                    })
+                };
                 for (let i = 0; i < fns.length; ++i) {
                     items.push(this._renderTopBtn(fns[i].id, fns[i].label, fns[i].f));
                 }
 
                 return (
-                    <div className="top-btn top-dropdown-control">
+                    <div className="top-btn top-dropdown-control" onMouseEnter={() => {_setTopDropDownPosition()}}>
                         <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${id}.png`}} />
                         <div className="btn-label">
                             {label}
                         </div>
-                        <div className="dropdown-content">
+                        <div className="top-dropdown-content">
                             <div className="arrowup "></div>
                             <div className="dropdown-block">
                                 {items}

@@ -29,6 +29,7 @@
             display: none;
         }
         .top-btn-container {
+            height: 90px;
             width: 1000px;
         }
         .top-btn {
@@ -59,9 +60,10 @@
         .arrowup {
             width: 0; 
             height: 0;
+            left: 0px;
             margin-top: 10px;
             margin-left: 10px;
-            position: absolute;
+            position: relative;
             border-left: 14px solid transparent;
             border-right: 14px solid transparent;
             border-bottom: 16px solid #333;
@@ -72,16 +74,17 @@
             height: 69px;
         }
         .dropdown-block {
-            padding-top: 26px;
-            position: absolute;
+            left: 0px;
+            position: relative;
             background: #333;
             background-clip: content-box;
             z-index: 1;
         }
-        .dropdown-content {
+        .top-dropdown-content {
+            position: absolute;
             display: none;
         }
-        &:hover .dropdown-content {
+        &:hover .top-dropdown-content {
             display: block;
         }
     }
