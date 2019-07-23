@@ -18,7 +18,9 @@ define(function() {
         const meetVersion = (targetVersion) => {
             targetVersion = targetVersion.split('.');
             // Compare first version number
-            if (parseInt(targetVersion[0]) > parseInt(currentVersion[0])) return false;
+            if (parseInt(targetVersion[0]) !== parseInt(currentVersion[0])) {
+                return parseInt(targetVersion[0]) < parseInt(currentVersion[0]);
+            }
             const targetMinorVersion = targetVersion[1].split(/[ab]/);
             const currentMinorVersion = currentVersion[1].split(/[ab]/);
 
