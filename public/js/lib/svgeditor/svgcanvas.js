@@ -8346,7 +8346,7 @@ define([
             }
             if (len > 2 && mode === 'diff') {
                 //TODO: lang
-                AlertActions.showPopupError('Error', 'Too Many Objects.');
+                AlertActions.showPopupError('Error', LANG.popup.more_than_two_object);
                 return;
             }
             let batchCmd = new svgedit.history.BatchCommand(`${mode} Elements`);
@@ -8362,7 +8362,12 @@ define([
                 let clipper = new svgedit.ClipperLib.Clipper();
                 const elem =selectedElements[i];
                 if (!(elem.tagName === 'rect' || elem.tagName === 'path' || elem.tagName === 'polygon' || elem.tagName === 'ellipse')) {
-                    AlertActions.showPopupError('Error', `Not Support Object Type: ${elem.tagName}`);
+                    tagNameMap = {
+                        'g': LANG.tag.g,
+                        'use': LANG.tag.use,
+                        'image': LANG.tag.image
+                    };
+                    AlertActions.showPopupError('Error', `${LANG.popup.not_support_object_type}: ${tagNameMap[elem.tagName]}`);
                     return;
                 }
                 const dpath = svgedit.utilities.getPathDFromElement(elem);
