@@ -63,7 +63,11 @@ define([
             let value = parseFloat(val);
 
             if(isNaN(value)) {
-                value = this.state.savedValue;
+                if (this.state) {
+                    value = this.state.savedValue;
+                } else {
+                    value = Number(this.props.defaultValue).toFixed(this.props.decimal);
+                }
             } else {
                 // check value boundary
                 value = Math.min(value, this.props.max);
