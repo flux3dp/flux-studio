@@ -33,14 +33,16 @@ define([
     'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
-    'app/actions/beambox'
+    'app/actions/beambox',
+    'app/actions/beambox/constant'
 ], function (
     i18n,
     BeamboxPreference,
     AlertActions,
     ObjectPanelsController,
     PreviewModeController,
-    BeamboxActions
+    BeamboxActions,
+    Constant
 ) {
     const LANG = i18n.lang.beambox;
     // Class: SvgCanvas
@@ -8076,6 +8078,48 @@ define([
             }
         };
 
+        this.moveElements = function (dx, dy, undoable, elems) {
+            if (dx.constructor != Array) {
+                dx /= current_zoom;
+                dy /= current_zoom;
+            }
+            undoable = (undoable == null) ? true : undoable;
+            var batchCmd = new svgedit.history.BatchCommand('position');
+            var i = elems.length;
+            while (i--) {
+                var selected = elems[i];
+                if (selected != null) {
+                    var xform = svgroot.createSVGTransform();
+                    var tlist = svgedit.transformlist.getTransformList(selected);
+                    // dx and dy could be arrays
+                    if (dx.constructor == Array) {
+                        xform.setTranslate(dx[i], dy[i]);
+                    } else {
+                        xform.setTranslate(dx, dy);
+                    }
+                    if (tlist.numberOfItems) {
+                        tlist.insertItemBefore(xform, 0);
+                    } else {
+                        tlist.appendItem(xform);
+                    }
+
+                    var cmd = svgedit.recalculate.recalculateDimensions(selected);
+                    if (cmd) {
+                        batchCmd.addSubCommand(cmd);
+                    }
+                    //selectorManager.requestSelector(selected).resize();
+                }
+            }
+
+            if (!batchCmd.isEmpty()) {
+                if (undoable) {
+                    addCommandToHistory(batchCmd);
+                }
+                call('changed', elems);
+                return batchCmd;
+            }
+        };
+
         this.getCenter = function(elem) {
             //TODO: no polygon, path,... maybe use bbox to find X Y?
             let centerX,centerY ;
@@ -8382,33 +8426,84 @@ define([
                 }
             }
             let batchCmd = new svgedit.history.BatchCommand('Flip Elements');
+
             for (let i = 0; i < len; ++i) {
                 elem = selectedElements[i];
                 let bbox;
-                if (elem.tagName !== 'use') {
-                    bbox = elem.getBBox();
-                } else {
+                if (elem.tagName === 'use') {
                     bbox = this.getSvgRealLocation(elem);
+                } else {
+                    bbox = elem.getBBox();
                 }
-                const cx = bbox.x + bbox.width / 2;
-                const cy = bbox.y + bbox.height / 2;
-                let sx = horizon;
-                let sy = vertical;
+                const center = {x: bbox.x + bbox.width / 2, y: bbox.y + bbox.height / 2};
+                const flipPara = {horizon, vertical};
                 startTransform = elem.getAttribute('transform'); //???maybe non need
 
-                const angle = svgedit.utilities.getRotationAngle(elem);
-                canvas.undoMgr.beginUndoableChange('transform', [elem]);
-                canvas.setRotationAngle(-angle, true, elem);
-                let cmd = canvas.undoMgr.finishUndoableChange();
-                batchCmd.addSubCommand(cmd);
+                let cmd;
+                let stack = [{elem}];
+                while (stack.length > 0) {
+                    ({elem: topElem, originalAngle} = stack.pop());
+                    if (topElem.tagName !== 'g') {
+                        cmd = this.flipElementWithRespectToCenter(topElem, center, flipPara);
+                        if (!cmd.isEmpty()) {
+                            batchCmd.addSubCommand(cmd);
+                        }
+                    } else {
+                        if (originalAngle == null) {
+                            let angle = svgedit.utilities.getRotationAngle(topElem);
+                            if (angle !== 0) {
+                                canvas.undoMgr.beginUndoableChange('transform', [topElem]);
+                                canvas.setRotationAngle(0, true, topElem);
+                                cmd = canvas.undoMgr.finishUndoableChange();
+                                if (!cmd.isEmpty()) {
+                                    batchCmd.addSubCommand(cmd);
+                                }
+                                stack.push({elem: topElem, originalAngle: angle});
+                            }
+                            topElem.childNodes.forEach((e) => {
+                                stack.push({elem: e});
+                            }); 
+                        } else {
+                            canvas.setRotationAngle(-originalAngle, true, topElem);
+                        }
+                    }
+                }
+                selectorManager.requestSelector(elem).resize();
+                selectorManager.requestSelector(elem).showGrips(true);
+                window.updateContextPanel();
+            }
+            addCommandToHistory(batchCmd);
+            console.log(canvas.undoMgr);
+        }
 
-                const tlist = svgedit.transformlist.getTransformList(elem);
+        this.flipElementWithRespectToCenter = function(elem, center, flipPara) {
+            let batchCmd = new svgedit.history.BatchCommand('Flip Single Element');
+
+            const angle = svgedit.utilities.getRotationAngle(elem);
+            canvas.undoMgr.beginUndoableChange('transform', [elem]);
+            canvas.setRotationAngle(-angle, true, elem);
+            let cmd = canvas.undoMgr.finishUndoableChange();
+            if (!cmd.isEmpty()) {
+                batchCmd.addSubCommand(cmd);
+            }
+            let bbox;
+            if (elem.tagName === 'use') {
+                bbox = this.getSvgRealLocation(elem);
+            } else {
+                bbox = elem.getBBox();
+            }
+            const cx = bbox.x + bbox.width / 2;
+            const cy = bbox.y + bbox.height / 2;
+            const dx = flipPara.horizon < 0 ? 2 * (center.x - cx) : 0;
+            const dy = flipPara.vertical < 0 ? 2 * (center.y - cy) : 0;
+            const tlist = svgedit.transformlist.getTransformList(elem);
+            if (elem.tagName !== 'image') {
                 let translateOrigin = svgroot.createSVGTransform();
                 let scale = svgroot.createSVGTransform();
                 let translateBack = svgroot.createSVGTransform();
 
                 translateOrigin.setTranslate(-cx, -cy);
-                scale.setScale(sx, sy);
+                scale.setScale(flipPara.horizon, flipPara.vertical);
                 translateBack.setTranslate(cx, cy);
                 const hasMatrix = svgedit.math.hasMatrixTransform(tlist);
                 if (hasMatrix) {
@@ -8421,14 +8516,33 @@ define([
                     tlist.appendItem(scale);
                     tlist.appendItem(translateOrigin);
                 }
-                selectorManager.requestSelector(elem).resize();
-                selectorManager.requestSelector(elem).showGrips(true);
                 cmd = svgedit.recalculate.recalculateDimensions(elem);
-                batchCmd.addSubCommand(cmd)
-                window.updateContextPanel();
+            } else {
+                cmd = this._flipImage(elem, flipPara.horizon, flipPara.vertical);
             }
-            addCommandToHistory(batchCmd);
+            if (!cmd.isEmpty()) {
+                batchCmd.addSubCommand(cmd);
+            }
+            cmd = this.moveElements(dx / Constant.dpmm, dy / Constant.dpmm, false, [elem]);
+            batchCmd.addSubCommand(cmd);
+            return batchCmd;
         }
+
+        this._flipImage = function(image, horizon=1, vertical=1) {
+            const flipCanvas = document.createElement('canvas');
+            const flipContext = flipCanvas.getContext('2d');
+            flipCanvas.width = $(image).attr('width');
+            flipCanvas.height = $(image).attr('height');
+            flipContext.translate(horizon < 0 ? flipCanvas.width : 0, vertical < 0 ? flipCanvas.height : 0);
+            flipContext.scale(horizon, vertical);
+            flipContext.drawImage(image, 0, 0, flipCanvas.width, flipCanvas.height);
+
+            canvas.undoMgr.beginUndoableChange('xlink:href', [image]);
+            image.setAttribute('xlink:href', flipCanvas.toDataURL());
+            const cmd = canvas.undoMgr.finishUndoableChange();
+
+            return cmd;
+        };
 
         // Function: cloneSelectedElements
         // Create deep DOM copies (clones) of all selected elements and move them slightly
@@ -8781,19 +8895,24 @@ define([
             const elemX = parseFloat($(elem).attr('x') || '0');
             const elemY = parseFloat($(elem).attr('y') || '0');
 
-            const obj = {};
-            xform.split(' ').forEach((pair) => {
-                [key, value] = pair.split('=');
-                if (value === undefined) {
-                    return;
-                };
-                obj[key] = parseFloat(value);
-            });
+            let obj = {};
+            if (xform) {
+                xform.split(' ').forEach((pair) => {
+                    [key, value] = pair.split('=');
+                    if (value === undefined) {
+                        return;
+                    };
+                    obj[key] = parseFloat(value);
+                });
+            } else {
+                obj = elem.getBBox();
+                obj.x = 0;
+                obj.y = 0;
+            }
             const matrix = ts.match(/matrix\(.*?\)/g);
 
             const matr = matrix ? matrix[0].substring(7, matrix[0].length - 1) : '1,0,0,1,0,0';
             [a, b, c, d, e, f] = matr.split(',').map(parseFloat);
-            console.log(obj, matr);
             let x = a * obj.x + c * obj.y + e + a * elemX;
             let y = b * obj.x + d * obj.y + f + d * elemY;
 
@@ -8808,7 +8927,6 @@ define([
                 y += height;
                 height *= -1;
             }
-
             return {
                 x: x,
                 y: y,
