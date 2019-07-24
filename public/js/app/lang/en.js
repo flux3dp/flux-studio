@@ -1074,6 +1074,17 @@ define(function() {
                 line: 'Line',
                 image: 'Image',
                 text: 'Text',
+                label: {
+                    cursor: 'Select',
+                    photo: 'Image',
+                    text: 'Text',
+                    rect: 'Square',
+                    oval: 'Oval',
+                    polygon: 'Polygon',
+                    pen: 'Pen',
+                    array: 'Array',
+                    preview: 'Camera Preview'
+                },
                 insert_object_submenu: {
                     rectangle: 'Rectangle',
                     ellipse: 'Ellipse',

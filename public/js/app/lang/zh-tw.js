@@ -1071,6 +1071,17 @@ define(function() {
                 line: '線段',
                 image: '圖片',
                 text: '文字',
+                label: {
+                    cursor: '選取',
+                    photo: '圖片',
+                    text: '文字',
+                    rect: '方塊',
+                    oval: '橢圓',
+                    polygon: '多邊形',
+                    pen: '鋼筆',
+                    array: '陣列',
+                    preview: '相機預覽'
+                },
                 insert_object_submenu: {
                     rectangle: '矩形',
                     ellipse: '橢圓形',

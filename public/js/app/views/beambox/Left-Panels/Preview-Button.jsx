@@ -288,6 +288,7 @@ define([
                     <div
                         className={classNames('tool-btn', 'preview-btn', {'active': isPreviewMode})}
                         onClick={() => this._handlePreviewClick()}
+                        title={LANG.label.preview}
                     >
                         <img src={'img/left-bar/icon-camera.svg'} draggable="false"/>
                     </div>
