@@ -7627,7 +7627,6 @@
 //----------------------Customized functions
 	ClipperLib.dPathtoPointPathsAndScale = function (dPath, rotation, scale) {
 		const commands  = ClipperLib.dPathSpliter(dPath);
-		console.log(commands);
 		let resultPaths = [];
 		let currentPath = [];
 		for (let i = 0; i < commands.length; ++i) {
