@@ -94,7 +94,12 @@ define([
         }
 
         _renderButtons() {
-            let _onCancel = () => {this.props.unmount()};
+            let _onCancel = () => {
+                this.props.unmount();
+                svgCanvas.setMode('select');
+                $('.tool-btn').removeClass('active');
+                $('#left-Cursor').addClass('active');
+            };
             let _onYes = () => {this.props.unmount()};
             const type = this.props.type;
 
@@ -105,7 +110,10 @@ define([
                     distance.dx = _mm2pixel(data.distance.dx);
                     distance.dy = _mm2pixel(data.distance.dy);
                     svgCanvas.gridArraySelectedElement(distance, data.rowcolumn);
-                    this.props.unmount()
+                    this.props.unmount();
+                    svgCanvas.setMode('select');
+                    $('.tool-btn').removeClass('active');
+                    $('#left-Cursor').addClass('active');
                 }
             }
             return (

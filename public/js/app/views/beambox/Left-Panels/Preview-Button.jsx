@@ -184,6 +184,7 @@ define([
 
                     try {
                         await PreviewModeController.start(device, errorCallback);
+                        $('.tool-btn').removeClass('active');
                         this.setState({ isPreviewMode: true });
                         $(workarea).css('cursor', 'url(img/camera-cursor.svg), cell');
 

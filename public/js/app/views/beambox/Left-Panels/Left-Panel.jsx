@@ -159,11 +159,13 @@ _
                 if (this.state.endPreview) {
                     this.state.endPreview();
                 }
+                $('.tool-btn').removeClass('active');
+                $(`#left-${label}`).addClass('active');
                 onClick();
             }
 
             return (
-                <div className={cx} onClick={endPreviewAndOnClick}>
+                <div  id={`left-${label}`} className={cx} onClick={endPreviewAndOnClick}>
                     <img src={`img/left-bar/icon-${iconName}.svg`} draggable="false"/>
                 </div>
             );

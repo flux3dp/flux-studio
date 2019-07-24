@@ -1112,6 +1112,8 @@ define([
             var current_layer = getCurrentDrawing().getCurrentLayer();
             if (current_layer) {
                 current_mode = 'select';
+                $('.tool-btn').removeClass('active');
+                $('#left-Cursor').addClass('active');
                 const elemsToAdd = $(current_group || current_layer).children();
                 if((elemsToAdd.length === 1) && (elemsToAdd[0].tagName === 'title')){
                     console.warn('Selecting empty layer in "selectAllInCurrentLayer"');
@@ -1295,6 +1297,8 @@ define([
 
                 if (right_click) {
                     current_mode = 'select';
+                    $('.tool-btn').removeClass('active');
+                    $('#left-Cursor').addClass('active');
                     lastClickPoint = pt;
                 }
 
@@ -2180,6 +2184,8 @@ define([
                             }
                         };
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                         // intentionally fall-through to select here
                     case 'resize':
                     case 'multiselect':
@@ -2188,6 +2194,8 @@ define([
                             curBBoxes = [];
                         }
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                     case 'select':
                         if (selectedElements[0] != null) {
                             // if we only have one selected element
@@ -2315,16 +2323,22 @@ define([
                         attrs = $(element).attr(['x1', 'x2', 'y1', 'y2']);
                         keep = (attrs.x1 !== attrs.x2 || attrs.y1 !== attrs.y2);
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                         break;
                     case 'foreignObject':
                     case 'square':
                     case 'rect':
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                     case 'image':
                         attrs = $(element).attr(['width', 'height']);
                         // Image should be kept regardless of size (use inherit dimensions later)
                         keep = (attrs.width != 0 || attrs.height != 0) || current_mode === 'image';
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                         break;
                     case 'circle':
                         keep = (element.getAttribute('r') != 0);
@@ -2333,6 +2347,8 @@ define([
                         attrs = $(element).attr(['rx', 'ry']);
                         keep = (attrs.rx != null || attrs.ry != null);
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                         break;
                     case 'fhellipse':
                         if ((freehand.maxx - freehand.minx) > 0 &&
@@ -2399,6 +2415,8 @@ define([
                         keep = true;
                         element = null;
                         current_mode = 'select';
+                        $('.tool-btn').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                         var batchCmd = canvas.undoMgr.finishUndoableChange();
                         if (!batchCmd.isEmpty()) {
                             addCommandToHistory(batchCmd);
@@ -2945,6 +2963,8 @@ define([
                 },
                 toSelectMode: function (selectElem) {
                     current_mode = 'select';
+                    $('.tool-btn').removeClass('active');
+                    $('#left-Cursor').addClass('active');
                     clearInterval(blinker);
                     blinker = null;
                     if (selblock) {
@@ -3617,6 +3637,8 @@ define([
                 toSelectMode: function (elem) {
                     var selPath = (elem === svgedit.path.path.elem);
                     current_mode = 'select';
+                    $('.tool-btn').removeClass('active');
+                    $('#left-Cursor').addClass('active');
                     svgedit.path.path.show(false);
                     current_path = false;
                     clearSelection();

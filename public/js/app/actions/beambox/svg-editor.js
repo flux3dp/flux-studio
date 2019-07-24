@@ -3678,8 +3678,11 @@ define([
                         ToolPanelsController.render();
                         ObjectPanelsController.setVisibility(false);
                         ObjectPanelsController.render();
+                    } else {
+                        $('#left-Grid').removeClass('active');
+                        $('#left-Cursor').addClass('active');
                     }
-                }
+                } 
             }
 
                 // Delete is a contextual tool that only appears in the ribbon if
