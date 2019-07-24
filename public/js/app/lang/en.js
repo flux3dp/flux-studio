@@ -217,17 +217,17 @@ define(function() {
 
             // page specific
             connect_beambox: {
-                set_beambox_connection: 'Set Beambox Connection',
+                set_beambox_connection: 'Beambox Connection Setup',
                 please_goto_touchpad: 'Please go to Beambox touchpad',
-                tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".',
+                tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".\n4. If WiFi is unavailable, you connect with the ethernet port, with routers which enabled DHCP.',
                 please_see_tutorial_video: 'Tutorial Video',
                 tutorial_url: 'https://flux3dp.com/beambox-tutorial/'
             },
 
             connect_beamo: {
-                set_beamo_connection: 'Set Beamo Connection',
-                please_goto_touchpad: 'Please go to Beamo touchpad',
-                tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".',
+                set_beamo_connection: 'Beamo Connection Setup',
+                please_goto_touchpad: 'Please go to beamo touchpad',
+                tutorial: '1. Click touchpad "Setting" > "Internet" > "Setting."\n2. Select your WiFi and enter the password.\n3. Wait 10 seconds, the Wireless IP Address would show at "Setting" > "Internet".\n4. If WiFi is unavailable, you connect with the ethernet port, with routers which enabled DHCP.',
                 please_see_tutorial_video: 'Tutorial Video',
                 tutorial_url: 'https://tw.flux3dp.com/beamo-tutorial/'
             },

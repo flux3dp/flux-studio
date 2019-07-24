@@ -1,7 +1,7 @@
 .initialization {
     // local varibles
     $primary-font-color: #808080;
-    $primary-background-color: #DEDEDE;
+    $primary-background-color: #F8F8F8;
 
     background: $primary-background-color;
     color: $primary-font-color;
@@ -13,6 +13,7 @@
         position: absolute;
         top: 15px;
         width: 52px;
+        display: none;
     }
 
     .headline {
@@ -108,21 +109,27 @@
             .main-title {
                 margin-bottom: 50px;
             }
+            .btn-h-group {
+                display: block !important;
+                width: 300px;
+                margin: auto auto;
+            }
             .btn-action,
             .btn-action:hover {
                 background: #333;
-                height: 176px;
+                height: 60px !important;
+                line-height: 60px !important;
                 width: 300px;
+                margin-bottom: 25px;
+                border-radius: 2px;
                 transition: all .3s ease;                                
     
                 .headline,
                 .subtitle {
                     transition: all .3s ease;                
                     color: white;
-                }
-    
-                .subtitle {
-                    margin: 0 0 10px 0;
+                    line-height: 60px;
+                    font-size: 18px !important;
                 }
             }
     
