@@ -313,7 +313,7 @@ define([
             const onSlideBarClick = (e) => {
                 const l = $('.rainbow-sidebar').offset().left;
                 const w = $('.rainbow-sidebar').width();
-                const newValue = Math.round(((e.clientX - l) / w * (maxValue - minValue) + minValue) * 10) / 10;
+                const newValue = Math.round((e.clientX - l) / w * (maxValue - minValue) + minValue);
                 this._handleSpeedChange(newValue);
             };
             const _handleDrag = (e) => {
@@ -323,7 +323,7 @@ define([
                 if (x < l || x > w + l) {
                     return;
                 }
-                let newValue = Math.round(((x - l) / w * (maxValue - minValue) + minValue) * 10) / 10;
+                let newValue = Math.round((x - l) / w * (maxValue - minValue) + minValue);
                 this._handleSpeedChange(newValue);
             };
             return (
