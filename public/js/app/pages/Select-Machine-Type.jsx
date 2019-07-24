@@ -21,15 +21,21 @@ define([
                         <div className="btn-h-group">
                             <button
                                 className="btn btn-action btn-large"
-                                onClick={() => location.hash = '#initialize/wifi/select-beambox-type'}
+                                onClick={() => location.hash = '#initialize/wifi/connect-beamo'}
                             >
-                                <p className="subtitle">Beambox</p>
+                                <p className="subtitle">FLUX beamo</p>
                             </button>
                             <button
                                 className="btn btn-action btn-large"
-                                onClick={() => location.hash = '#initialize/wifi/connect-beamo'}
+                                onClick={() => location.hash = '#initialize/wifi/connect-beambox'}
                             >
-                                <p className="subtitle">Beamo</p>
+                                <p className="subtitle">FLUX Beambox</p>
+                            </button>
+                            <button
+                                className="btn btn-action btn-large"
+                                onClick={() => location.hash = '#initialize/wifi/connect-beambox#Pro'}
+                            >
+                                <p className="subtitle">FLUX Beambox Pro</p>
                             </button>
                         </div>
                     </div>
