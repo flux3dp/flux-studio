@@ -1060,7 +1060,8 @@ define(function() {
                 should_update_firmware_to_continue: 'Your firmware does not support some improvements of FLUX Studio. For better performance and user experience, please update firmware to continue. (Menu > Machine > [Your Machine] > Update Firmware)',
                 more_than_two_object: 'Too many objects. Only support for 2 objects',
                 not_support_object_type: 'Not support object type',
-                select_first: 'Select an object first.'
+                select_first: 'Select an object first.',
+                select_at_least_two: 'Select two objects to proceed'
             },
             left_panel: {
                 insert_object: 'Insert Object',

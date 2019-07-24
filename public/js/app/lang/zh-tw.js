@@ -1057,7 +1057,8 @@ define(function() {
                 should_update_firmware_to_continue: '您的韌體版本不支援最新的軟體改善。為了更良好的使用經驗與雕刻品質，請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)',
                 more_than_two_object: '太多物件，只支援兩物件操作',
                 not_support_object_type: '不支援的物件類型',
-                select_first: '請先選取物件以繼續'
+                select_first: '請先選取物件以繼續',
+                select_at_least_two: '請選取兩個物件以繼續'
             },
             left_panel: {
                 insert_object: '插入物件',

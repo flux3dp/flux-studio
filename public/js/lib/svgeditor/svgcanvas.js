@@ -8371,11 +8371,12 @@ define([
                 }
             }
             if (len < 2) {
+                AlertActions.showPopupError('Boolean Operate', LANG.popup.select_at_least_two);
                 return;
             }
             if (len > 2 && mode === 'diff') {
                 //TODO: lang
-                AlertActions.showPopupError('Error', LANG.popup.more_than_two_object);
+                AlertActions.showPopupError('Boolean Operate', LANG.popup.more_than_two_object);
                 return;
             }
             let batchCmd = new svgedit.history.BatchCommand(`${mode} Elements`);
@@ -8396,7 +8397,7 @@ define([
                         'use': LANG.tag.use,
                         'image': LANG.tag.image
                     };
-                    AlertActions.showPopupError('Error', `${LANG.popup.not_support_object_type}: ${tagNameMap[elem.tagName]}`);
+                    AlertActions.showPopupError('Boolean Operate', `${LANG.popup.not_support_object_type}: ${tagNameMap[elem.tagName]}`);
                     return;
                 }
                 const dpath = svgedit.utilities.getPathDFromElement(elem);
