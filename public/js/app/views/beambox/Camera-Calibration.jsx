@@ -152,7 +152,7 @@ define([
 
     const StepBeforeCut = ({device, updateImgBlobUrl, gotoNextStep, onClose, model, updateOffsetDataCb}) => {
         const cutThenCapture = async function(updateOffsetDataCb) {
-            // await _doCuttingTask();
+            await _doCuttingTask();
             let blobUrl = await _doCaptureTask();
             await _doGetOffsetFromPicture(blobUrl, updateOffsetDataCb);
         };
