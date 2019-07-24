@@ -8447,7 +8447,7 @@ define([
             canvas.undoMgr.undoStackPointer -= 1;
             canvas.undoMgr.undoStack.pop();
             addCommandToHistory(batchCmd);
-            this.selectOnly([element]);
+            this.selectOnly([element], true);
             //console.log(canvas.undoMgr);
         }
 
