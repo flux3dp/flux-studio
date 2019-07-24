@@ -3679,6 +3679,7 @@ define([
                         ObjectPanelsController.setVisibility(false);
                         ObjectPanelsController.render();
                     } else {
+                        AlertActions.showPopupError('Select First', LANG.popup.select_first, LANG.left_panel.label.array);
                         $('#left-Grid').removeClass('active');
                         $('#left-Cursor').addClass('active');
                     }

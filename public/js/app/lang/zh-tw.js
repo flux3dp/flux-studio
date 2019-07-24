@@ -1056,7 +1056,8 @@ define(function() {
                 both_power_and_speed_too_high: '雷射管在高功率下耗損較快，使用低功率可以延長雷試管使用壽命。\n並且在此雕刻解析度使用過快的速度可能導致漸層雕刻的品質較差。',
                 should_update_firmware_to_continue: '您的韌體版本不支援最新的軟體改善。為了更良好的使用經驗與雕刻品質，請先更新 Beambox 的韌體以繼續。 (主選單 > 機器 > [ Your Beambox ] > 韌體更新)',
                 more_than_two_object: '太多物件，只支援兩物件操作',
-                not_support_object_type: '不支援的物件類型'
+                not_support_object_type: '不支援的物件類型',
+                select_first: '請先選取物件以繼續'
             },
             left_panel: {
                 insert_object: '插入物件',
