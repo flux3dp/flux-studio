@@ -271,32 +271,75 @@ define([
         },
 
         _renderStrength: function() {
+            const maxValue = 100;
+            const minValue = 1;
+            const onSlideBarClick = (e) => {
+                const l = $('.rainbow-sidebar').offset().left;
+                const w = $('.rainbow-sidebar').width();
+                const newValue = Math.round(((e.clientX - l) / w * (maxValue - minValue) + minValue) * 10) / 10;
+                this._handleStrengthChange(newValue);
+            };
+            const _handleDrag = (e) => {
+                const l = $('.rainbow-sidebar').offset().left;
+                const w = $('.rainbow-sidebar').width();
+                const x = e.clientX;
+                if (x < l || x > w + l) {
+                    return;
+                }
+                let newValue = Math.round(((x - l) / w * (maxValue - minValue) + minValue) * 10) / 10;
+                this._handleStrengthChange(newValue);
+            };
             return (
                 <div className='panel'>
                     <span className='title'>{LANG.strength}</span>
                     <UnitInput
-                        min={1}
-                        max={100}
+                        min={minValue}
+                        max={maxValue}
                         unit="%"
                         defaultValue={this.state.strength}
                         getValue={this._handleStrengthChange}
                         decimal={1}
                         />
+                     <div className="rainbow-sidebar" onClick={onSlideBarClick.bind(this)}>
+                        <div className="rainbow-drag" draggable="true" onDrag={_handleDrag.bind(this)} style={{left: `${this.state.strength}%`}}/>
+                    </div>
                 </div>
+                 
             );
         },
         _renderSpeed: function() {
+            const maxValue = 300;
+            const minValue = 3;
+            const onSlideBarClick = (e) => {
+                const l = $('.rainbow-sidebar').offset().left;
+                const w = $('.rainbow-sidebar').width();
+                const newValue = Math.round(((e.clientX - l) / w * (maxValue - minValue) + minValue) * 10) / 10;
+                this._handleSpeedChange(newValue);
+            };
+            const _handleDrag = (e) => {
+                const l = $('.rainbow-sidebar').offset().left;
+                const w = $('.rainbow-sidebar').width();
+                const x = e.clientX;
+                if (x < l || x > w + l) {
+                    return;
+                }
+                let newValue = Math.round(((x - l) / w * (maxValue - minValue) + minValue) * 10) / 10;
+                this._handleSpeedChange(newValue);
+            };
             return (
                 <div className='panel'>
                     <span className='title'>{LANG.speed}</span>
                     <UnitInput
-                        min={3}
-                        max={300}
+                        min={minValue}
+                        max={maxValue}
                         unit="mm/s"
                         defaultValue={this.state.speed}
                         getValue={this._handleSpeedChange}
                         decimal={1}
                     />
+                    <div className="rainbow-sidebar" onClick={onSlideBarClick.bind(this)}>
+                        <div className="rainbow-drag" draggable="true" onDrag={_handleDrag.bind(this)} style={{left: `${this.state.speed/3}%`}} /> 
+                    </div>
                 </div>
             );
         },
@@ -595,13 +638,7 @@ define([
                             options={dropdownOptions}
                         />
                         {strengthPanel}
-                        <div className="rainbow-sidebar">
-                            <div className="rainbow-drag" style={{left: `${this.state.strength}%`}} />
-                        </div>
                         {speedPanel}
-                        <div className="rainbow-sidebar">
-                            <div className="rainbow-drag" style={{left: `${this.state.speed/3}%`}} /> 
-                        </div>
                         {repeatPanel}
                         {modalDialog}
                         {this.state.isPrinterSelectorOpen ? printerSelector : ''}
