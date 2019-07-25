@@ -17,7 +17,6 @@ function(
         
         $('.top-menu').css({'-webkit-app-region': 'no-drag'});
         $('.content').css({'height': 'calc(100% - 60px)'});
-        console.log($('.top-btn'));
         new customTitlebar.Titlebar({
             backgroundColor: customTitlebar.Color.fromHex('#333'),
             shadow: true,
