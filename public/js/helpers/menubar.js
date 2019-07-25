@@ -1,15 +1,28 @@
 define([
+<<<<<<< HEAD
 ], 
 function(
 ) {
     'use strict';
 
+=======
+    'jquery',
+    'helpers/i18n'
+], 
+function(
+    $,
+    i18n
+) {
+    'use strict';
+    const LANG = i18n.lang;
+>>>>>>> fae51a7a... Update windows frameless browser style
     if (process.platform !== 'win32') return () => {};
 
     return () => {
         const customTitlebar = require('custom-electron-titlebar');
         const Menu = require('electron').remote.Menu;
         const MenuItem = require('electron').remote.MenuItem;
+<<<<<<< HEAD
 
         const tempMenu = new Menu();
         tempMenu.append(new MenuItem({
@@ -51,6 +64,15 @@ function(
         const titlebar = new customTitlebar.Titlebar({
             backgroundColor: customTitlebar.Color.fromHex('#444'),
             menu: tempMenu,
+=======
+        
+        $('.top-menu').css({'-webkit-app-region': 'no-drag'});
+        $('.content').css({'height': 'calc(100% - 60px)'});
+        console.log($('.top-btn'));
+        new customTitlebar.Titlebar({
+            backgroundColor: customTitlebar.Color.fromHex('#333'),
+            shadow: true,
+>>>>>>> fae51a7a... Update windows frameless browser style
             menuPosition: 'bottom'
         });
     }

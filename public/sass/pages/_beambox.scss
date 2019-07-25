@@ -13,7 +13,7 @@
         position: absolute;
         top: 85px;
         left: 0px;
-        height: 100vh;
+        height: 100%;
         .tool-btn {
             text-align: center;
             line-height: 26px;
@@ -386,7 +386,7 @@
             opacity: 1.0;
             z-index: 2;
             top: 85px;
-            height: calc(100vh - 85px);
+            height: calc(100% - 85px);
             right: -$sidePanelWidth;
             transition: opacity 0.3s;
             &:hover {
@@ -467,7 +467,7 @@
             }
             &.layerblock-activated {
                 #layerlist_container {
-                    height: calc(100vh - 505px);
+                    height: calc(100% - 505px);
                 }
             }
             #sidepanel_handle {

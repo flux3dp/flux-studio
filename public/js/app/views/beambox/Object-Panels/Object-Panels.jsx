@@ -109,7 +109,7 @@ define([
                     return input;
                 }
                 const left = _between(thePoint.left, 0, $(window).width()-240);
-                const top = _between(thePoint.top, 100, $(window).height()-$('#beamboxObjPanel').height());
+                const top = _between(thePoint.top, 100, $('#svg_editor').height()-$('#beamboxObjPanel').height());
                 return {
                     left: left,
                     top: top
