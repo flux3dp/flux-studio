@@ -23,7 +23,7 @@ function(
         let titlebar = new customTitlebar.Titlebar({
             backgroundColor: customTitlebar.Color.fromHex('#333'),
             shadow: false,
-            icon: 'win-icon.ico'
+            icon: 'win-title-icon.png'
         });
         titlebar.updateTitle(' ');
     }
