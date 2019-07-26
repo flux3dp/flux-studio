@@ -15,12 +15,16 @@ function(
         const Menu = require('electron').remote.Menu;
         const MenuItem = require('electron').remote.MenuItem;
         
-        $('.top-menu').css({'-webkit-app-region': 'no-drag'});
-        $('.content').css({'height': 'calc(100% - 60px)'});
-        new customTitlebar.Titlebar({
-            backgroundColor: customTitlebar.Color.fromHex('#333'),
-            shadow: true,
-            menuPosition: 'bottom'
+        $('.top-menu').css({
+            '-webkit-app-region': 'no-drag',
+            'height': '75px',
         });
+        $('.content').css({'height': 'calc(100% - 30px)'});
+        let titlebar = new customTitlebar.Titlebar({
+            backgroundColor: customTitlebar.Color.fromHex('#333'),
+            shadow: false,
+            icon: 'win-icon.ico'
+        });
+        titlebar.updateTitle(' ');
     }
 });

@@ -666,9 +666,15 @@ define([
                 for (let i = 0; i < fns.length; ++i) {
                     items.push(this._renderTopBtn(fns[i].id, fns[i].label, fns[i].f));
                 }
+                let style;
+                if (process.platform === 'win32') {
+                    style = { 
+                        paddingTop: '15px'
+                    };
+                }
 
                 return (
-                    <div className="top-btn top-dropdown-control" onMouseEnter={() => {_setTopDropDownPosition()}}>
+                    <div className="top-btn top-dropdown-control" onMouseEnter={() => {_setTopDropDownPosition()}} style={style}>
                         <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${id}.png`}} />
                         <div className="btn-label">
                             {label}
@@ -685,8 +691,14 @@ define([
             },
 
             _renderTopBtn: function(id, label, onClick) {
+                let style;
+                if (process.platform === 'win32') {
+                    style = { 
+                        paddingTop: '15px'
+                    };
+                }
                 return (
-                    <div className="top-btn" onClick={onClick}>
+                    <div className="top-btn" onClick={onClick} style={style}>
                         <img src={`img/top-menu/icon-${id}.svg`} onError={(e)=>{e.target.onerror = null; e.target.src=`img/top-menu/icon-${iconName}.png`}} />
                         <div className="btn-label">
                             {label}
@@ -711,6 +723,13 @@ define([
                             {barTitle}
                         </div>
                     );
+                }
+                let top_btn_container_style,
+                    device_style;
+                if (process.platform === 'win32') {
+                    device_style = {
+                        top: '14px'
+                    };
                 }
                 return (
                     <div>
@@ -743,7 +762,7 @@ define([
                             </div>
                         </div>
 
-                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleExportClick}>
+                        <div title={lang.print.deviceTitle} className="device" onClick={this._handleExportClick} style={device_style}>
                             <p className="device-icon">
                                 <img src="img/top-menu/icon-export.svg" draggable="false" />
                                 <div>{lang.topbar.export}</div>
