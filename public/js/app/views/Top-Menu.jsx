@@ -712,11 +712,20 @@ define([
                 const containerWidth = 1000;
                 const left_space = topbtns.scrollLeft();
                 const right_space = containerWidth - left_space - topbtns.width();
-                const left_scroll_cue = (<div className="top-scroll-cue">
+                const startScroll = (v) => {
+                    const f = (v) => {
+                        $('.top-btns').scrollLeft($('.top-btns').scrollLeft() + v);
+                    }
+                    this.interval = setInterval(f, 15, v);
+                }
+                const endScroll = () => {
+                    clearInterval(this.interval);
+                }
+                const left_scroll_cue = (<div className="top-scroll-cue" onMouseEnter={() => {startScroll.bind(this)(-5)}} onMouseLeave={endScroll.bind(this)}>
                     {left_space > 30 ? <img src="img/top-menu/icon-cue-left.svg"/> : null}
                 </div>
                 );
-                const right_scroll_cue = (<div className="top-scroll-cue">
+                const right_scroll_cue = (<div className="top-scroll-cue" onMouseEnter={() => {startScroll.bind(this)(5)}} onMouseLeave={endScroll.bind(this)}>
                     {right_space > 30 ? <img src="img/top-menu/icon-cue-right.svg"/> : null}
                 </div>
                 );
