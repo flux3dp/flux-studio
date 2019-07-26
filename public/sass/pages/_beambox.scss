@@ -934,6 +934,10 @@
         top: 0;
         left: 60%;
         z-index: 2;
+        cursor: -webkit-grab;
+    }
+    &:active {
+        cursor: -webkit-grabbing;
     }
     &::after {
         position: absolute;
