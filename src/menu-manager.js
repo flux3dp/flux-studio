@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const {app, Menu, MenuItem, shell, ipcMain} = require('electron');
+const {app, BrowserWindow, Menu, MenuItem, shell, ipcMain} = require('electron');
 const resource = require('./menu-resource');
 const events = require('./ipc-events');
 
@@ -107,7 +107,8 @@ function buildMenu(callback) {
             { id: 'FORUM', label: r.forum || 'Forum', click() { shell.openExternal(r.link.forum); } },
             { type: 'separator' },
             { id: 'SOFTWARE_UPDATE', label: r.software_update || 'Software Update', click() { shell.openExternal(r.link.downloads); } },
-            { id: 'BUG_REPORT', label: r.bug_report || 'Bug Report', click: callback }
+            { id: 'BUG_REPORT', label: r.bug_report || 'Bug Report', click: callback },
+            { id: 'DEV_TOOL', label: r.dev_tool || 'Debug Tool', click() {BrowserWindow.getFocusedWindow().webContents.openDevTools()} }
         ]
     });
 
