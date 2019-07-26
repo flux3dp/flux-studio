@@ -707,11 +707,28 @@ define([
                 );
             },
 
+            _renderScrollCue: function() {
+                const topbtns = $('.top-btns')
+                const containerWidth = 1000;
+                const left_space = topbtns.scrollLeft();
+                const right_space = containerWidth - left_space - topbtns.width();
+                const left_scroll_cue = (<div className="top-scroll-cue">
+                    {left_space > 30 ? <img src="img/top-menu/icon-cue-left.svg"/> : null}
+                </div>
+                );
+                const right_scroll_cue = (<div className="top-scroll-cue">
+                    {right_space > 30 ? <img src="img/top-menu/icon-cue-right.svg"/> : null}
+                </div>
+                );
+                return {left_scroll_cue, right_scroll_cue};
+            },
+
             render: function () {
                 let deviceList = this._renderDeviceList(),
                     menuClass,
                     topClass;
 
+                let {left_scroll_cue, right_scroll_cue}  = this._renderScrollCue();
                 let lang = i18n.get();
                 console.log("Props...", this.props);
                 let barTitle = lang.topbar.titles[this.props.page] || this.props.page;
@@ -724,16 +741,17 @@ define([
                         </div>
                     );
                 }
-                let top_btn_container_style,
-                    device_style;
+                let device_style;
                 if (process.platform === 'win32') {
                     device_style = {
                         top: '14px'
                     };
                 }
+
                 return (
                     <div>
-                        <div className="top-btns">
+                        {left_scroll_cue}
+                        <div className="top-btns" onScroll={()=>{this.setState(this.state)}}>
                             <div className="top-btn-container">
                                 <div className="top-controls zoom-controls">
                                     {this._renderTopBtn('zoom', lang.topbar.zoom)}
@@ -761,6 +779,7 @@ define([
                                 </div>
                             </div>
                         </div>
+                        {right_scroll_cue}
 
                         <div title={lang.print.deviceTitle} className="device" onClick={this._handleExportClick} style={device_style}>
                             <p className="device-icon">

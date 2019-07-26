@@ -22,7 +22,26 @@
         display: inline-block;
         margin: 0px 20px 0 20px;
     }
+    .zoom-controls {
+        margin-left: 0px;
+    }
+    .top-scroll-cue {
+        position: relative;
+        float: left;
+        width: 20px;
+        height: 84px;
+        text-align: center;
+        color: #F8F8F8;
+        img {
+            opacity: 0.8;
+            height: 15px;
+            position: relative;
+            top: calc(60% - 15px);
+            filter: brightness(0) invert(100%);
+        }
+    }
     .top-btns {
+        float: left;
         width: calc(100% - 100px);
         overflow-x: scroll;
         &::-webkit-scrollbar { 
