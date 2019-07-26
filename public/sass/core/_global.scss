@@ -513,3 +513,12 @@ hr {
 .vague-round-corner {
     border-radius: 2px;
 }
+
+.menubar-menu-container .action-menu-item {
+  text-decoration: none;  
+}
+
+body .titlebar > .window-appicon {
+    width: 28px;
+    background-position: 9px center;
+}
