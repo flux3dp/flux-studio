@@ -82,7 +82,8 @@
     "publish": [
       {
         "provider": "s3",
-        "bucket": "beamstudio"
+        "bucket": "beamstudio",
+        "path": "${os}${env.PUBLISH_PATH}"
       }
     ],
     "mac": {
