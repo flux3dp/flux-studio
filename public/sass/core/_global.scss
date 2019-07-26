@@ -517,3 +517,8 @@ hr {
 .menubar-menu-container .action-menu-item {
   text-decoration: none;  
 }
+
+body .titlebar > .window-appicon {
+    width: 28px;
+    background-position: 9px center;
+}
