@@ -5687,8 +5687,11 @@ define([
                                     id = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
                                     match = tmp[i].match(/data-xform="[^"]*"/)[0];
                                     xform = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
-                                    match = tmp[i].match(/data-wireframe="[a-z]*"/)[0];
-                                    wireframe = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+                                    match = tmp[i].match(/data-wireframe="[a-z]*"/);
+                                    if (match) {
+                                        match = match[0];
+                                        wireframe = match.substring(match.indexOf('"')+1, match.lastIndexOf('"'));
+                                    }
 
                                     elem = document.getElementById(id);
                                     elem.setAttribute('data-xform', xform);
@@ -5699,6 +5702,8 @@ define([
                         reader.readAsText(file);
                     });
                 };
+
+                editor.importBvg = importBvg;
 
                 var importImage = function (e) {
                     $.process_cancel(uiStrings.notification.loadingImage);
