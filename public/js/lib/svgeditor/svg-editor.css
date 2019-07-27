@@ -608,10 +608,6 @@ div.toolset label span {
 	height: 15px;
 }
 
-input[type=text] {
-	padding: 2px;
-}
-
 #tools_left .tool_button,
 #tools_left .tool_button_current {
 	position: relative;

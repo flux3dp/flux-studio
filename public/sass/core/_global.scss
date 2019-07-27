@@ -522,3 +522,14 @@ body .titlebar > .window-appicon {
     width: 28px;
     background-position: 9px center;
 }
+
+input[type=text] {
+    border: 1px solid #ccc;
+    background: #FFF;
+    padding-left: 10px;
+    border-radius: 2px;
+    height: 32px;
+    &::placeholder{
+        color: #BBB;
+    }
+}
