@@ -467,7 +467,7 @@
             }
             &.layerblock-activated {
                 #layerlist_container {
-                    height: calc(100% - 505px);
+                    height: calc(100vh - 505px);
                 }
             }
             #sidepanel_handle {
