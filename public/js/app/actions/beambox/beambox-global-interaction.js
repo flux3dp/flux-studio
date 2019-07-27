@@ -16,6 +16,24 @@ define([
                         electron.trigger_file_input_click('import_image');
                     }
                 },
+                'IMPORT_EXAMPLE': () => {
+                    const fs = require('fs');
+                    fs.readFile('./public/examples/badge.bvg', (err, data) => {
+                        if (err) {
+                            return alert(err.toString());
+                        }
+                        svgEditor.importBvg(new Blob([data]));
+                    });
+                },
+                'IMPORT_MATERIAL_TESTING': () => {
+                    const fs = require('fs');
+                    fs.readFile('./public/examples/mat_test.bvg', (err, data) => {
+                        if (err) {
+                            return alert(err.toString());
+                        }
+                        svgEditor.importBvg(new Blob([data]));
+                    });
+                },
                 'SAVE_SCENE': () => FnWrapper.saveFile(),
                 'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
                 'UNDO': () => FnWrapper.undo(),
