@@ -17,28 +17,38 @@ define([
                     }
                 },
                 'IMPORT_EXAMPLE': () => {
-                    const fs = require('fs');
-                    fs.exists(process.resourcesPath + '/public/examples', (exists) => {
-                        let path = exists ? `${process.resourcesPath}/public/examples/badge.bvg` : './public/examples/badge.bvg';
-                        fs.readFile(path, (err, data) => {
-                            if (err) {
-                                return alert(err.toString());
-                            }
-                            svgEditor.importBvg(new Blob([data]));
-                        });
-                    });
+                    var fileEntry = {
+                        name: 'examples/badge.bvg',
+                        toURL: function() {
+                            return 'examples/badge.bvg';
+                        }
+                    }
+                    var oReq = new XMLHttpRequest();
+                    oReq.open('GET', 'examples/badge.bvg', true);
+                    oReq.responseType = 'blob';
+
+                    oReq.onload = function(oEvent) {
+                        svgEditor.importBvg(oReq.response);
+                    };
+
+                    oReq.send();
                 },
                 'IMPORT_MATERIAL_TESTING': () => {
-                    const fs = require('fs');
-                    fs.exists(process.resourcesPath + '/public/examples', (exists) => {
-                        let path = exists ? `${process.resourcesPath}/public/examples/mat_test.bvg` : './public/examples/mat_test.bvg';
-                        fs.readFile(path, (err, data) => {
-                            if (err) {
-                                return alert(err.toString());
-                            }
-                            svgEditor.importBvg(new Blob([data]));
-                        });
-                    });
+                    var fileEntry = {
+                        name: 'examples/mat_test.bvg',
+                        toURL: function() {
+                            return 'examples/mat_test.bvg';
+                        }
+                    }
+                    var oReq = new XMLHttpRequest();
+                    oReq.open('GET', 'examples/mat_test.bvg', true);
+                    oReq.responseType = 'blob';
+
+                    oReq.onload = function(oEvent) {
+                        svgEditor.importBvg(oReq.response);
+                    };
+
+                    oReq.send();
                 },
                 'SAVE_SCENE': () => FnWrapper.saveFile(),
                 'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
