@@ -32,6 +32,7 @@ define([
     return function() {
         var $deferred = $.Deferred();
 
+        console.log("Outputing");
         html2canvas(window.document.body).then(function(canvas) {
             var jpegUrl = canvas.toDataURL('image/jpeg'),
                 _logger = new Logger('websocket'),
@@ -79,9 +80,10 @@ define([
 
             for(let key in localStorage) {
                 let value = localStorage[key];
-                if(value.startsWith("-----BEGIN RSA PRIVATE KEY-----\n")) {
+                if(typeof value == "string" && value.startsWith("-----BEGIN RSA PRIVATE KEY-----\n")) {
                     value = "[hidden]";
                 }
+                if (typeof value == "function") continue;
                 output.push(`${key}=${value}\n\n`);
             }
 
