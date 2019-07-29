@@ -139,7 +139,7 @@
    </g>
   </symbol>
  </defs>
- <g class="layer" data-color="#FE0000" data-speed="5" data-strength="65" data-repeat="1">
+ <g class="layer" data-color="#FE0000" data-speed="10" data-strength="60" data-repeat="1">
   <title>切割圖層</title>
   <use x="144.00462" y="170.18727" data-wireframe="false" data-xform="x=43.504661560058594 y=43.504661560058594 width=407.7339172363281 height=407.7339172363281 " id="svg_2" xlink:href="#svg_1"/>
   <g id="svg_3"/>
