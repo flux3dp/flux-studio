@@ -18,20 +18,26 @@ define([
                 },
                 'IMPORT_EXAMPLE': () => {
                     const fs = require('fs');
-                    fs.readFile('./public/examples/badge.bvg', (err, data) => {
-                        if (err) {
-                            return alert(err.toString());
-                        }
-                        svgEditor.importBvg(new Blob([data]));
+                    fs.exists(process.resourcesPath + '/public/examples', (exists) => {
+                        let path = exists ? `${process.resourcesPath}/public/examples/badge.bvg` : './public/examples/badge.bvg';
+                        fs.readFile(path, (err, data) => {
+                            if (err) {
+                                return alert(err.toString());
+                            }
+                            svgEditor.importBvg(new Blob([data]));
+                        });
                     });
                 },
                 'IMPORT_MATERIAL_TESTING': () => {
                     const fs = require('fs');
-                    fs.readFile('./public/examples/mat_test.bvg', (err, data) => {
-                        if (err) {
-                            return alert(err.toString());
-                        }
-                        svgEditor.importBvg(new Blob([data]));
+                    fs.exists(process.resourcesPath + '/public/examples', (exists) => {
+                        let path = exists ? `${process.resourcesPath}/public/examples/mat_test.bvg` : './public/examples/mat_test.bvg';
+                        fs.readFile(path, (err, data) => {
+                            if (err) {
+                                return alert(err.toString());
+                            }
+                            svgEditor.importBvg(new Blob([data]));
+                        });
                     });
                 },
                 'SAVE_SCENE': () => FnWrapper.saveFile(),
