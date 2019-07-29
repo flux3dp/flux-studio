@@ -5150,6 +5150,60 @@ define([
 
             Actions.setAll();
 
+            editor.setWorkAreaContextMenu = function () {
+                $('#workarea').contextMenu({
+                    menu: 'cmenu_canvas',
+                    inSpeed: 0
+                },
+                    function (action, el, pos) {
+                        switch (action) {
+                            case 'delete':
+                                deleteSelected();
+                                break;
+                            case 'cut':
+                                cutSelected();
+                                break;
+                            case 'copy':
+                                copySelected();
+                                break;
+                            case 'paste':
+                                svgCanvas.pasteElements();
+                                break;
+                            case 'paste_in_place':
+                                svgCanvas.pasteElements('in_place');
+                                break;
+                            case 'group':
+                            case 'group_elements':
+                                svgCanvas.groupSelectedElements();
+                                break;
+                            case 'ungroup':
+                                svgCanvas.ungroupSelectedElement();
+                                break;
+                            case 'move_front':
+                                moveToTopSelected();
+                                break;
+                            case 'move_up':
+                                moveUpDownSelected('Up');
+                                break;
+                            case 'move_down':
+                                moveUpDownSelected('Down');
+                                break;
+                            case 'move_back':
+                                moveToBottomSelected();
+                                break;
+                            default:
+                                if (svgedit.contextmenu && svgedit.contextmenu.hasCustomHandler(action)) {
+                                    svgedit.contextmenu.getCustomHandler(action).call();
+                                }
+                                break;
+                        }
+                        if (svgCanvas.clipBoard.length) {
+                            canv_menu.enableContextMenuItems('#paste,#paste_in_place');
+                        }
+                    }
+                );
+            }
+
             // Select given tool
             editor.ready(function () {
                 var tool,
@@ -5233,57 +5287,7 @@ define([
                 callback: changeBlur
             });
 
-            $('#workarea').contextMenu({
-                menu: 'cmenu_canvas',
-                inSpeed: 0
-            },
-            function (action, el, pos) {
-                switch (action) {
-                    case 'delete':
-                        deleteSelected();
-                        break;
-                    case 'cut':
-                        cutSelected();
-                        break;
-                    case 'copy':
-                        copySelected();
-                        break;
-                    case 'paste':
-                        svgCanvas.pasteElements();
-                        break;
-                    case 'paste_in_place':
-                        svgCanvas.pasteElements('in_place');
-                        break;
-                    case 'group':
-                    case 'group_elements':
-                        svgCanvas.groupSelectedElements();
-                        break;
-                    case 'ungroup':
-                        svgCanvas.ungroupSelectedElement();
-                        break;
-                    case 'move_front':
-                        moveToTopSelected();
-                        break;
-                    case 'move_up':
-                        moveUpDownSelected('Up');
-                        break;
-                    case 'move_down':
-                        moveUpDownSelected('Down');
-                        break;
-                    case 'move_back':
-                        moveToBottomSelected();
-                        break;
-                    default:
-                        if (svgedit.contextmenu && svgedit.contextmenu.hasCustomHandler(action)) {
-                            svgedit.contextmenu.getCustomHandler(action).call();
-                        }
-                        break;
-                }
-                if (svgCanvas.clipBoard.length) {
-                    canv_menu.enableContextMenuItems('#paste,#paste_in_place');
-                }
-            }
-            );
+            editor.setWorkAreaContextMenu()
 
             var lmenu_func = function (action, el, pos) {
                 switch (action) {

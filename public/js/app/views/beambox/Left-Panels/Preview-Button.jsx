@@ -220,6 +220,17 @@ define([
                 await startPreviewMode(device);
                 this.props.passEndPreview(this.endPreviewMode.bind(this));
                 shortcuts.on(['esc'], this.endPreviewMode.bind(this));
+                const self = this;
+                $('#workarea').contextMenu({
+                    menu: []
+                    },
+                    ()=>{}
+                );
+                $('#workarea').contextmenu(function() {
+                    //console.log(self.endPreviewMode);
+                    self.endPreviewMode();
+                    return false;
+                });
                 ClearPreviewGraffitiButton.activate(this.endPreviewMode.bind(this));
             };
 
@@ -266,6 +277,8 @@ define([
                 this.resetPreviewButton();
                 this.props.passEndPreview(()=>{});
                 shortcuts.off(['esc']);
+                $('#workarea').off('contextmenu');
+                svgEditor.setWorkAreaContextMenu();
             }
         }
 
