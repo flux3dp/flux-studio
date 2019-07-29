@@ -372,10 +372,11 @@ define([
             const coordinates = PreviewModeBackgroundDrawer.getCoordinates();
             const sourceWidth = (coordinates.maxX - coordinates.minX) + 465.17;
             const sourceHeight = (coordinates.maxY - coordinates.minY) + 465.17;
-            const reference = (640/sourceWidth < 600/sourceHeight) ? 'w' : 'h';
-            const ratio = (reference === 'w') ? sourceHeight/sourceWidth : sourceWidth/sourceHeight;
-            const destWidth = (reference === 'w') ? 640 : 640 * ratio;
-            const destHeight = (reference === 'h') ? 600 : 600 * ratio;
+            const maxAllowableWidth = $('.top-menu').width() - 100;
+            const maxAllowableHieght = $(window).height() - 2 * $('.top-menu').height() - 80;
+            const ratio = Math.min(maxAllowableHieght / sourceHeight, maxAllowableWidth / sourceWidth);
+            const destWidth = sourceWidth * ratio;
+            const destHeight = sourceHeight * ratio;
 
             this.setState({
                 preCrop: {
@@ -498,7 +499,10 @@ define([
             } = this.state;
             const footer = this._renderImageTraceFooter();
             const it = ((currentStep === STEP_APPLY) && (imageTrace!=='')) ? this._getImageTraceDom() : null;
-            const containerStyle = (TESTING_IT || (cropData.width > cropData.height)) ? { width: '400px' } : { height: '520px' };
+            const maxAllowableWidth = $('.top-menu').width() - 390;
+            const maxAllowableHieght = $(window).height() - 2 * $('.top-menu').height() - 120;
+            const containerStyle = (TESTING_IT || (cropData.width / maxAllowableWidth > cropData.height / maxAllowableHieght)) ? 
+                {width: `${maxAllowableWidth}px`} : {height: `${maxAllowableHieght}px`};
 
             return (
                 <Modal>
