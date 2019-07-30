@@ -5151,7 +5151,11 @@ define([
                             wrappedSymbolContent.appendChild(content);
                         });
                     } else {
-                        wrappedSymbolContent.appendChild(symbolContents);
+                        try {
+                            wrappedSymbolContent.appendChild(symbolContents);
+                        } catch (e) {
+                            console.log(e);
+                        }
                     }
                     wrappedSymbolContent.setAttribute('viewBox', rootViewBox);
                     wrappedSymbolContent.setAttribute('transform', transformList.join(' '));
@@ -5515,10 +5519,10 @@ define([
                 symbol.setAttribute(attr.nodeName, attr.value);
             }
             symbol.id = getNextId();
-            if (elem.firstChild.id) {
+            if (elem.firstChild && elem.firstChild.id) {
                 symbol.setAttribute('data-id', elem.firstChild.id);
             }
-            if (elem.firstChild.getAttribute('data-color')) {
+            if (elem.firstChild && elem.firstChild.getAttribute('data-color')) {
                 symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
             }
 
