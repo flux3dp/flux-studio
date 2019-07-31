@@ -66,9 +66,10 @@ function buildMenu(callback) {
         submenu: [
             { 'id': 'UNDO', label: r.undo || 'Undo', click: callback, 'accelerator': `${fnKey}+Z`},
             { type:'separator'},
-            { 'id': 'DUPLICATE', label: r.duplicate || 'Duplicate', enabled: false , click: callback, 'accelerator': `${fnKey}+D` },
+            { 'id': 'DUPLICATE', label: r.duplicate || 'Duplicate', enabled: false, click: callback, 'accelerator': `${fnKey}+D` },
+            { 'id': 'PHOTO_EDIT', label: r.photo_edit || 'Edit Photo', enabled: false, click: callback},
             { type:'separator'},
-            { 'id': 'PHOTO_EDIT', label: r.photo_edit || 'Edit Photo', click: callback},
+            { 'id': 'DOCUMENT_SETTING', label: r.document_setting || 'Document Setting', click: callback},
             { type: 'separator' },
             { 'id': 'CLEAR_SCENE', label: r.clear_scene || 'Clear Scene', enabled: false, click: callback, 'accelerator': `${fnKey}+Shift+X` },
         ]

@@ -55,12 +55,13 @@ define([
                 'UNDO': () => FnWrapper.undo(),
                 'DUPLICATE': () => FnWrapper.cloneSelectedElement(),
                 'PHOTO_EDIT': () => FnWrapper.photoEdit(),
+                'DOCUMENT_SETTING': () => FnWrapper.openAdvancedPanel(),
                 'CLEAR_SCENE': () => {window.svgEditorClearScene()},
                 'TUTORIAL': () => {}
             };
         }
         attach() {
-            super.attach(['IMPORT', 'SAVE_SCENE', 'UNDO', 'EXPORT_FLUX_TASK', 'CLEAR_SCENE']);
+            super.attach(['IMPORT', 'SAVE_SCENE', 'UNDO', 'EXPORT_FLUX_TASK', 'DOCUMENT_SETTING', 'CLEAR_SCENE']);
         }
         onObjectFocus() {
             this.enableMenuItems(['DUPLICATE']);

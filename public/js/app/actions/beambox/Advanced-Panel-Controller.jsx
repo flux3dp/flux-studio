@@ -1,16 +1,18 @@
 define([
     'react',
     'reactDOM',
-    'jsx!views/beambox/Photo-Edit-Panel'
+    'jsx!views/beambox/Advanced-Panel',
+    'app/actions/beambox/beambox-preference',
 ], function(
     React,
     ReactDOM,
-    PhotoEditPanel
+    AdvancedPanel,
+    BeamboxPreference
 ){
-    class PhotoEditPanelController {
+    class AdvancedPanelController {
         constructor() {
             this.reactRoot = '';
-            this.element = null;
+            this.isVisible = false;
             this.src = null;
             this.unmount = this.unmount.bind(this);
         }
@@ -20,35 +22,27 @@ define([
         }
 
         render() {
-            if(this.src) {
-                this._render();
-            } else {
-                this.unmount();
-            }
+            this._render();
         }
 
-        setElememt(element) {
-            this.element = element;
-            this.src = element.getAttribute('origImage');
+        setVisibility(isVisible) {
+            this.isVisible = isVisible;
         }
 
         unmount() {
-            this.element = null;
             ReactDOM.unmountComponentAtNode(document.getElementById(this.reactRoot));
         }
 
         _render() {
             ReactDOM.render(
-                <PhotoEditPanel
-                    element={this.element}
-                    src={this.src}
+                <AdvancedPanel
                     unmount={this.unmount}
                 />, document.getElementById(this.reactRoot)
             );
         }
     }
 
-    const instance = new PhotoEditPanelController();
+    const instance = new AdvancedPanelController();
 
     return instance;
 });

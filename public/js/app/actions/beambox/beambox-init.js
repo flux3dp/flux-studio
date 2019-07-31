@@ -2,6 +2,7 @@ define([
     'helpers/api/config',
     'app/actions/beambox/beambox-preference',
     'app/actions/beambox/constant',
+    'jsx!app/actions/beambox/Advanced-Panel-Controller',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Tool-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
@@ -11,6 +12,7 @@ define([
     ConfigHelper,
     BeamboxPreference,
     Constant,
+    AdvancedPanelController,
     ObjectPanelsController,
     ToolPanelsController,
     LaserPanelController,
@@ -18,6 +20,7 @@ define([
     PhotoEditPanelController
 ) {
     const init = () => {
+        AdvancedPanelController.init('advanced-panel-placeholder');
         ObjectPanelsController.init('object-panels-placeholder');
         ToolPanelsController.init('tool-panels-placeholder');
         LaserPanelController.init('layer-laser-panel-placeholder');

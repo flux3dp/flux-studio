@@ -2,11 +2,15 @@ define([
     'app/actions/beambox/constant',
     'helpers/image-data',
     'lib/cropper',
+    'jsx!app/actions/beambox/Advanced-Panel-Controller',
+    'jsx!app/actions/beambox/Photo-Edit-Panel-Controller',
     'helpers/i18n'
 ], function(
     Constant,
     ImageData,
     Cropper,
+    AdvancedPanelController,
+    PhotoEditPanelController,
     i18n
 ){
     const LANG = i18n.lang.beambox;
@@ -275,10 +279,6 @@ define([
             $('#tool_grid').mouseup();
         },
 
-        photoEdit: function() {
-            svgCanvas.editPhoto();
-        },
-
         enterPreviewMode: function() {
             svgCanvas.setMode('preview');
         },
@@ -366,6 +366,28 @@ define([
         },
         write_image_data_threshold: function(elem, val) {
             elem.attr('data-threshold', val);
+        },
+
+        //menubar
+        photoEdit: function() {
+            const selectedElements = window.svgCanvas.getSelectedElems();
+            let len = selectedElements.length;
+            for (let i = 0; i < selectedElements.length; ++i) {
+                if (!selectedElements[i]) {
+                    len = i;
+                    break;
+                }
+            }
+            if (len > 1) {
+                return;
+            }
+            elem = selectedElements[0];
+            PhotoEditPanelController.setElememt(elem);
+            PhotoEditPanelController.render();
+        },
+
+        openAdvancedPanel: function() {
+            AdvancedPanelController.render();
         },
 
         // others

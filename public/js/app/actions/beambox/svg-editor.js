@@ -35,6 +35,7 @@ define([
     'helpers/image-data',
     'helpers/shortcuts',
     'helpers/i18n',
+    'app/actions/beambox/beambox-preference',
     'app/actions/beambox/constant',
     'helpers/dxf2svg',
     'app/constants/keycode-constants',
@@ -52,6 +53,7 @@ define([
     ImageData,
     Shortcuts,
     i18n,
+    BeamboxPreference,
     Constant,
     Dxf2Svg,
     KeycodeConstants,
@@ -5678,7 +5680,6 @@ define([
                         reader.onloadend = (evt) => {
                             let str = evt.target.result;
                             editor.loadFromString(str.replace(/STYLE>/g, 'style>'));
-
                             // loadFromString will lose data-xform and data-wireframe of `use` so set it back here
                             if (typeof(str) === 'string') {
                                 let tmp = str.substr(str.indexOf('<use')).split('<use');
@@ -5700,6 +5701,19 @@ define([
                                     elem = document.getElementById(id);
                                     elem.setAttribute('data-xform', xform);
                                     elem.setAttribute('data-wireframe', wireframe === 'true');
+                                }
+                                match = str.match(/data-rotary_mode="[a-zA-Z]+"/);
+                                if (match) {
+                                    let rotaryMode = match[0].substring(18, match[0].length - 1);
+                                    rotaryMode = rotaryMode === 'true';
+                                    svgCanvas.setRotaryMode(rotaryMode);
+                                    svgCanvas.runExtensions('updateRotaryAxis');
+                                    BeamboxPreference.write('rotary_mode', rotaryMode);
+                                }
+                                match = str.match(/data-engrave_dpi="[a-zA-Z]+"/);
+                                if (match) {
+                                    let engraveDpi = match[0].substring(18, match[0].length - 1);
+                                    BeamboxPreference.write('engrave_dpi', engraveDpi);
                                 }
                             }
                         };
