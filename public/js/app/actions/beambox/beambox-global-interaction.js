@@ -17,22 +17,38 @@ define([
                     }
                 },
                 'IMPORT_EXAMPLE': () => {
-                    const fs = require('fs');
-                    fs.readFile('./public/examples/badge.bvg', (err, data) => {
-                        if (err) {
-                            return alert(err.toString());
+                    var fileEntry = {
+                        name: 'examples/badge.bvg',
+                        toURL: function() {
+                            return 'examples/badge.bvg';
                         }
-                        svgEditor.importBvg(new Blob([data]));
-                    });
+                    }
+                    var oReq = new XMLHttpRequest();
+                    oReq.open('GET', 'examples/badge.bvg', true);
+                    oReq.responseType = 'blob';
+
+                    oReq.onload = function(oEvent) {
+                        svgEditor.importBvg(oReq.response);
+                    };
+
+                    oReq.send();
                 },
                 'IMPORT_MATERIAL_TESTING': () => {
-                    const fs = require('fs');
-                    fs.readFile('./public/examples/mat_test.bvg', (err, data) => {
-                        if (err) {
-                            return alert(err.toString());
+                    var fileEntry = {
+                        name: 'examples/mat_test.bvg',
+                        toURL: function() {
+                            return 'examples/mat_test.bvg';
                         }
-                        svgEditor.importBvg(new Blob([data]));
-                    });
+                    }
+                    var oReq = new XMLHttpRequest();
+                    oReq.open('GET', 'examples/mat_test.bvg', true);
+                    oReq.responseType = 'blob';
+
+                    oReq.onload = function(oEvent) {
+                        svgEditor.importBvg(oReq.response);
+                    };
+
+                    oReq.send();
                 },
                 'SAVE_SCENE': () => FnWrapper.saveFile(),
                 'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
