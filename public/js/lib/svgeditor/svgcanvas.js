@@ -33,6 +33,7 @@ define([
     'app/actions/alert-actions',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
+    'jsx!app/actions/beambox/Photo-Edit-Panel-Controller',
     'app/actions/beambox',
     'app/actions/beambox/constant'
 ], function (
@@ -41,6 +42,7 @@ define([
     AlertActions,
     ObjectPanelsController,
     PreviewModeController,
+    PhotoEditPanelController,
     BeamboxActions,
     Constant
 ) {
@@ -9215,6 +9217,23 @@ define([
 
             svgedit.recalculate.recalculateDimensions(selected);
         };
+
+        this.editPhoto = function() {
+            let len = selectedElements.length;
+            for (let i = 0; i < selectedElements.length; ++i) {
+                if (!selectedElements[i]) {
+                    len = i;
+                    break;
+                }
+            }
+            if (len > 1) {
+                return;
+            }
+            elem = selectedElements[0];
+            PhotoEditPanelController.setElememt(elem);
+            PhotoEditPanelController.setVisibility(true);
+            PhotoEditPanelController.render();
+        }
     };
 
 

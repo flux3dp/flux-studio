@@ -274,6 +274,11 @@ define([
         gridArraySelected: function() {
             $('#tool_grid').mouseup();
         },
+
+        photoEdit: function() {
+            svgCanvas.editPhoto();
+        },
+
         enterPreviewMode: function() {
             svgCanvas.setMode('preview');
         },

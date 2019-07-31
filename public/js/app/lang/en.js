@@ -1170,6 +1170,20 @@ define(function() {
                 okay: 'Okay',
                 tuning: 'Parameters'
             },
+            photo_edit_panel: {
+                apply: 'Apply',
+                back: 'Back',
+                cancel: 'Cancel',
+                next: 'Next',
+                sharpen: 'Sharpen',
+                sharpen_radius: 'Radius (px)',
+                crop: 'Crop',
+                start: 'Start',
+                processing: 'Processing',
+                invert: 'Invert Color',
+                okay: 'Okay',
+                phote_edit: 'Photo Edit'
+            },
             object_panels: {
                 position: 'Position',
                 rotation: 'Rotation',

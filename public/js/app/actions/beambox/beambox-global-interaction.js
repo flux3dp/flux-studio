@@ -54,10 +54,7 @@ define([
                 'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
                 'UNDO': () => FnWrapper.undo(),
                 'DUPLICATE': () => FnWrapper.cloneSelectedElement(),
-                'ROTATE': () => {},
-                'SCALE': () => {},
-                'RESET': () => {},
-                'ALIGN_CENTER': () => {},
+                'PHOTO_EDIT': () => FnWrapper.photoEdit(),
                 'CLEAR_SCENE': () => {window.svgEditorClearScene()},
                 'TUTORIAL': () => {}
             };
@@ -67,9 +64,12 @@ define([
         }
         onObjectFocus() {
             this.enableMenuItems(['DUPLICATE']);
+            if (svgCanvas.getSelectedElems()[0].tagName ==='image') {
+                this.enableMenuItems(['PHOTO_EDIT']);
+            }
         }
         onObjectBlur() {
-            this.disableMenuItems(['DUPLICATE']);
+            this.disableMenuItems(['DUPLICATE', 'PHOTO_EDIT']);
         }
     }
     const instance = new BeamboxGlobalInteraction();
