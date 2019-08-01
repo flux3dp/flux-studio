@@ -262,7 +262,6 @@ define([
 
         _handleCrop() {
             const cropData = cropper.getData();
-            console.log(cropData);
             const extractPara = {
                 left: parseInt(cropData.x),
                 top: parseInt(cropData.y),
