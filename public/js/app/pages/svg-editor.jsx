@@ -285,6 +285,7 @@ define([
                                     </div>
                                 </fieldset>
                                 <div id="layerlist_container">
+                                    <div id="color_picker_placeholder"></div>
                                     <table id="layerlist">
                                         <tbody>
                                             <tr className="layer">

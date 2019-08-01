@@ -30,6 +30,7 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'jsx!app/actions/announcement',
     'jsx!app/views/beambox/DxfDpiSelector',
+    'jsx!app/views/beambox/Color-Picker-Panel',
     'app/actions/alert-actions',
     'app/actions/topbar',
     'helpers/image-data',
@@ -48,6 +49,7 @@ define([
     PreviewModeController,
     Announcement,
     DxfDpiSelector,
+    ColorPickerPanel,
     AlertActions,
     TopbarActions,
     ImageData,
@@ -1082,6 +1084,17 @@ define([
                     var vis = $(this).hasClass('layerinvis');
                     svgCanvas.setLayerVisibility(name, vis);
                     $(this).toggleClass('layerinvis');
+                });
+
+                $('#layerlist td.layercolor').click(function (e) {
+                    const layerName = $(this).parent().find('.layername').text();
+                    const layer = drawing.getLayerByName(layerName);
+                    //$(drawing.getLayerByName(layerName)).attr('data-color', '#f7ff99');
+                    //$(this).find('div').css('background', '#f7ff99');
+                    ColorPickerPanel.init('color_picker_placeholder', layer, $(this));
+                    ColorPickerPanel.setPosition(e.clientX, e.clientY)
+                    ColorPickerPanel.render();
+                    ColorPickerPanel.renderPickr();
                 });
 
                 // if there were too few rows, let's add a few to make it not so lonely
