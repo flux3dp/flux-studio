@@ -1089,8 +1089,6 @@ define([
                 $('#layerlist td.layercolor').click(function (e) {
                     const layerName = $(this).parent().find('.layername').text();
                     const layer = drawing.getLayerByName(layerName);
-                    //$(drawing.getLayerByName(layerName)).attr('data-color', '#f7ff99');
-                    //$(this).find('div').css('background', '#f7ff99');
                     ColorPickerPanel.init('color_picker_placeholder', layer, $(this));
                     ColorPickerPanel.setPosition(e.clientX, e.clientY)
                     ColorPickerPanel.render();
