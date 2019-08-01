@@ -33,7 +33,8 @@ define([
                 isCropping: false,
                 wRatio: 1,
                 hRatio: 1,
-                threshold: $(this.props.element).attr('data-threshold')
+                threshold: $(this.props.element).attr('data-threshold'),
+                shading: ($(this.props.element).attr('data-shading') === 'true')
             };
             this.sharpenSigma = 1;
             let tempImg = new Image();
@@ -79,7 +80,7 @@ define([
                 this.state.src, {
                     grayscale: {
                         is_rgba: true,
-                        is_shading: false,
+                        is_shading: this.state.shading,
                         threshold: this.state.threshold,
                         is_svg: false
                     },
@@ -159,9 +160,8 @@ define([
                 this.state.src,
                 {
                     grayscale: {
-                        is_binary: true,
                         is_rgba: true,
-                        is_shading: false,
+                        is_shading: this.state.shading,
                         threshold: this.state.threshold,
                         is_svg: false
                     },
