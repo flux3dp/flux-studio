@@ -281,6 +281,12 @@
             .caption {
                 margin: 0;
             }
+            .accordion {
+                .shading-checkbox {
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+            }
             .accordion .caption .value {
                 color: #999;
             }

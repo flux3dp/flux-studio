@@ -7146,6 +7146,78 @@ define([
             }
         };
 
+        this.setSelectedFill = function () {
+            for (let i = 0; i < selectedElements.length; ++i) {
+                elem = selectedElements[i];
+                if (elem == null) {
+                    break;
+                }
+                const availableType = ['rect', 'ellipse', 'path', 'text', 'polygon'];
+                if (elem.tagName === 'path') {
+                    const d = $(elem).attr('d');
+                    const matchM = d.match(/M/ig);
+                    const matchZ = d.match(/z/ig);
+                    if (matchZ && matchM.length === matchZ.length) {
+                        const color = $(elem).attr('stroke');
+                        this.setElementFill(elem, color);
+                    } else {
+                        console.log('Not a closed path')
+                    }
+                } else if (availableType.indexOf(elem.tagName) >= 0) {
+                    const color = $(elem).attr('stroke');
+                    this.setElementFill(elem, color);
+                } else {
+                    console.log(`Not support type: ${elem.tagName}`)
+                }
+            }
+        }
+
+        this.setElementFill = function (elem, color) {
+            let batchCmd = new svgedit.history.BatchCommand('set fill');
+            canvas.undoMgr.beginUndoableChange('fill', [elem]);
+            elem.setAttribute('fill', color);
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.beginUndoableChange('fill-opacity', [elem]);
+            elem.setAttribute('fill-opacity', 1);
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.addCommandToHistory(batchCmd);
+        }
+
+        this.setSelectedUnfill = function () {
+            for (let i = 0; i < selectedElements.length; ++i) {
+                elem = selectedElements[i];
+                if (elem == null) {
+                    break;
+                }
+                const availableType = ['rect', 'ellipse', 'path', 'text', 'polygon'];
+                if (elem.tagName === 'path') {
+                    const d = $(elem).attr('d');
+                    const matchM = d.match(/M/ig);
+                    const matchZ = d.match(/z/ig);
+                    if (matchZ && matchM.length === matchZ.length) {
+                        this.setElementUnfill(elem);
+                    } else {
+                        console.log('Not a closed path')
+                    }
+                } else if (availableType.indexOf(elem.tagName) >= 0) {
+                    this.setElementUnfill(elem);
+                } else {
+                    console.log(`Not support type: ${elem.tagName}`)
+                }
+            }
+        }
+
+        this.setElementUnfill = function (elem) {
+            let batchCmd = new svgedit.history.BatchCommand('set unfill');
+            canvas.undoMgr.beginUndoableChange('fill', [elem]);
+            elem.setAttribute('fill', '#FFFFFF');
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.beginUndoableChange('fill-opacity', [elem]);
+            elem.setAttribute('fill-opacity', 0);
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.addCommandToHistory(batchCmd);
+        }
+
         // Function: makeHyperlink
         // Wraps the selected element(s) in an anchor element or converts group to one
         this.makeHyperlink = function (url) {
@@ -8453,6 +8525,9 @@ define([
                     d += solution_paths[i].map(x => `${x.X / scale},${x.Y / scale}`).join(' L');
                     d += ' Z'
                 }
+                const base = selectedElements[len-1];
+                const fill = $(base).attr('fill');
+                const fill_opacity = $(base).attr('fill-opacity');
                 element = addSvgElementFromJson({
                     element: 'path',
                     curStyles: false,
@@ -8460,7 +8535,8 @@ define([
                         id: getNextId(),
                         d: d,
                         stroke: '#000',
-                        'fill-opacity': 0,
+                        fill: fill,
+                        'fill-opacity': fill_opacity,
                         opacity: cur_shape.opacity
                     }
                 });
