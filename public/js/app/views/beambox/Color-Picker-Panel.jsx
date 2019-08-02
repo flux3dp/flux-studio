@@ -45,7 +45,6 @@ define([
 
         renderPickr() {
             const Pickr = require('@simonwep/pickr');
-            console.log($(this.layer).attr('data-color'));
             const origColor = $(this.layer).attr('data-color');
             this.pickr = Pickr.create({
                 el: '.pickr',
@@ -82,10 +81,6 @@ define([
             $(this.layer).attr('data-color', hexColor);
             this.$me.find('div').css('background', hexColor);
             this.unmount();
-        }
-
-        onBlur() {
-            console.log('hi');
         }
 
         unmount() {
