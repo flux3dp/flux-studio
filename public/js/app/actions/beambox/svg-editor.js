@@ -5725,6 +5725,8 @@ define([
                                 if (match) {
                                     let engraveDpi = match[0].substring(18, match[0].length - 1);
                                     BeamboxPreference.write('engrave_dpi', engraveDpi);
+                                } else {
+                                    BeamboxPreference.write('engrave_dpi', 'medium');
                                 }
                             }
                         };
