@@ -8420,7 +8420,8 @@ define([
                     tagNameMap = {
                         'g': LANG.tag.g,
                         'use': LANG.tag.use,
-                        'image': LANG.tag.image
+                        'image': LANG.tag.image,
+                        'text': LANG.tag.text
                     };
                     AlertActions.showPopupError('Boolean Operate', `${LANG.popup.not_support_object_type}: ${tagNameMap[elem.tagName]}`);
                     return;

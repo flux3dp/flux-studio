@@ -1023,6 +1023,7 @@ define(function() {
                 g: 'Group',
                 use: 'Import Svg',
                 image: 'Image',
+                text: 'Text'
             },
             toolbox: {
                 ALIGN_LEFT: 'Align Left',

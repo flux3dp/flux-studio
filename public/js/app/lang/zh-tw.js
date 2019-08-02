@@ -1020,6 +1020,7 @@ define(function() {
                 g: '群組',
                 use: '匯入圖檔',
                 image: '圖片',
+                text: '文字'
             },
             toolbox: {
                 ALIGN_LEFT: '向左靠齊',
