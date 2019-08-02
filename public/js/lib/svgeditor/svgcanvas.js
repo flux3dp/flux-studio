@@ -34,7 +34,8 @@ define([
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox',
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
+    'helpers/shortcuts',
 ], function (
     i18n,
     BeamboxPreference,
@@ -42,7 +43,8 @@ define([
     ObjectPanelsController,
     PreviewModeController,
     BeamboxActions,
-    Constant
+    Constant,
+    shortcuts
 ) {
     const LANG = i18n.lang.beambox;
     // Class: SvgCanvas
@@ -3260,6 +3262,25 @@ define([
                             stretchy.setAttribute('d', ['M', mouse_x, mouse_y, mouse_x, mouse_y].join(' '));
                             index = subpath ? svgedit.path.path.segs.length : 0;
                             svgedit.path.addPointGrip(index, mouse_x, mouse_y);
+                            shortcuts.off(['esc']);
+                            shortcuts.on(['esc'], function() {
+                                id = getId();
+                                svgedit.path.removePath_(id);
+                                let element = svgedit.utilities.getElem(id);
+                                $(stretchy).remove();
+                                drawn_path = null;
+                                started = false;
+
+                                element.setAttribute('opacity', cur_shape.opacity);
+                                element.setAttribute('style', 'pointer-events:inherit');
+                                cleanupElement(element);
+                                pathActions.toEditMode(element);
+                                addCommandToHistory(new svgedit.history.InsertElementCommand(element));
+                                call('changed', [element]);
+
+                                shortcuts.off(['esc']);
+                                shortcuts.on(['esc'], svgEditor.clickSelect);
+                            });
                         } else {
                             // determine if we clicked on an existing point
                             var seglist = drawn_path.pathSegList;
@@ -3291,12 +3312,11 @@ define([
                             // if we clicked on an existing point, then we are done this path, commit it
                             // (i, i+1) are the x,y that were clicked on
                             if (clickOnPoint) {
-                                console.log('hi');
                                 // if clicked on any other point but the first OR
                                 // the first point was clicked on and there are less than 3 points
                                 // then leave the path open
                                 // otherwise, close the path
-                                if (i <= 1 && len >= 2) {
+                                if (i === 0 && len >= 2) {
                                     // Create end segment
                                     var abs_x = seglist.getItem(0).x;
                                     var abs_y = seglist.getItem(0).y;
@@ -3321,7 +3341,7 @@ define([
                                     seglist.appendItem(endseg);
                                 } else if (len < 3) {
                                     keep = false;
-                                    return keep;
+                                    //return keep;
                                 }
                                 $(stretchy).remove();
 
@@ -3390,7 +3410,6 @@ define([
 
                                 // set stretchy line to latest point
                                 stretchy.setAttribute('d', ['M', x, y, x, y].join(' '));
-                                console.log(stretchy);
                                 index = num;
                                 if (subpath) {
                                     index += svgedit.path.path.segs.length;
@@ -8170,7 +8189,6 @@ define([
                 case 'path':
                 case 'use':
                     let realLocation = this.getSvgRealLocation(elem);
-                    console.log(realLocation);
                     centerX = realLocation.x + realLocation.width/2 ;
                     centerY = realLocation.y + realLocation.height/2 ;
                     break;
@@ -8199,7 +8217,6 @@ define([
                 const elem = realSelectedElements[i];
 
                 let centerX = this.getCenter(elem).x;
-                console.log(centerX);
                 centerXs[i] = centerX;
                 if (centerX < minX) {
                     minX = centerX;
