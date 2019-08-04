@@ -127,14 +127,16 @@ backendManager.start();
 function createWindow () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: 1024, height: 768,
+        width: 1024,
+        height: 768,
         title: `FLUX Studio - ${app.getVersion()}`,
         webPreferences: {
-            preload: path.join(__dirname, 'src', 'main-window-entry.js')
+            preload: path.join(__dirname, 'src', 'main-window-entry.js'),
+            nodeIntegration: true
         },
         vibrancy: 'light'});
 
-    mainWindow.maximize();
+    // mainWindow.maximize();
 
     mainWindow.loadURL(url.format({
         pathname: path.join(__dirname, 'public/index.html'),
@@ -336,21 +338,13 @@ ipcMain.on(events.REQUEST_PATH_D_OF_TEXT , async (event, {text, x, y, fontFamily
 
 console.log('Running FLUX Studio on ', os.arch());
 
-if  (os.arch() == 'ia32' || os.arch() == 'x32') {
+if (os.arch() == 'ia32' || os.arch() == 'x32') {
     app.commandLine.appendSwitch('js-flags', '--max-old-space-size=2048');
 } else {
     app.commandLine.appendSwitch('js-flags', '--max-old-space-size=4096');
 }
 
 app.on('ready', () => {
-    app.makeSingleInstance((commandLine, workingDirectory) => {
-        if(mainWindow === null) {
-            createWindow();
-        } else {
-            mainWindow.focus();
-        }
-    });
-
     menuManager = new MenuManager();
     menuManager.on(events.MENU_CLICK, (data) => {
         if(mainWindow) {
@@ -359,7 +353,15 @@ app.on('ready', () => {
             console.log('Menu event triggered but window does not exist.');
         }
     });
-    createWindow();
+
+    if (app.requestSingleInstanceLock()) {
+        if(!mainWindow) {
+            createWindow();
+        } else {
+            console.log("MainWindow instance", mainWindow);
+            mainWindow.focus();
+        }
+    };
 });
 
 
