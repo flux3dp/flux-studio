@@ -75,7 +75,7 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.flux3dp.flux-studio",
+    "appId": "com.flux3dp.beam-studio",
     "extraResources": [
       "backend"
     ],
