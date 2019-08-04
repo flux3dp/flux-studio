@@ -30,11 +30,13 @@ define([
     'app/actions/beambox/preview-mode-controller',
     'jsx!app/actions/announcement',
     'jsx!app/views/beambox/DxfDpiSelector',
+    'jsx!app/views/beambox/Color-Picker-Panel',
     'app/actions/alert-actions',
     'app/actions/topbar',
     'helpers/image-data',
     'helpers/shortcuts',
     'helpers/i18n',
+    'app/actions/beambox/beambox-preference',
     'app/actions/beambox/constant',
     'helpers/dxf2svg',
     'app/constants/keycode-constants',
@@ -47,11 +49,13 @@ define([
     PreviewModeController,
     Announcement,
     DxfDpiSelector,
+    ColorPickerPanel,
     AlertActions,
     TopbarActions,
     ImageData,
     Shortcuts,
     i18n,
+    BeamboxPreference,
     Constant,
     Dxf2Svg,
     KeycodeConstants,
@@ -1080,6 +1084,15 @@ define([
                     var vis = $(this).hasClass('layerinvis');
                     svgCanvas.setLayerVisibility(name, vis);
                     $(this).toggleClass('layerinvis');
+                });
+
+                $('#layerlist td.layercolor').click(function (e) {
+                    const layerName = $(this).parent().find('.layername').text();
+                    const layer = drawing.getLayerByName(layerName);
+                    ColorPickerPanel.init('color_picker_placeholder', layer, $(this));
+                    ColorPickerPanel.setPosition(e.clientX, e.clientY)
+                    ColorPickerPanel.render();
+                    ColorPickerPanel.renderPickr();
                 });
 
                 // if there were too few rows, let's add a few to make it not so lonely
@@ -5678,7 +5691,6 @@ define([
                         reader.onloadend = (evt) => {
                             let str = evt.target.result;
                             editor.loadFromString(str.replace(/STYLE>/g, 'style>'));
-
                             // loadFromString will lose data-xform and data-wireframe of `use` so set it back here
                             if (typeof(str) === 'string') {
                                 let tmp = str.substr(str.indexOf('<use')).split('<use');
@@ -5700,6 +5712,21 @@ define([
                                     elem = document.getElementById(id);
                                     elem.setAttribute('data-xform', xform);
                                     elem.setAttribute('data-wireframe', wireframe === 'true');
+                                }
+                                match = str.match(/data-rotary_mode="[a-zA-Z]+"/);
+                                if (match) {
+                                    let rotaryMode = match[0].substring(18, match[0].length - 1);
+                                    rotaryMode = rotaryMode === 'true';
+                                    svgCanvas.setRotaryMode(rotaryMode);
+                                    svgCanvas.runExtensions('updateRotaryAxis');
+                                    BeamboxPreference.write('rotary_mode', rotaryMode);
+                                }
+                                match = str.match(/data-engrave_dpi="[a-zA-Z]+"/);
+                                if (match) {
+                                    let engraveDpi = match[0].substring(18, match[0].length - 1);
+                                    BeamboxPreference.write('engrave_dpi', engraveDpi);
+                                } else {
+                                    BeamboxPreference.write('engrave_dpi', 'medium');
                                 }
                             }
                         };

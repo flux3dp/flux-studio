@@ -1716,7 +1716,8 @@
         acc += point[0] + ',' + point[1];
         return acc;
       }, '');
-      return `<path fill="transparent" stroke="#000" stroke-width="1px" d="${d}"/>`;
+
+      return `<path fill="transparent" stroke="#000" stroke-width="1px" vector-effect="non-scaling-stroke" d="${d}"/>`;
     };
 
     /**

@@ -1023,6 +1023,7 @@ define(function() {
                 g: 'Group',
                 use: 'Import Svg',
                 image: 'Image',
+                text: 'Text'
             },
             toolbox: {
                 ALIGN_LEFT: 'Align Left',
@@ -1169,6 +1170,20 @@ define(function() {
                 threshold: 'Threshold',
                 okay: 'Okay',
                 tuning: 'Parameters'
+            },
+            photo_edit_panel: {
+                apply: 'Apply',
+                back: 'Back',
+                cancel: 'Cancel',
+                next: 'Next',
+                sharpen: 'Sharpen',
+                sharpen_radius: 'Radius (px)',
+                crop: 'Crop',
+                start: 'Start',
+                processing: 'Processing',
+                invert: 'Invert Color',
+                okay: 'Okay',
+                phote_edit: 'Photo Edit'
             },
             object_panels: {
                 position: 'Position',

@@ -9,6 +9,7 @@ define([
     'jsx!views/beambox/Object-Panels/EllipseRadius',
     'jsx!views/beambox/Object-Panels/RectRoundedCorner',
     'jsx!views/beambox/Object-Panels/Line',
+    'jsx!views/beambox/Object-Panels/Fill',
     'jsx!views/beambox/Object-Panels/Text',
     'jsx!views/beambox/Object-Panels/ShadingThreshold'
 ], function(
@@ -22,16 +23,17 @@ define([
     EllipseRadiusPanel,
     RectRoundedCorner,
     LinePanel,
+    FillPanel,
     TextPanel,
     ShadingThresholdPanel
 ) {
 
     const validPanelsMap = {
         'unknown':  [],
-        'path':     ['position', 'size', 'rotation'],
-        'polygon':     ['position', 'size', 'rotation'],
-        'rect':     ['position', 'size', 'rotation', 'rectRoundedCorner'],
-        'ellipse':  ['ellipsePosition', 'ellipseRadius', 'rotation'],
+        'path':     ['position', 'size', 'fill', 'rotation'],
+        'polygon':     ['position', 'size', 'fill', 'rotation'],
+        'rect':     ['position', 'size', 'fill', 'rotation', 'rectRoundedCorner'],
+        'ellipse':  ['ellipsePosition', 'ellipseRadius', 'fill', 'rotation'],
         'line':     ['line', 'rotation'],
         'image':    ['position', 'size', 'rotation', 'shadingThreshold'],
         'text':     ['rotation', 'text'],
@@ -64,6 +66,7 @@ define([
                     case 'ellipseRadius':       panel = <EllipseRadiusPanel key={panelName} {...data.ellipseRadius}/>; break;
                     case 'rectRoundedCorner':   panel = <RectRoundedCorner key={panelName} {...data.rectRoundedCorner}/>; break;
                     case 'line':                panel = <LinePanel key={panelName} {...data.line}/>; break;
+                    case 'fill':                panel = <FillPanel key={panelName} $me={$me} type={type}/>; break;
                     case 'shadingThreshold':    panel = <ShadingThresholdPanel key={panelName} {...data.image} $me={$me}/>; break;
                     case 'text':                panel = <TextPanel key={panelName} {...(data.font)} $me={$me}/>; break;
                 }

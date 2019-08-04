@@ -1,0 +1,109 @@
+.color-picker-panel {
+    z-index: 2;
+    right: 0px;
+    position: fixed;
+    width: 200px;
+    height: 250px;
+    background: white;
+    box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+    .pcr-button {
+        display: none;
+    }
+    .pcr-app {
+        width: 100%;
+        height: calc(100% - 40px);
+        padding: 10px;
+        .pcr-picker {
+            border-style: solid;
+            border-color: #FFF;
+            border-radius: 100%;
+            border-width: 2px;
+            height: 18px;
+            width: 18px;
+            position: absolute;
+        }
+        .pcr-selection {
+            width: 100%;
+            height: 200px;
+            padding-bottom: 5px;
+            .pcr-color-preview {
+                width: 100%;
+                height: 20px;
+                margin-bottom: 5px;
+                .pcr-last-color {
+                    border-radius: 3px 0px 0px 3px;
+                    margin: 0px;
+                    padding: 0px;
+                    border: 0px;
+                    background: currentColor;
+                    float: left;
+                    width: 90px;
+                    height: 20px;
+                }
+                .pcr-current-color {
+                    border-radius: 0px 3px 3px 0px;
+                    background: currentColor;
+                    float: left;
+                    width: 90px;
+                    height: 20px;
+                }
+            }
+            .pcr-color-palette {
+                width: 180px;
+                height: 150px;
+                position: absolute;
+                .pcr-palette {
+                    height: 100%;
+                    border-radius: 3px;
+                }
+            }
+            .pcr-color-chooser {
+                position: absolute;
+                margin-top: 10px;
+                top: 180px;
+                height: 8px;
+                width: 180px;
+                .pcr-slider {
+                    height: 8px;
+                }
+                .pcr-picker {
+                    height: 12px;
+                    width: 12px;
+                    top: -2px;
+                }
+                .pcr-hue {
+                    background-image: linear-gradient(90deg, red, rgb(255, 255, 0), rgb(0, 255, 0), rgb(0, 255, 255), rgb(0, 0, 255), rgb(255, 0, 255), red);
+                    border-radius: 3px;
+                }
+            }
+        }
+        .pcr-interaction {
+            .pcr-result {
+                border-style: solid;
+                padding: 5px;
+                border-color: (192, 192, 192);
+                border-radius: 2px;
+                width: 70px;
+                height: 30px;
+                line-height: 25px;
+                border-width: 2px;
+            }
+        }
+    }
+    .footer {
+        height: 40px;
+        padding: 0px 10px 5px 10px;
+        .btn {
+            height: 30px;
+            line-height: 30px;
+        }
+    }
+    .modal-background {
+        z-index: -1;
+        top: 0px;
+        left: 0px;
+        position: fixed;
+        height: 100%;
+        width: 100%;
+    }
+}

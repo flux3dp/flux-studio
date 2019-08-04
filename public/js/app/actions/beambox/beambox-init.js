@@ -2,24 +2,30 @@ define([
     'helpers/api/config',
     'app/actions/beambox/beambox-preference',
     'app/actions/beambox/constant',
+    'jsx!app/actions/beambox/Advanced-Panel-Controller',
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'jsx!app/actions/beambox/Tool-Panels-Controller',
     'jsx!app/actions/beambox/Laser-Panel-Controller',
-    'jsx!app/actions/beambox/Image-Trace-Panel-Controller'
+    'jsx!app/actions/beambox/Image-Trace-Panel-Controller',
+    'jsx!app/actions/beambox/Photo-Edit-Panel-Controller'
 ], function (
     ConfigHelper,
     BeamboxPreference,
     Constant,
+    AdvancedPanelController,
     ObjectPanelsController,
     ToolPanelsController,
     LaserPanelController,
-    ImageTracePanelController
+    ImageTracePanelController,
+    PhotoEditPanelController
 ) {
     const init = () => {
+        AdvancedPanelController.init('advanced-panel-placeholder');
         ObjectPanelsController.init('object-panels-placeholder');
         ToolPanelsController.init('tool-panels-placeholder');
         LaserPanelController.init('layer-laser-panel-placeholder');
         ImageTracePanelController.init('image-trace-panel-placeholder');
+        PhotoEditPanelController.init('photo-edit-panel-placeholder');
     };
 
     const displayGuides = () => {

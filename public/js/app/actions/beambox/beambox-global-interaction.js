@@ -54,22 +54,23 @@ define([
                 'EXPORT_FLUX_TASK': () => BottomRightFuncs.exportFcode(),
                 'UNDO': () => FnWrapper.undo(),
                 'DUPLICATE': () => FnWrapper.cloneSelectedElement(),
-                'ROTATE': () => {},
-                'SCALE': () => {},
-                'RESET': () => {},
-                'ALIGN_CENTER': () => {},
+                'PHOTO_EDIT': () => FnWrapper.photoEdit(),
+                'DOCUMENT_SETTING': () => FnWrapper.openAdvancedPanel(),
                 'CLEAR_SCENE': () => {window.svgEditorClearScene()},
                 'TUTORIAL': () => {}
             };
         }
         attach() {
-            super.attach(['IMPORT', 'SAVE_SCENE', 'UNDO', 'EXPORT_FLUX_TASK', 'CLEAR_SCENE']);
+            super.attach(['IMPORT', 'SAVE_SCENE', 'UNDO', 'EXPORT_FLUX_TASK', 'DOCUMENT_SETTING', 'CLEAR_SCENE']);
         }
         onObjectFocus() {
             this.enableMenuItems(['DUPLICATE']);
+            if (svgCanvas.getSelectedElems()[0].tagName ==='image') {
+                this.enableMenuItems(['PHOTO_EDIT']);
+            }
         }
         onObjectBlur() {
-            this.disableMenuItems(['DUPLICATE']);
+            this.disableMenuItems(['DUPLICATE', 'PHOTO_EDIT']);
         }
     }
     const instance = new BeamboxGlobalInteraction();

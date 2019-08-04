@@ -34,7 +34,8 @@ define([
     'jsx!app/actions/beambox/Object-Panels-Controller',
     'app/actions/beambox/preview-mode-controller',
     'app/actions/beambox',
-    'app/actions/beambox/constant'
+    'app/actions/beambox/constant',
+    'helpers/shortcuts',
 ], function (
     i18n,
     BeamboxPreference,
@@ -42,7 +43,8 @@ define([
     ObjectPanelsController,
     PreviewModeController,
     BeamboxActions,
-    Constant
+    Constant,
+    shortcuts
 ) {
     const LANG = i18n.lang.beambox;
     // Class: SvgCanvas
@@ -3260,6 +3262,25 @@ define([
                             stretchy.setAttribute('d', ['M', mouse_x, mouse_y, mouse_x, mouse_y].join(' '));
                             index = subpath ? svgedit.path.path.segs.length : 0;
                             svgedit.path.addPointGrip(index, mouse_x, mouse_y);
+                            shortcuts.off(['esc']);
+                            shortcuts.on(['esc'], function() {
+                                id = getId();
+                                svgedit.path.removePath_(id);
+                                let element = svgedit.utilities.getElem(id);
+                                $(stretchy).remove();
+                                drawn_path = null;
+                                started = false;
+
+                                element.setAttribute('opacity', cur_shape.opacity);
+                                element.setAttribute('style', 'pointer-events:inherit');
+                                cleanupElement(element);
+                                pathActions.toEditMode(element);
+                                addCommandToHistory(new svgedit.history.InsertElementCommand(element));
+                                call('changed', [element]);
+
+                                shortcuts.off(['esc']);
+                                shortcuts.on(['esc'], svgEditor.clickSelect);
+                            });
                         } else {
                             // determine if we clicked on an existing point
                             var seglist = drawn_path.pathSegList;
@@ -3291,12 +3312,11 @@ define([
                             // if we clicked on an existing point, then we are done this path, commit it
                             // (i, i+1) are the x,y that were clicked on
                             if (clickOnPoint) {
-                                console.log('hi');
                                 // if clicked on any other point but the first OR
                                 // the first point was clicked on and there are less than 3 points
                                 // then leave the path open
                                 // otherwise, close the path
-                                if (i <= 1 && len >= 2) {
+                                if (i === 0 && len >= 2) {
                                     // Create end segment
                                     var abs_x = seglist.getItem(0).x;
                                     var abs_y = seglist.getItem(0).y;
@@ -3321,7 +3341,7 @@ define([
                                     seglist.appendItem(endseg);
                                 } else if (len < 3) {
                                     keep = false;
-                                    return keep;
+                                    //return keep;
                                 }
                                 $(stretchy).remove();
 
@@ -3390,7 +3410,6 @@ define([
 
                                 // set stretchy line to latest point
                                 stretchy.setAttribute('d', ['M', x, y, x, y].join(' '));
-                                console.log(stretchy);
                                 index = num;
                                 if (subpath) {
                                     index += svgedit.path.path.segs.length;
@@ -4179,6 +4198,10 @@ define([
                     $(this).replaceWith(svg);
                 }
             });
+            engraveDpi= BeamboxPreference.read('engrave_dpi');
+            rotaryMode= BeamboxPreference.read('rotary_mode');
+            svgcontent.setAttribute('data-engrave_dpi', engraveDpi);
+            svgcontent.setAttribute('data-rotary_mode', rotaryMode);
             var output = this.svgToString(svgcontent, 0);
 
             // Rewrap gsvg
@@ -5177,7 +5200,11 @@ define([
                             wrappedSymbolContent.appendChild(content);
                         });
                     } else {
-                        wrappedSymbolContent.appendChild(symbolContents);
+                        try {
+                            wrappedSymbolContent.appendChild(symbolContents);
+                        } catch (e) {
+                            console.log(e);
+                        }
                     }
                     wrappedSymbolContent.setAttribute('viewBox', rootViewBox);
                     wrappedSymbolContent.setAttribute('transform', transformList.join(' '));
@@ -5541,10 +5568,10 @@ define([
                 symbol.setAttribute(attr.nodeName, attr.value);
             }
             symbol.id = getNextId();
-            if (elem.firstChild.id) {
+            if (elem.firstChild && elem.firstChild.id) {
                 symbol.setAttribute('data-id', elem.firstChild.id);
             }
-            if (elem.firstChild.getAttribute('data-color')) {
+            if (elem.firstChild && elem.firstChild.getAttribute('data-color')) {
                 symbol.setAttribute('data-color', elem.firstChild.getAttribute('data-color'));
             }
 
@@ -7119,6 +7146,78 @@ define([
             }
         };
 
+        this.setSelectedFill = function () {
+            for (let i = 0; i < selectedElements.length; ++i) {
+                elem = selectedElements[i];
+                if (elem == null) {
+                    break;
+                }
+                const availableType = ['rect', 'ellipse', 'path', 'text', 'polygon'];
+                if (elem.tagName === 'path') {
+                    const d = $(elem).attr('d');
+                    const matchM = d.match(/M/ig);
+                    const matchZ = d.match(/z/ig);
+                    if (matchZ && matchM.length === matchZ.length) {
+                        const color = $(elem).attr('stroke');
+                        this.setElementFill(elem, color);
+                    } else {
+                        console.log('Not a closed path')
+                    }
+                } else if (availableType.indexOf(elem.tagName) >= 0) {
+                    const color = $(elem).attr('stroke');
+                    this.setElementFill(elem, color);
+                } else {
+                    console.log(`Not support type: ${elem.tagName}`)
+                }
+            }
+        }
+
+        this.setElementFill = function (elem, color) {
+            let batchCmd = new svgedit.history.BatchCommand('set fill');
+            canvas.undoMgr.beginUndoableChange('fill', [elem]);
+            elem.setAttribute('fill', color);
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.beginUndoableChange('fill-opacity', [elem]);
+            elem.setAttribute('fill-opacity', 1);
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.addCommandToHistory(batchCmd);
+        }
+
+        this.setSelectedUnfill = function () {
+            for (let i = 0; i < selectedElements.length; ++i) {
+                elem = selectedElements[i];
+                if (elem == null) {
+                    break;
+                }
+                const availableType = ['rect', 'ellipse', 'path', 'text', 'polygon'];
+                if (elem.tagName === 'path') {
+                    const d = $(elem).attr('d');
+                    const matchM = d.match(/M/ig);
+                    const matchZ = d.match(/z/ig);
+                    if (matchZ && matchM.length === matchZ.length) {
+                        this.setElementUnfill(elem);
+                    } else {
+                        console.log('Not a closed path')
+                    }
+                } else if (availableType.indexOf(elem.tagName) >= 0) {
+                    this.setElementUnfill(elem);
+                } else {
+                    console.log(`Not support type: ${elem.tagName}`)
+                }
+            }
+        }
+
+        this.setElementUnfill = function (elem) {
+            let batchCmd = new svgedit.history.BatchCommand('set unfill');
+            canvas.undoMgr.beginUndoableChange('fill', [elem]);
+            elem.setAttribute('fill', '#FFFFFF');
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.beginUndoableChange('fill-opacity', [elem]);
+            elem.setAttribute('fill-opacity', 0);
+            batchCmd.addSubCommand(canvas.undoMgr.finishUndoableChange());
+            canvas.undoMgr.addCommandToHistory(batchCmd);
+        }
+
         // Function: makeHyperlink
         // Wraps the selected element(s) in an anchor element or converts group to one
         this.makeHyperlink = function (url) {
@@ -8162,7 +8261,6 @@ define([
                 case 'path':
                 case 'use':
                     let realLocation = this.getSvgRealLocation(elem);
-                    console.log(realLocation);
                     centerX = realLocation.x + realLocation.width/2 ;
                     centerY = realLocation.y + realLocation.height/2 ;
                     break;
@@ -8191,7 +8289,6 @@ define([
                 const elem = realSelectedElements[i];
 
                 let centerX = this.getCenter(elem).x;
-                console.log(centerX);
                 centerXs[i] = centerX;
                 if (centerX < minX) {
                     minX = centerX;
@@ -8395,7 +8492,8 @@ define([
                     tagNameMap = {
                         'g': LANG.tag.g,
                         'use': LANG.tag.use,
-                        'image': LANG.tag.image
+                        'image': LANG.tag.image,
+                        'text': LANG.tag.text
                     };
                     AlertActions.showPopupError('Boolean Operate', `${LANG.popup.not_support_object_type}: ${tagNameMap[elem.tagName]}`);
                     return;
@@ -8427,6 +8525,9 @@ define([
                     d += solution_paths[i].map(x => `${x.X / scale},${x.Y / scale}`).join(' L');
                     d += ' Z'
                 }
+                const base = selectedElements[len-1];
+                const fill = $(base).attr('fill');
+                const fill_opacity = $(base).attr('fill-opacity');
                 element = addSvgElementFromJson({
                     element: 'path',
                     curStyles: false,
@@ -8434,7 +8535,8 @@ define([
                         id: getNextId(),
                         d: d,
                         stroke: '#000',
-                        'fill-opacity': 0,
+                        fill: fill,
+                        'fill-opacity': fill_opacity,
                         opacity: cur_shape.opacity
                     }
                 });

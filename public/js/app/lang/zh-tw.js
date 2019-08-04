@@ -1020,6 +1020,7 @@ define(function() {
                 g: '群組',
                 use: '匯入圖檔',
                 image: '圖片',
+                text: '文字'
             },
             toolbox: {
                 ALIGN_LEFT: '向左靠齊',
@@ -1166,6 +1167,20 @@ define(function() {
                 threshold: '閾值',
                 okay: '完成',
                 tuning: '描圖參數'
+            },
+            photo_edit_panel: {
+                apply: '套用',
+                back: '上一步',
+                cancel: '取消',
+                next: '下一步',
+                sharpen: '銳化',
+                sharpen_radius: '半徑 (px)',
+                crop: '裁剪',
+                start: '開始',
+                processing: '處理中',
+                invert: '色彩反轉',
+                okay: '完成',
+                phote_edit: '影像編輯'
             },
             object_panels: {
                 position: '位置',

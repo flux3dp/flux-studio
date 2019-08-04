@@ -87,7 +87,7 @@ define([
 
         render() {
             return (
-                <Modal onClose={() => this.props.onClose()}>
+                <Modal onClose={() => this.props.unmount()}>
                     <div className='advanced-panel'>
                         <section className='main-content'>
                             <div className='title'>{LANG.engrave_parameters}</div>
@@ -105,14 +105,14 @@ define([
                         <section className='footer'>
                             <button
                                 className='btn btn-default pull-right'
-                                onClick={() => this.props.onClose()}
+                                onClick={() => this.props.unmount()}
                             >{LANG.cancel}
                             </button>
                             <button
                                 className='btn btn-default pull-right'
                                 onClick={() => {
                                     this.save();
-                                    this.props.onClose();
+                                    this.props.unmount();
                                 }}
                             >{LANG.save}
                             </button>

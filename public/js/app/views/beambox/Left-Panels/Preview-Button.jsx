@@ -65,7 +65,10 @@ define([
             BeamboxStore.onStartDrawingPreviewBlob(() => this.startDrawing());
             BeamboxStore.onEndDrawingPreviewBlob(() => this.endDrawing());
             BeamboxStore.onClearCameraCanvas(() => this.hideImageTraceButton());
-            BeamboxStore.onEndImageTrace(() => this.endImageTrace());
+            BeamboxStore.onEndImageTrace(() => {
+                this.endImageTrace();
+                this.endPreviewMode();
+            });
             BeamboxStore.onResetPreviewButton(() => this.resetPreviewButton());
         }
 
