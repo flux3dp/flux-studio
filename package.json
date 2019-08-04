@@ -87,7 +87,7 @@
       }
     ],
     "mac": {
-      "category": "com.flux3dp.flux-studio",
+      "category": "com.flux3dp.beam-studio",
       "target": "dmg",
       "icon": "public/logo.icns"
     },
