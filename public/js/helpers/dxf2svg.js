@@ -1740,13 +1740,16 @@
       var paths = [];
       polylines.forEach(function (polyline, i) {
         var entity = entities[i];
-        var layerTable = parsed.tables.layers[entity.layer];
-        if (!layerTable) {
-          throw new Error('no layer table for layer:' + entity.layer);
+        var layerTable = null;
+
+        try {
+            var layerTable = parsed.tables.layers[entity.layer];
+        } catch (e) {
+            console.log('no layer table for layer:', e);
         }
 
         // TODO: not sure if this prioritization is good (entity color first, layer color as fallback)
-        var colorNumber = 'colorNumber' in entity ? entity.colorNumber : layerTable.colorNumber;
+        var colorNumber = 'colorNumber' in entity ? entity.colorNumber : (layerTable ? layerTable.colorNumber : 0);
         var rgb = _colors2.default[colorNumber];
         if (rgb === undefined) {
           _logger2.default.warn('Color index', colorNumber, 'invalid, defaulting to black');
